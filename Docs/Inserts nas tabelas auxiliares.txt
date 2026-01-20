@@ -1,0 +1,27 @@
+Categorias:
+
+Estofado
+Cadeira
+Chaise
+Poltrona
+Cama
+Almofada
+Puff
+
+Modelos:
+Daybed fixa (144)
+Daybed Giratória (144)
+Daybed fixa (164)
+Daybed giratória (164)
+
+Tecidos:
+
+G0
+G1
+G2
+G3
+G4
+G5
+G6
+G7
+G8
