@@ -12,15 +12,15 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260119234706_Initial")]
-    partial class Initial
+    [Migration("20260120150733_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.15")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -29,61 +29,72 @@ namespace Pi.Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("ativo");
 
                     b.Property<DateTimeOffset>("AtualizadoEm")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("atualizado_em");
 
                     b.Property<string>("CargoFuncao")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("cargo_funcao");
 
                     b.Property<string>("Cep")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("cep");
 
                     b.Property<string>("Cidade")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("cidade");
 
                     b.Property<DateTimeOffset>("CriadoEm")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("criado_em");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<string>("Empresa")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("empresa");
 
                     b.Property<string>("Endereco")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("endereco");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("nome");
 
                     b.Property<string>("Observacoes")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("observacoes");
 
                     b.Property<string>("Pais")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("pais");
 
                     b.Property<string>("PessoaContato")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("pessoa_contato");
 
                     b.Property<string>("Telefone")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("telefone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Email");
-
-                    b.HasIndex("Nome");
 
                     b.ToTable("clientes", (string)null);
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.Pi", b =>
+            modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -107,8 +118,7 @@ namespace Pi.Api.Migrations
 
                     b.Property<string>("Prefixo")
                         .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("character varying(7)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -137,35 +147,44 @@ namespace Pi.Api.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.HasIndex("Numero")
-                        .IsUnique();
-
                     b.ToTable("pis", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiSequencia", b =>
                 {
-                    b.Property<string>("Prefixo")
-                        .HasMaxLength(7)
-                        .HasColumnType("character varying(7)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<int>("Ano")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("ano");
+
+                    b.Property<string>("Prefixo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("prefixo");
 
                     b.Property<int>("UltimoNumero")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("ultimo_numero");
 
-                    b.HasKey("Prefixo", "Ano");
+                    b.HasKey("Id");
 
-                    b.ToTable("pi_sequencia", (string)null);
+                    b.HasIndex("Prefixo", "Ano")
+                        .IsUnique()
+                        .HasDatabaseName("uq_pi_sequencias_prefixo_ano");
+
+                    b.ToTable("pi_sequencias", (string)null);
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.Pi", b =>
+            modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
                 {
                     b.HasOne("Pi.Api.Models.Cliente", "Cliente")
                         .WithMany()
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cliente");

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Pi.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,38 +15,39 @@ namespace Pi.Api.Migrations
                 name: "clientes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Nome = table.Column<string>(type: "text", nullable: false),
-                    Empresa = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    Telefone = table.Column<string>(type: "text", nullable: true),
-                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
-                    Pais = table.Column<string>(type: "text", nullable: true),
-                    Cidade = table.Column<string>(type: "text", nullable: true),
-                    Endereco = table.Column<string>(type: "text", nullable: true),
-                    Cep = table.Column<string>(type: "text", nullable: true),
-                    PessoaContato = table.Column<string>(type: "text", nullable: true),
-                    CargoFuncao = table.Column<string>(type: "text", nullable: true),
-                    Observacoes = table.Column<string>(type: "text", nullable: true),
-                    CriadoEm = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    AtualizadoEm = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    nome = table.Column<string>(type: "text", nullable: false),
+                    empresa = table.Column<string>(type: "text", nullable: true),
+                    email = table.Column<string>(type: "text", nullable: true),
+                    telefone = table.Column<string>(type: "text", nullable: true),
+                    ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    pais = table.Column<string>(type: "text", nullable: true),
+                    cidade = table.Column<string>(type: "text", nullable: true),
+                    endereco = table.Column<string>(type: "text", nullable: true),
+                    cep = table.Column<string>(type: "text", nullable: true),
+                    pessoa_contato = table.Column<string>(type: "text", nullable: true),
+                    cargo_funcao = table.Column<string>(type: "text", nullable: true),
+                    observacoes = table.Column<string>(type: "text", nullable: true),
+                    criado_em = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    atualizado_em = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_clientes", x => x.Id);
+                    table.PrimaryKey("PK_clientes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "pi_sequencia",
+                name: "pi_sequencias",
                 columns: table => new
                 {
-                    Prefixo = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
-                    Ano = table.Column<int>(type: "integer", nullable: false),
-                    UltimoNumero = table.Column<int>(type: "integer", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    prefixo = table.Column<string>(type: "text", nullable: false),
+                    ano = table.Column<int>(type: "integer", nullable: false),
+                    ultimo_numero = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_pi_sequencia", x => new { x.Prefixo, x.Ano });
+                    table.PrimaryKey("PK_pi_sequencias", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,7 +56,7 @@ namespace Pi.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Numero = table.Column<string>(type: "text", nullable: false),
-                    Prefixo = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
+                    Prefixo = table.Column<string>(type: "text", nullable: false),
                     DataPi = table.Column<DateOnly>(type: "date", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     ClienteId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -75,37 +76,27 @@ namespace Pi.Api.Migrations
                         name: "FK_pis_clientes_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_clientes_Email",
-                table: "clientes",
-                column: "Email");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_clientes_Nome",
-                table: "clientes",
-                column: "Nome");
+                name: "uq_pi_sequencias_prefixo_ano",
+                table: "pi_sequencias",
+                columns: new[] { "prefixo", "ano" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_pis_ClienteId",
                 table: "pis",
                 column: "ClienteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_pis_Numero",
-                table: "pis",
-                column: "Numero",
-                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "pi_sequencia");
+                name: "pi_sequencias");
 
             migrationBuilder.DropTable(
                 name: "pis");
