@@ -17,7 +17,21 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<Cliente>().ToTable("clientes");
         modelBuilder.Entity<PiModel>().ToTable("pis");
-        modelBuilder.Entity<PiSequencia>().ToTable("pi_sequencias");
+        modelBuilder.Entity<PiSequencia>(e =>
+        {
+            e.ToTable("pi_sequencias");
+
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Prefixo).HasColumnName("prefixo");
+            e.Property(x => x.Ano).HasColumnName("ano");
+            e.Property(x => x.UltimoNumero).HasColumnName("ultimo_numero");
+
+            e.HasIndex(x => new { x.Prefixo, x.Ano })
+             .IsUnique()
+             .HasDatabaseName("uq_pi_sequencias_prefixo_ano");
+        });
 
         base.OnModelCreating(modelBuilder);
     }

@@ -1,3 +1,4 @@
+
 -- Extensões úteis
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
@@ -233,4 +234,19 @@ CREATE TABLE IF NOT EXISTS pi_sequencia (
 ALTER TABLE pis
   ADD COLUMN IF NOT EXISTS prefixo TEXT;
 
--- (Se a tabela pis ainda não existe no seu banco, isso vai no CREATE TABLE)
+-- PostgreSQL
+CREATE TABLE IF NOT EXISTS pi_sequencias (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  prefixo       varchar(20) NOT NULL,
+  ano           integer     NOT NULL,
+  ultimo_numero integer     NOT NULL DEFAULT 0,
+
+  CONSTRAINT uq_pi_sequencias_prefixo_ano UNIQUE (prefixo, ano),
+  CONSTRAINT ck_pi_sequencias_ano CHECK (ano >= 1900 AND ano <= 3000),
+  CONSTRAINT ck_pi_sequencias_ultimo_numero CHECK (ultimo_numero >= 0)
+);
+
+-- Índice extra (opcional): já existe via UNIQUE, então normalmente não precisa.
+-- CREATE INDEX IF NOT EXISTS ix_pi_sequencias_prefixo_ano ON pi_sequencias(prefixo, ano);
+
+  
