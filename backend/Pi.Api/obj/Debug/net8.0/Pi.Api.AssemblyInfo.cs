@@ -13,15 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pi.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9a59107cdf1dd68a59277220f8a7d7b90ea70fc6")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+57f16672c9488f27e4deaf0f1c970ee867f9e981")]
->>>>>>> paulo.takeda
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a1671cc8f85e56af118f2a9634bc621b2c3f196")]
->>>>>>> paulo.takeda
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+87792e774e25505bcbad33b2f17bf6c9bc884937")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pi.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pi.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
