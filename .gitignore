@@ -1,1 +1,1 @@
-Add-Content -Path ".gitignore" -Value "`n# Ignorar migrations do Pi.Api`nbackend/Pi.Api/Migrations/`n"
+
