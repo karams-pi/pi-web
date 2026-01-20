@@ -173,6 +173,13 @@ export default function ClientesPage() {
               <th style={th}>Empresa</th>
               <th style={th}>E-mail</th>
               <th style={th}>Telefone</th>
+              <th style={th}>País</th>
+              <th style={th}>Cidade</th>
+              <th style={th}>Endereço</th>
+              <th style={th}>CEP</th>
+              <th style={th}>Contato</th>
+              <th style={th}>Cargo</th>
+              <th style={th}>Obs.</th>
               <th style={th}>Ativo</th>
               <th style={th}>Ações</th>
             </tr>
@@ -184,6 +191,16 @@ export default function ClientesPage() {
                 <td style={td}>{c.empresa || '-'}</td>
                 <td style={td}>{c.email || '-'}</td>
                 <td style={td}>{c.telefone || '-'}</td>
+                <td style={td}>{c.pais || "-"}</td>
+                <td style={td}>{c.cidade || "-"}</td>
+                <td style={td}>{c.endereco || "-"}</td>
+                <td style={td}>{c.cep || "-"}</td>
+                <td style={td}>{c.pessoaContato || "-"}</td>
+                <td style={td}>{c.cargoFuncao || "-"}</td>
+                <td style={td} title={c.observacoes || ""}>
+                  {(c.observacoes || "-").slice(0, 24)}
+                  {(c.observacoes?.length ?? 0) > 24 ? "…" : ""}
+                </td>
                 <td style={td}>{c.ativo ? 'Sim' : 'Não'}</td>
                 <td style={td}>
                   <button onClick={() => openEdit(c)}>Editar</button>{' '}
@@ -266,6 +283,65 @@ export default function ClientesPage() {
                 />
               </label>
               <label>
+                País{" "}
+                <input
+                  value={form.pais || ""}
+                  onChange={(e) => setForm({ ...form, pais: e.target.value })}
+                />
+              </label>
+
+              <label>
+                Cidade{" "}
+                <input
+                  value={form.cidade || ""}
+                  onChange={(e) => setForm({ ...form, cidade: e.target.value })}
+                />
+              </label>
+
+              <label>
+                Endereço{" "}
+                <input
+                  value={form.endereco || ""}
+                  onChange={(e) => setForm({ ...form, endereco: e.target.value })}
+                />
+              </label>
+
+              <label>
+                CEP{" "}
+                <input
+                  value={form.cep || ""}
+                  onChange={(e) => setForm({ ...form, cep: e.target.value })}
+                  placeholder="00000-000"
+                />
+              </label>
+
+              <label>
+                Contato{" "}
+                <input
+                  value={form.pessoaContato || ""}
+                  onChange={(e) => setForm({ ...form, pessoaContato: e.target.value })}
+                  placeholder="Nome do contato"
+                />
+              </label>
+
+              <label>
+                Cargo{" "}
+                <input
+                  value={form.cargoFuncao || ""}
+                  onChange={(e) => setForm({ ...form, cargoFuncao: e.target.value })}
+                  placeholder="Ex.: Compras"
+                />
+              </label>
+
+              <label>
+                Observações{" "}
+                <textarea
+                  value={form.observacoes || ""}
+                  onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+                  rows={3}
+                />
+              </label>
+              <label>
                 Ativo{' '}
                 <input
                   type='checkbox'
@@ -322,8 +398,10 @@ const modalOverlay: React.CSSProperties = {
   justifyContent: 'center',
 };
 const modalCard: React.CSSProperties = {
-  background: '#fff',
+  background: "#fff",
   padding: 16,
   borderRadius: 8,
-  minWidth: 420,
+  width: "min(900px, 92vw)",
+  maxHeight: "85vh",
+  overflow: "auto",
 };
