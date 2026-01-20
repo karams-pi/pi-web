@@ -1,40 +1,33 @@
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Data;
-using Pi.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); // <-- evita "Id" vs "id"
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("dev", p =>
+        p.WithOrigins("http://localhost:5173")
+         .AllowAnyHeader()
+         .AllowAnyMethod());
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(opt =>
-{
-    var cs = builder.Configuration.GetConnectionString("Default");
-    opt.UseNpgsql(cs);
-});
-
-// HttpClient para FX
-builder.Services.AddHttpClient<FxService>();
-
-// CORS (ajuste origem do Vite depois)
-builder.Services.AddCors(opt =>
-{
-    opt.AddPolicy("dev", p =>
-        p.AllowAnyHeader()
-         .AllowAnyMethod()
-         .AllowAnyOrigin());
-});
-
 var app = builder.Build();
 
-app.UseCors("dev");
+app.UseSwagger();
+app.UseSwaggerUI();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseCors("dev");
 
 app.MapControllers();
 

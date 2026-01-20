@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pi.Api.Contracts;
 using Pi.Api.Data;
 using Pi.Api.Models;
-using PiEntity = global::Pi.Api.Models.Pi;
+using PiEntity = global::Pi.Api.Models.PiModel;
 
 namespace Pi.Api.Controllers
 {

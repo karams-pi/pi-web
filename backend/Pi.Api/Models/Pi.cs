@@ -1,6 +1,6 @@
 namespace Pi.Api.Models;
 
-public class Pi
+public class PiModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 

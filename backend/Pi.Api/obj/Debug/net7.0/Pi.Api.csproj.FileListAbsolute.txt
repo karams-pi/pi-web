@@ -34,9 +34,10 @@ C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\staticwebassets.pack.json
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\staticwebassets.build.json
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\staticwebassets.development.json
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\scopedcss\bundle\Pi.Api.styles.css
-C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\Pi.Api.csproj.CopyComplete
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\Pi.Api.dll
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\refint\Pi.Api.dll
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\Pi.Api.pdb
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\Pi.Api.genruntimeconfig.cache
 C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\ref\Pi.Api.dll
+C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\Pi.Api.sourcelink.json
+C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net7.0\Pi.Api.csproj.Up2Date

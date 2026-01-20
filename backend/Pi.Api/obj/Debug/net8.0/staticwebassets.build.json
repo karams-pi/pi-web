@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "S3TCuIGedkN47cmeBuZt1hwV7zoc7e4a7iBPrubuwcc=",
+  "Source": "Pi.Api",
+  "BasePath": "_content/Pi.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

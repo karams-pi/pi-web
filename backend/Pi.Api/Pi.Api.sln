@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pi.Api", "Pi.Api.csproj", "{09B58113-90A8-9201-8B7C-29CF93FE3A15}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09B58113-90A8-9201-8B7C-29CF93FE3A15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09B58113-90A8-9201-8B7C-29CF93FE3A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09B58113-90A8-9201-8B7C-29CF93FE3A15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09B58113-90A8-9201-8B7C-29CF93FE3A15}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {24F38BA0-65FB-4489-8569-E767DE2EAB3C}
+	EndGlobalSection
+EndGlobal
