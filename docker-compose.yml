@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pi-postgres
+    environment:
+      POSTGRES_USER: pi
+      POSTGRES_PASSWORD: pi123
+      POSTGRES_DB: pi_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - pi_pgdata:/var/lib/postgresql/data
+
+volumes:
+  pi_pgdata:
