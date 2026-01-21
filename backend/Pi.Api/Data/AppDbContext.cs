@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Modelo> Modelos => Set<Modelo>();
     public DbSet<Tecido> Tecidos => Set<Tecido>();
 
+    public DbSet<ListaPreco> ListasPreco => Set<ListaPreco>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Cliente>().ToTable("clientes");
@@ -76,6 +78,35 @@ public class AppDbContext : DbContext
             new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000208"), Nome = "G7" },
             new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000209"), Nome = "G8" }
         );
+
+        modelBuilder.Entity<ListaPreco>(e =>
+        {
+            e.ToTable("lista_preco");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.FornecedorLista).HasColumnName("fornecedor_lista");
+            e.Property(x => x.Marca).HasColumnName("marca");
+            e.Property(x => x.TipoPreco).HasColumnName("tipo_preco");
+            e.Property(x => x.Descricao).HasColumnName("descricao");
+
+            e.Property(x => x.Largura).HasColumnName("largura").HasPrecision(18, 3);
+            e.Property(x => x.Profundidade).HasColumnName("profundidade").HasPrecision(18, 3);
+            e.Property(x => x.Altura).HasColumnName("altura").HasPrecision(18, 3);
+            e.Property(x => x.M3).HasColumnName("m3").HasPrecision(18, 3);
+
+            e.Property(x => x.G0).HasColumnName("g0").HasPrecision(18, 2);
+            e.Property(x => x.G1).HasColumnName("g1").HasPrecision(18, 2);
+            e.Property(x => x.G2).HasColumnName("g2").HasPrecision(18, 2);
+            e.Property(x => x.G3).HasColumnName("g3").HasPrecision(18, 2);
+            e.Property(x => x.G4).HasColumnName("g4").HasPrecision(18, 2);
+            e.Property(x => x.G5).HasColumnName("g5").HasPrecision(18, 2);
+            e.Property(x => x.G6).HasColumnName("g6").HasPrecision(18, 2);
+            e.Property(x => x.G7).HasColumnName("g7").HasPrecision(18, 2);
+            e.Property(x => x.G8).HasColumnName("g8").HasPrecision(18, 2);
+
+            e.Property(x => x.FlAtivo).HasColumnName("fl_ativo");
+        });
 
         base.OnModelCreating(modelBuilder);
     }
