@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import HomeMenu from "./pages/HomeMenu";
 import ClientesPage from "./pages/ClientesPage";
+import CategoriasPage from "./pages/CategoriasPage";
+import ModelosPage from "./pages/ModelosPage";
+import TecidosPage from "./pages/TecidosPage";
 
 function ProdutosPage() {
   return (
@@ -60,6 +63,9 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomeMenu />} />
               <Route path="/clientes" element={<ClientesPage />} />
+              <Route path="/categorias" element={<CategoriasPage />} />
+              <Route path="/modelos" element={<ModelosPage />} />
+              <Route path="/tecidos" element={<TecidosPage />} />
               <Route path="/produtos" element={<ProdutosPage />} />
               <Route path="/pis/novo" element={<NovaPiPage />} />
               <Route path="/config" element={<ConfigPage />} />
@@ -100,6 +106,31 @@ function Header() {
               }
             >
               Clientes
+            </NavLink>
+
+            <NavLink
+              to="/categorias"
+              className={({ isActive }) =>
+                `navlink ${isActive ? "navlink-active" : ""}`
+              }
+            >
+              Categorias
+            </NavLink>
+            <NavLink
+              to="/modelos"
+              className={({ isActive }) =>
+                `navlink ${isActive ? "navlink-active" : ""}`
+              }
+            >
+              Modelos
+            </NavLink>
+            <NavLink
+              to="/tecidos"
+              className={({ isActive }) =>
+                `navlink ${isActive ? "navlink-active" : ""}`
+              }
+            >
+              Tecidos
             </NavLink>
 
             <NavLink
