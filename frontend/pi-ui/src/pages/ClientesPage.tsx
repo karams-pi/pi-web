@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import './ClientesPage.css';
 
 // importe TIPOS como type-only
 import type { Cliente, PagedResult } from '../api/clientes';
@@ -54,8 +55,8 @@ export default function ClientesPage() {
         pageSize,
       });
       setData(result);
-    } catch (e: any) {
-      setError(e.message || 'Erro ao carregar');
+    } catch (e: unknown) {
+      setError(getErrorMessage(e) || 'Erro ao carregar');
     } finally {
       setLoading(false);
     }
@@ -92,8 +93,8 @@ export default function ClientesPage() {
       }
       setIsOpen(false);
       await load();
-    } catch (e: any) {
-      alert(e.message || 'Erro ao salvar');
+    } catch (e: unknown) {
+      alert(getErrorMessage(e) || 'Erro ao salvar');
     } finally {
       setSaving(false);
     }
@@ -104,8 +105,8 @@ export default function ClientesPage() {
     try {
       await deleteCliente(c.id);
       await load();
-    } catch (e: any) {
-      alert(e.message || 'Erro ao remover');
+    } catch (e: unknown) {
+      alert(getErrorMessage(e) || 'Erro ao remover');
     }
   }
 
@@ -244,128 +245,151 @@ export default function ClientesPage() {
       </div>
 
       {isOpen && (
-        <div style={modalOverlay}>
-          <div style={modalCard}>
-            <h3>{editing ? 'Editar Cliente' : 'Novo Cliente'}</h3>
-            <form onSubmit={onSave} style={{ display: 'grid', gap: 8 }}>
-              <label>
-                Nome*{' '}
-                <input
-                  value={form.nome || ''}
-                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  required
-                />
-              </label>
-              <label>
-                Empresa{' '}
-                <input
-                  value={form.empresa || ''}
-                  onChange={(e) =>
-                    setForm({ ...form, empresa: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                E-mail{' '}
-                <input
-                  type='email'
-                  value={form.email || ''}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </label>
-              <label>
-                Telefone{' '}
-                <input
-                  value={form.telefone || ''}
-                  onChange={(e) =>
-                    setForm({ ...form, telefone: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                País{" "}
-                <input
-                  value={form.pais || ""}
-                  onChange={(e) => setForm({ ...form, pais: e.target.value })}
-                />
-              </label>
+      <div className="modalOverlay" onMouseDown={() => setIsOpen(false)}>
+        <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="modalHeader">
+            <h3 className="modalTitle">{editing ? 'Editar Cliente' : 'Novo Cliente'}</h3>
+            <button className="btn btn-sm" type="button" onClick={() => setIsOpen(false)}>
+              Fechar
+            </button>
+          </div>
 
-              <label>
-                Cidade{" "}
-                <input
-                  value={form.cidade || ""}
-                  onChange={(e) => setForm({ ...form, cidade: e.target.value })}
-                />
-              </label>
+          <form onSubmit={onSave}>
+            <div className="modalBody">
+              <div className="formGrid">
+                <div className="field">
+                  <div className="label">Nome*</div>
+                  <input
+                    className="cl-input"
+                    value={form.nome || ''}
+                    onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                    required
+                  />
+                </div>
 
-              <label>
-                Endereço{" "}
-                <input
-                  value={form.endereco || ""}
-                  onChange={(e) => setForm({ ...form, endereco: e.target.value })}
-                />
-              </label>
+                <div className="field">
+                  <div className="label">Empresa</div>
+                  <input
+                    className="cl-input"
+                    value={form.empresa || ''}
+                    onChange={(e) => setForm({ ...form, empresa: e.target.value })}
+                  />
+                </div>
 
-              <label>
-                CEP{" "}
-                <input
-                  value={form.cep || ""}
-                  onChange={(e) => setForm({ ...form, cep: e.target.value })}
-                  placeholder="00000-000"
-                />
-              </label>
+                <div className="field">
+                  <div className="label">E-mail</div>
+                  <input
+                    className="cl-input"
+                    type="email"
+                    value={form.email || ''}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  />
+                </div>
 
-              <label>
-                Contato{" "}
-                <input
-                  value={form.pessoaContato || ""}
-                  onChange={(e) => setForm({ ...form, pessoaContato: e.target.value })}
-                  placeholder="Nome do contato"
-                />
-              </label>
+                <div className="field">
+                  <div className="label">Telefone</div>
+                  <input
+                    className="cl-input"
+                    value={form.telefone || ''}
+                    onChange={(e) => setForm({ ...form, telefone: e.target.value })}
+                  />
+                </div>
 
-              <label>
-                Cargo{" "}
-                <input
-                  value={form.cargoFuncao || ""}
-                  onChange={(e) => setForm({ ...form, cargoFuncao: e.target.value })}
-                  placeholder="Ex.: Compras"
-                />
-              </label>
+                <div className="field">
+                  <div className="label">País</div>
+                  <input
+                    className="cl-input"
+                    value={form.pais || ''}
+                    onChange={(e) => setForm({ ...form, pais: e.target.value })}
+                  />
+                </div>
 
-              <label>
-                Observações{" "}
-                <textarea
-                  value={form.observacoes || ""}
-                  onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
-                  rows={3}
-                />
-              </label>
-              <label>
-                Ativo{' '}
-                <input
-                  type='checkbox'
-                  checked={!!form.ativo}
-                  onChange={(e) =>
-                    setForm({ ...form, ativo: e.target.checked })
-                  }
-                />
-              </label>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 8,
-                  justifyContent: 'flex-end',
-                  marginTop: 8,
-                }}>
-                <button type='button' onClick={() => setIsOpen(false)}>
-                  Cancelar
-                </button>
-                <button type='submit' disabled={saving}>
-                  {saving ? 'Salvando...' : 'Salvar'}
-                </button>
+                <div className="field">
+                  <div className="label">Cidade</div>
+                  <input
+                    className="cl-input"
+                    value={form.cidade || ''}
+                    onChange={(e) => setForm({ ...form, cidade: e.target.value })}
+                  />
+                </div>
+
+                <div className="field fieldFull">
+                  <div className="label">Endereço</div>
+                  <input
+                    className="cl-input"
+                    value={form.endereco || ''}
+                    onChange={(e) => setForm({ ...form, endereco: e.target.value })}
+                  />
+                </div>
+
+                <div className="field">
+                  <div className="label">CEP</div>
+                  <input
+                    className="cl-input"
+                    value={form.cep || ''}
+                    onChange={(e) => setForm({ ...form, cep: e.target.value })}
+                    placeholder="00000-000"
+                  />
+                </div>
+
+                <div className="field">
+                  <div className="label">Contato</div>
+                  <input
+                    className="cl-input"
+                    value={form.pessoaContato || ''}
+                    onChange={(e) =>
+                      setForm({ ...form, pessoaContato: e.target.value })
+                    }
+                    placeholder="Nome do contato"
+                  />
+                </div>
+
+                <div className="field">
+                  <div className="label">Cargo</div>
+                  <input
+                    className="cl-input"
+                    value={form.cargoFuncao || ''}
+                    onChange={(e) =>
+                      setForm({ ...form, cargoFuncao: e.target.value })
+                    }
+                    placeholder="Ex.: Compras"
+                  />
+                </div>
+
+                <div className="field fieldFull">
+                  <div className="label">Observações</div>
+                  <textarea
+                    className="textarea"
+                    value={form.observacoes || ''}
+                    onChange={(e) =>
+                      setForm({ ...form, observacoes: e.target.value })
+                    }
+                    rows={4}
+                  />
+                </div>
+
+                <div className="field fieldFull">
+                  <label className="checkboxRow">
+                    <input
+                      type="checkbox"
+                      checked={!!form.ativo}
+                      onChange={(e) => setForm({ ...form, ativo: e.target.checked })}
+                    />
+                    Ativo
+                  </label>
+                </div>
               </div>
-            </form>
+            </div>
+
+            <div className="modalFooter">
+              <button className="btn" type="button" onClick={() => setIsOpen(false)}>
+                Cancelar
+              </button>
+              <button className="btn btn-primary" type="submit" disabled={saving}>
+                {saving ? 'Salvando...' : 'Salvar'}
+              </button>
+            </div>
+          </form>
           </div>
         </div>
       )}
@@ -389,19 +413,40 @@ const th: React.CSSProperties = {
 };
 const td: React.CSSProperties = { borderBottom: '1px solid #eee', padding: 8 };
 
-const modalOverlay: React.CSSProperties = {
-  position: 'fixed',
-  inset: 0,
-  background: 'rgba(0,0,0,0.3)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-const modalCard: React.CSSProperties = {
-  background: "#fff",
-  padding: 16,
-  borderRadius: 8,
-  width: "min(900px, 92vw)",
-  maxHeight: "85vh",
-  overflow: "auto",
-};
+// const modalOverlay: React.CSSProperties = {
+//   position: 'fixed',
+//   inset: 0,
+//   background: 'rgba(0,0,0,0.3)',
+//   display: 'flex',
+//   alignItems: 'center',
+//   justifyContent: 'center',
+// };
+// const modalCard: React.CSSProperties = {
+//   background: "#fff",
+//   padding: 16,
+//   borderRadius: 8,
+//   width: "min(900px, 92vw)",
+//   maxHeight: "85vh",
+//   overflow: "auto",
+// };
+
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+
+  // Caso o seu api.ts jogue string (às vezes acontece)
+  if (typeof e === 'string') return e;
+
+  // Casos comuns (axios/fetch wrappers, etc.)
+  if (e && typeof e === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyE = e as any;
+    if (typeof anyE.message === 'string') return anyE.message;
+    if (typeof anyE.error === 'string') return anyE.error;
+  }
+
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return 'Erro desconhecido';
+  }
+}
