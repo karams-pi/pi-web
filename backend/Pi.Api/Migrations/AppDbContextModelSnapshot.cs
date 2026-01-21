@@ -31,7 +31,8 @@ namespace Pi.Api.Migrations
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
                         .HasColumnName("nome");
 
                     b.HasKey("Id");
@@ -148,6 +149,114 @@ namespace Pi.Api.Migrations
                     b.ToTable("clientes", (string)null);
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.ListaPreco", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Altura")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("altura");
+
+                    b.Property<DateTimeOffset>("DataListaPreco")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_lista_preco");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("descricao");
+
+                    b.Property<bool>("FlAtivo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("fl_ativo");
+
+                    b.Property<string>("FornecedorLista")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("fornecedor_lista");
+
+                    b.Property<decimal?>("G0")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g0");
+
+                    b.Property<decimal?>("G1")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g1");
+
+                    b.Property<decimal?>("G2")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g2");
+
+                    b.Property<decimal?>("G3")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g3");
+
+                    b.Property<decimal?>("G4")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g4");
+
+                    b.Property<decimal?>("G5")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g5");
+
+                    b.Property<decimal?>("G6")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g6");
+
+                    b.Property<decimal?>("G7")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g7");
+
+                    b.Property<decimal?>("G8")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("g8");
+
+                    b.Property<decimal>("Largura")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("largura");
+
+                    b.Property<decimal>("M3")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("m3");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("marca");
+
+                    b.Property<decimal>("Profundidade")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("profundidade");
+
+                    b.Property<string>("TipoPreco")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("tipo_preco");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("lista_preco", (string)null);
+                });
+
             modelBuilder.Entity("Pi.Api.Models.Modelo", b =>
                 {
                     b.Property<Guid>("Id")
@@ -157,7 +266,8 @@ namespace Pi.Api.Migrations
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
                         .HasColumnName("nome");
 
                     b.HasKey("Id");
@@ -284,7 +394,8 @@ namespace Pi.Api.Migrations
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
                         .HasColumnName("nome");
 
                     b.HasKey("Id");
