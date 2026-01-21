@@ -1,11 +1,20 @@
+import { getArray } from "./normalize";
+
 export type Modelo = { id: string; nome: string };
 
 const base = "/api/modelos";
 
-export async function listModelos(): Promise<Modelo[]> {
-  const r = await fetch(base);
-  if (!r.ok) throw new Error("Erro ao listar modelos");
-  return r.json();
+export async function listModelos(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  const qs = new URLSearchParams({
+    search: params?.search ?? "",
+    page: String(params?.page ?? 1),
+    pageSize: String(params?.pageSize ?? 50),
+  });
+  return getArray<Modelo>(`/api/modelos?${qs.toString()}`);
 }
 export async function createModelo(input: Partial<Modelo>): Promise<Modelo> {
   const r = await fetch(base, {

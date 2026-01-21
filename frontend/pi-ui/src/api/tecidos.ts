@@ -1,11 +1,20 @@
+import { getArray } from "./normalize";
+
 export type Tecido = { id: string; nome: string };
 
 const base = "/api/tecidos";
 
-export async function listTecidos(): Promise<Tecido[]> {
-  const r = await fetch(base);
-  if (!r.ok) throw new Error("Erro ao listar tecidos");
-  return r.json();
+export async function listTecidos(params?: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  const qs = new URLSearchParams({
+    search: params?.search ?? "",
+    page: String(params?.page ?? 1),
+    pageSize: String(params?.pageSize ?? 50),
+  });
+  return getArray<Tecido>(`/api/tecidos?${qs.toString()}`);
 }
 export async function createTecido(input: Partial<Tecido>): Promise<Tecido> {
   const r = await fetch(base, {
