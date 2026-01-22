@@ -1,112 +1,217 @@
 import React, { useEffect, useState } from "react";
+import "./ClientesPage.css";
+import type { Tecido } from "../api/types";
 import {
-  type Tecido,
-  listTecidos,
   createTecido,
-  updateTecido,
   deleteTecido,
+  listTecidos,
+  updateTecido,
 } from "../api/tecidos";
+
+type FormState = Partial<Tecido>;
+const emptyForm: FormState = { nome: "" };
 
 export default function TecidosPage() {
   const [items, setItems] = useState<Tecido[]>([]);
   const [loading, setLoading] = useState(false);
-  const [nome, setNome] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState<Tecido | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [saving, setSaving] = useState(false);
 
   async function load() {
-    setLoading(true);
     try {
+      setLoading(true);
+      setError(null);
       setItems(await listTecidos());
+    } catch (e: unknown) {
+      setError(getErrorMessage(e) || "Erro ao carregar");
     } finally {
       setLoading(false);
     }
   }
+
   useEffect(() => {
-    load();
+    void load();
   }, []);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!nome.trim()) return alert("Código é obrigatório.");
-    if (editing) await updateTecido(editing.id, { nome });
-    else await createTecido({ nome });
-    setNome("");
+  function openCreate() {
     setEditing(null);
-    await load();
+    setForm(emptyForm);
+    setIsOpen(true);
+  }
+
+  function openEdit(x: Tecido) {
+    setEditing(x);
+    setForm({ ...x });
+    setIsOpen(true);
+  }
+
+  async function onSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      if (!form.nome || form.nome.trim().length === 0)
+        throw new Error("Nome é obrigatório.");
+
+      if (editing) {
+        await updateTecido(editing.id, { nome: form.nome.trim() });
+      } else {
+        await createTecido({ nome: form.nome.trim() });
+      }
+
+      setIsOpen(false);
+      await load();
+    } catch (e: unknown) {
+      alert(getErrorMessage(e) || "Erro ao salvar");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function onDelete(x: Tecido) {
+    if (!confirm(`Remover tecido "${x.nome}"?`)) return;
+    try {
+      await deleteTecido(x.id);
+      await load();
+    } catch (e: unknown) {
+      alert(getErrorMessage(e) || "Erro ao remover");
+    }
   }
 
   return (
-    <div className="card">
-      <h2>Tecidos</h2>
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", gap: 8, marginBottom: 12 }}
-      >
-        <input
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          placeholder="Ex.: G0"
-        />
-        <button type="submit">{editing ? "Salvar" : "Adicionar"}</button>
-        {editing && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditing(null);
-              setNome("");
-            }}
-          >
-            Cancelar
-          </button>
-        )}
-      </form>
+    <div className="cl-page">
+      <h1 className="cl-title">Tecidos</h1>
 
-      {loading ? (
-        "Carregando..."
-      ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={th}>Código</th>
-              <th style={th}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((x) => (
-              <tr key={x.id}>
-                <td style={td}>{x.nome}</td>
-                <td style={td}>
-                  <button
-                    onClick={() => {
-                      setEditing(x);
-                      setNome(x.nome);
-                    }}
-                  >
-                    Editar
-                  </button>{" "}
-                  <button
-                    onClick={async () => {
-                      if (confirm(`Remover "${x.nome}"?`)) {
-                        await deleteTecido(x.id);
-                        await load();
+      <div className="cl-toolbar">
+        <button className="btn btn-primary" onClick={openCreate}>
+          Novo
+        </button>
+      </div>
+
+      {error && <div className="errorBox">{error}</div>}
+
+      <div className="cl-card">
+        <div className="cl-tableWrap">
+          {loading ? (
+            <div style={{ padding: 16, color: "var(--muted)" }}>
+              Carregando...
+            </div>
+          ) : (
+            <table className="cl-table" style={{ minWidth: 600 }}>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th style={{ width: 220 }}>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((x) => (
+                  <tr key={x.id}>
+                    <td>{x.id}</td>
+                    <td>{x.nome}</td>
+                    <td className="cl-actions">
+                      <button
+                        className="btn btn-sm"
+                        onClick={() => openEdit(x)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => onDelete(x)}
+                      >
+                        Remover
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {!loading && items.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      style={{
+                        padding: 12,
+                        textAlign: "center",
+                        color: "var(--muted)",
+                      }}
+                    >
+                      Nenhum tecido cadastrado
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="modalOverlay" onMouseDown={() => setIsOpen(false)}>
+          <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modalHeader">
+              <h3 className="modalTitle">
+                {editing ? "Editar Tecido" : "Novo Tecido"}
+              </h3>
+              <button
+                className="btn btn-sm"
+                type="button"
+                onClick={() => setIsOpen(false)}
+              >
+                Fechar
+              </button>
+            </div>
+
+            <form onSubmit={onSave}>
+              <div className="modalBody">
+                <div className="formGrid">
+                  <div className="field fieldFull">
+                    <div className="label">Nome*</div>
+                    <input
+                      className="cl-input"
+                      value={form.nome || ""}
+                      onChange={(e) =>
+                        setForm({ ...form, nome: e.target.value })
                       }
-                    }}
-                    style={{ color: "red" }}
-                  >
-                    Remover
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modalFooter">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn btn-primary"
+                  type="submit"
+                  disabled={saving}
+                >
+                  {saving ? "Salvando..." : "Salvar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
 }
-const th: React.CSSProperties = {
-  textAlign: "left",
-  borderBottom: "1px solid #ddd",
-  padding: 8,
-};
-const td: React.CSSProperties = { borderBottom: "1px solid #eee", padding: 8 };
+
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "string") return e;
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return "Erro desconhecido";
+  }
+}

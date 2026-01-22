@@ -1,42 +1,32 @@
-import { getArray } from "./normalize";
+import { apiDelete, apiGet, apiPost, apiPut } from "./api";
+import type { Modelo } from "./types";
 
-export type Modelo = { id: string; nome: string };
+export type ListModelosQuery = {
+  fornecedorId?: number;
+  categoriaId?: number;
+  tecidoId?: number;
+};
 
-const base = "/api/modelos";
-
-export async function listModelos(params?: {
-  search?: string;
-  page?: number;
-  pageSize?: number;
-}) {
-  const qs = new URLSearchParams({
-    search: params?.search ?? "",
-    page: String(params?.page ?? 1),
-    pageSize: String(params?.pageSize ?? 50),
-  });
-  return getArray<Modelo>(`/api/modelos?${qs.toString()}`);
+export async function listModelos(q?: ListModelosQuery) {
+  const qs = new URLSearchParams();
+  if (q?.fornecedorId) qs.set("fornecedorId", String(q.fornecedorId));
+  if (q?.categoriaId) qs.set("categoriaId", String(q.categoriaId));
+  if (q?.tecidoId) qs.set("tecidoId", String(q.tecidoId));
+  const url = `/api/modelos${qs.toString() ? `?${qs}` : ""}`;
+  return apiGet<Modelo[]>(url);
 }
-export async function createModelo(input: Partial<Modelo>): Promise<Modelo> {
-  const r = await fetch(base, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  if (!r.ok) throw new Error("Erro ao criar modelo");
-  return r.json();
+
+export async function createModelo(input: Omit<Modelo, "id" | "m3">) {
+  return apiPost<Modelo>("/api/modelos", input);
 }
+
 export async function updateModelo(
-  id: string,
-  input: Partial<Modelo>,
-): Promise<void> {
-  const r = await fetch(`${base}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  if (!r.ok) throw new Error("Erro ao atualizar modelo");
+  id: number,
+  input: Partial<Omit<Modelo, "id" | "m3">>,
+) {
+  return apiPut<void>(`/api/modelos/${id}`, input);
 }
-export async function deleteModelo(id: string): Promise<void> {
-  const r = await fetch(`${base}/${id}`, { method: "DELETE" });
-  if (!r.ok) throw new Error("Erro ao remover modelo");
+
+export async function deleteModelo(id: number) {
+  return apiDelete(`/api/modelos/${id}`);
 }

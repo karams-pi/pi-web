@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Pi.Api.Models;
 
-[Table("tecido")]
-public class Tecido
+[Table("fornecedor")]
+public class Fornecedor
 {
     [Key]
     [Column("id")]
@@ -16,6 +16,11 @@ public class Tecido
     [Column("nome")]
     [MaxLength(200)]
     public string Nome { get; set; } = string.Empty;
+
+    [Required]
+    [Column("cnpj")]
+    [MaxLength(14)] // ajuste se você salvar com máscara
+    public string Cnpj { get; set; } = string.Empty;
 
     public ICollection<Modelo> Modelos { get; set; } = new List<Modelo>();
 }

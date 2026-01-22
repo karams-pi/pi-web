@@ -4,8 +4,6 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Pi.Api.Migrations
 {
     /// <inheritdoc />
@@ -18,8 +16,9 @@ namespace Pi.Api.Migrations
                 name: "categoria",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    nome = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    nome = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,6 +48,20 @@ namespace Pi.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_clientes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "fornecedor",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    nome = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    cnpj = table.Column<string>(type: "character varying(14)", maxLength: 14, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_fornecedor", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,18 +96,6 @@ namespace Pi.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "modelo",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    nome = table.Column<string>(type: "character varying(160)", maxLength: 160, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_modelo", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "pi_sequencias",
                 columns: table => new
                 {
@@ -112,8 +113,9 @@ namespace Pi.Api.Migrations
                 name: "tecido",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    nome = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false)
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    nome = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -150,45 +152,44 @@ namespace Pi.Api.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "categoria",
-                columns: new[] { "id", "nome" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "modelo",
+                columns: table => new
                 {
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000001"), "Estofado" },
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000002"), "Cadeira" },
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000003"), "Chaise" },
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000004"), "Poltrona" },
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000005"), "Cama" },
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000006"), "Almofada" },
-                    { new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000007"), "Puff" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "modelo",
-                columns: new[] { "id", "nome" },
-                values: new object[,]
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id_fornecedor = table.Column<long>(type: "bigint", nullable: false),
+                    id_categoria = table.Column<long>(type: "bigint", nullable: false),
+                    descricao = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
+                    largura = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    profundidade = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    altura = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    pa = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    m3 = table.Column<decimal>(type: "numeric(18,2)", nullable: false, computedColumnSql: "round((largura * profundidade * altura)::numeric, 2)", stored: true),
+                    id_tecido = table.Column<long>(type: "bigint", nullable: false),
+                    valor_tecido = table.Column<decimal>(type: "numeric(18,3)", nullable: false)
+                },
+                constraints: table =>
                 {
-                    { new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000101"), "Daybed fixa (144)" },
-                    { new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000102"), "Daybed giratória (144)" },
-                    { new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000103"), "Daybed fixa (164)" },
-                    { new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000104"), "Daybed giratória (164)" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "tecido",
-                columns: new[] { "id", "nome" },
-                values: new object[,]
-                {
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000201"), "G0" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000202"), "G1" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000203"), "G2" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000204"), "G3" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000205"), "G4" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000206"), "G5" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000207"), "G6" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000208"), "G7" },
-                    { new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000209"), "G8" }
+                    table.PrimaryKey("PK_modelo", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_modelo_categoria_id_categoria",
+                        column: x => x.id_categoria,
+                        principalTable: "categoria",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_modelo_fornecedor_id_fornecedor",
+                        column: x => x.id_fornecedor,
+                        principalTable: "fornecedor",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_modelo_tecido_id_tecido",
+                        column: x => x.id_tecido,
+                        principalTable: "tecido",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -198,10 +199,19 @@ namespace Pi.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_modelo_nome",
+                name: "IX_modelo_id_categoria",
                 table: "modelo",
-                column: "nome",
-                unique: true);
+                column: "id_categoria");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_modelo_id_fornecedor",
+                table: "modelo",
+                column: "id_fornecedor");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_modelo_id_tecido",
+                table: "modelo",
+                column: "id_tecido");
 
             migrationBuilder.CreateIndex(
                 name: "uq_pi_sequencias_prefixo_ano",
@@ -225,9 +235,6 @@ namespace Pi.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "categoria");
-
-            migrationBuilder.DropTable(
                 name: "lista_preco");
 
             migrationBuilder.DropTable(
@@ -238,6 +245,12 @@ namespace Pi.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "pis");
+
+            migrationBuilder.DropTable(
+                name: "categoria");
+
+            migrationBuilder.DropTable(
+                name: "fornecedor");
 
             migrationBuilder.DropTable(
                 name: "tecido");
