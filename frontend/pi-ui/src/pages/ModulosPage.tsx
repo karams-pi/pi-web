@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ClientesPage.css";
 
 import type { Categoria, Fornecedor, Marca, Modulo, ModuloTecido, Tecido } from "../api/types";
@@ -32,6 +33,7 @@ const emptyForm: FormState = {
 };
 
 export default function ModulosPage() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Modulo[]>([]);
   const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]);
   
@@ -304,19 +306,31 @@ export default function ModulosPage() {
                     </div>
                     <div className="field">
                       <label className="label">Marca*</label>
-                      <select
-                        className="cl-select"
-                        value={form.idMarca || ""}
-                        onChange={(e) => setForm({ ...form, idMarca: Number(e.target.value) })}
-                        required
-                      >
-                        <option value="">Selecione...</option>
-                        {marcas.map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.nome}
-                          </option>
-                        ))}
-                      </select>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <select
+                          className="cl-select"
+                          value={form.idMarca || ""}
+                          onChange={(e) => setForm({ ...form, idMarca: Number(e.target.value) })}
+                          required
+                          style={{ flex: 1 }}
+                        >
+                          <option value="">Selecione...</option>
+                          {marcas.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.nome}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          onClick={() => navigate("/marcas")}
+                          title="Cadastrar nova marca"
+                          style={{ minWidth: "40px" }}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
 
                     <div className="field">
