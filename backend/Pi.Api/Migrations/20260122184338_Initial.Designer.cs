@@ -12,7 +12,7 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260122160637_Initial")]
+    [Migration("20260122184338_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
