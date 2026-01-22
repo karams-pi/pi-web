@@ -1,0 +1,9 @@
+INSERT INTO tecido(id, nome) VALUES (1, 'G0');
+INSERT INTO tecido(id, nome) VALUES (2, 'G1');
+INSERT INTO tecido(id, nome) VALUES (3, 'G2');
+INSERT INTO tecido(id, nome) VALUES (4, 'G3');
+INSERT INTO tecido(id, nome) VALUES (5, 'G4');
+INSERT INTO tecido(id, nome) VALUES (6, 'G5');
+INSERT INTO tecido(id, nome) VALUES (7, 'G6');
+INSERT INTO tecido(id, nome) VALUES (8, 'G7');
+INSERT INTO tecido(id, nome) VALUES (9, 'G8');

@@ -12,7 +12,7 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260121192357_Initial")]
+    [Migration("20260122005623_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,15 +27,17 @@ namespace Pi.Api.Migrations
 
             modelBuilder.Entity("Pi.Api.Models.Categoria", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
                         .HasColumnName("nome");
 
                     b.HasKey("Id");
@@ -44,43 +46,6 @@ namespace Pi.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("categoria");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000001"),
-                            Nome = "Estofado"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000002"),
-                            Nome = "Cadeira"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000003"),
-                            Nome = "Chaise"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000004"),
-                            Nome = "Poltrona"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000005"),
-                            Nome = "Cama"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000006"),
-                            Nome = "Almofada"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5e1c1b1-8b2c-4b2f-9f11-000000000007"),
-                            Nome = "Puff"
-                        });
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Cliente", b =>
@@ -150,6 +115,32 @@ namespace Pi.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("clientes", (string)null);
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Cnpj")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)")
+                        .HasColumnName("cnpj");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("nome");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("fornecedor");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ListaPreco", b =>
@@ -262,45 +253,67 @@ namespace Pi.Api.Migrations
 
             modelBuilder.Entity("Pi.Api.Models.Modelo", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<string>("Nome")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Altura")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("altura");
+
+                    b.Property<long>("CategoriaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_categoria");
+
+                    b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("character varying(160)")
-                        .HasColumnName("nome");
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)")
+                        .HasColumnName("descricao");
+
+                    b.Property<long>("FornecedorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_fornecedor");
+
+                    b.Property<decimal>("Largura")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("largura");
+
+                    b.Property<decimal>("M3")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("m3")
+                        .HasComputedColumnSql("round((largura * profundidade * altura)::numeric, 2)", true);
+
+                    b.Property<decimal?>("Pa")
+                        .IsRequired()
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("pa");
+
+                    b.Property<decimal>("Profundidade")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("profundidade");
+
+                    b.Property<long>("TecidoId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tecido");
+
+                    b.Property<decimal>("ValorTecido")
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("valor_tecido");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Nome")
-                        .IsUnique();
+                    b.HasIndex("CategoriaId");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.HasIndex("TecidoId");
 
                     b.ToTable("modelo");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000101"),
-                            Nome = "Daybed fixa (144)"
-                        },
-                        new
-                        {
-                            Id = new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000102"),
-                            Nome = "Daybed giratória (144)"
-                        },
-                        new
-                        {
-                            Id = new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000103"),
-                            Nome = "Daybed fixa (164)"
-                        },
-                        new
-                        {
-                            Id = new Guid("d2a2b2c2-1a1b-4c4d-9f22-000000000104"),
-                            Nome = "Daybed giratória (164)"
-                        });
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
@@ -390,15 +403,17 @@ namespace Pi.Api.Migrations
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("character varying(16)")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
                         .HasColumnName("nome");
 
                     b.HasKey("Id");
@@ -407,53 +422,33 @@ namespace Pi.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("tecido");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000201"),
-                            Nome = "G0"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000202"),
-                            Nome = "G1"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000203"),
-                            Nome = "G2"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000204"),
-                            Nome = "G3"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000205"),
-                            Nome = "G4"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000206"),
-                            Nome = "G5"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000207"),
-                            Nome = "G6"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000208"),
-                            Nome = "G7"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b3c3d3-2b2c-4d4e-9f33-000000000209"),
-                            Nome = "G8"
-                        });
+            modelBuilder.Entity("Pi.Api.Models.Modelo", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Categoria", "Categoria")
+                        .WithMany("Modelos")
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Fornecedor", "Fornecedor")
+                        .WithMany("Modelos")
+                        .HasForeignKey("FornecedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Tecido", "Tecido")
+                        .WithMany("Modelos")
+                        .HasForeignKey("TecidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Categoria");
+
+                    b.Navigation("Fornecedor");
+
+                    b.Navigation("Tecido");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
@@ -465,6 +460,21 @@ namespace Pi.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Cliente");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Categoria", b =>
+                {
+                    b.Navigation("Modelos");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>
+                {
+                    b.Navigation("Modelos");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Tecido", b =>
+                {
+                    b.Navigation("Modelos");
                 });
 #pragma warning restore 612, 618
         }
