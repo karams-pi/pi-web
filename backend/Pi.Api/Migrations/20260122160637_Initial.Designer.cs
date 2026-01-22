@@ -12,7 +12,7 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260122005623_Initial")]
+    [Migration("20260122160637_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -43,9 +43,10 @@ namespace Pi.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Nome")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("uq_categoria_nome");
 
-                    b.ToTable("categoria");
+                    b.ToTable("categoria", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Cliente", b =>
@@ -140,7 +141,11 @@ namespace Pi.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("fornecedor");
+                    b.HasIndex("Cnpj")
+                        .IsUnique()
+                        .HasDatabaseName("uq_fornecedor_cnpj");
+
+                    b.ToTable("fornecedor", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ListaPreco", b =>
@@ -251,7 +256,41 @@ namespace Pi.Api.Migrations
                     b.ToTable("lista_preco", (string)null);
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.Modelo", b =>
+            modelBuilder.Entity("Pi.Api.Models.Marca", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("nome");
+
+                    b.Property<string>("Observacao")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("observacao");
+
+                    b.Property<string>("UrlImagem")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("url_imagem");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nome")
+                        .IsUnique()
+                        .HasDatabaseName("uq_marca_nome");
+
+                    b.ToTable("marca", (string)null);
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Modulo", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -264,19 +303,23 @@ namespace Pi.Api.Migrations
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("altura");
 
-                    b.Property<long>("CategoriaId")
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("descricao");
+
+                    b.Property<long>("IdCategoria")
                         .HasColumnType("bigint")
                         .HasColumnName("id_categoria");
 
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasMaxLength(400)
-                        .HasColumnType("character varying(400)")
-                        .HasColumnName("descricao");
-
-                    b.Property<long>("FornecedorId")
+                    b.Property<long>("IdFornecedor")
                         .HasColumnType("bigint")
                         .HasColumnName("id_fornecedor");
+
+                    b.Property<long>("IdMarca")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_marca");
 
                     b.Property<decimal>("Largura")
                         .HasColumnType("numeric(18,2)")
@@ -288,8 +331,7 @@ namespace Pi.Api.Migrations
                         .HasColumnName("m3")
                         .HasComputedColumnSql("round((largura * profundidade * altura)::numeric, 2)", true);
 
-                    b.Property<decimal?>("Pa")
-                        .IsRequired()
+                    b.Property<decimal>("Pa")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("pa");
 
@@ -297,7 +339,34 @@ namespace Pi.Api.Migrations
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("profundidade");
 
-                    b.Property<long>("TecidoId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdCategoria")
+                        .HasDatabaseName("ix_modulo_id_categoria");
+
+                    b.HasIndex("IdFornecedor")
+                        .HasDatabaseName("ix_modulo_id_fornecedor");
+
+                    b.HasIndex("IdMarca")
+                        .HasDatabaseName("ix_modulo_id_marca");
+
+                    b.ToTable("modulo", (string)null);
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.ModuloTecido", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("IdModulo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_modulo");
+
+                    b.Property<long>("IdTecido")
                         .HasColumnType("bigint")
                         .HasColumnName("id_tecido");
 
@@ -307,13 +376,17 @@ namespace Pi.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoriaId");
+                    b.HasIndex("IdModulo")
+                        .HasDatabaseName("ix_modulo_tecido_id_modulo");
 
-                    b.HasIndex("FornecedorId");
+                    b.HasIndex("IdTecido")
+                        .HasDatabaseName("ix_modulo_tecido_id_tecido");
 
-                    b.HasIndex("TecidoId");
+                    b.HasIndex("IdModulo", "IdTecido")
+                        .IsUnique()
+                        .HasDatabaseName("uq_modulo_tecido_id_modulo_id_tecido");
 
-                    b.ToTable("modelo");
+                    b.ToTable("modulo_tecido", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
@@ -419,34 +492,54 @@ namespace Pi.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Nome")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("uq_tecido_nome");
 
-                    b.ToTable("tecido");
+                    b.ToTable("tecido", (string)null);
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.Modelo", b =>
+            modelBuilder.Entity("Pi.Api.Models.Modulo", b =>
                 {
                     b.HasOne("Pi.Api.Models.Categoria", "Categoria")
-                        .WithMany("Modelos")
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Modulos")
+                        .HasForeignKey("IdCategoria")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Pi.Api.Models.Fornecedor", "Fornecedor")
-                        .WithMany("Modelos")
-                        .HasForeignKey("FornecedorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Modulos")
+                        .HasForeignKey("IdFornecedor")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Pi.Api.Models.Tecido", "Tecido")
-                        .WithMany("Modelos")
-                        .HasForeignKey("TecidoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Pi.Api.Models.Marca", "Marca")
+                        .WithMany("Modulos")
+                        .HasForeignKey("IdMarca")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Categoria");
 
                     b.Navigation("Fornecedor");
+
+                    b.Navigation("Marca");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.ModuloTecido", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Modulo", "Modulo")
+                        .WithMany("ModulosTecidos")
+                        .HasForeignKey("IdModulo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Tecido", "Tecido")
+                        .WithMany("ModulosTecidos")
+                        .HasForeignKey("IdTecido")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Modulo");
 
                     b.Navigation("Tecido");
                 });
@@ -464,17 +557,27 @@ namespace Pi.Api.Migrations
 
             modelBuilder.Entity("Pi.Api.Models.Categoria", b =>
                 {
-                    b.Navigation("Modelos");
+                    b.Navigation("Modulos");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>
                 {
-                    b.Navigation("Modelos");
+                    b.Navigation("Modulos");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Marca", b =>
+                {
+                    b.Navigation("Modulos");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Modulo", b =>
+                {
+                    b.Navigation("ModulosTecidos");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>
                 {
-                    b.Navigation("Modelos");
+                    b.Navigation("ModulosTecidos");
                 });
 #pragma warning restore 612, 618
         }

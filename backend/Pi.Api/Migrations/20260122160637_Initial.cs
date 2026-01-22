@@ -96,6 +96,21 @@ namespace Pi.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "marca",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    nome = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    url_imagem = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    observacao = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_marca", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "pi_sequencias",
                 columns: table => new
                 {
@@ -153,65 +168,119 @@ namespace Pi.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "modelo",
+                name: "modulo",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     id_fornecedor = table.Column<long>(type: "bigint", nullable: false),
                     id_categoria = table.Column<long>(type: "bigint", nullable: false),
-                    descricao = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
+                    id_marca = table.Column<long>(type: "bigint", nullable: false),
+                    descricao = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
                     largura = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     profundidade = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     altura = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     pa = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    m3 = table.Column<decimal>(type: "numeric(18,2)", nullable: false, computedColumnSql: "round((largura * profundidade * altura)::numeric, 2)", stored: true),
+                    m3 = table.Column<decimal>(type: "numeric(18,2)", nullable: false, computedColumnSql: "round((largura * profundidade * altura)::numeric, 2)", stored: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_modulo", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_modulo_categoria_id_categoria",
+                        column: x => x.id_categoria,
+                        principalTable: "categoria",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_modulo_fornecedor_id_fornecedor",
+                        column: x => x.id_fornecedor,
+                        principalTable: "fornecedor",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_modulo_marca_id_marca",
+                        column: x => x.id_marca,
+                        principalTable: "marca",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "modulo_tecido",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id_modulo = table.Column<long>(type: "bigint", nullable: false),
                     id_tecido = table.Column<long>(type: "bigint", nullable: false),
                     valor_tecido = table.Column<decimal>(type: "numeric(18,3)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_modelo", x => x.id);
+                    table.PrimaryKey("PK_modulo_tecido", x => x.id);
                     table.ForeignKey(
-                        name: "FK_modelo_categoria_id_categoria",
-                        column: x => x.id_categoria,
-                        principalTable: "categoria",
+                        name: "FK_modulo_tecido_modulo_id_modulo",
+                        column: x => x.id_modulo,
+                        principalTable: "modulo",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_modelo_fornecedor_id_fornecedor",
-                        column: x => x.id_fornecedor,
-                        principalTable: "fornecedor",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_modelo_tecido_id_tecido",
+                        name: "FK_modulo_tecido_tecido_id_tecido",
                         column: x => x.id_tecido,
                         principalTable: "tecido",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_categoria_nome",
+                name: "uq_categoria_nome",
                 table: "categoria",
                 column: "nome",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_modelo_id_categoria",
-                table: "modelo",
+                name: "uq_fornecedor_cnpj",
+                table: "fornecedor",
+                column: "cnpj",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "uq_marca_nome",
+                table: "marca",
+                column: "nome",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_modulo_id_categoria",
+                table: "modulo",
                 column: "id_categoria");
 
             migrationBuilder.CreateIndex(
-                name: "IX_modelo_id_fornecedor",
-                table: "modelo",
+                name: "ix_modulo_id_fornecedor",
+                table: "modulo",
                 column: "id_fornecedor");
 
             migrationBuilder.CreateIndex(
-                name: "IX_modelo_id_tecido",
-                table: "modelo",
+                name: "ix_modulo_id_marca",
+                table: "modulo",
+                column: "id_marca");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_modulo_tecido_id_modulo",
+                table: "modulo_tecido",
+                column: "id_modulo");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_modulo_tecido_id_tecido",
+                table: "modulo_tecido",
                 column: "id_tecido");
+
+            migrationBuilder.CreateIndex(
+                name: "uq_modulo_tecido_id_modulo_id_tecido",
+                table: "modulo_tecido",
+                columns: new[] { "id_modulo", "id_tecido" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "uq_pi_sequencias_prefixo_ano",
@@ -225,7 +294,7 @@ namespace Pi.Api.Migrations
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tecido_nome",
+                name: "uq_tecido_nome",
                 table: "tecido",
                 column: "nome",
                 unique: true);
@@ -238,7 +307,7 @@ namespace Pi.Api.Migrations
                 name: "lista_preco");
 
             migrationBuilder.DropTable(
-                name: "modelo");
+                name: "modulo_tecido");
 
             migrationBuilder.DropTable(
                 name: "pi_sequencias");
@@ -247,16 +316,22 @@ namespace Pi.Api.Migrations
                 name: "pis");
 
             migrationBuilder.DropTable(
-                name: "categoria");
-
-            migrationBuilder.DropTable(
-                name: "fornecedor");
+                name: "modulo");
 
             migrationBuilder.DropTable(
                 name: "tecido");
 
             migrationBuilder.DropTable(
                 name: "clientes");
+
+            migrationBuilder.DropTable(
+                name: "categoria");
+
+            migrationBuilder.DropTable(
+                name: "fornecedor");
+
+            migrationBuilder.DropTable(
+                name: "marca");
         }
     }
 }

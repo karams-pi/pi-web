@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Pi.Api.Models;
 
-[Table("tecido")]
-public class Tecido
+[Table("marca")]
+public class Marca
 {
     [Key]
     [Column("id")]
@@ -16,6 +16,14 @@ public class Tecido
     [MaxLength(200)]
     public string Nome { get; set; } = string.Empty;
 
-    // 1 tecido -> N registros em modulo_tecido
-    public ICollection<ModuloTecido> ModulosTecidos { get; set; } = new List<ModuloTecido>();
+    [Column("url_imagem")]
+    [MaxLength(500)]
+    public string? UrlImagem { get; set; }
+
+    [Column("observacao")]
+    [MaxLength(1000)]
+    public string? Observacao { get; set; }
+
+    // 1 marca -> N módulos
+    public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 }

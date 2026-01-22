@@ -7,14 +7,20 @@ namespace Pi.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ModelosController : ControllerBase
+public class ModulosController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public ModelosController(AppDbContext db) => _db = db;
+    public ModulosController(AppDbContext db) => _db = db;
+
+    private static decimal CalcM3(Modulo m)
+        => Math.Round(m.Largura * m.Profundidade * m.Altura, 2);
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Modulo>>> GetAll()
-        => await _db.Modulos.AsNoTracking().OrderBy(x => x.Id).ToListAsync();
+        => await _db.Modulos
+            .AsNoTracking()
+            .OrderBy(x => x.Id)
+            .ToListAsync();
 
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Modulo>> GetById(long id)
@@ -26,10 +32,11 @@ public class ModelosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Modulo>> Create([FromBody] Modulo input)
     {
-        // m3 está computed no banco (HasComputedColumnSql stored:true),
-        // então não precisa setar aqui.
+        input.M3 = CalcM3(input);
+
         _db.Modulos.Add(input);
         await _db.SaveChangesAsync();
+
         return CreatedAtAction(nameof(GetById), new { id = input.Id }, input);
     }
 
@@ -48,6 +55,8 @@ public class ModelosController : ControllerBase
         item.Profundidade = input.Profundidade;
         item.Altura = input.Altura;
         item.Pa = input.Pa;
+
+        item.M3 = CalcM3(item);
 
         await _db.SaveChangesAsync();
         return NoContent();

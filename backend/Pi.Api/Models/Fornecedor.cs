@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,8 +18,9 @@ public class Fornecedor
 
     [Required]
     [Column("cnpj")]
-    [MaxLength(14)] // ajuste se você salvar com máscara
+    [MaxLength(14)]
     public string Cnpj { get; set; } = string.Empty;
 
-    public ICollection<Modelo> Modelos { get; set; } = new List<Modelo>();
+    // 1 fornecedor -> N módulos
+    public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 }

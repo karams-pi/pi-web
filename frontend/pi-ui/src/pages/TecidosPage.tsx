@@ -15,6 +15,7 @@ export default function TecidosPage() {
   const [items, setItems] = useState<Tecido[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState<Tecido | null>(null);
@@ -36,6 +37,12 @@ export default function TecidosPage() {
   useEffect(() => {
     void load();
   }, []);
+
+  const filteredHelper = React.useMemo(() => {
+    if (!search) return items;
+    const lower = search.toLowerCase();
+    return items.filter((x) => x.nome.toLowerCase().includes(lower));
+  }, [items, search]);
 
   function openCreate() {
     setEditing(null);
@@ -82,72 +89,66 @@ export default function TecidosPage() {
   }
 
   return (
-    <div className="cl-page">
-      <h1 className="cl-title">Tecidos</h1>
+    <div style={{ padding: 16 }}>
+      <h1>Tecidos</h1>
 
-      <div className="cl-toolbar">
-        <button className="btn btn-primary" onClick={openCreate}>
-          Novo
-        </button>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+          marginBottom: 12,
+        }}
+      >
+        <input
+          placeholder="Buscar..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ flex: 1, padding: 8 }}
+        />
+        <button onClick={openCreate}>Novo</button>
       </div>
 
-      {error && <div className="errorBox">{error}</div>}
-
-      <div className="cl-card">
-        <div className="cl-tableWrap">
-          {loading ? (
-            <div style={{ padding: 16, color: "var(--muted)" }}>
-              Carregando...
-            </div>
-          ) : (
-            <table className="cl-table" style={{ minWidth: 600 }}>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nome</th>
-                  <th style={{ width: 220 }}>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((x) => (
-                  <tr key={x.id}>
-                    <td>{x.id}</td>
-                    <td>{x.nome}</td>
-                    <td className="cl-actions">
-                      <button
-                        className="btn btn-sm"
-                        onClick={() => openEdit(x)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => onDelete(x)}
-                      >
-                        Remover
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {!loading && items.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={3}
-                      style={{
-                        padding: 12,
-                        textAlign: "center",
-                        color: "var(--muted)",
-                      }}
-                    >
-                      Nenhum tecido cadastrado
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
+      <div style={{ marginBottom: 8 }}>
+        <span>Total: {filteredHelper.length}</span>
       </div>
+
+      {error && <div style={{ color: "red" }}>{error}</div>}
+
+      {loading ? (
+        <div>Carregando...</div>
+      ) : (
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={th}>ID</th>
+              <th style={th}>Nome</th>
+              <th style={th}>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredHelper.map((x) => (
+              <tr key={x.id}>
+                <td style={td}>{x.id}</td>
+                <td style={td}>{x.nome}</td>
+                <td style={td}>
+                  <button onClick={() => openEdit(x)}>Editar</button>{" "}
+                  <button onClick={() => onDelete(x)} style={{ color: "red" }}>
+                    Remover
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {filteredHelper.length === 0 && (
+              <tr>
+                <td colSpan={3} style={{ padding: 12, textAlign: "center" }}>
+                  Nenhum tecido cadastrado
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
 
       {isOpen && (
         <div className="modalOverlay" onMouseDown={() => setIsOpen(false)}>
@@ -206,9 +207,21 @@ export default function TecidosPage() {
   );
 }
 
+const th: React.CSSProperties = {
+  textAlign: "left",
+  borderBottom: "1px solid #ddd",
+  padding: 8,
+};
+const td: React.CSSProperties = { borderBottom: "1px solid #eee", padding: 8 };
+
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
   if (typeof e === "string") return e;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (e && typeof e === "object" && "message" in e && typeof e.message === "string") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (e as any).message;
+  }
   try {
     return JSON.stringify(e);
   } catch {

@@ -1,24 +1,29 @@
-import React, { useEffect, useState } from "react";
-import "./ClientesPage.css"; // Reuse modal styles from here
-import type { Categoria } from "../api/types";
+import React, { useEffect, useState, useMemo } from "react";
+import "./ClientesPage.css";
+
+import type { Marca } from "../api/types";
 import {
-  createCategoria,
-  deleteCategoria,
-  listCategorias,
-  updateCategoria,
-} from "../api/categorias";
+  createMarca,
+  deleteMarca,
+  listMarcas,
+  updateMarca,
+} from "../api/marcas";
 
-type FormState = Partial<Categoria>;
-const emptyForm: FormState = { nome: "" };
+type FormState = Partial<Marca>;
+const emptyForm: FormState = {
+  nome: "",
+  urlImagem: "",
+  observacao: "",
+};
 
-export default function CategoriasPage() {
-  const [items, setItems] = useState<Categoria[]>([]);
+export default function MarcasPage() {
+  const [items, setItems] = useState<Marca[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const [isOpen, setIsOpen] = useState(false);
-  const [editing, setEditing] = useState<Categoria | null>(null);
+  const [editing, setEditing] = useState<Marca | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
 
@@ -26,7 +31,7 @@ export default function CategoriasPage() {
     try {
       setLoading(true);
       setError(null);
-      setItems(await listCategorias());
+      setItems(await listMarcas());
     } catch (e: unknown) {
       setError(getErrorMessage(e) || "Erro ao carregar");
     } finally {
@@ -38,8 +43,7 @@ export default function CategoriasPage() {
     void load();
   }, []);
 
-  // Simple client-side search
-  const filteredHelper = React.useMemo(() => {
+  const filteredItems = useMemo(() => {
     if (!search) return items;
     const lower = search.toLowerCase();
     return items.filter((x) => x.nome.toLowerCase().includes(lower));
@@ -51,7 +55,7 @@ export default function CategoriasPage() {
     setIsOpen(true);
   }
 
-  function openEdit(x: Categoria) {
+  function openEdit(x: Marca) {
     setEditing(x);
     setForm({ ...x });
     setIsOpen(true);
@@ -64,10 +68,16 @@ export default function CategoriasPage() {
       if (!form.nome || form.nome.trim().length === 0)
         throw new Error("Nome é obrigatório.");
 
+      const payload = {
+        nome: form.nome.trim(),
+        urlImagem: form.urlImagem || null,
+        observacao: form.observacao || null,
+      };
+
       if (editing) {
-        await updateCategoria(editing.id, { nome: form.nome.trim() });
+        await updateMarca(editing.id, payload);
       } else {
-        await createCategoria({ nome: form.nome.trim() });
+        await createMarca(payload);
       }
 
       setIsOpen(false);
@@ -79,10 +89,10 @@ export default function CategoriasPage() {
     }
   }
 
-  async function onDelete(x: Categoria) {
-    if (!confirm(`Remover categoria "${x.nome}"?`)) return;
+  async function onDelete(x: Marca) {
+    if (!confirm(`Remover marca "${x.nome}"?`)) return;
     try {
-      await deleteCategoria(x.id);
+      await deleteMarca(x.id);
       await load();
     } catch (e: unknown) {
       alert(getErrorMessage(e) || "Erro ao remover");
@@ -91,27 +101,16 @@ export default function CategoriasPage() {
 
   return (
     <div style={{ padding: 16 }}>
-      <h1>Categorias</h1>
+      <h1>Marcas</h1>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          marginBottom: 12,
-        }}
-      >
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <input
-          placeholder="Buscar..."
+          placeholder="Buscar marca..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: 8 }}
         />
         <button onClick={openCreate}>Nova</button>
-      </div>
-
-      <div style={{ marginBottom: 8 }}>
-        <span>Total: {filteredHelper.length}</span>
       </div>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
@@ -124,14 +123,26 @@ export default function CategoriasPage() {
             <tr>
               <th style={th}>ID</th>
               <th style={th}>Nome</th>
+              <th style={th}>Imagem (URL)</th>
+              <th style={th}>Observação</th>
               <th style={th}>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {filteredHelper.map((x) => (
+            {filteredItems.map((x) => (
               <tr key={x.id}>
                 <td style={td}>{x.id}</td>
                 <td style={td}>{x.nome}</td>
+                <td style={td}>
+                  {x.urlImagem ? (
+                    <a href={x.urlImagem} target="_blank" rel="noreferrer">
+                      Link
+                    </a>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td style={td}>{x.observacao || "-"}</td>
                 <td style={td}>
                   <button onClick={() => openEdit(x)}>Editar</button>{" "}
                   <button onClick={() => onDelete(x)} style={{ color: "red" }}>
@@ -140,10 +151,10 @@ export default function CategoriasPage() {
                 </td>
               </tr>
             ))}
-            {filteredHelper.length === 0 && (
+            {filteredItems.length === 0 && (
               <tr>
-                <td colSpan={3} style={{ padding: 12, textAlign: "center" }}>
-                  Nenhuma categoria cadastrada
+                <td colSpan={5} style={{ padding: 12, textAlign: "center" }}>
+                  Nenhuma marca encontrada
                 </td>
               </tr>
             )}
@@ -156,13 +167,9 @@ export default function CategoriasPage() {
           <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
             <div className="modalHeader">
               <h3 className="modalTitle">
-                {editing ? "Editar Categoria" : "Nova Categoria"}
+                {editing ? "Editar Marca" : "Nova Marca"}
               </h3>
-              <button
-                className="btn btn-sm"
-                type="button"
-                onClick={() => setIsOpen(false)}
-              >
+              <button className="btn btn-sm" onClick={() => setIsOpen(false)}>
                 Fechar
               </button>
             </div>
@@ -170,8 +177,8 @@ export default function CategoriasPage() {
             <form onSubmit={onSave}>
               <div className="modalBody">
                 <div className="formGrid">
-                  <div className="field fieldFull">
-                    <div className="label">Nome*</div>
+                  <div className="field">
+                    <label className="label">Nome*</label>
                     <input
                       className="cl-input"
                       value={form.nome || ""}
@@ -179,6 +186,27 @@ export default function CategoriasPage() {
                         setForm({ ...form, nome: e.target.value })
                       }
                       required
+                    />
+                  </div>
+                  <div className="field">
+                    <label className="label">URL Imagem</label>
+                    <input
+                      className="cl-input"
+                      value={form.urlImagem || ""}
+                      onChange={(e) =>
+                        setForm({ ...form, urlImagem: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="field fieldFull">
+                    <label className="label">Observação</label>
+                    <textarea
+                      className="textarea"
+                      value={form.observacao || ""}
+                      onChange={(e) =>
+                        setForm({ ...form, observacao: e.target.value })
+                      }
+                      rows={3}
                     />
                   </div>
                 </div>
@@ -217,15 +245,7 @@ const td: React.CSSProperties = { borderBottom: "1px solid #eee", padding: 8 };
 
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
-  if (typeof e === "string") return e;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (e && typeof e === "object" && "message" in e && typeof e.message === "string") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (e as any).message;
-  }
-  try {
-    return JSON.stringify(e);
-  } catch {
-    return "Erro desconhecido";
-  }
+  if (typeof e === "object" && e && (e as any).message) return (e as any).message;
+  return "Erro desconhecido";
 }

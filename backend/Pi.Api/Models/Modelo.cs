@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace Pi.Api.Models;
 
@@ -14,52 +13,26 @@ public class Modelo
 
     [Required]
     [Column("id_fornecedor")]
-    public long FornecedorId { get; set; }
+    public long IdFornecedor { get; set; }
 
-    [ForeignKey(nameof(FornecedorId))]
-    public Fornecedor Fornecedor { get; set; } = null!;
+    [ForeignKey(nameof(IdFornecedor))]
+    public Fornecedor? Fornecedor { get; set; }
 
     [Required]
     [Column("id_categoria")]
-    public long CategoriaId { get; set; }
+    public long IdCategoria { get; set; }
 
-    [ForeignKey(nameof(CategoriaId))]
-    public Categoria Categoria { get; set; } = null!;
+    [ForeignKey(nameof(IdCategoria))]
+    public Categoria? Categoria { get; set; }
 
     [Required]
+    [MaxLength(300)]
     [Column("descricao")]
-    [MaxLength(400)]
     public string Descricao { get; set; } = string.Empty;
 
-    [Required]
-    [Column("largura", TypeName = "numeric(18,2)")]
-    public decimal Largura { get; set; }
+    [MaxLength(500)]
+    [Column("url_imagem")]
+    public string? UrlImagem { get; set; }
 
-    [Required]
-    [Column("profundidade", TypeName = "numeric(18,2)")]
-    public decimal Profundidade { get; set; }
-
-    [Required]
-    [Column("altura", TypeName = "numeric(18,2)")]
-    public decimal Altura { get; set; }
-
-    [Required]
-    [Column("pa", TypeName = "numeric(18,2)")]
-    public decimal? Pa { get; set; }
-
-    // Calculado no banco (DbContext). Não aceitar do cliente.
-    [Column("m3", TypeName = "numeric(18,2)")]
-    [JsonIgnore]
-    public decimal M3 { get; private set; }
-
-    [Required]
-    [Column("id_tecido")]
-    public long TecidoId { get; set; }
-
-    [ForeignKey(nameof(TecidoId))]
-    public Tecido Tecido { get; set; } = null!;
-
-    [Required]
-    [Column("valor_tecido", TypeName = "numeric(18,3)")]
-    public decimal ValorTecido { get; set; }
+    public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 }

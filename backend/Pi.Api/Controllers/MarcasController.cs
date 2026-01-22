@@ -7,37 +7,40 @@ namespace Pi.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CategoriasController : ControllerBase
+public class MarcasController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public CategoriasController(AppDbContext db) => _db = db;
+    public MarcasController(AppDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Categoria>>> GetAll()
-        => await _db.Categorias.AsNoTracking().OrderBy(x => x.Id).ToListAsync();
+    public async Task<ActionResult<IEnumerable<Marca>>> GetAll()
+        => await _db.Marcas.AsNoTracking().OrderBy(x => x.Id).ToListAsync();
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<Categoria>> GetById(long id)
+    public async Task<ActionResult<Marca>> GetById(long id)
     {
-        var item = await _db.Categorias.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Marcas.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         return item is null ? NotFound() : item;
     }
 
     [HttpPost]
-    public async Task<ActionResult<Categoria>> Create([FromBody] Categoria input)
+    public async Task<ActionResult<Marca>> Create([FromBody] Marca input)
     {
-        _db.Categorias.Add(input);
+        _db.Marcas.Add(input);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = input.Id }, input);
     }
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Update(long id, [FromBody] Categoria input)
+    public async Task<IActionResult> Update(long id, [FromBody] Marca input)
     {
-        var item = await _db.Categorias.FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Marcas.FirstOrDefaultAsync(x => x.Id == id);
         if (item is null) return NotFound();
 
         item.Nome = input.Nome;
+        item.UrlImagem = input.UrlImagem;
+        item.Observacao = input.Observacao;
+
         await _db.SaveChangesAsync();
         return NoContent();
     }
@@ -45,10 +48,10 @@ public class CategoriasController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
     {
-        var item = await _db.Categorias.FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Marcas.FirstOrDefaultAsync(x => x.Id == id);
         if (item is null) return NotFound();
 
-        _db.Categorias.Remove(item);
+        _db.Marcas.Remove(item);
         await _db.SaveChangesAsync();
         return NoContent();
     }

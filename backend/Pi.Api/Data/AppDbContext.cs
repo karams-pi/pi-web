@@ -15,15 +15,21 @@ public class AppDbContext : DbContext
 
     public DbSet<Fornecedor> Fornecedores => Set<Fornecedor>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
-    public DbSet<Modelo> Modelos => Set<Modelo>();
+    public DbSet<Marca> Marcas => Set<Marca>();
     public DbSet<Tecido> Tecidos => Set<Tecido>();
+
+    // NOVO MODELO (remodelado)
+    public DbSet<Modulo> Modulos => Set<Modulo>();
+    public DbSet<ModuloTecido> ModulosTecidos => Set<ModuloTecido>();
 
     public DbSet<ListaPreco> ListasPreco => Set<ListaPreco>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // ===== Tabelas já existentes =====
         modelBuilder.Entity<Cliente>().ToTable("clientes");
         modelBuilder.Entity<PiModel>().ToTable("pis");
+
         modelBuilder.Entity<PiSequencia>(e =>
         {
             e.ToTable("pi_sequencias");
@@ -36,54 +42,9 @@ public class AppDbContext : DbContext
             e.Property(x => x.UltimoNumero).HasColumnName("ultimo_numero");
 
             e.HasIndex(x => new { x.Prefixo, x.Ano })
-             .IsUnique()
-             .HasDatabaseName("uq_pi_sequencias_prefixo_ano");
+                .IsUnique()
+                .HasDatabaseName("uq_pi_sequencias_prefixo_ano");
         });
-
-        // UNIQUE
-        modelBuilder.Entity<Categoria>()
-            .HasIndex(x => x.Nome).IsUnique();
-
-        // modelBuilder.Entity<Modelo>()
-        //     .HasIndex(x => x.Nome).IsUnique();
-
-        modelBuilder.Entity<Tecido>()
-            .HasIndex(x => x.Nome).IsUnique();
-
-        modelBuilder.Entity<Categoria>()
-        .Property(x => x.Id)
-        .ValueGeneratedOnAdd();
-
-        // SEED (GUIDs fixos para estabilidade)
-        // modelBuilder.Entity<Categoria>().HasData(
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000001"), Nome = "Estofado" },
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000002"), Nome = "Cadeira" },
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000003"), Nome = "Chaise" },
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000004"), Nome = "Poltrona" },
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000005"), Nome = "Cama" },
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000006"), Nome = "Almofada" },
-        //     new Categoria { Id = Guid.Parse("c5e1c1b1-8b2c-4b2f-9f11-000000000007"), Nome = "Puff" }
-        // );
-
-        // modelBuilder.Entity<Modelo>().HasData(
-        //     new Modelo { Id = Guid.Parse("d2a2b2c2-1a1b-4c4d-9f22-000000000101"), Nome = "Affair" },
-        //     new Modelo { Id = Guid.Parse("d2a2b2c2-1a1b-4c4d-9f22-000000000102"), Nome = "Daybed fixa (144)" },
-        //     new Modelo { Id = Guid.Parse("d2a2b2c2-1a1b-4c4d-9f22-000000000103"), Nome = "Daybed giratória (144)" },
-        //     new Modelo { Id = Guid.Parse("d2a2b2c2-1a1b-4c4d-9f22-000000000104"), Nome = "Daybed fixa (164)" },
-        //     new Modelo { Id = Guid.Parse("d2a2b2c2-1a1b-4c4d-9f22-000000000105"), Nome = "Daybed giratória (164)" }
-        // );
-
-        // modelBuilder.Entity<Tecido>().HasData(
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000201"), Nome = "G0" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000202"), Nome = "G1" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000203"), Nome = "G2" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000204"), Nome = "G3" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000205"), Nome = "G4" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000206"), Nome = "G5" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000207"), Nome = "G6" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000208"), Nome = "G7" },
-        //     new Tecido { Id = Guid.Parse("e3b3c3d3-2b2c-4d4e-9f33-000000000209"), Nome = "G8" }
-        // );
 
         modelBuilder.Entity<ListaPreco>(e =>
         {
@@ -114,12 +75,55 @@ public class AppDbContext : DbContext
             e.Property(x => x.FlAtivo).HasColumnName("fl_ativo");
         });
 
-        modelBuilder.Entity<Modelo>(entity =>
+        // ===== Mapeamento/Índices/Restrições para as novas tabelas =====
+
+        // Fornecedor / Categoria / Tecido / Marca:
+        // (Se seus Models já usam [Table("...")] você pode até remover ToTable,
+        //  mas deixo explícito aqui para ficar "blindado")
+        modelBuilder.Entity<Fornecedor>().ToTable("fornecedor");
+        modelBuilder.Entity<Categoria>().ToTable("categoria");
+        modelBuilder.Entity<Tecido>().ToTable("tecido");
+        modelBuilder.Entity<Marca>().ToTable("marca");
+
+        // UNIQUE (mantive o que você já tinha e adicionei Marca)
+        modelBuilder.Entity<Categoria>()
+            .HasIndex(x => x.Nome)
+            .IsUnique()
+            .HasDatabaseName("uq_categoria_nome");
+
+        modelBuilder.Entity<Tecido>()
+            .HasIndex(x => x.Nome)
+            .IsUnique()
+            .HasDatabaseName("uq_tecido_nome");
+
+        modelBuilder.Entity<Marca>()
+            .HasIndex(x => x.Nome)
+            .IsUnique()
+            .HasDatabaseName("uq_marca_nome");
+
+        // (opcional) CNPJ único
+        modelBuilder.Entity<Fornecedor>()
+            .HasIndex(x => x.Cnpj)
+            .IsUnique()
+            .HasDatabaseName("uq_fornecedor_cnpj");
+
+        // Modulo
+        modelBuilder.Entity<Modulo>(entity =>
         {
-            // Garante tipos (opcional, mas bom para Postgres)
+            entity.ToTable("modulo");
+
+            entity.HasKey(x => x.Id);
+
+            // índices de FK (performance)
+            entity.HasIndex(x => x.IdFornecedor).HasDatabaseName("ix_modulo_id_fornecedor");
+            entity.HasIndex(x => x.IdCategoria).HasDatabaseName("ix_modulo_id_categoria");
+            entity.HasIndex(x => x.IdMarca).HasDatabaseName("ix_modulo_id_marca");
+
+            // tipos numéricos
             entity.Property(x => x.Largura).HasColumnType("numeric(18,2)");
             entity.Property(x => x.Profundidade).HasColumnType("numeric(18,2)");
             entity.Property(x => x.Altura).HasColumnType("numeric(18,2)");
+            entity.Property(x => x.Pa).HasColumnType("numeric(18,2)");
 
             // m3 como coluna calculada no banco (STORED)
             entity.Property(x => x.M3)
@@ -128,7 +132,58 @@ public class AppDbContext : DbContext
                     "round((largura * profundidade * altura)::numeric, 2)",
                     stored: true
                 );
+
+            // relacionamentos
+            entity.HasOne(x => x.Fornecedor)
+                .WithMany(x => x.Modulos)
+                .HasForeignKey(x => x.IdFornecedor)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Categoria)
+                .WithMany(x => x.Modulos)
+                .HasForeignKey(x => x.IdCategoria)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Marca)
+                .WithMany(x => x.Modulos)
+                .HasForeignKey(x => x.IdMarca)
+                .OnDelete(DeleteBehavior.Restrict);
         });
+
+        // ModuloTecido (tabela de junção com preço)
+        modelBuilder.Entity<ModuloTecido>(entity =>
+        {
+            entity.ToTable("modulo_tecido");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.IdModulo).HasDatabaseName("ix_modulo_tecido_id_modulo");
+            entity.HasIndex(x => x.IdTecido).HasDatabaseName("ix_modulo_tecido_id_tecido");
+
+            // impede duplicar o mesmo tecido no mesmo módulo
+            entity.HasIndex(x => new { x.IdModulo, x.IdTecido })
+                .IsUnique()
+                .HasDatabaseName("uq_modulo_tecido_id_modulo_id_tecido");
+
+            entity.Property(x => x.ValorTecido).HasColumnType("numeric(18,3)");
+
+            entity.HasOne(x => x.Modulo)
+                .WithMany(x => x.ModulosTecidos)
+                .HasForeignKey(x => x.IdModulo)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Tecido)
+                .WithMany(x => x.ModulosTecidos)
+                .HasForeignKey(x => x.IdTecido)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ===== IMPORTANTE: removi tudo que era do MODELO ANTIGO =====
+        // - DbSet<Modelo> e mapeamentos de Modelo
+        // - índices Modulo.IdModelo e Modulo.IdTecido (agora virou ModuloTecido)
+        //
+        // Se ainda existir a classe Modelo no projeto por outros motivos, ok,
+        // mas não deve estar mais no DbContext nem com migrations novas.
 
         base.OnModelCreating(modelBuilder);
     }

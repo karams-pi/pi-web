@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,5 +16,6 @@ public class Categoria
     [MaxLength(200)]
     public string Nome { get; set; } = string.Empty;
 
-    public ICollection<Modelo> Modelos { get; set; } = new List<Modelo>();
+    // 1 categoria -> N módulos
+    public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 }

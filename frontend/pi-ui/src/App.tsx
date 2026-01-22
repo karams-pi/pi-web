@@ -1,18 +1,20 @@
 import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import HomeMenu from "./pages/HomeMenu";
 import ClientesPage from "./pages/ClientesPage";
+import FornecedoresPage from "./pages/FornecedoresPage";
 import CategoriasPage from "./pages/CategoriasPage";
-import ModelosPage from "./pages/ModelosPage";
 import TecidosPage from "./pages/TecidosPage";
+import ModulosPage from "./pages/ModulosPage";
+import MarcasPage from "./pages/MarcasPage";
 
-function ProdutosPage() {
-  return (
-    <div className="card">
-      <h2>Produtos</h2>
-      <p>Em breve: cadastro de produtos.</p>
-    </div>
-  );
-}
+// function ProdutosPage() {
+//   return (
+//     <div className="card">
+//       <h2>Produtos</h2>
+//       <p>Em breve: cadastro de produtos.</p>
+//     </div>
+//   );
+// }
 
 function NovaPiPage() {
   return (
@@ -32,14 +34,14 @@ function ConfigPage() {
   );
 }
 
-function PrecosPage() {
-  return (
-    <div className="card">
-      <h2>Lista de Preços</h2>
-      <p>Em breve: gerenciamento de preços.</p>
-    </div>
-  );
-}
+// function PrecosPage() {
+//   return (
+//     <div className="card">
+//       <h2>Lista de Preços</h2>
+//       <p>Em breve: gerenciamento de preços.</p>
+//     </div>
+//   );
+// }
 
 function NotFound() {
   return (
@@ -63,13 +65,14 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomeMenu />} />
               <Route path="/clientes" element={<ClientesPage />} />
+              <Route path="/fornecedores" element={<FornecedoresPage />} />
               <Route path="/categorias" element={<CategoriasPage />} />
-              <Route path="/modelos" element={<ModelosPage />} />
+              <Route path="/marcas" element={<MarcasPage />} />
               <Route path="/tecidos" element={<TecidosPage />} />
-              <Route path="/produtos" element={<ProdutosPage />} />
+              <Route path="/modulos" element={<ModulosPage />} />
               <Route path="/pis/novo" element={<NovaPiPage />} />
               <Route path="/config" element={<ConfigPage />} />
-              <Route path="/precos" element={<PrecosPage />} />
+              {/* <Route path="/precos" element={<PrecosPage />} /> */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
@@ -107,6 +110,14 @@ function Header() {
             >
               Clientes
             </NavLink>
+            <NavLink
+              to="/fornecedores"
+              className={({ isActive }) =>
+                `navlink ${isActive ? "navlink-active" : ""}`
+              }
+            >
+              Fornecedores
+            </NavLink>
 
             <NavLink
               to="/categorias"
@@ -117,12 +128,12 @@ function Header() {
               Categorias
             </NavLink>
             <NavLink
-              to="/modelos"
+              to="/marcas"
               className={({ isActive }) =>
                 `navlink ${isActive ? "navlink-active" : ""}`
               }
             >
-              Modelos
+              Marcas
             </NavLink>
             <NavLink
               to="/tecidos"
@@ -134,21 +145,12 @@ function Header() {
             </NavLink>
 
             <NavLink
-              to="/produtos"
+              to="/modulos"
               className={({ isActive }) =>
                 `navlink ${isActive ? "navlink-active" : ""}`
               }
             >
-              Produtos
-            </NavLink>
-
-            <NavLink
-              to="/precos"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Lista de Preços
+              Modulos
             </NavLink>
 
             <NavLink
