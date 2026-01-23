@@ -116,7 +116,7 @@ export default function FornecedoresPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: 8 }}
         />
-        <button onClick={openCreate}>Novo</button>
+        <button className="btn btn-primary" onClick={openCreate}>Novo</button>
       </div>
 
       <div style={{ marginBottom: 8 }}>
@@ -144,8 +144,8 @@ export default function FornecedoresPage() {
                 <td style={td}>{item.nome}</td>
                 <td style={td}>{item.cnpj}</td>
                 <td style={td}>
-                  <button onClick={() => openEdit(item)}>Editar</button>{' '}
-                  <button onClick={() => onDelete(item)} style={{ color: 'red' }}>
+                  <button className="btn btn-sm" onClick={() => openEdit(item)}>Editar</button>{' '}
+                  <button className="btn btn-danger btn-sm" onClick={() => onDelete(item)}>
                     Remover
                   </button>
                 </td>

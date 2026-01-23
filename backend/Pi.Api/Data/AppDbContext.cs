@@ -24,6 +24,8 @@ public class AppDbContext : DbContext
 
     public DbSet<ListaPreco> ListasPreco => Set<ListaPreco>();
 
+    public DbSet<Configuracao> Configuracoes => Set<Configuracao>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ===== Tabelas já existentes =====
@@ -176,6 +178,24 @@ public class AppDbContext : DbContext
                 .WithMany(x => x.ModulosTecidos)
                 .HasForeignKey(x => x.IdTecido)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configuracoes
+        modelBuilder.Entity<Configuracao>(entity =>
+        {
+            entity.ToTable("configuracoes");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.DataConfig).HasColumnName("data_config");
+            entity.Property(x => x.ValorReducaoDolar).HasColumnName("valor_reducao_dolar");
+            entity.Property(x => x.ValorPercImposto).HasColumnName("valor_perc_imposto");
+            entity.Property(x => x.PercentualComissao).HasColumnName("percentual_comissao");
+            entity.Property(x => x.PercentualGordura).HasColumnName("percentual_gordura");
+            entity.Property(x => x.ValorFCAFreteRodFronteira).HasColumnName("valor_FCA_frete_rod_fronteira");
+            entity.Property(x => x.ValorDespesasFCA).HasColumnName("valor_despesas_FCA");
+            entity.Property(x => x.ValorFOBFretePortoParanagua).HasColumnName("valor_FOB_frete_porto_paranagua");
+            entity.Property(x => x.ValorFOBDespPortRegDoc).HasColumnName("valor_FOB_desp_port_reg_doc");
+            entity.Property(x => x.ValorFOBDespDespacAduaneiro).HasColumnName("valor_FOB_desp_despac_aduaneiro");
+            entity.Property(x => x.ValorFOBDespCourier).HasColumnName("valor_FOB_desp_courier");
         });
 
         // ===== IMPORTANTE: removi tudo que era do MODELO ANTIGO =====

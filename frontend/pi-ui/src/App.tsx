@@ -25,14 +25,7 @@ function NovaPiPage() {
   );
 }
 
-function ConfigPage() {
-  return (
-    <div className="card">
-      <h2>Configurações</h2>
-      <p>Em breve: preferências do sistema.</p>
-    </div>
-  );
-}
+import ConfiguracoesPage from "./pages/ConfiguracoesPage";
 
 // function PrecosPage() {
 //   return (
@@ -71,7 +64,7 @@ export default function App() {
               <Route path="/tecidos" element={<TecidosPage />} />
               <Route path="/modulos" element={<ModulosPage />} />
               <Route path="/pis/novo" element={<NovaPiPage />} />
-              <Route path="/config" element={<ConfigPage />} />
+              <Route path="/config" element={<ConfiguracoesPage />} />
               {/* <Route path="/precos" element={<PrecosPage />} /> */}
               <Route path="*" element={<NotFound />} />
             </Routes>
