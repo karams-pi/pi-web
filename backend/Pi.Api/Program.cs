@@ -24,7 +24,7 @@ builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("dev", p =>
-        p.WithOrigins("http://localhost:5173")
+        p.AllowAnyOrigin()
          .AllowAnyHeader()
          .AllowAnyMethod());
 });
