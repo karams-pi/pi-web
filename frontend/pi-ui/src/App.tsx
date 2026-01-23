@@ -8,6 +8,7 @@ import ModulosPage from "./pages/ModulosPage";
 import MarcasPage from "./pages/MarcasPage";
 import ProformaInvoicePage from "./pages/ProformaInvoicePage";
 import PrintPiPage from "./pages/PrintPiPage";
+import ImportacaoPage from "./pages/ImportacaoPage";
 
 // function ProdutosPage() {
 //   return (
@@ -60,6 +61,7 @@ export default function App() {
               <Route path="/modulos" element={<ModulosPage />} />
               <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
               <Route path="/print-pi/:id" element={<PrintPiPage />} />
+              <Route path="/importacao" element={<ImportacaoPage />} />
               <Route path="/config" element={<ConfiguracoesPage />} />
               {/* <Route path="/precos" element={<PrecosPage />} /> */}
               <Route path="*" element={<NotFound />} />
@@ -149,6 +151,15 @@ function Header() {
               }
             >
               Proforma Invoice
+            </NavLink>
+
+            <NavLink
+              to="/importacao"
+              className={({ isActive }) =>
+                `navlink ${isActive ? "navlink-active" : ""}`
+              }
+            >
+              Importar
             </NavLink>
 
             <NavLink

@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Data;
 
+using OfficeOpenXml;
+
+// Configurar licença do EPPlus (v8+)
+ExcelPackage.License.SetNonCommercialPersonal("PI Web User");
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -12,7 +17,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // Registrar HttpClient e CotacaoService
+// Registrar HttpClient e CotacaoService
 builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>();
+builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 
 builder.Services.AddCors(options =>
 {
