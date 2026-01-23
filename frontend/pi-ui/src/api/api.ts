@@ -100,3 +100,19 @@ export async function apiDelete(
   await assertOk(res);
   // Se vier 204 ou body vazio, simplesmente retorna.
 }
+
+export async function apiPostFormData<T>(
+  path: string,
+  formData: FormData,
+  init?: RequestInit,
+): Promise<T> {
+  const res = await fetch(buildUrl(path), {
+    method: "POST",
+    body: formData,
+    // Note: Do NOT set Content-Type header for FormData; browser sets it with boundary
+    credentials: "omit",
+    ...init,
+  });
+  await assertOk(res);
+  return parseJson<T>(res);
+}
