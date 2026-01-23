@@ -110,7 +110,7 @@ export default function MarcasPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: 8 }}
         />
-        <button onClick={openCreate}>Nova</button>
+        <button className="btn btn-primary" onClick={openCreate}>Nova</button>
       </div>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
@@ -144,8 +144,8 @@ export default function MarcasPage() {
                 </td>
                 <td style={td}>{x.observacao || "-"}</td>
                 <td style={td}>
-                  <button onClick={() => openEdit(x)}>Editar</button>{" "}
-                  <button onClick={() => onDelete(x)} style={{ color: "red" }}>
+                  <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
+                  <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
                     Remover
                   </button>
                 </td>

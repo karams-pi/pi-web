@@ -1,0 +1,214 @@
+/* src/pages/ConfiguracoesPage.css */
+
+:root {
+  --cfg-primary: var(--primary, #2563eb);
+  --cfg-bg: var(--bg, #0b1220);
+  --cfg-card: rgba(255, 255, 255, 0.03);
+  --cfg-border: rgba(148, 163, 184, 0.2);
+  --cfg-text: var(--text, #e5e7eb);
+  --cfg-muted: var(--muted, #94a3b8);
+  --cfg-radius: 16px;
+}
+
+.cfg-page {
+  padding: 24px;
+  color: var(--cfg-text);
+  min-height: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cfg-header {
+  margin-bottom: 32px;
+}
+
+.cfg-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  background: linear-gradient(90deg, #fff, #94a3b8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cfg-subtitle {
+  color: var(--cfg-muted);
+  font-size: 15px;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.cfg-container {
+  display: grid;
+  gap: 24px;
+  max-width: 1200px;
+}
+
+.cfg-section {
+  background: var(--cfg-card);
+  border: 1px solid var(--cfg-border);
+  border-radius: var(--cfg-radius);
+  padding: 24px;
+  transition: border-color 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.cfg-section:hover {
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.cfg-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cfg-border);
+}
+
+.cfg-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #f1f5f9;
+}
+
+.cfg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.cfg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cfg-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cfg-muted);
+  margin-left: 2px;
+}
+
+.cfg-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cfg-currency-symbol {
+  position: absolute;
+  left: 12px;
+  color: var(--cfg-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.cfg-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  padding-left: 12px; /* Adjusted since we might put symbol outside or handle it differently */
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--cfg-border);
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-family: 'JetBrains Mono', monospace, ui-monospace, SFMono-Regular; /* Monospace for numbers looks better alignment-wise */
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.cfg-input.has-symbol {
+    padding-left: 36px;
+}
+
+.cfg-input:focus {
+  border-color: var(--cfg-primary);
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.cfg-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.cfg-actions {
+  /* Removed sticky positioning to let it sit at the bottom naturally */
+  background: rgba(11, 18, 32, 0.95);
+  backdrop-filter: blur(12px);
+  padding: 16px 24px;
+  border: 1px solid var(--cfg-border);
+  border-radius: 16px;
+  display: flex;
+  justify-content: flex-end; /* Align button to the right */
+  align-items: center;
+  margin-top: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.cfg-last-update {
+  font-size: 13px;
+  color: var(--cfg-muted);
+  font-family: monospace;
+}
+
+.cfg-btn-save {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  height: 44px;
+  padding: 0 32px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+.cfg-btn-save:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+  filter: brightness(1.1);
+}
+
+.cfg-btn-save:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* Status Messages */
+.cfg-message {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cfg-message.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.cfg-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}

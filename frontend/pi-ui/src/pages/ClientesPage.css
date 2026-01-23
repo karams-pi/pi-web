@@ -61,6 +61,11 @@
   outline: none;
 }
 
+.cl-select option {
+  background-color: var(--card);
+  color: var(--text);
+}
+
 .cl-meta {
   display: flex;
   gap: 12px;
@@ -144,42 +149,60 @@
 /* Buttons */
 .btn {
   height: 40px;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 10px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  transition: 120ms ease;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, var(--primary), var(--primary2));
-  border-color: rgba(37, 99, 235, 0.55);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(180deg, #2f6df0, #1e4fe0);
+  filter: brightness(1.1);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
 }
 
 .btn-danger {
-  background: linear-gradient(180deg, var(--danger), var(--danger2));
-  border-color: rgba(239, 68, 68, 0.55);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover {
-  background: linear-gradient(180deg, #f35b5b, #d63a3a);
+  filter: brightness(1.1);
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4);
 }
 
 .btn-sm {

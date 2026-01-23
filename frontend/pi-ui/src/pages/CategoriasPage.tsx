@@ -107,7 +107,7 @@ export default function CategoriasPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: 8 }}
         />
-        <button onClick={openCreate}>Nova</button>
+        <button className="btn btn-primary" onClick={openCreate}>Nova</button>
       </div>
 
       <div style={{ marginBottom: 8 }}>
@@ -133,8 +133,8 @@ export default function CategoriasPage() {
                 <td style={td}>{x.id}</td>
                 <td style={td}>{x.nome}</td>
                 <td style={td}>
-                  <button onClick={() => openEdit(x)}>Editar</button>{" "}
-                  <button onClick={() => onDelete(x)} style={{ color: "red" }}>
+                  <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
+                  <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
                     Remover
                   </button>
                 </td>

@@ -16,14 +16,14 @@ public class ModuloTecido
     public long IdModulo { get; set; }
 
     [ForeignKey(nameof(IdModulo))]
-    public Modulo Modulo { get; set; } = null!;
+    public Modulo? Modulo { get; set; }
 
     [Required]
     [Column("id_tecido")]
     public long IdTecido { get; set; }
 
     [ForeignKey(nameof(IdTecido))]
-    public Tecido Tecido { get; set; } = null!;
+    public Tecido? Tecido { get; set; }
 
     [Required]
     [Column("valor_tecido", TypeName = "numeric(18,3)")]

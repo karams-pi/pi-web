@@ -135,7 +135,7 @@ export default function ClientesPage() {
           }}
           style={{ flex: 1, padding: 8 }}
         />
-        <button onClick={openCreate}>Novo</button>
+        <button className="btn btn-primary" onClick={openCreate}>Novo</button>
       </div>
 
       <div
@@ -204,8 +204,8 @@ export default function ClientesPage() {
                 </td>
                 <td style={td}>{c.ativo ? 'Sim' : 'Não'}</td>
                 <td style={td}>
-                  <button onClick={() => openEdit(c)}>Editar</button>{' '}
-                  <button onClick={() => onDelete(c)} style={{ color: 'red' }}>
+                  <button className="btn btn-sm" onClick={() => openEdit(c)}>Editar</button>{' '}
+                  <button className="btn btn-danger btn-sm" onClick={() => onDelete(c)}>
                     Remover
                   </button>
                 </td>
@@ -230,6 +230,7 @@ export default function ClientesPage() {
           alignItems: 'center',
         }}>
         <button
+          className="btn"
           disabled={page <= 1}
           onClick={() => setPage((p) => Math.max(1, p - 1))}>
           Anterior
@@ -238,6 +239,7 @@ export default function ClientesPage() {
           Página {page} de {totalPages}
         </span>
         <button
+          className="btn"
           disabled={page >= totalPages}
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
           Próxima

@@ -181,7 +181,7 @@ export default function ModulosPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: 8 }}
         />
-        <button onClick={openCreate}>Novo</button>
+        <button className="btn btn-primary" onClick={openCreate}>Novo</button>
       </div>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
@@ -199,29 +199,54 @@ export default function ModulosPage() {
               <th style={th}>Marca</th>
               <th style={th}>Dimensões (LxPxA)</th>
               <th style={th}>M³</th>
+              <th style={th}>Tecidos / Valores</th>
               <th style={th}>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {filteredItems.map((x) => (
-              <tr key={x.id}>
-                <td style={td}>{x.id}</td>
-                <td style={td}>{x.descricao}</td>
-                <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
-                <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
-                <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
-                <td style={td}>
-                  {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
-                </td>
-                <td style={td}>{fmt(x.m3)}</td>
-                <td style={td}>
-                  <button onClick={() => openEdit(x)}>Editar</button>{" "}
-                  <button onClick={() => onDelete(x)} style={{ color: "red" }}>
-                    Remover
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {filteredItems.map((x) => {
+               // Find related fabrics
+               const myTecidos = modulosTecidos.filter(mt => mt.idModulo === x.id);
+
+               return (
+                <tr key={x.id}>
+                    <td style={td}>{x.id}</td>
+                    <td style={td}>{x.descricao}</td>
+                    <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
+                    <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
+                    <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
+                    <td style={td}>
+                    {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
+                    </td>
+                    <td style={td}>{fmt(x.m3)}</td>
+                    <td style={td}>
+                        {myTecidos.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                {myTecidos.map(mt => (
+                                    <div key={mt.id} style={{ fontSize: '0.9em' }}>
+                                        <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                                            {tecidoMap.get(mt.idTecido) || mt.idTecido}:
+                                        </span>
+                                        {' '}
+                                        <span style={{ color: '#e5e7eb' }}>
+                                            R$ {fmt(mt.valorTecido, 3)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
+                        )}
+                    </td>
+                    <td style={td}>
+                    <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
+                    <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
+                        Remover
+                    </button>
+                    </td>
+                </tr>
+               );
+            })}
           </tbody>
         </table>
       )}
@@ -241,12 +266,14 @@ export default function ModulosPage() {
             <div style={{ padding: "0 16px", borderBottom: "1px solid #ddd" }}>
               <div style={{ display: "flex", gap: 16 }}>
                 <button
+                  className="btn"
                   style={tabStyle(activeTab === "geral")}
                   onClick={() => setActiveTab("geral")}
                 >
                   Geral
                 </button>
                 <button
+                  className="btn"
                   style={tabStyle(activeTab === "tecidos")}
                   onClick={() => {
                     if (!editing) alert("Salve o módulo antes de adicionar tecidos.");

@@ -16,21 +16,21 @@ public class Modulo
     public long IdFornecedor { get; set; }
 
     [ForeignKey(nameof(IdFornecedor))]
-    public Fornecedor Fornecedor { get; set; } = null!;
+    public Fornecedor? Fornecedor { get; set; }
 
     [Required]
     [Column("id_categoria")]
     public long IdCategoria { get; set; }
 
     [ForeignKey(nameof(IdCategoria))]
-    public Categoria Categoria { get; set; } = null!;
+    public Categoria? Categoria { get; set; }
 
     [Required]
     [Column("id_marca")]
     public long IdMarca { get; set; }
 
     [ForeignKey(nameof(IdMarca))]
-    public Marca Marca { get; set; } = null!;
+    public Marca? Marca { get; set; }
 
     [Required]
     [Column("descricao")]
