@@ -210,3 +210,11 @@ E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.runtimeconfig.json
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.pdb
 E:\teste\pi-web\backend\Pi.Api\obj\Debug\net8.0\Pi.Api.genruntimeconfig.cache
 E:\teste\pi-web\backend\Pi.Api\obj\Debug\net8.0\ref\Pi.Api.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\EPPlus.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\EPPlus.Interfaces.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\System.Security.Cryptography.Xml.dll
+E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
