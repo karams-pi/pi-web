@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:latest
     container_name: pi-postgres
+    restart: always
     environment:
       POSTGRES_USER: pi
       POSTGRES_PASSWORD: pi123
@@ -10,6 +11,42 @@ services:
       - '5432:5432'
     volumes:
       - pi_pgdata:/var/lib/postgresql/data
+    networks:
+      - pi-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pi-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=pi_db;Username=pi;Password=pi123
+      - ASPNETCORE_URLS=http://+:8080
+    expose:
+      - "8080"
+    networks:
+      - pi-network
+
+  frontend:
+    build:
+      context: ./frontend/pi-ui
+      dockerfile: Dockerfile
+    container_name: pi-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - pi-network
 
 volumes:
   pi_pgdata:
+
+
+networks:
+  pi-network:
+    driver: bridge

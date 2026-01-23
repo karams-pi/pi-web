@@ -27,21 +27,50 @@ const DecimalInput = ({
   prefix,
   suffix,
 }: DecimalInputProps) => {
-  const [displayValue, setDisplayValue] = useState("");
+  const [localValue, setLocalValue] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
+    if (!isFocused) {
+      const formatted = (value || 0).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      setLocalValue(formatted);
+    }
+  }, [value, isFocused]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVal = e.target.value;
+    
+    // Allow digits, commas, dots only
+    if (!/^[\d.,]*$/.test(newVal)) return;
+    
+    setLocalValue(newVal);
+
+    // Try to parse number for parent update
+    // Remove thousand separators (dots) and replace decimal separator (comma) with dot
+    const cleanVal = newVal.replace(/\./g, "").replace(",", ".");
+    const numVal = parseFloat(cleanVal);
+    
+    if (!isNaN(numVal)) {
+      onChange(name, numVal);
+    }
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    // On blur, force the formatted display of the current prop value
     const formatted = (value || 0).toLocaleString("pt-BR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    setDisplayValue(formatted);
-  }, [value]);
+    setLocalValue(formatted);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = e.target.value;
-    const digits = inputValue.replace(/\\D/g, "");
-    const numberValue = parseInt(digits || "0", 10) / 100;
-    onChange(name, numberValue);
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    e.target.select();
   };
 
   return (
@@ -52,9 +81,10 @@ const DecimalInput = ({
         <input
           type="text"
           className={`cfg-input ${prefix ? "has-symbol" : ""}`}
-          value={displayValue}
+          value={localValue}
           onChange={handleChange}
-          onFocus={(e) => e.target.select()}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder="0,00"
         />
         {suffix && <span style={{position: "absolute", right: 12, color: "var(--cfg-muted)", fontSize: 13}}>{suffix}</span>}
