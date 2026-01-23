@@ -245,6 +245,14 @@
   box-shadow: var(--shadow);
 }
 
+.modalCard > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .modalHeader {
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
