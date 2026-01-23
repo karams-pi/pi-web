@@ -58,7 +58,7 @@ O Render possui um "Nível Gratuito" (Free Tier) generoso que suporta:
 2.  Conecte o mesmo repositório do GitHub.
 3.  Configurações:
     -   **Name**: `pi-web`.
-    -   **Root Directory**: `frontend/pi-ui`.
+    -   **Root Directory**: `frontend/pi-ui` (Apenas o caminho da pasta, não a URL completa do GitHub).
     -   **Build Command**: `npm install && npm run build`.
     -   **Publish Directory**: `dist`.
     -   **Instance Type**: Free.

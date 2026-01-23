@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./ClientesPage.css";
 
-import type { Frete, ModuloTecido, Configuracao, PiItem } from "../api/types";
+import type { Frete, ModuloTecido, Configuracao } from "../api/types";
 import { listFretes } from "../api/fretes";
 import { getTotalFrete } from "../api/configuracoesFreteItem";
 import { getProximaSequencia, getCotacaoUSD, createPi, getPi } from "../api/pis";
@@ -354,9 +354,7 @@ export default function ProformaInvoicePage() {
         const mt = item.moduloTecido;
         const forn = mt.modulo?.fornecedor?.nome || "?";
         const cat = mt.modulo?.categoria?.nome || "?";
-        const marc = mt.modulo?.marca?.nome || "?";
         const mod = mt.modulo?.descricao || "?";
-        const tec = mt.tecido?.nome || "?";
         return `${forn.substring(0,10)} > ${cat.substring(0,10)}... > ${mod.substring(0,15)}...`;
     }
     return `Módulo #${item.idModuloTecido}`;
