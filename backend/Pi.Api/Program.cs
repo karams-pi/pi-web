@@ -12,8 +12,20 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options
-        .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); // <-- evita "Id" vs "id"
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    // Fix para Render/Railwa (URLs tipo postgres://user:pass@host:port/db)
+    if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+    {
+        var uri = new Uri(connectionString);
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo[0];
+        var password = userInfo.Length > 1 ? userInfo[1] : "";
+        
+        connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
+    }
+
+    options.UseNpgsql(connectionString);
 });
 
 // Registrar HttpClient e CotacaoService
