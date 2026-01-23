@@ -65,6 +65,8 @@ O Render possui um "Nível Gratuito" (Free Tier) generoso que suporta:
 4.  **Environment Variables**:
     -   `VITE_API_BASE`: Cole a URL do seu Backend (ex: `https://pi-backend.onrender.com`).
         -   *Importante*: Não coloque barra no final.
+    -   `NODE_VERSION`: `22` (Ou `20.19.0`).
+        -   *Isso é necessário pois o Vite 7 exige Node.js versão 20.19+ ou 22+*.
 5.  Clique em **Create Static Site**.
 
 ---
