@@ -1,10 +1,18 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
 
 export default function HomeMenu() {
   return (
     <div className="home">
-      <section className="card home-left">
+      <section className="card home-logos-card">
+        <div className="home-logos">
+          <img src="/logo-karams.png" alt="Karams" style={{ height: 60 }} />
+          <div className="logo-divider" />
+          <img src="/logo-seawise.png" alt="SEAWISE" style={{ height: 50 }} />
+        </div>
+      </section>
+
+      <section className="card home-menu-section">
         <div className="meta">Sistema PI Web - Versão 1.0</div>
 
         <div className="title">MENU DE NAVEGAÇÃO</div>
@@ -12,17 +20,9 @@ export default function HomeMenu() {
         <div className="home-menuGrid">
           <MenuButton to="/clientes" label="Cadastro de Clientes" />
           <MenuButton to="/produtos" label="Cadastro de Produtos" />
-          <MenuButton to="/pis/novo" label="Criar Proforma Invoice" />
+          <MenuButton to="/proforma-invoice" label="Criar Proforma Invoice" />
           <MenuButton to="/config" label="Configurações" />
           <MenuButton to="/precos" label="Lista de Preços" />
-        </div>
-      </section>
-
-      <section className="card home-right">
-        <div className="home-logos">
-          <img src="/logo-karams.png" alt="Karams" style={{ height: 60 }} />
-          <div style={{ height: 24 }} />
-          <img src="/logo-seawise.png" alt="SEAWISE" />
         </div>
       </section>
     </div>

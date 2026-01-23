@@ -29,7 +29,7 @@ export async function listClientes(params: {
   search?: string;
   page?: number;
   pageSize?: number;
-}) {
+} = {}) {
   const u = new URL(`${API_BASE}/api/clientes`, window.location.origin);
   if (params.search) u.searchParams.set('search', params.search);
   if (params.page) u.searchParams.set('page', String(params.page));

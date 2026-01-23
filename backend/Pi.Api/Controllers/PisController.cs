@@ -1,96 +1,175 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Pi.Api.Contracts;
 using Pi.Api.Data;
 using Pi.Api.Models;
-using PiEntity = global::Pi.Api.Models.PiModel;
+using Pi.Api.Services;
 
-namespace Pi.Api.Controllers
+namespace Pi.Api.Controllers;
+
+[ApiController]
+[Route("api/pis")]
+public class PisController : ControllerBase
 {
-    [ApiController]
-    [Route("api/pis")]
-    public class PisController : ControllerBase
+    private readonly AppDbContext _db;
+    private readonly CotacaoService _cotacaoService;
+
+    public PisController(AppDbContext db, CotacaoService cotacaoService)
     {
-        private readonly AppDbContext _db;
+        _db = db;
+        _cotacaoService = cotacaoService;
+    }
 
-        public PisController(AppDbContext db)
-        {
-            _db = db;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<PiCreateResponse>> Create([FromBody] PiCreateRequest req, CancellationToken ct)
-        {
-            var prefixo = (req.Prefixo ?? "").Trim().ToUpperInvariant();
-            if (string.IsNullOrWhiteSpace(prefixo) || prefixo.Length > 7)
-                return BadRequest("Prefixo deve ter de 1 a 7 caracteres.");
-
-            var ano = req.DataPi.Year;
-
-            var clienteExists = await _db.Clientes.AnyAsync(x => x.Id == req.ClienteId, ct);
-            if (!clienteExists) return BadRequest("ClienteId inválido.");
-
-            await using var tx = await _db.Database.BeginTransactionAsync(ct);
-
-            PiSequencia? seq = await _db.PiSequencias
-                .FromSqlInterpolated($@"
-                    SELECT * FROM pi_sequencia
-                    WHERE prefixo = {prefixo} AND ano = {ano}
-                    FOR UPDATE")
-                .SingleOrDefaultAsync(ct);
-
-            if (seq is null)
+    [HttpGet]
+    public async Task<ActionResult<List<object>>> GetAll()
+    {
+        return await _db.Pis
+            .AsNoTracking()
+            .Select(x => new
             {
-                seq = new PiSequencia { Prefixo = prefixo, Ano = ano, UltimoNumero = 0 };
-                _db.PiSequencias.Add(seq);
-                await _db.SaveChangesAsync(ct);
+                x.Id,
+                x.Prefixo,
+                x.PiSequencia,
+                x.DataPi,
+                x.IdCliente,
+                x.IdFrete,
+                x.ValorTecido,
+                x.ValorTotalFreteBRL,
+                x.ValorTotalFreteUSD,
+                x.CotacaoAtualUSD,
+                x.CotacaoRisco,
+                Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
+                Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null
+            })
+            .OrderByDescending(x => x.Id)
+            .ToListAsync<object>();
+    }
 
-                seq = await _db.PiSequencias
-                    .FromSqlInterpolated($@"
-                        SELECT * FROM pi_sequencia
-                        WHERE prefixo = {prefixo} AND ano = {ano}
-                        FOR UPDATE")
-                    .SingleAsync(ct);
-            }
-
-            seq.UltimoNumero += 1;
-            await _db.SaveChangesAsync(ct);
-
-            var numero = $"{prefixo}{seq.UltimoNumero:00000}-{ano}";
-
-            var pi = new PiEntity
+    [HttpGet("{id}")]
+    public async Task<ActionResult<object>> GetById(long id)
+    {
+        var pi = await _db.Pis
+            .AsNoTracking()
+            .Where(x => x.Id == id)
+            .Select(x => new
             {
-                Id = Guid.NewGuid(),
-                Prefixo = prefixo,
-                Numero = numero,
-                DataPi = req.DataPi,
-                ClienteId = req.ClienteId,
-                TipoPreco = req.TipoPreco,
-                UsdRate = req.UsdRate,
-                UsdRateFonte = req.UsdRateFonte,
-                UsdRateAtualizadoEm = req.UsdRate is null ? null : DateTimeOffset.UtcNow,
-                Status = "ABERTA",
-                CriadoEm = DateTimeOffset.UtcNow,
-                AtualizadoEm = DateTimeOffset.UtcNow
-            };
+                x.Id,
+                x.Prefixo,
+                x.PiSequencia,
+                x.DataPi,
+                x.IdCliente,
+                x.IdFrete,
+                x.ValorTecido,
+                x.ValorTotalFreteBRL,
+                x.ValorTotalFreteUSD,
+                x.CotacaoAtualUSD,
+                x.CotacaoRisco,
+                Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
+                Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
+                PiItens = x.PiItens.Select(i => new
+                {
+                    i.Id,
+                    i.IdModuloTecido,
+                    i.Quantidade,
+                    i.Largura,
+                    i.Profundidade,
+                    i.Altura,
+                    i.Pa,
+                    i.M3,
+                    i.ValorEXW,
+                    i.ValorFreteRateadoBRL,
+                    i.ValorFreteRateadoUSD,
+                    i.ValorFinalItemBRL,
+                    i.ValorFinalItemUSDRisco
+                })
+            })
+            .FirstOrDefaultAsync();
+            
+        if (pi == null) return NotFound();
+        return pi;
+    }
 
+    [HttpGet("proxima-sequencia")]
+    public async Task<ActionResult<object>> GetProximaSequencia()
+    {
+        string sequencia = await GenerateNextSequenceString();
+        return Ok(new { sequencia });
+    }
 
-            _db.Pis.Add(pi);
-            await _db.SaveChangesAsync(ct);
+    private async Task<string> GenerateNextSequenceString()
+    {
+        var ultimaPi = await _db.Pis
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefaultAsync();
 
-            await tx.CommitAsync(ct);
-
-            return Ok(new PiCreateResponse { Id = pi.Id, Numero = pi.Numero });
-        }
-
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> Get(Guid id, CancellationToken ct)
+        if (ultimaPi != null && int.TryParse(ultimaPi.PiSequencia, out int numero))
         {
-            var pi = await _db.Pis
-                .Include(x => x.Cliente)
-                .FirstOrDefaultAsync(x => x.Id == id, ct);
-
-            return pi is null ? NotFound() : Ok(pi);
+            return (numero + 1).ToString("00000");
         }
+
+        return "00001";
+    }
+
+    [HttpGet("cotacao-usd")]
+    public async Task<ActionResult<object>> GetCotacaoUSD()
+    {
+        var cotacao = await _cotacaoService.GetCotacaoUSD();
+        return Ok(new { valor = cotacao });
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<object>> Create(ProformaInvoice pi)
+    {
+        // Sempre gera a próxima sequência para garantir integridade em concorrência
+        pi.PiSequencia = await GenerateNextSequenceString();
+
+        _db.Pis.Add(pi);
+        await _db.SaveChangesAsync();
+        
+        return CreatedAtAction(nameof(GetById), new { id = pi.Id }, new 
+        { 
+            pi.Id, 
+            pi.Prefixo, 
+            pi.PiSequencia,
+            pi.IdCliente,
+            PiItens = pi.PiItens?.Select(i => new
+            {
+                i.Id,
+                i.IdModuloTecido,
+                i.Quantidade,
+                i.Largura,
+                i.Profundidade,
+                i.Altura,
+                i.Pa,
+                i.M3,
+                i.ValorEXW,
+                i.ValorFreteRateadoBRL,
+                i.ValorFreteRateadoUSD,
+                i.ValorFinalItemBRL,
+                i.ValorFinalItemUSDRisco
+            })
+        });
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(long id, ProformaInvoice pi)
+    {
+        if (id != pi.Id) return BadRequest();
+        
+        _db.Entry(pi).State = EntityState.Modified;
+        await _db.SaveChangesAsync();
+        
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(long id)
+    {
+        var pi = await _db.Pis.FindAsync(id);
+        if (pi == null) return NotFound();
+        
+        _db.Pis.Remove(pi);
+        await _db.SaveChangesAsync();
+        
+        return NoContent();
     }
 }

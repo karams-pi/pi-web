@@ -13,8 +13,36 @@ public class ModulosTecidosController : ControllerBase
     public ModulosTecidosController(AppDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ModuloTecido>>> GetAll()
-        => await _db.ModulosTecidos.AsNoTracking().OrderBy(x => x.Id).ToListAsync();
+    public async Task<ActionResult<object>> GetAll()
+    {
+        var list = await _db.ModulosTecidos
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.Id,
+                x.IdModulo,
+                x.IdTecido,
+                x.ValorTecido,
+                Modulo = new
+                {
+                    x.Modulo!.Id,
+                    x.Modulo.Descricao,
+                    Categoria = new { x.Modulo.Categoria!.Id, x.Modulo.Categoria.Nome },
+                    Fornecedor = new { x.Modulo.Fornecedor!.Id, x.Modulo.Fornecedor.Nome },
+                    Marca = new { x.Modulo.Marca!.Id, x.Modulo.Marca.Nome },
+                    x.Modulo.Largura,
+                    x.Modulo.Profundidade,
+                    x.Modulo.Altura,
+                    x.Modulo.Pa,
+                    x.Modulo.M3
+                },
+                Tecido = new { x.Tecido!.Id, x.Tecido.Nome }
+            })
+            .OrderBy(x => x.Id)
+            .ToListAsync();
+
+        return Ok(list);
+    }
 
     [HttpGet("{id:long}")]
     public async Task<ActionResult<ModuloTecido>> GetById(long id)

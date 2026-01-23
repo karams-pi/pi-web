@@ -1,0 +1,32 @@
+import { apiDelete, apiGet, apiPost, apiPut } from "./api";
+import type { ProformaInvoice } from "./types";
+
+export async function listPis() {
+  return apiGet<ProformaInvoice[]>("/api/pis");
+}
+
+export async function getPi(id: number) {
+  return apiGet<ProformaInvoice>(`/api/pis/${id}`);
+}
+
+export async function getProximaSequencia() {
+  const res = await apiGet<{ sequencia: string }>("/api/pis/proxima-sequencia");
+  return res.sequencia;
+}
+
+export async function getCotacaoUSD() {
+  const res = await apiGet<{ valor: number }>("/api/pis/cotacao-usd");
+  return res.valor;
+}
+
+export async function createPi(input: Omit<ProformaInvoice, "id">) {
+  return apiPost<ProformaInvoice>("/api/pis", input);
+}
+
+export async function updatePi(id: number, input: Omit<ProformaInvoice, "id">) {
+  return apiPut<void>(`/api/pis/${id}`, input);
+}
+
+export async function deletePi(id: number) {
+  return apiDelete(`/api/pis/${id}`);
+}

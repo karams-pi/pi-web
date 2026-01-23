@@ -14,6 +14,7 @@ import {
   updateModulo,
   createModuloTecido,
   deleteModuloTecido,
+  updateModuloTecido,
   listModulosTecidos,
 } from "../api/modulos";
 
@@ -256,7 +257,7 @@ export default function ModulosPage() {
           <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
             <div className="modalHeader">
               <h3 className="modalTitle">
-                {editing ? `Editar Módulo #${editing.id}` : "Novo Módulo"}
+                {editing ? "Editar Módulo" : "Novo Módulo"}
               </h3>
               <button className="btn btn-sm" onClick={() => setIsOpen(false)}>
                 Fechar
@@ -286,7 +287,7 @@ export default function ModulosPage() {
               </div>
             </div>
 
-            <div className="modalBody" style={{ minHeight: 300 }}>
+            <div className="modalBody">
               {activeTab === "geral" ? (
                 <form onSubmit={onSaveGeral}>
                   <div className="formGrid">
@@ -431,6 +432,8 @@ function TecidosTab({
   const [selTecido, setSelTecido] = useState("");
   const [valor, setValor] = useState("0,000");
   const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingValor, setEditingValor] = useState("");
 
   async function add() {
     if (!selTecido) return alert("Selecione um tecido");
@@ -461,10 +464,38 @@ function TecidosTab({
     }
   }
 
+  function startEdit(link: ModuloTecido) {
+    setEditingId(link.id);
+    setEditingValor(fmt(link.valorTecido, 3));
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditingValor("");
+  }
+
+  async function saveEdit(id: number) {
+    try {
+      const link = currentLinks.find(l => l.id === id);
+      if (!link) return;
+      
+      await updateModuloTecido(id, {
+        idModulo: link.idModulo,
+        idTecido: link.idTecido,
+        valorTecido: parse(editingValor),
+      });
+      setEditingId(null);
+      setEditingValor("");
+      onUpdate();
+    } catch (e) {
+      alert(getErrorMessage(e));
+    }
+  }
+
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 16 }}>
-        <div style={{ flex: 1 }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-end", marginBottom: 16 }}>
+        <div className="field" style={{ flex: 1 }}>
           <label className="label">Tecido</label>
           <select
             className="cl-select"
@@ -479,7 +510,7 @@ function TecidosTab({
             ))}
           </select>
         </div>
-        <div style={{ width: 120 }}>
+        <div className="field" style={{ width: 140 }}>
           <label className="label">Valor</label>
           <input
             className="cl-input"
@@ -487,33 +518,74 @@ function TecidosTab({
             onChange={(e) => setValor(e.target.value)}
           />
         </div>
-        <button className="btn btn-primary" onClick={add} disabled={adding}>
+        <button className="btn btn-primary" onClick={add} disabled={adding} style={{ marginBottom: 0 }}>
           Adicionar
         </button>
       </div>
 
-      <table className="cl-table">
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th>Tecido</th>
-            <th>Valor</th>
-            <th>Ações</th>
+            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, color: "var(--muted)", borderBottom: "1px solid var(--line)", padding: 12 }}>Tecido</th>
+            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, color: "var(--muted)", borderBottom: "1px solid var(--line)", padding: 12 }}>Valor</th>
+            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, color: "var(--muted)", borderBottom: "1px solid var(--line)", padding: 12 }}>Ações</th>
           </tr>
         </thead>
         <tbody>
           {currentLinks.map((link) => {
             const t = allTecidos.find((x) => x.id === link.idTecido);
+            const isEditing = editingId === link.id;
+            
             return (
               <tr key={link.id}>
-                <td>{t?.nome || link.idTecido}</td>
-                <td>{fmt(link.valorTecido, 3)}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => remove(link.id)}
-                  >
-                    Remover
-                  </button>
+                <td style={{ borderBottom: "1px solid rgba(148, 163, 184, 0.14)", padding: 12, fontSize: 14 }}>{t?.nome || link.idTecido}</td>
+                <td style={{ borderBottom: "1px solid rgba(148, 163, 184, 0.14)", padding: 12, fontSize: 14 }}>
+                  {isEditing ? (
+                    <input
+                      className="cl-input"
+                      value={editingValor}
+                      onChange={(e) => setEditingValor(e.target.value)}
+                      style={{ width: "120px" }}
+                      autoFocus
+                    />
+                  ) : (
+                    fmt(link.valorTecido, 3)
+                  )}
+                </td>
+                <td style={{ borderBottom: "1px solid rgba(148, 163, 184, 0.14)", padding: 12, fontSize: 14 }}>
+                  {isEditing ? (
+                    <>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => saveEdit(link.id)}
+                        style={{ marginRight: 4 }}
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        className="btn btn-sm"
+                        onClick={cancelEdit}
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="btn btn-sm"
+                        onClick={() => startEdit(link)}
+                        style={{ marginRight: 4 }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => remove(link.id)}
+                      >
+                        Remover
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             );

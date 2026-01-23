@@ -6,6 +6,8 @@ import CategoriasPage from "./pages/CategoriasPage";
 import TecidosPage from "./pages/TecidosPage";
 import ModulosPage from "./pages/ModulosPage";
 import MarcasPage from "./pages/MarcasPage";
+import ProformaInvoicePage from "./pages/ProformaInvoicePage";
+import PrintPiPage from "./pages/PrintPiPage";
 
 // function ProdutosPage() {
 //   return (
@@ -16,14 +18,7 @@ import MarcasPage from "./pages/MarcasPage";
 //   );
 // }
 
-function NovaPiPage() {
-  return (
-    <div className="card">
-      <h2>Criar Proforma Invoice</h2>
-      <p>Em breve: formulário de criação de PI.</p>
-    </div>
-  );
-}
+
 
 import ConfiguracoesPage from "./pages/ConfiguracoesPage";
 
@@ -63,7 +58,8 @@ export default function App() {
               <Route path="/marcas" element={<MarcasPage />} />
               <Route path="/tecidos" element={<TecidosPage />} />
               <Route path="/modulos" element={<ModulosPage />} />
-              <Route path="/pis/novo" element={<NovaPiPage />} />
+              <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
+              <Route path="/print-pi/:id" element={<PrintPiPage />} />
               <Route path="/config" element={<ConfiguracoesPage />} />
               {/* <Route path="/precos" element={<PrecosPage />} /> */}
               <Route path="*" element={<NotFound />} />
@@ -144,6 +140,15 @@ function Header() {
               }
             >
               Modulos
+            </NavLink>
+
+            <NavLink
+              to="/proforma-invoice"
+              className={({ isActive }) =>
+                `navlink ${isActive ? "navlink-active" : ""}`
+              }
+            >
+              Proforma Invoice
             </NavLink>
 
             <NavLink

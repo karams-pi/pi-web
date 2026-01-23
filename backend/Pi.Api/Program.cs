@@ -11,6 +11,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); // <-- evita "Id" vs "id"
 });
 
+// Registrar HttpClient e CotacaoService
+builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("dev", p =>
