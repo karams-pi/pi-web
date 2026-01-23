@@ -9,10 +9,6 @@ public class AppDbContext : DbContext
 
     public DbSet<Cliente> Clientes => Set<Cliente>();
 
-    // Para o PisController:
-    public DbSet<PiModel> Pis => Set<PiModel>();
-    public DbSet<PiSequencia> PiSequencias => Set<PiSequencia>();
-
     public DbSet<Fornecedor> Fornecedores => Set<Fornecedor>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<Marca> Marcas => Set<Marca>();
@@ -26,27 +22,17 @@ public class AppDbContext : DbContext
 
     public DbSet<Configuracao> Configuracoes => Set<Configuracao>();
 
+    // Proforma Invoice
+    public DbSet<Frete> Fretes => Set<Frete>();
+    public DbSet<FreteItem> FreteItens => Set<FreteItem>();
+    public DbSet<ConfiguracoesFreteItem> ConfiguracoesFreteItens => Set<ConfiguracoesFreteItem>();
+    public DbSet<ProformaInvoice> Pis => Set<ProformaInvoice>();
+    public DbSet<PiItem> PiItens => Set<PiItem>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ===== Tabelas já existentes =====
         modelBuilder.Entity<Cliente>().ToTable("clientes");
-        modelBuilder.Entity<PiModel>().ToTable("pis");
-
-        modelBuilder.Entity<PiSequencia>(e =>
-        {
-            e.ToTable("pi_sequencias");
-
-            e.HasKey(x => x.Id);
-
-            e.Property(x => x.Id).HasColumnName("id");
-            e.Property(x => x.Prefixo).HasColumnName("prefixo");
-            e.Property(x => x.Ano).HasColumnName("ano");
-            e.Property(x => x.UltimoNumero).HasColumnName("ultimo_numero");
-
-            e.HasIndex(x => new { x.Prefixo, x.Ano })
-                .IsUnique()
-                .HasDatabaseName("uq_pi_sequencias_prefixo_ano");
-        });
 
         modelBuilder.Entity<ListaPreco>(e =>
         {
@@ -196,6 +182,133 @@ public class AppDbContext : DbContext
             entity.Property(x => x.ValorFOBDespPortRegDoc).HasColumnName("valor_FOB_desp_port_reg_doc");
             entity.Property(x => x.ValorFOBDespDespacAduaneiro).HasColumnName("valor_FOB_desp_despac_aduaneiro");
             entity.Property(x => x.ValorFOBDespCourier).HasColumnName("valor_FOB_desp_courier");
+        });
+
+        // ===== Proforma Invoice =====
+        
+        // Frete
+        modelBuilder.Entity<Frete>(entity =>
+        {
+            entity.ToTable("frete");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.Nome).HasColumnName("nome").HasMaxLength(50).IsRequired();
+            
+            // Seed data
+            entity.HasData(
+                new Frete { Id = 1, Nome = "FOB" },
+                new Frete { Id = 2, Nome = "FCA" },
+                new Frete { Id = 3, Nome = "CIF" }
+            );
+        });
+
+        // FreteItem
+        modelBuilder.Entity<FreteItem>(entity =>
+        {
+            entity.ToTable("frete_item");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.IdFrete).HasColumnName("id_frete").IsRequired();
+            entity.Property(x => x.Nome).HasColumnName("nome").HasMaxLength(100).IsRequired();
+            
+            entity.HasIndex(x => x.IdFrete).HasDatabaseName("ix_frete_item_id_frete");
+            
+            entity.HasOne(x => x.Frete)
+                .WithMany(x => x.FreteItens)
+                .HasForeignKey(x => x.IdFrete)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ConfiguracoesFreteItem
+        modelBuilder.Entity<ConfiguracoesFreteItem>(entity =>
+        {
+            entity.ToTable("configuracoes_frete_item");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.IdFreteItem).HasColumnName("id_frete_item").IsRequired();
+            entity.Property(x => x.Valor).HasColumnName("valor").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.FlDesconsidera).HasColumnName("fl_desconsidera").IsRequired();
+            
+            entity.HasIndex(x => x.IdFreteItem).HasDatabaseName("ix_configuracoes_frete_item_id_frete_item");
+            
+            entity.HasOne(x => x.FreteItem)
+                .WithMany(x => x.ConfiguracoesFreteItens)
+                .HasForeignKey(x => x.IdFreteItem)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Pi
+        modelBuilder.Entity<ProformaInvoice>(entity =>
+        {
+            entity.ToTable("pi");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.Prefixo).HasColumnName("prefixo").HasMaxLength(10).IsRequired();
+            entity.Property(x => x.PiSequencia).HasColumnName("pi_sequencia").HasMaxLength(5).IsRequired();
+            entity.Property(x => x.DataPi).HasColumnName("data_pi").IsRequired();
+            entity.Property(x => x.IdCliente).HasColumnName("id_cliente").IsRequired();
+            entity.Property(x => x.IdConfiguracoes).HasColumnName("id_configuracoes").IsRequired();
+            entity.Property(x => x.IdFrete).HasColumnName("id_frete").IsRequired();
+            entity.Property(x => x.ValorTecido).HasColumnName("valor_tecido").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorTotalFreteBRL).HasColumnName("valor_total_frete_brl").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorTotalFreteUSD).HasColumnName("valor_total_frete_usd").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.CotacaoAtualUSD).HasColumnName("cotacao_atual_usd").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.CotacaoRisco).HasColumnName("cotacao_risco").HasColumnType("numeric(18,2)").IsRequired();
+            
+            entity.HasIndex(x => x.IdCliente).HasDatabaseName("ix_pi_id_cliente");
+            entity.HasIndex(x => x.IdConfiguracoes).HasDatabaseName("ix_pi_id_configuracoes");
+            entity.HasIndex(x => x.IdFrete).HasDatabaseName("ix_pi_id_frete");
+            entity.HasIndex(x => x.PiSequencia).HasDatabaseName("ix_pi_sequencia");
+            
+            entity.HasOne(x => x.Cliente)
+                .WithMany()
+                .HasForeignKey(x => x.IdCliente)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(x => x.Configuracoes)
+                .WithMany()
+                .HasForeignKey(x => x.IdConfiguracoes)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(x => x.Frete)
+                .WithMany(x => x.Pis)
+                .HasForeignKey(x => x.IdFrete)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // PiItem
+        modelBuilder.Entity<PiItem>(entity =>
+        {
+            entity.ToTable("pi_item");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.IdPi).HasColumnName("id_pi").IsRequired();
+            entity.Property(x => x.IdModuloTecido).HasColumnName("id_modulo_tecido").IsRequired();
+            entity.Property(x => x.Largura).HasColumnName("largura").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.Profundidade).HasColumnName("profundidade").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.Altura).HasColumnName("altura").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.Pa).HasColumnName("pa").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.M3).HasColumnName("m3").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.RateioFrete).HasColumnName("rateio_frete").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.Quantidade).HasColumnName("quantidade").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorEXW).HasColumnName("valor_exw").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorFreteRateadoBRL).HasColumnName("valor_frete_rateado_brl").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorFreteRateadoUSD).HasColumnName("valor_frete_rateado_usd").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorFinalItemBRL).HasColumnName("valor_final_item_brl").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.ValorFinalItemUSDRisco).HasColumnName("valor_final_item_usd_risco").HasColumnType("numeric(18,2)").IsRequired();
+            
+            entity.HasIndex(x => x.IdPi).HasDatabaseName("ix_pi_item_id_pi");
+            entity.HasIndex(x => x.IdModuloTecido).HasDatabaseName("ix_pi_item_id_modulo_tecido");
+            
+            entity.HasOne(x => x.Pi)
+                .WithMany(x => x.PiItens)
+                .HasForeignKey(x => x.IdPi)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(x => x.ModuloTecido)
+                .WithMany()
+                .HasForeignKey(x => x.IdModuloTecido)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ===== IMPORTANTE: removi tudo que era do MODELO ANTIGO =====

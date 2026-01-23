@@ -20,7 +20,7 @@ export default function HomeMenu() {
         <div className="home-menuGrid">
           <MenuButton to="/clientes" label="Cadastro de Clientes" />
           <MenuButton to="/produtos" label="Cadastro de Produtos" />
-          <MenuButton to="/pis/novo" label="Criar Proforma Invoice" />
+          <MenuButton to="/proforma-invoice" label="Criar Proforma Invoice" />
           <MenuButton to="/config" label="Configurações" />
           <MenuButton to="/precos" label="Lista de Preços" />
         </div>

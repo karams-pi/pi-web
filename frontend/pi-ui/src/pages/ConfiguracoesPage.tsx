@@ -4,6 +4,8 @@ import {
   createConfig,
   getLatestConfig,
 } from "../api/configuracoes";
+import { getConfiguracoesFreteItemByFrete, updateConfiguracoesFreteItem } from "../api/configuracoesFreteItem";
+import type { ConfiguracoesFreteItem } from "../api/types";
 import "./ConfiguracoesPage.css";
 
 // --- Components ---
@@ -27,10 +29,7 @@ const DecimalInput = ({
 }: DecimalInputProps) => {
   const [displayValue, setDisplayValue] = useState("");
 
-  // Update display value when the prop value changes
   useEffect(() => {
-    // Format the number to a locale string with 2 decimal places
-    // If value is 0, we can show "0,00" or empty. Let's show "0,00".
     const formatted = (value || 0).toLocaleString("pt-BR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -40,19 +39,9 @@ const DecimalInput = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value;
-
-    // Remove everything that is not a digit
-    const digits = inputValue.replace(/\D/g, "");
-
-    // Convert to number and divide by 100 to get decimal position
+    const digits = inputValue.replace(/\\D/g, "");
     const numberValue = parseInt(digits || "0", 10) / 100;
-
-    // Propagate changes up
     onChange(name, numberValue);
-
-    // Update local state is handled by the useEffect above reacting to the prop change
-    // effectively enforcing the mask, but to make UI snappy we could update here too
-    // but the useEffect approach guarantees sync with parent state.
   };
 
   return (
@@ -65,7 +54,7 @@ const DecimalInput = ({
           className={`cfg-input ${prefix ? "has-symbol" : ""}`}
           value={displayValue}
           onChange={handleChange}
-          onFocus={(e) => e.target.select()} // Auto-select on focus for easier editing
+          onFocus={(e) => e.target.select()}
           placeholder="0,00"
         />
         {suffix && <span style={{position: "absolute", right: 12, color: "var(--cfg-muted)", fontSize: 13}}>{suffix}</span>}
@@ -74,9 +63,125 @@ const DecimalInput = ({
   );
 };
 
+// Freight Grid Component
+interface FreightGridProps {
+  title: string;
+  color: string;
+  idFrete: number;
+}
+
+const FreightGrid = ({ title, color, idFrete }: FreightGridProps) => {
+  const [items, setItems] = useState<(ConfiguracoesFreteItem & { freteItem?: { nome: string } })[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadItems();
+  }, [idFrete]);
+
+  const loadItems = async () => {
+    try {
+      setLoading(true);
+      console.log(`[FreightGrid] Carregando itens para ${title} (idFrete: ${idFrete})`);
+      const data = await getConfiguracoesFreteItemByFrete(idFrete);
+      console.log(`[FreightGrid] ${title} - Dados recebidos:`, data);
+      console.log(`[FreightGrid] ${title} - Total de itens:`, data.length);
+      setItems(data);
+    } catch (error) {
+      console.error(`[FreightGrid] Erro ao carregar itens de frete ${title}:`, error);
+      setItems([]); // Garantir que items seja um array vazio em caso de erro
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleDesconsidera = async (item: ConfiguracoesFreteItem) => {
+    try {
+      await updateConfiguracoesFreteItem(item.id, {
+        ...item,
+        flDesconsidera: !item.flDesconsidera,
+      });
+      await loadItems();
+    } catch (error) {
+      console.error("Erro ao atualizar item:", error);
+    }
+  };
+
+  const fmt = (n: number) => n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  if (loading) {
+    return (
+      <section className="cfg-section">
+        <div className="cfg-section-header">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke={color}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="cfg-section-title">{title}</h3>
+        </div>
+        <div style={{ padding: 20, textAlign: "center", color: "var(--cfg-muted)" }}>
+          Carregando...
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="cfg-section" style={{ marginBottom: 24 }}>
+      <div className="cfg-section-header">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke={color}>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 className="cfg-section-title">{title}</h3>
+      </div>
+      
+      {items.length === 0 ? (
+        <div style={{ padding: 20, textAlign: "center", color: "var(--cfg-muted)" }}>
+          Nenhum item configurado para este tipo de frete.
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8, fontSize: 13, fontWeight: 600, color: "var(--cfg-muted)" }}>
+                  Item
+                </th>
+                <th style={{ textAlign: "right", borderBottom: "1px solid #ddd", padding: 8, fontSize: 13, fontWeight: 600, color: "var(--cfg-muted)" }}>
+                  Valor
+                </th>
+                <th style={{ textAlign: "center", borderBottom: "1px solid #ddd", padding: 8, fontSize: 13, fontWeight: 600, color: "var(--cfg-muted)" }}>
+                  Desconsiderar
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.id}>
+                  <td style={{ borderBottom: "1px solid #eee", padding: 8, fontSize: 14 }}>
+                    {(item as any).freteItem?.nome || `Item #${item.idFreteItem}`}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #eee", padding: 8, fontSize: 14, textAlign: "right" }}>
+                    R$ {fmt(item.valor)}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #eee", padding: 8, fontSize: 14, textAlign: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={item.flDesconsidera}
+                      onChange={() => handleToggleDesconsidera(item)}
+                      style={{ cursor: "pointer", width: 18, height: 18 }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+};
+
 // --- Page Component ---
 
-// Initial state for form when no config exists
 const initialFormState = {
   valorReducaoDolar: 0,
   valorPercImposto: 0,
@@ -125,7 +230,6 @@ export default function ConfiguracoesPage() {
       }
     } catch (error) {
       console.error("Erro ao carregar configurações", error);
-      // It's okay if not found, we just start with defaults
     } finally {
       setLoading(false);
     }
@@ -144,17 +248,14 @@ export default function ConfiguracoesPage() {
     setMessage(null);
 
     try {
-      // Create new config (history)
       const newConfig = await createConfig(formData);
       setCurrentConfig(newConfig);
       
-      // Show success message
       setMessage({
         type: "success",
         text: "Configurações salvas e histórico atualizado com sucesso!",
       });
       
-      // Auto-hide message after 3 seconds
       setTimeout(() => setMessage(null), 3000);
 
     } catch (error) {
@@ -247,72 +348,6 @@ export default function ConfiguracoesPage() {
           </div>
         </section>
 
-        {/* Custos FCA Section */}
-        <section className="cfg-section">
-          <div className="cfg-section-header">
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#8b5cf6">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="cfg-section-title">Custos FCA</h3>
-          </div>
-          <div className="cfg-grid">
-            <DecimalInput
-              label="Frete Rod. Fronteira"
-              name="valorFCAFreteRodFronteira"
-              value={formData.valorFCAFreteRodFronteira}
-              onChange={handleDecimalChange}
-              prefix="R$"
-            />
-            <DecimalInput
-              label="Despesas FCA"
-              name="valorDespesasFCA"
-              value={formData.valorDespesasFCA}
-              onChange={handleDecimalChange}
-              prefix="R$"
-            />
-          </div>
-        </section>
-
-        {/* Custos FOB Section */}
-        <section className="cfg-section">
-          <div className="cfg-section-header">
-             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#10b981">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="cfg-section-title">Custos FOB</h3>
-          </div>
-          <div className="cfg-grid">
-            <DecimalInput
-              label="Frete Porto Paranaguá"
-              name="valorFOBFretePortoParanagua"
-              value={formData.valorFOBFretePortoParanagua}
-              onChange={handleDecimalChange}
-              prefix="R$"
-            />
-            <DecimalInput
-              label="Desp. Port. Reg. Doc"
-              name="valorFOBDespPortRegDoc"
-              value={formData.valorFOBDespPortRegDoc}
-              onChange={handleDecimalChange}
-              prefix="R$"
-            />
-            <DecimalInput
-              label="Desp. Aduaneiro"
-              name="valorFOBDespDespacAduaneiro"
-              value={formData.valorFOBDespDespacAduaneiro}
-              onChange={handleDecimalChange}
-              prefix="R$"
-            />
-            <DecimalInput
-              label="Desp. Courier"
-              name="valorFOBDespCourier"
-              value={formData.valorFOBDespCourier}
-              onChange={handleDecimalChange}
-              prefix="R$"
-            />
-          </div>
-        </section>
-
         {/* Footer Actions */}
         <div className="cfg-actions">
           <button type="submit" className="cfg-btn-save" disabled={saving}>
@@ -330,6 +365,13 @@ export default function ConfiguracoesPage() {
         </div>
 
       </form>
+
+      {/* Freight Grids - Outside form */}
+      <div style={{ marginTop: 32 }}>
+        <FreightGrid title="Custos FOB" color="#10b981" idFrete={1} />
+        <FreightGrid title="Custos FCA" color="#8b5cf6" idFrete={2} />
+        <FreightGrid title="Custos CIF" color="#f59e0b" idFrete={3} />
+      </div>
     </div>
   );
 }

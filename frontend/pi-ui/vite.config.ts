@@ -7,9 +7,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:5000", // <- troque para a porta do seu backend
+        target: "http://localhost:5000", // Backend ASP.NET Core
         changeOrigin: true,
-        secure: false, // se usar https no backend, mantenha secure:false
+        secure: false,
       },
     },
   },

@@ -173,6 +173,35 @@ namespace Pi.Api.Migrations
                     b.ToTable("configuracoes", (string)null);
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.ConfiguracoesFreteItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("FlDesconsidera")
+                        .HasColumnType("boolean")
+                        .HasColumnName("fl_desconsidera");
+
+                    b.Property<long>("IdFreteItem")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_frete_item");
+
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdFreteItem")
+                        .HasDatabaseName("ix_configuracoes_frete_item_id_frete_item");
+
+                    b.ToTable("configuracoes_frete_item", (string)null);
+                });
+
             modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>
                 {
                     b.Property<long>("Id")
@@ -201,6 +230,70 @@ namespace Pi.Api.Migrations
                         .HasDatabaseName("uq_fornecedor_cnpj");
 
                     b.ToTable("fornecedor", (string)null);
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Frete", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("nome");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("frete", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Nome = "FOB"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Nome = "FCA"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Nome = "CIF"
+                        });
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.FreteItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("IdFrete")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_frete");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdFrete")
+                        .HasDatabaseName("ix_frete_item_id_frete");
+
+                    b.ToTable("frete_item", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ListaPreco", b =>
@@ -444,89 +537,154 @@ namespace Pi.Api.Migrations
                     b.ToTable("modulo_tecido", (string)null);
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
+            modelBuilder.Entity("Pi.Api.Models.PiItem", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("AtualizadoEm")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ClienteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CriadoEm")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly>("DataPi")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Numero")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Prefixo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("TipoPreco")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("TotalBrl")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("TotalUsd")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("UsdRate")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTimeOffset?>("UsdRateAtualizadoEm")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UsdRateFonte")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
-
-                    b.ToTable("pis", (string)null);
-                });
-
-            modelBuilder.Entity("Pi.Api.Models.PiSequencia", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<int>("Ano")
-                        .HasColumnType("integer")
-                        .HasColumnName("ano");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Prefixo")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("prefixo");
+                    b.Property<decimal>("Altura")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("altura");
 
-                    b.Property<int>("UltimoNumero")
-                        .HasColumnType("integer")
-                        .HasColumnName("ultimo_numero");
+                    b.Property<long>("IdModuloTecido")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_modulo_tecido");
+
+                    b.Property<long>("IdPi")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_pi");
+
+                    b.Property<decimal>("Largura")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("largura");
+
+                    b.Property<decimal>("M3")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("m3");
+
+                    b.Property<decimal>("Pa")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("pa");
+
+                    b.Property<decimal>("Profundidade")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("profundidade");
+
+                    b.Property<decimal>("Quantidade")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("quantidade");
+
+                    b.Property<decimal>("RateioFrete")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("rateio_frete");
+
+                    b.Property<decimal>("ValorEXW")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_exw");
+
+                    b.Property<decimal>("ValorFinalItemBRL")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_final_item_brl");
+
+                    b.Property<decimal>("ValorFinalItemUSDRisco")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_final_item_usd_risco");
+
+                    b.Property<decimal>("ValorFreteRateadoBRL")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_frete_rateado_brl");
+
+                    b.Property<decimal>("ValorFreteRateadoUSD")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_frete_rateado_usd");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Prefixo", "Ano")
-                        .IsUnique()
-                        .HasDatabaseName("uq_pi_sequencias_prefixo_ano");
+                    b.HasIndex("IdModuloTecido")
+                        .HasDatabaseName("ix_pi_item_id_modulo_tecido");
 
-                    b.ToTable("pi_sequencias", (string)null);
+                    b.HasIndex("IdPi")
+                        .HasDatabaseName("ix_pi_item_id_pi");
+
+                    b.ToTable("pi_item", (string)null);
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.ProformaInvoice", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("CotacaoAtualUSD")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("cotacao_atual_usd");
+
+                    b.Property<decimal>("CotacaoRisco")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("cotacao_risco");
+
+                    b.Property<DateTimeOffset>("DataPi")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_pi");
+
+                    b.Property<Guid>("IdCliente")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id_cliente");
+
+                    b.Property<long>("IdConfiguracoes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_configuracoes");
+
+                    b.Property<long>("IdFrete")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_frete");
+
+                    b.Property<string>("PiSequencia")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("pi_sequencia");
+
+                    b.Property<string>("Prefixo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("prefixo");
+
+                    b.Property<decimal>("ValorTecido")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_tecido");
+
+                    b.Property<decimal>("ValorTotalFreteBRL")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_total_frete_brl");
+
+                    b.Property<decimal>("ValorTotalFreteUSD")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_total_frete_usd");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdCliente")
+                        .HasDatabaseName("ix_pi_id_cliente");
+
+                    b.HasIndex("IdConfiguracoes")
+                        .HasDatabaseName("ix_pi_id_configuracoes");
+
+                    b.HasIndex("IdFrete")
+                        .HasDatabaseName("ix_pi_id_frete");
+
+                    b.HasIndex("PiSequencia")
+                        .HasDatabaseName("ix_pi_sequencia");
+
+                    b.ToTable("pi", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>
@@ -551,6 +709,28 @@ namespace Pi.Api.Migrations
                         .HasDatabaseName("uq_tecido_nome");
 
                     b.ToTable("tecido", (string)null);
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.ConfiguracoesFreteItem", b =>
+                {
+                    b.HasOne("Pi.Api.Models.FreteItem", "FreteItem")
+                        .WithMany("ConfiguracoesFreteItens")
+                        .HasForeignKey("IdFreteItem")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FreteItem");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.FreteItem", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Frete", "Frete")
+                        .WithMany("FreteItens")
+                        .HasForeignKey("IdFrete")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Frete");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Modulo", b =>
@@ -599,15 +779,50 @@ namespace Pi.Api.Migrations
                     b.Navigation("Tecido");
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.PiModel", b =>
+            modelBuilder.Entity("Pi.Api.Models.PiItem", b =>
                 {
-                    b.HasOne("Pi.Api.Models.Cliente", "Cliente")
+                    b.HasOne("Pi.Api.Models.ModuloTecido", "ModuloTecido")
                         .WithMany()
-                        .HasForeignKey("ClienteId")
+                        .HasForeignKey("IdModuloTecido")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.ProformaInvoice", "Pi")
+                        .WithMany("PiItens")
+                        .HasForeignKey("IdPi")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("ModuloTecido");
+
+                    b.Navigation("Pi");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.ProformaInvoice", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("IdCliente")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Configuracao", "Configuracoes")
+                        .WithMany()
+                        .HasForeignKey("IdConfiguracoes")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Frete", "Frete")
+                        .WithMany("Pis")
+                        .HasForeignKey("IdFrete")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("Configuracoes");
+
+                    b.Navigation("Frete");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Categoria", b =>
@@ -620,6 +835,18 @@ namespace Pi.Api.Migrations
                     b.Navigation("Modulos");
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.Frete", b =>
+                {
+                    b.Navigation("FreteItens");
+
+                    b.Navigation("Pis");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.FreteItem", b =>
+                {
+                    b.Navigation("ConfiguracoesFreteItens");
+                });
+
             modelBuilder.Entity("Pi.Api.Models.Marca", b =>
                 {
                     b.Navigation("Modulos");
@@ -628,6 +855,11 @@ namespace Pi.Api.Migrations
             modelBuilder.Entity("Pi.Api.Models.Modulo", b =>
                 {
                     b.Navigation("ModulosTecidos");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.ProformaInvoice", b =>
+                {
+                    b.Navigation("PiItens");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>

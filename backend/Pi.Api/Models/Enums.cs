@@ -1,5 +1,12 @@
 namespace Pi.Api.Models;
 
+public enum TipoFrete
+{
+    FOB = 1,
+    FCA = 2,
+    CIF = 3
+}
+
 public enum CategoriaKind
 {
     Estofado,
