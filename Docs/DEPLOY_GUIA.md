@@ -113,3 +113,26 @@ Abra a URL do backend no navegador (ex: `https://pi-backend.onrender.com/swagger
 
 ### 4. Permissões de Rede (CORS)
 O código já está configurado para aceitar conexões (`AllowAnyOrigin`), então isso não deve ser o problema, a menos que você tenha alterado `Program.cs`.
+
+---
+
+## 🐘 Como Acessar o Banco do Render pelo PC (PgAdmin)
+
+Sim, você pode conectar seu PgAdmin local no banco da nuvem para ver os dados, fazer backups, etc.
+
+1.  No Dashboard do Render, vá no seu **PostgreSQL**.
+2.  Desça até encontrar **"External Database URL"**.
+    *   *Atenção: Use a External, não a Internal. A Internal só funciona lá dentro do Render.*
+3.  Copie o valor.
+4.  No seu **PgAdmin**:
+    *   Clique com botão direito em Servers > Register > Server.
+    *   **Aba General**: Dê um nome (ex: `Render PI`).
+    *   **Aba Connection**:
+        *   **Host name/address**: O domínio que está na URL (ex: `dpg-xxxx-a.oregon-postgres.render.com`).
+        *   **Port**: `5432`.
+        *   **Maintenance database**: O nome do banco (ex: `pi_db`).
+        *   **Username**: O usuário (ex: `pi`).
+        *   **Password**: A senha (que está na URL ou oculta no dashboard).
+5.  Clique em Save.
+
+> **Dica:** O acesso externo pode ser um pouco lento dependendo da internet, pois o banco está nos EUA/Europa.

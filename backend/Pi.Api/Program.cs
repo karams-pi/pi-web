@@ -15,7 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
     // Fix para Render/Railwa (URLs tipo postgres://user:pass@host:port/db)
-    if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+    if (!string.IsNullOrEmpty(connectionString) && (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
     {
         var uri = new Uri(connectionString);
         var userInfo = uri.UserInfo.Split(':');
