@@ -47,6 +47,21 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// AUTO-MIGRATION: Garante que o banco seja criado/atualizado ao iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        // Se falhar a migração, logar, mas tentar continuar (ou falhar de vez se preferir)
+        Console.WriteLine($"Erro ao aplicar Migrations: {ex.Message}");
+    }
+}
+
 // SEMPRE ativar página de erro detalhada para debugar no Render (temporário)
 app.UseDeveloperExceptionPage();
 
