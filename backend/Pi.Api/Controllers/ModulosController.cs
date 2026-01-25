@@ -91,7 +91,7 @@ public class ModulosController : ControllerBase
         var fornecedores = await qForn
             .Select(x => x.Fornecedor)
             .Distinct()
-            .OrderBy(x => x.Nome)
+            .OrderBy(x => x!.Nome)
             .ToListAsync();
 
         // Available Categorias
@@ -100,7 +100,7 @@ public class ModulosController : ControllerBase
         var categorias = await qCat
             .Select(x => x.Categoria)
             .Distinct()
-            .OrderBy(x => x.Nome)
+            .OrderBy(x => x!.Nome)
             .ToListAsync();
 
         // Available Marcas
@@ -109,21 +109,21 @@ public class ModulosController : ControllerBase
         var marcas = await qMarca
             .Select(x => x.Marca)
             .Distinct()
-            .OrderBy(x => x.Nome)
+            .OrderBy(x => x!.Nome)
             .ToListAsync();
 
         // Available Tecidos (via ModuloTecido)
         var qTec = _db.ModulosTecidos.AsNoTracking().Include(mt => mt.Tecido).AsQueryable();
         // Manually apply parent filters to the junction query 
-        if (idFornecedor.HasValue) qTec = qTec.Where(mt => mt.Modulo.IdFornecedor == idFornecedor.Value);
-        if (idCategoria.HasValue) qTec = qTec.Where(mt => mt.Modulo.IdCategoria == idCategoria.Value);
-        if (idMarca.HasValue) qTec = qTec.Where(mt => mt.Modulo.IdMarca == idMarca.Value);
+        if (idFornecedor.HasValue) qTec = qTec.Where(mt => mt.Modulo != null && mt.Modulo.IdFornecedor == idFornecedor.Value);
+        if (idCategoria.HasValue) qTec = qTec.Where(mt => mt.Modulo != null && mt.Modulo.IdCategoria == idCategoria.Value);
+        if (idMarca.HasValue) qTec = qTec.Where(mt => mt.Modulo != null && mt.Modulo.IdMarca == idMarca.Value);
         // exclude "tecido" -> we don't filter by idTecido here, naturally
 
         var tecidos = await qTec
             .Select(mt => mt.Tecido)
             .Distinct()
-            .OrderBy(x => x.Nome)
+            .OrderBy(x => x!.Nome)
             .ToListAsync();
 
         return Ok(new { fornecedores, categorias, marcas, tecidos });
