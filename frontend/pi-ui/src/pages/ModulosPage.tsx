@@ -16,6 +16,7 @@ import {
   deleteModuloTecido,
   updateModuloTecido,
 } from "../api/modulos";
+import { SearchableSelect } from "../components/SearchableSelect";
 
 type FormState = Partial<Modulo> & {
   larguraStr?: string;
@@ -208,53 +209,41 @@ export default function ModulosPage() {
     <div style={{ padding: 16 }}>
       <h1>Módulos</h1>
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
-        <select
-          value={filterFornecedor}
-          onChange={(e) => { setFilterFornecedor(e.target.value); setPage(1); }}
-          className="cl-select"
-          style={{ width: 180 }}
-        >
-          <option value="">Fornecedor (Todos)</option>
-          {fornecedores.map(f => (
-            <option key={f.id} value={f.id}>{f.nome}</option>
-          ))}
-        </select>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterFornecedor}
+            onChange={(val) => { setFilterFornecedor(val); setPage(1); }}
+            placeholder="Fornecedor (Todos)"
+            options={[{ value: "", label: "Fornecedor (Todos)" }, ...fornecedores.map(f => ({ value: f.id, label: f.nome }))]}
+          />
+        </div>
 
-        <select
-          value={filterCategoria}
-          onChange={(e) => { setFilterCategoria(e.target.value); setPage(1); }}
-          className="cl-select"
-          style={{ width: 180 }}
-        >
-          <option value="">Categoria (Todas)</option>
-          {categorias.map(c => (
-            <option key={c.id} value={c.id}>{c.nome}</option>
-          ))}
-        </select>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterCategoria}
+            onChange={(val) => { setFilterCategoria(val); setPage(1); }}
+            placeholder="Categoria (Todas)"
+            options={[{ value: "", label: "Categoria (Todas)" }, ...categorias.map(c => ({ value: c.id, label: c.nome }))]}
+          />
+        </div>
 
-        <select
-          value={filterMarca}
-          onChange={(e) => { setFilterMarca(e.target.value); setPage(1); }}
-          className="cl-select"
-          style={{ width: 180 }}
-        >
-          <option value="">Marca (Todas)</option>
-          {marcas.map(m => (
-            <option key={m.id} value={m.id}>{m.nome}</option>
-          ))}
-        </select>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterMarca}
+            onChange={(val) => { setFilterMarca(val); setPage(1); }}
+            placeholder="Marca (Todas)"
+            options={[{ value: "", label: "Marca (Todas)" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
+          />
+        </div>
 
-        <select
-          value={filterTecido}
-          onChange={(e) => { setFilterTecido(e.target.value); setPage(1); }}
-          className="cl-select"
-          style={{ width: 180 }}
-        >
-          <option value="">Tecido (Todos)</option>
-          {tecidos.map(t => (
-            <option key={t.id} value={t.id}>{t.nome}</option>
-          ))}
-        </select>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterTecido}
+            onChange={(val) => { setFilterTecido(val); setPage(1); }}
+            placeholder="Tecido (Todos)"
+            options={[{ value: "", label: "Tecido (Todos)" }, ...tecidos.map(t => ({ value: t.id, label: t.nome }))]}
+          />
+        </div>
 
         <input
           placeholder="Buscar módulo..."
@@ -293,7 +282,10 @@ export default function ModulosPage() {
             <tbody>
                 {items.map((x) => {
                 // Now using nested fabrics
-                const myTecidos = x.modulosTecidos || [];
+                let myTecidos = x.modulosTecidos || [];
+                if (filterTecido) {
+                  myTecidos = myTecidos.filter(t => t.idTecido === Number(filterTecido));
+                }
 
                 return (
                     <tr key={x.id}>
@@ -413,53 +405,33 @@ export default function ModulosPage() {
                     </div>
                     <div className="field">
                       <label className="label">Fornecedor*</label>
-                      <select
-                        className="cl-select"
+                      <SearchableSelect
                         value={form.idFornecedor || ""}
-                        onChange={(e) => setForm({ ...form, idFornecedor: Number(e.target.value) })}
-                        required
-                      >
-                        <option value="">Selecione...</option>
-                        {fornecedores.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.nome}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(val) => setForm({ ...form, idFornecedor: Number(val) })}
+                        options={fornecedores.map(f => ({ value: f.id, label: f.nome }))}
+                        placeholder="Selecione..."
+                      />
                     </div>
                     <div className="field">
                       <label className="label">Categoria*</label>
-                      <select
-                        className="cl-select"
+                      <SearchableSelect
                         value={form.idCategoria || ""}
-                        onChange={(e) => setForm({ ...form, idCategoria: Number(e.target.value) })}
-                        required
-                      >
-                        <option value="">Selecione...</option>
-                        {categorias.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.nome}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(val) => setForm({ ...form, idCategoria: Number(val) })}
+                        options={categorias.map(c => ({ value: c.id, label: c.nome }))}
+                        placeholder="Selecione..."
+                      />
                     </div>
                     <div className="field">
                       <label className="label">Marca*</label>
                       <div style={{ display: "flex", gap: 8 }}>
-                        <select
-                          className="cl-select"
-                          value={form.idMarca || ""}
-                          onChange={(e) => setForm({ ...form, idMarca: Number(e.target.value) })}
-                          required
-                          style={{ flex: 1 }}
-                        >
-                          <option value="">Selecione...</option>
-                          {marcas.map((m) => (
-                            <option key={m.id} value={m.id}>
-                              {m.nome}
-                            </option>
-                          ))}
-                        </select>
+                        <div style={{ flex: 1 }}>
+                          <SearchableSelect
+                            value={form.idMarca || ""}
+                            onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
+                            options={marcas.map(m => ({ value: m.id, label: m.nome }))}
+                            placeholder="Selecione..."
+                          />
+                        </div>
                         <button
                           type="button"
                           className="btn btn-sm"
@@ -606,18 +578,12 @@ function TecidosTab({
       <div style={{ display: "flex", gap: 12, alignItems: "flex-end", marginBottom: 16 }}>
         <div className="field" style={{ flex: 1 }}>
           <label className="label">Tecido</label>
-          <select
-            className="cl-select"
+          <SearchableSelect
             value={selTecido}
-            onChange={(e) => setSelTecido(e.target.value)}
-          >
-            <option value="">Selecione...</option>
-            {allTecidos.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.nome}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => setSelTecido(val)}
+            options={allTecidos.map(t => ({ value: t.id, label: t.nome }))}
+            placeholder="Selecione..."
+          />
         </div>
         <div className="field" style={{ width: 140 }}>
           <label className="label">Valor</label>
