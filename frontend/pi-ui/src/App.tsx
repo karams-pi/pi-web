@@ -73,11 +73,15 @@ export default function App() {
   );
 }
 
+
 // ... imports
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { 
+  Menu, X, Home, Users, Truck, Layers, Tag, Scissors, 
+  Grid, FileText, Download, Settings 
+} from "lucide-react";
 
-// ... (Header function start)
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -100,96 +104,58 @@ function Header() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            ☰
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
           <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Menu
+            <NavLink to="/" end className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Home size={18} />
+              <span>Menu</span>
             </NavLink>
 
-            <NavLink
-              to="/clientes"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Clientes
-            </NavLink>
-            <NavLink
-              to="/fornecedores"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Fornecedores
+            <NavLink to="/clientes" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Users size={18} />
+              <span>Clientes</span>
             </NavLink>
 
-            <NavLink
-              to="/categorias"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Categorias
-            </NavLink>
-            <NavLink
-              to="/marcas"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Marcas
-            </NavLink>
-            <NavLink
-              to="/tecidos"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Tecidos
+            <NavLink to="/fornecedores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Truck size={18} />
+              <span>Fornecedores</span>
             </NavLink>
 
-            <NavLink
-              to="/modulos"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Modulos
+            <NavLink to="/categorias" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Layers size={18} />
+              <span>Categorias</span>
             </NavLink>
 
-            <NavLink
-              to="/proforma-invoice"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Proforma Invoice
+            <NavLink to="/marcas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Tag size={18} />
+              <span>Marcas</span>
             </NavLink>
 
-            <NavLink
-              to="/importacao"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Importar
+            <NavLink to="/tecidos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Scissors size={18} />
+              <span>Tecidos</span>
             </NavLink>
 
-            <NavLink
-              to="/config"
-              className={({ isActive }) =>
-                `navlink ${isActive ? "navlink-active" : ""}`
-              }
-            >
-              Config
+            <NavLink to="/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Grid size={18} />
+              <span>Modulos</span>
+            </NavLink>
+
+            <NavLink to="/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <FileText size={18} />
+              <span>Proforma</span>
+            </NavLink>
+
+            <NavLink to="/importacao" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Download size={18} />
+              <span>Importar</span>
+            </NavLink>
+
+            <NavLink to="/config" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Settings size={18} />
+              <span>Config</span>
             </NavLink>
           </nav>
         </div>
