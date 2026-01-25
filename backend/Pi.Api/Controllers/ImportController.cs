@@ -77,4 +77,34 @@ public class ImportController : ControllerBase
             return StatusCode(500, new { message = $"Erro na importação Karams: {sb}" });
         }
     }
+    [HttpPost("koyo")]
+    public async Task<IActionResult> ImportarKoyo(IFormFile file, [FromForm] long idFornecedor)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Arquivo inválido.");
+        if (idFornecedor <= 0)
+            return BadRequest("Fornecedor inválido.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            using var stream = file.OpenReadStream();
+            await _importService.ImportarKoyoAsync(stream, idFornecedor);
+
+            await transaction.CommitAsync();
+            return Ok(new { message = "Importação Koyo concluída com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+             var sb = new System.Text.StringBuilder();
+            var current = ex;
+            while (current != null)
+            {
+                sb.Append(current.Message + " | ");
+                current = current.InnerException;
+            }
+            return StatusCode(500, new { message = $"Erro na importação Koyo: {sb}" });
+        }
+    }
 }

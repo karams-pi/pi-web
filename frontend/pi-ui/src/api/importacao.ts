@@ -15,3 +15,11 @@ export const importKarams = async (file: File, idFornecedor: number) => {
 
   return apiPostFormData<any>('/api/Import/karams', formData);
 };
+
+export const importKoyo = async (file: File, idFornecedor: number) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('idFornecedor', String(idFornecedor));
+
+  return apiPostFormData<any>('/api/Import/koyo', formData);
+};

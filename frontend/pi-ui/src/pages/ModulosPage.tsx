@@ -15,7 +15,6 @@ import {
   createModuloTecido,
   deleteModuloTecido,
   updateModuloTecido,
-  listModulosTecidos,
 } from "../api/modulos";
 
 type FormState = Partial<Modulo> & {
@@ -36,7 +35,7 @@ const emptyForm: FormState = {
 export default function ModulosPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Modulo[]>([]);
-  const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]);
+  // const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]); // Removed: using nested now
   
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
@@ -45,7 +44,12 @@ export default function ModulosPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination / Search State
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState<Modulo | null>(null);
@@ -57,26 +61,33 @@ export default function ModulosPage() {
   const catMap = useMemo(() => new Map(categorias.map((x) => [x.id, x.nome])), [categorias]);
   const fornMap = useMemo(() => new Map(fornecedores.map((x) => [x.id, x.nome])), [fornecedores]);
   const marcaMap = useMemo(() => new Map(marcas.map((x) => [x.id, x.nome])), [marcas]);
-  const tecidoMap = useMemo(() => new Map(tecidos.map((x) => [x.id, x.nome])), [tecidos]);
+  // const tecidoMap = useMemo(() => new Map(tecidos.map((x) => [x.id, x.nome])), [tecidos]); // Not needed if nested has names
 
-  async function loadAll() {
-    try {
-      setLoading(true);
-      setError(null);
-      const [m, mt, c, f, ma, t] = await Promise.all([
-        listModulos(),
-        listModulosTecidos(),
-        listCategorias(),
-        listFornecedores(),
-        listMarcas(),
-        listTecidos(),
-      ]);
-      setItems(m);
-      setModulosTecidos(mt);
+  // Basic lists (small tables)
+  useEffect(() => {
+    Promise.all([
+      listCategorias(),
+      listFornecedores(),
+      listMarcas(),
+      listTecidos(),
+    ]).then(([c, f, ma, t]) => {
       setCategorias(c);
       setFornecedores(f);
       setMarcas(ma);
       setTecidos(t);
+    }).catch(e => console.error(e));
+  }, []);
+
+  // Main Loader
+  async function loadItems() {
+    try {
+      setLoading(true);
+      setError(null);
+      // Calls paged API
+      const res = await listModulos(search, page, 10);
+      setItems(res.items);
+      setTotalPages(res.totalPages);
+      setTotalItems(res.total);
     } catch (e: unknown) {
       setError(getErrorMessage(e));
     } finally {
@@ -84,17 +95,14 @@ export default function ModulosPage() {
     }
   }
 
+  // Effect: reload when page or search changes
   useEffect(() => {
-    void loadAll();
-  }, []);
-
-  const filteredItems = useMemo(() => {
-    if (!search) return items;
-    const lower = search.toLowerCase();
-    return items.filter((x) =>
-      x.descricao.toLowerCase().includes(lower) || String(x.id).includes(lower)
-    );
-  }, [items, search]);
+    // Debounce search could be added here, but for now simple effect
+    const timer = setTimeout(() => {
+      loadItems();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [page, search]);
 
   function openCreate() {
     setEditing(null);
@@ -138,22 +146,20 @@ export default function ModulosPage() {
 
       if (editing) {
         await updateModulo(editing.id, payload);
-        // Reload list but keep modal open to edit fabrics if needed
-        const updatedList = await listModulos();
-        setItems(updatedList);
-        
-        // Update editing state to reflect persisted changes
-        const updatedItem = updatedList.find(i => i.id === editing.id);
-        if (updatedItem) setEditing(updatedItem);
-        
         alert("Módulo atualizado!");
+        await loadItems();
+        // Update editing ref to match the new data (to keep modal fresh)
+         // Note: loadItems updates 'items' state asynchronously. 
+         // For now, simpler to just close or let user re-open if they want.
+         setIsOpen(false); 
       } else {
         const created = await createModulo(payload);
-        setEditing(created); // Now we have an ID to add fabrics
         alert("Módulo criado! Agora você pode adicionar tecidos.");
-        
-        const updatedList = await listModulos();
-        setItems(updatedList);
+        await loadItems();
+        // Set editing to the NEW item so we can add fabrics
+        // But the new item doesn't have nested fabrics yet (it's empty).
+        setEditing(created);
+        setActiveTab("tecidos"); // Switch to tecidos tab automatically
       }
     } catch (e: unknown) {
       alert(getErrorMessage(e));
@@ -166,11 +172,24 @@ export default function ModulosPage() {
     if (!confirm(`Remover módulo "${x.descricao}"?`)) return;
     try {
       await deleteModulo(x.id);
-      await loadAll();
+      await loadItems();
     } catch (e: unknown) {
       alert(getErrorMessage(e));
     }
   }
+
+  // Callback when fabrics are changed in the modal
+  async function onFabricsUpdated() {
+    await loadItems();
+  }
+
+  // Update editing object when items change (to refresh fabrics in modal)
+  useEffect(() => {
+    if (editing && items.length > 0) {
+      const fresh = items.find(i => i.id === editing.id);
+      if (fresh) setEditing(fresh);
+    }
+  }, [items]);
 
   return (
     <div style={{ padding: 16 }}>
@@ -179,7 +198,10 @@ export default function ModulosPage() {
         <input
           placeholder="Buscar módulo..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1); // Reset to page 1 on search
+          }}
           style={{ flex: 1, padding: 8 }}
         />
         <button className="btn btn-primary" onClick={openCreate}>Novo</button>
@@ -190,66 +212,92 @@ export default function ModulosPage() {
       {loading ? (
         <div>Carregando...</div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={th}>ID</th>
-              <th style={th}>Descrição</th>
-              <th style={th}>Fornecedor</th>
-              <th style={th}>Categoria</th>
-              <th style={th}>Marca</th>
-              <th style={th}>Dimensões (LxPxA)</th>
-              <th style={th}>M³</th>
-              <th style={th}>Tecidos / Valores</th>
-              <th style={th}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredItems.map((x) => {
-               // Find related fabrics
-               const myTecidos = modulosTecidos.filter(mt => mt.idModulo === x.id);
-
-               return (
-                <tr key={x.id}>
-                    <td style={td}>{x.id}</td>
-                    <td style={td}>{x.descricao}</td>
-                    <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
-                    <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
-                    <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
-                    <td style={td}>
-                    {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
-                    </td>
-                    <td style={td}>{fmt(x.m3)}</td>
-                    <td style={td}>
-                        {myTecidos.length > 0 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {myTecidos.map(mt => (
-                                    <div key={mt.id} style={{ fontSize: '0.9em' }}>
-                                        <span style={{ fontWeight: 500, color: '#94a3b8' }}>
-                                            {tecidoMap.get(mt.idTecido) || mt.idTecido}:
-                                        </span>
-                                        {' '}
-                                        <span style={{ color: '#e5e7eb' }}>
-                                            R$ {fmt(mt.valorTecido, 3)}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
-                        )}
-                    </td>
-                    <td style={td}>
-                    <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
-                    <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
-                        Remover
-                    </button>
-                    </td>
+        <>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+                <tr>
+                <th style={th}>ID</th>
+                <th style={th}>Descrição</th>
+                <th style={th}>Fornecedor</th>
+                <th style={th}>Categoria</th>
+                <th style={th}>Marca</th>
+                <th style={th}>Dimensões (LxPxA)</th>
+                <th style={th}>M³</th>
+                <th style={th}>Tecidos / Valores</th>
+                <th style={th}>Ações</th>
                 </tr>
-               );
-            })}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+                {items.map((x) => {
+                // Now using nested fabrics
+                const myTecidos = x.modulosTecidos || [];
+
+                return (
+                    <tr key={x.id}>
+                        <td style={td}>{x.id}</td>
+                        <td style={td}>{x.descricao}</td>
+                        <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
+                        <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
+                        <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
+                        <td style={td}>
+                        {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
+                        </td>
+                        <td style={td}>{fmt(x.m3)}</td>
+                        <td style={td}>
+                            {myTecidos.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {myTecidos.slice(0, 5).map(mt => (
+                                        <div key={mt.id} style={{ fontSize: '0.9em' }}>
+                                            <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                                                {mt.tecido?.nome || mt.idTecido}:
+                                            </span>
+                                            {' '}
+                                            <span style={{ color: '#e5e7eb' }}>
+                                                R$ {fmt(mt.valorTecido, 3)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                    {myTecidos.length > 5 && (
+                                        <span style={{ fontSize: '0.8em', color: '#666' }}>
+                                            +{myTecidos.length - 5} tecidos...
+                                        </span>
+                                    )}
+                                </div>
+                            ) : (
+                                <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
+                            )}
+                        </td>
+                        <td style={td}>
+                        <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
+                        <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
+                            Remover
+                        </button>
+                        </td>
+                    </tr>
+                );
+                })}
+            </tbody>
+            </table>
+
+            {/* Pagination Controls */}
+            <div style={{ marginTop: 16, display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center' }}>
+                <button 
+                    className="btn btn-secondary" 
+                    disabled={page <= 1} 
+                    onClick={() => setPage(p => p - 1)}
+                >
+                    Anterior
+                </button>
+                <span>Página {page} de {totalPages || 1} (Total: {totalItems})</span>
+                <button 
+                    className="btn btn-secondary" 
+                    disabled={page >= totalPages} 
+                    onClick={() => setPage(p => p + 1)}
+                >
+                    Próxima
+                </button>
+            </div>
+        </>
       )}
 
       {isOpen && (
@@ -404,10 +452,8 @@ export default function ModulosPage() {
                 <TecidosTab
                   moduloId={editing!.id}
                   allTecidos={tecidos}
-                  currentLinks={modulosTecidos.filter((mt) => mt.idModulo === editing!.id)}
-                  onUpdate={() =>
-                    listModulosTecidos().then(setModulosTecidos)
-                  }
+                  currentLinks={editing?.modulosTecidos || []}
+                  onUpdate={onFabricsUpdated}
                 />
               )}
             </div>
@@ -533,7 +579,7 @@ function TecidosTab({
         </thead>
         <tbody>
           {currentLinks.map((link) => {
-            const t = allTecidos.find((x) => x.id === link.idTecido);
+            const t = link.tecido || allTecidos.find((x) => x.id === link.idTecido);
             const isEditing = editingId === link.id;
             
             return (

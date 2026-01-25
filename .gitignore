@@ -1,1 +1,27 @@
+# .NET
+bin/
+obj/
+*.suo
+*.user
+*.pdb
+*.dll
+*.exe
+*.cache
+*.force
+*.sourcelink.json
 
+# Node
+node_modules/
+dist/
+build/
+.env
+
+# MacOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Temp
+*.tmp
+*.bak

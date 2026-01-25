@@ -16,11 +16,41 @@ public class ModulosController : ControllerBase
         => Math.Round(m.Largura * m.Profundidade * m.Altura, 2);
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Modulo>>> GetAll()
-        => await _db.Modulos
+    public async Task<ActionResult<object>> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var query = _db.Modulos
             .AsNoTracking()
-            .OrderBy(x => x.Id)
+            .Include(m => m.ModulosTecidos)
+            .ThenInclude(mt => mt.Tecido)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            var lower = search.ToLower();
+            // Basic search (case insensitive logic handled by DB usually, explicit ToLower for safety/memory)
+            query = query.Where(x => x.Descricao.ToLower().Contains(lower) || x.Id.ToString().Contains(lower));
+        }
+
+        var total = await query.CountAsync();
+        
+        var items = await query
+            .OrderByDescending(x => x.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return Ok(new 
+        { 
+            items, 
+            total, 
+            page, 
+            pageSize, 
+            totalPages = (int)Math.Ceiling(total / (double)pageSize) 
+        });
+    }
 
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Modulo>> GetById(long id)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { importKarams } from '../api/importacao';
+import { importKarams, importKoyo } from '../api/importacao';
 import { listFornecedores } from '../api/fornecedores';
 import type { Fornecedor } from '../api/types';
 import './ClientesPage.css';
@@ -7,7 +7,7 @@ import './ClientesPage.css';
 export default function ImportacaoPage() {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [selectedFornecedor, setSelectedFornecedor] = useState<number | ''>('');
-  const [importType, setImportType] = useState<'karams'>('karams'); // Prepared for more types
+  const [importType, setImportType] = useState<'karams' | 'koyo'>('karams');
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -43,10 +43,12 @@ export default function ImportacaoPage() {
     try {
       if (importType === 'karams') {
         await importKarams(file, Number(selectedFornecedor));
+        setMessage({ type: 'success', text: "Importação Karam's realizada com sucesso!" });
+      } else if (importType === 'koyo') {
+        await importKoyo(file, Number(selectedFornecedor));
+        setMessage({ type: 'success', text: "Importação Koyo realizada com sucesso!" });
       }
-      // Future types go here
       
-      setMessage({ type: 'success', text: 'Importação realizada com sucesso!' });
       setFile(null);
     } catch (err: any) {
         const msg = err.response?.data?.message || err.message || 'Erro desconhecido na importação.';
@@ -87,7 +89,14 @@ export default function ImportacaoPage() {
               >
                 Karam's
               </button>
-              {/* Future buttons will be added here */}
+              <button
+                type="button"
+                className={`btn ${importType === 'koyo' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setImportType('koyo')}
+                style={{ flex: 1 }}
+              >
+                Koyo
+              </button>
             </div>
           </div>
 
@@ -138,11 +147,12 @@ export default function ImportacaoPage() {
 
         <div style={{ marginTop: '32px', borderTop: '1px solid var(--line)', paddingTop: '24px' }}>
           <h3 style={{ marginTop: 0, fontSize: '18px', color: 'var(--text)', marginBottom: '16px' }}>
-            Instruções de Layout (Karam's)
+            Instruções de Layout ({importType === 'karams' ? "Karam's" : "Koyo"})
           </h3>
           <p style={{ color: 'var(--muted)', marginBottom: '12px' }}>
             O arquivo Excel deve seguir a seguinte estrutura de colunas:
           </p>
+          
           <div style={{ 
             background: 'rgba(0,0,0,0.2)', 
             padding: '16px', 
@@ -150,15 +160,28 @@ export default function ImportacaoPage() {
             fontSize: '14px',
             color: 'var(--text)'
           }}>
-            <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
-              <li><strong>Aba</strong>: Nome da Categoria</li>
-              <li><strong>A</strong>: Marca (Distinct)</li>
-              <li><strong>B</strong>: Descrição (Ignora "Descrição" ou vazio)</li>
-              <li><strong>C</strong>: Largura (Ignora "Larg" ou vazio)</li>
-              <li><strong>D</strong>: Profundidade (Ignora "Prof" ou vazio)</li>
-              <li><strong>F</strong>: Altura (Ignora "Altura" ou vazio)</li>
-              <li><strong>H a P</strong>: Tecidos G0 a G8</li>
-            </ul>
+            {importType === 'karams' ? (
+                <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
+                    <li><strong>Aba</strong>: Nome da Categoria</li>
+                    <li><strong>A</strong>: Marca (Distinct)</li>
+                    <li><strong>B</strong>: Descrição (Ignora "Descrição" ou vazio)</li>
+                    <li><strong>C</strong>: Largura (Ignora "Larg" ou vazio)</li>
+                    <li><strong>D</strong>: Profundidade (Ignora "Prof" ou vazio)</li>
+                    <li><strong>F</strong>: Altura (Ignora "Altura" ou vazio)</li>
+                    <li><strong>H a P</strong>: Tecidos G0 a G8</li>
+                </ul>
+            ) : (
+                <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
+                    <li><strong>Aba</strong>: Nome da Categoria</li>
+                    <li><strong>Col A</strong>: Marca (Distinct)</li>
+                    <li><strong>Col B</strong>: Descrição (Ignora "Descrição" / Vazio)</li>
+                    <li><strong>Col C</strong>: Largura (Ignora "Larg" / Vazio)</li>
+                    <li><strong>Col D</strong>: Profundidade (Ignora "Prof" / Vazio)</li>
+                    <li><strong>Col E</strong>: Altura (Ignora "Altura" / Vazio)</li>
+                    <li><strong>PA</strong>: Sempre Zero (0)</li>
+                    <li><strong>Tecidos</strong>: Mapeamento Especial (G1..G10 nas colunas H..S)</li>
+                </ul>
+            )}
           </div>
         </div>
       </div>

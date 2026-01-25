@@ -3,8 +3,10 @@ import type { Modulo, ModuloTecido } from "./types";
 
 // --- MODULOS ---
 
-export async function listModulos() {
-  return apiGet<Modulo[]>("/api/modulos");
+export async function listModulos(search = "", page = 1, pageSize = 10) {
+  return apiGet<{ items: Modulo[]; total: number; totalPages: number }>(
+    `/api/modulos?search=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`
+  );
 }
 
 export async function createModulo(input: Omit<Modulo, "id" | "m3">) {

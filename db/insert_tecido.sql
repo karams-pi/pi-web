@@ -7,3 +7,5 @@ INSERT INTO tecido(id, nome) VALUES (6, 'G5');
 INSERT INTO tecido(id, nome) VALUES (7, 'G6');
 INSERT INTO tecido(id, nome) VALUES (8, 'G7');
 INSERT INTO tecido(id, nome) VALUES (9, 'G8');
+INSERT INTO tecido(id, nome) VALUES (10, 'G9');
+INSERT INTO tecido(id, nome) VALUES (11, 'G10');

@@ -28,6 +28,7 @@ export type Modulo = {
   altura: number;
   pa: number;
   m3: number;
+  modulosTecidos?: ModuloTecido[];
 };
 
 export type ModuloTecido = {
