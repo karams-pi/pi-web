@@ -134,7 +134,6 @@ public class ExcelImportService
         // --- PRE-CREATE KOYO FABRICS (G0-G10) ---
         // Nomes usados pela Koyo
         var koyoTecidoNames = new[] { "G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10" };
-        bool savedTecidos = false;
         foreach (var tName in koyoTecidoNames)
         {
             if (!tecidos.ContainsKey(tName.ToLower()))

@@ -101,7 +101,7 @@ export default function ProformaInvoicePage() {
         listFretes(),
         listClientes({ pageSize: 1000 }),
         listModulosTecidos(),
-        getLatestConfig(),
+        getLatestConfig().catch(() => null),
         getProximaSequencia(),
         getCotacaoUSD()
       ]);

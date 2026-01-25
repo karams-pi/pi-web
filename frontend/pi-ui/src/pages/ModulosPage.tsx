@@ -50,6 +50,7 @@ export default function ModulosPage() {
   const [filterFornecedor, setFilterFornecedor] = useState("");
   const [filterCategoria, setFilterCategoria] = useState("");
   const [filterMarca, setFilterMarca] = useState("");
+  const [filterTecido, setFilterTecido] = useState("");
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -94,7 +95,8 @@ export default function ModulosPage() {
         10, 
         filterFornecedor ? Number(filterFornecedor) : undefined,
         filterCategoria ? Number(filterCategoria) : undefined,
-        filterMarca ? Number(filterMarca) : undefined
+        filterMarca ? Number(filterMarca) : undefined,
+        filterTecido ? Number(filterTecido) : undefined
       );
       setItems(res.items);
       setTotalPages(res.totalPages);
@@ -113,7 +115,7 @@ export default function ModulosPage() {
       loadItems();
     }, 300);
     return () => clearTimeout(timer);
-  }, [page, search, filterFornecedor, filterCategoria, filterMarca]);
+  }, [page, search, filterFornecedor, filterCategoria, filterMarca, filterTecido]);
 
   function openCreate() {
     setEditing(null);
@@ -239,6 +241,18 @@ export default function ModulosPage() {
           <option value="">Marca (Todas)</option>
           {marcas.map(m => (
             <option key={m.id} value={m.id}>{m.nome}</option>
+          ))}
+        </select>
+
+        <select
+          value={filterTecido}
+          onChange={(e) => { setFilterTecido(e.target.value); setPage(1); }}
+          className="cl-select"
+          style={{ width: 180 }}
+        >
+          <option value="">Tecido (Todos)</option>
+          {tecidos.map(t => (
+            <option key={t.id} value={t.id}>{t.nome}</option>
           ))}
         </select>
 

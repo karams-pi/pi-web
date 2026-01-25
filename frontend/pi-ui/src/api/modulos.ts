@@ -9,7 +9,8 @@ export async function listModulos(
   pageSize = 10,
   idFornecedor?: number,
   idCategoria?: number,
-  idMarca?: number
+  idMarca?: number,
+  idTecido?: number
 ) {
   const query = new URLSearchParams({
     search,
@@ -20,6 +21,7 @@ export async function listModulos(
   if (idFornecedor) query.append("idFornecedor", String(idFornecedor));
   if (idCategoria) query.append("idCategoria", String(idCategoria));
   if (idMarca) query.append("idMarca", String(idMarca));
+  if (idTecido) query.append("idTecido", String(idTecido));
 
   return apiGet<{ items: Modulo[]; total: number; totalPages: number }>(
     `/api/modulos?${query.toString()}`

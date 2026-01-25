@@ -21,6 +21,7 @@ public class ModulosController : ControllerBase
         [FromQuery] long? idFornecedor,
         [FromQuery] long? idCategoria,
         [FromQuery] long? idMarca,
+        [FromQuery] long? idTecido,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
@@ -45,6 +46,9 @@ public class ModulosController : ControllerBase
 
         if (idMarca.HasValue)
             query = query.Where(x => x.IdMarca == idMarca.Value);
+
+        if (idTecido.HasValue)
+            query = query.Where(x => x.ModulosTecidos.Any(mt => mt.IdTecido == idTecido.Value));
 
         var total = await query.CountAsync();
         
