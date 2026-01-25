@@ -68,11 +68,24 @@ export default function App() {
             </Routes>
           </div>
         </main>
+
+        <Footer />
       </div>
     </BrowserRouter>
   );
 }
 
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <p>
+          Desenvolvido por Paulo Roberto Schmitz Takeda • Contato: paulo.takeda@gmail.com - (43) 9 9974-1880
+        </p>
+      </div>
+    </footer>
+  );
+}
 
 // ... imports
 import { useState, useEffect } from "react";

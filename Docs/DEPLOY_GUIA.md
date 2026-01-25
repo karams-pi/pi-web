@@ -86,3 +86,30 @@ O Render possui um "Nível Gratuito" (Free Tier) generoso que suporta:
 | **Banco** | Render PostgreSQL | Grátis (Expira a cada 90 dias, precisa renovar) |
 
 *\*Nota: No plano Free, o Backend pode demorar uns 50 segundos para "acordar" na primeira requisição após ficar parado. Isso é normal.*
+
+---
+
+## 🛠️ Solução de Problemas (Troubleshooting)
+
+Se você está vendo **"Failed to fetch"** ou erros de conexão:
+
+### 1. Verifique as Variáveis do Frontend (Static Site)
+No dashboard do Render, vá em **Environment**.
+- Certifique-se de que `VITE_API_BASE` existe.
+- O valor deve ser a URL do seu Backend (ex: `https://pi-backend.onrender.com`).
+- **Importante**: Deve ser `HTTPS`, não `HTTP`, senão o navegador bloqueia (Mixed Content).
+
+### 2. Verifique os Logs do Backend (Web Service)
+No dashboard do Render, vá em **Logs**.
+- Veja se a aplicação iniciou corretamente (`Application started. Press Ctrl+C to shut down.`).
+- Se houver erro de **Database**, verifique se a variável `ConnectionStrings__DefaultConnection` está correta.
+    - Ela deve ser a **Internal Database URL** (começa com `postgres://`).
+    - Às vezes o Render muda a senha ou o host se você recriou o banco. Copie novamente a string de conexão do Dashboard do Banco de Dados.
+
+### 3. Teste o Backend Direto
+Abra a URL do backend no navegador (ex: `https://pi-backend.onrender.com/swagger`).
+- Se o Swagger carregar, o backend está no ar.
+- Se der "502 Bad Gateway" ou ficar carregando infinitamente, o backend não subiu (verifique os logs).
+
+### 4. Permissões de Rede (CORS)
+O código já está configurado para aceitar conexões (`AllowAnyOrigin`), então isso não deve ser o problema, a menos que você tenha alterado `Program.cs`.

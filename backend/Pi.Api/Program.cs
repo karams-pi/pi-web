@@ -46,6 +46,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// SEMPRE ativar página de erro detalhada para debugar no Render (temporário)
+app.UseDeveloperExceptionPage();
+
 app.UseSwagger();
 app.UseSwaggerUI();
 

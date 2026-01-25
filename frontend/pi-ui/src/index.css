@@ -43,7 +43,21 @@ a {
 .app {
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+}
+
+.footer {
+  text-align: right;
+  padding: 0 24px; /* Zero vertical padding */
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.1; /* Tight line height */
+}
+
+.footer p {
+  margin: 0;
 }
 
 .topbar {
