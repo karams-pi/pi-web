@@ -73,7 +73,20 @@ export default function App() {
   );
 }
 
+// ... imports
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+// ... (Header function start)
 function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location]);
+
   return (
     <header className="topbar">
       <div className="container">
@@ -82,7 +95,15 @@ function Header() {
             PI Web
           </Link>
 
-          <nav className="nav">
+          <button 
+            className="hamburger" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            ☰
+          </button>
+
+          <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
             <NavLink
               to="/"
               end
