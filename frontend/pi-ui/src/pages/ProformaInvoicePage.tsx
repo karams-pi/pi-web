@@ -40,6 +40,9 @@ type ItemGrid = {
   valorFreteRateadoUSD: number;
   valorFinalItemBRL: number;
   valorFinalItemUSDRisco: number;
+  exwTooltip?: string;
+  freteBrlTooltip?: string;
+  freteUsdTooltip?: string;
 };
 
 export default function ProformaInvoicePage() {
@@ -70,6 +73,18 @@ export default function ProformaInvoicePage() {
 
   // Modal State
   const [showSearchModal, setShowSearchModal] = useState(false);
+
+  // Help Modal State
+  const [helpModalOpen, setHelpModalOpen] = useState(false);
+  const [helpTitle, setHelpTitle] = useState("");
+  const [helpContent, setHelpContent] = useState("");
+
+  function openHelp(title: string, content?: string) {
+    if (!content) return;
+    setHelpTitle(title);
+    setHelpContent(content);
+    setHelpModalOpen(true);
+  }
 
   useEffect(() => {
     loadInitialData();
@@ -158,12 +173,22 @@ export default function ProformaInvoicePage() {
       const valorFinalBRL = (item.valorEXW + freteUnitarioBRL) * item.quantidade;
       const valorFinalUSD = (item.valorEXW + freteUnitarioUSD) * item.quantidade;
 
+      const freteBrlTooltip = 
+        `Total Frete R$ ${fmt(form.valorTotalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(custoPorM3BRL)}/m³\n` +
+        `x Item M³ ${fmt(item.m3)} = R$ ${fmt(freteUnitarioBRL)}`;
+      
+      const freteUsdTooltip = 
+        `Total Frete $ ${fmt(form.valorTotalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(custoPorM3USD)}/m³\n` +
+        `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
+
       return {
         ...item,
         valorFreteRateadoBRL: freteUnitarioBRL,
         valorFreteRateadoUSD: freteUnitarioUSD,
         valorFinalItemBRL: valorFinalBRL,
         valorFinalItemUSDRisco: valorFinalUSD,
+        freteBrlTooltip,
+        freteUsdTooltip
       };
     });
 
@@ -192,8 +217,19 @@ export default function ProformaInvoicePage() {
 
     const valorModuloTecido = moduloTecido.valorTecido;
     const comissao = config?.percentualComissao || 0;
+    const gordura = config?.percentualGordura || 0;
+    
+    // Calculation
     const valorBase = form.cotacaoRisco > 0 ? valorModuloTecido / form.cotacaoRisco : 0;
-    const valorEXW = valorBase + (valorBase * (comissao / 100));
+    const vComissao = valorBase * (comissao / 100);
+    const vGordura = valorBase * (gordura / 100);
+    const valorEXW = valorBase + vComissao + vGordura;
+
+    const exwTooltip = 
+      `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(form.cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
+      `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
+      `+ Gordura (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
+      `= $ ${fmt(valorEXW)}`;
 
     const novoItem: ItemGrid = {
       tempId: Date.now(),
@@ -210,6 +246,9 @@ export default function ProformaInvoicePage() {
       valorFreteRateadoUSD: 0,
       valorFinalItemBRL: 0,
       valorFinalItemUSDRisco: 0,
+      exwTooltip,
+      freteBrlTooltip: "",
+      freteUsdTooltip: "",
     };
 
     setItens(prev => [...prev, novoItem]);
@@ -311,6 +350,7 @@ export default function ProformaInvoicePage() {
 
         if (itensApi && Array.isArray(itensApi)) {
            const novosItens: ItemGrid[] = itensApi.map((item: any) => {
+
                const mt = modulosTecidos.find(m => m.id === item.idModuloTecido || m.id === item.IdModuloTecido);
                
                const largura = item.largura || item.Largura || (mt as any)?.modulo?.largura || 0;
@@ -333,7 +373,10 @@ export default function ProformaInvoicePage() {
                    valorFreteRateadoBRL: item.valorFreteRateadoBRL || item.ValorFreteRateadoBRL,
                    valorFreteRateadoUSD: item.valorFreteRateadoUSD || item.ValorFreteRateadoUSD,
                    valorFinalItemBRL: item.valorFinalItemBRL || item.ValorFinalItemBRL,
-                   valorFinalItemUSDRisco: item.valorFinalItemUSDRisco || item.ValorFinalItemUSDRisco
+                   valorFinalItemUSDRisco: item.valorFinalItemUSDRisco || item.ValorFinalItemUSDRisco,
+                   exwTooltip: "Cálculo importado",
+                   freteBrlTooltip: "Cálculo importado",
+                   freteUsdTooltip: "Cálculo importado"
                };
            });
            setItens(novosItens);
@@ -413,6 +456,20 @@ export default function ProformaInvoicePage() {
             onClose={() => setShowSearchModal(false)}
             onSelect={handleSelectPi}
         />
+      )}
+
+      {helpModalOpen && (
+        <div className="modalOverlay" onMouseDown={() => setHelpModalOpen(false)}>
+          <div className="modalCard" style={{ width: 400, height: 'auto', maxHeight: '80vh' }} onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modalHeader">
+              <h3 className="modalTitle">{helpTitle}</h3>
+              <button className="btn btn-sm" onClick={() => setHelpModalOpen(false)}>Fechar</button>
+            </div>
+            <div className="modalBody" style={{ whiteSpace: 'pre-line', lineHeight: 1.5 }}>
+              {helpContent}
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="cl-card" style={{ marginBottom: 20, padding: 16 }}>
@@ -575,9 +632,24 @@ export default function ProformaInvoicePage() {
                   <td style={td}>{fmt(item.altura)}</td>
                   <td style={td}>{fmt(item.pa)}</td>
                   <td style={td}>{fmt(item.m3, 3)}</td>
-                  <td style={{...td, textAlign:"right"}}>R$ {fmt(item.valorEXW)}</td>
-                  <td style={{...td, textAlign:"right"}}>R$ {fmt(item.valorFreteRateadoBRL)}</td>
-                  <td style={{...td, textAlign:"right"}}>$ {fmt(item.valorFreteRateadoUSD)}</td>
+                  <td style={{...td, textAlign:"right"}} title={item.exwTooltip}>
+                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+                          R$ {fmt(item.valorEXW)}
+                          <span className="mobile-help-icon" onClick={() => openHelp("Cálculo EXW", item.exwTooltip)}>?</span>
+                      </div>
+                  </td>
+                  <td style={{...td, textAlign:"right"}} title={item.freteBrlTooltip}>
+                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+                          R$ {fmt(item.valorFreteRateadoBRL)}
+                          <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete R$", item.freteBrlTooltip)}>?</span>
+                      </div>
+                  </td>
+                  <td style={{...td, textAlign:"right"}} title={item.freteUsdTooltip}>
+                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+                          $ {fmt(item.valorFreteRateadoUSD)}
+                          <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete USD", item.freteUsdTooltip)}>?</span>
+                      </div>
+                  </td>
                   <td style={{...td, textAlign:"right"}}>R$ {fmt(item.valorFinalItemBRL)}</td>
                   <td style={{...td, textAlign:"right"}}>$ {fmt(item.valorFinalItemUSDRisco)}</td>
                 </tr>

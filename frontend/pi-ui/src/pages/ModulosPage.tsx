@@ -301,7 +301,7 @@ export default function ModulosPage() {
                         <td style={td}>
                             {myTecidos.length > 0 ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {myTecidos.slice(0, 5).map(mt => (
+                                    {myTecidos.map(mt => (
                                         <div key={mt.id} style={{ fontSize: '0.9em' }}>
                                             <span style={{ fontWeight: 500, color: '#94a3b8' }}>
                                                 {mt.tecido?.nome || mt.idTecido}:
@@ -312,11 +312,6 @@ export default function ModulosPage() {
                                             </span>
                                         </div>
                                     ))}
-                                    {myTecidos.length > 5 && (
-                                        <span style={{ fontSize: '0.8em', color: '#666' }}>
-                                            +{myTecidos.length - 5} tecidos...
-                                        </span>
-                                    )}
                                 </div>
                             ) : (
                                 <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
