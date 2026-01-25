@@ -18,6 +18,9 @@ public class ModulosController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<object>> GetAll(
         [FromQuery] string? search,
+        [FromQuery] long? idFornecedor,
+        [FromQuery] long? idCategoria,
+        [FromQuery] long? idMarca,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
@@ -33,6 +36,15 @@ public class ModulosController : ControllerBase
             // Basic search (case insensitive logic handled by DB usually, explicit ToLower for safety/memory)
             query = query.Where(x => x.Descricao.ToLower().Contains(lower) || x.Id.ToString().Contains(lower));
         }
+
+        if (idFornecedor.HasValue)
+            query = query.Where(x => x.IdFornecedor == idFornecedor.Value);
+
+        if (idCategoria.HasValue)
+            query = query.Where(x => x.IdCategoria == idCategoria.Value);
+
+        if (idMarca.HasValue)
+            query = query.Where(x => x.IdMarca == idMarca.Value);
 
         var total = await query.CountAsync();
         

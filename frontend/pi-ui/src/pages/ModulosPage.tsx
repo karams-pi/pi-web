@@ -47,6 +47,10 @@ export default function ModulosPage() {
   
   // Pagination / Search State
   const [search, setSearch] = useState("");
+  const [filterFornecedor, setFilterFornecedor] = useState("");
+  const [filterCategoria, setFilterCategoria] = useState("");
+  const [filterMarca, setFilterMarca] = useState("");
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
@@ -84,7 +88,14 @@ export default function ModulosPage() {
       setLoading(true);
       setError(null);
       // Calls paged API
-      const res = await listModulos(search, page, 10);
+      const res = await listModulos(
+        search, 
+        page, 
+        10, 
+        filterFornecedor ? Number(filterFornecedor) : undefined,
+        filterCategoria ? Number(filterCategoria) : undefined,
+        filterMarca ? Number(filterMarca) : undefined
+      );
       setItems(res.items);
       setTotalPages(res.totalPages);
       setTotalItems(res.total);
@@ -102,7 +113,7 @@ export default function ModulosPage() {
       loadItems();
     }, 300);
     return () => clearTimeout(timer);
-  }, [page, search]);
+  }, [page, search, filterFornecedor, filterCategoria, filterMarca]);
 
   function openCreate() {
     setEditing(null);
@@ -194,7 +205,43 @@ export default function ModulosPage() {
   return (
     <div style={{ padding: 16 }}>
       <h1>Módulos</h1>
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+        <select
+          value={filterFornecedor}
+          onChange={(e) => { setFilterFornecedor(e.target.value); setPage(1); }}
+          className="cl-select"
+          style={{ width: 180 }}
+        >
+          <option value="">Fornecedor (Todos)</option>
+          {fornecedores.map(f => (
+            <option key={f.id} value={f.id}>{f.nome}</option>
+          ))}
+        </select>
+
+        <select
+          value={filterCategoria}
+          onChange={(e) => { setFilterCategoria(e.target.value); setPage(1); }}
+          className="cl-select"
+          style={{ width: 180 }}
+        >
+          <option value="">Categoria (Todas)</option>
+          {categorias.map(c => (
+            <option key={c.id} value={c.id}>{c.nome}</option>
+          ))}
+        </select>
+
+        <select
+          value={filterMarca}
+          onChange={(e) => { setFilterMarca(e.target.value); setPage(1); }}
+          className="cl-select"
+          style={{ width: 180 }}
+        >
+          <option value="">Marca (Todas)</option>
+          {marcas.map(m => (
+            <option key={m.id} value={m.id}>{m.nome}</option>
+          ))}
+        </select>
+
         <input
           placeholder="Buscar módulo..."
           value={search}
@@ -202,8 +249,10 @@ export default function ModulosPage() {
               setSearch(e.target.value);
               setPage(1); // Reset to page 1 on search
           }}
-          style={{ flex: 1, padding: 8 }}
+          style={{ flex: 1, padding: 8, minWidth: 200 }}
+          className="cl-input"
         />
+
         <button className="btn btn-primary" onClick={openCreate}>Novo</button>
       </div>
 
@@ -217,10 +266,10 @@ export default function ModulosPage() {
             <thead>
                 <tr>
                 <th style={th}>ID</th>
-                <th style={th}>Descrição</th>
                 <th style={th}>Fornecedor</th>
                 <th style={th}>Categoria</th>
                 <th style={th}>Marca</th>
+                <th style={th}>Módulo</th>
                 <th style={th}>Dimensões (LxPxA)</th>
                 <th style={th}>M³</th>
                 <th style={th}>Tecidos / Valores</th>
@@ -235,10 +284,10 @@ export default function ModulosPage() {
                 return (
                     <tr key={x.id}>
                         <td style={td}>{x.id}</td>
-                        <td style={td}>{x.descricao}</td>
                         <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
                         <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
                         <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
+                        <td style={td}>{x.descricao}</td>
                         <td style={td}>
                         {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
                         </td>

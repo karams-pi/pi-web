@@ -3,9 +3,26 @@ import type { Modulo, ModuloTecido } from "./types";
 
 // --- MODULOS ---
 
-export async function listModulos(search = "", page = 1, pageSize = 10) {
+export async function listModulos(
+  search = "", 
+  page = 1, 
+  pageSize = 10,
+  idFornecedor?: number,
+  idCategoria?: number,
+  idMarca?: number
+) {
+  const query = new URLSearchParams({
+    search,
+    page: String(page),
+    pageSize: String(pageSize),
+  });
+
+  if (idFornecedor) query.append("idFornecedor", String(idFornecedor));
+  if (idCategoria) query.append("idCategoria", String(idCategoria));
+  if (idMarca) query.append("idMarca", String(idMarca));
+
   return apiGet<{ items: Modulo[]; total: number; totalPages: number }>(
-    `/api/modulos?search=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`
+    `/api/modulos?${query.toString()}`
   );
 }
 
