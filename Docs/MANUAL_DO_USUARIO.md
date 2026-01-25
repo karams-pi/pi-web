@@ -63,21 +63,25 @@ O sistema busca no banco de dados o preço do Módulo naquele Tecido específico
 Converte o preço de tabela para Dólar usando a Cotação Risco.
 > Formula: `Valor Base USD = Preço Tabela BRL / Cotação Risco`
 
-#### C. Aplicação de Comissão (Valor EXW)
-Adiciona a porcentagem de comissão configurada sobre o valor base.
-> Formula: `Valor EXW = Valor Base USD + (Valor Base USD * % Comissão)`
-*   **O que é EXW?**: *Ex Works*. Significa o preço da mercadoria na fábrica, já em Dólar e com sua comissão, sem contar o frete.
+#### C. Aplicação de Comissão e Gordura (Valor EXW)
+Adiciona a porcentagem de comissão e a porcentagem de gordura (margem extra) configuradas sobre o valor base.
+> Formula: `Valor EXW = Valor Base USD + (Valor Base USD * % Comissão) + (Valor Base USD * % Gordura)`
+*   **O que é EXW?**: *Ex Works*. Significa o preço da mercadoria na fábrica, já em Dólar, com comissão e margem de gordura, sem contar o frete.
 
 ---
 
 ### 5.4. Cálculo do Frete e Rateio (Volume m³)
-O custo do frete (ex: valor do Container) não é dividido igualmente por "quantidade de itens", mas sim pelo **Volume (m³)** que cada item ocupa. Quem ocupa mais espaço, paga mais frete.
+O custo do frete (seja em BRL ou USD) não é dividido igualmente pela "quantidade de itens", mas sim proporcionalmente pelo **Volume (m³)** que cada item ocupa. Quem ocupa mais espaço, paga uma parcela maior do frete.
 
 1.  **Cálculo do Volume Total**: Soma-se o m³ de todos os itens da PI.
-2.  **Custo por m³**:
-    > Formula: `Custo por m³ = Valor Total Frete USD / Volume Total m³ da PI`
+2.  **Custo por m³ (Rateio)**:
+    *   O sistema calcula quanto custa cada m³ de frete em ambas as moedas.
+    > Formula BRL: `Fator Rateio BRL = Valor Total Frete BRL / Volume Total m³ da PI`
+    > Formula USD: `Fator Rateio USD = Valor Total Frete USD / Volume Total m³ da PI`
 3.  **Frete Unitário do Item**:
-    > Formula: `Frete Unitário = Custo por m³ * m³ do Item`
+    *   Multiplica-se o volume do item pelo fator de rateio.
+    > Formula: `Frete Item BRL = Fator Rateio BRL * m³ do Item`
+    > Formula: `Frete Item USD = Fator Rateio USD * m³ do Item`
 
 ---
 

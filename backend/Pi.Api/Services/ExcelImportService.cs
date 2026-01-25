@@ -527,12 +527,26 @@ public class ExcelImportService
                 // Check Local then DB (Use Local cache if possible)
                 // For simplified tracked lookup in loop:
                 var modulo = await _context.Modulos
+                     .Include(m => m.ModulosTecidos) // Fix: Include relations to check duplicates
                      .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor 
                                             && m.IdMarca == marca.Id // Issue: marca.Id might be 0 if new.
-                                            && m.Descricao.ToUpper() == descricao.ToUpper());
+                                            && m.Descricao.ToUpper() == descricao.ToUpper()
+                                            && m.Largura == larg); // Fix: Distinguish by Width
                                             
                 // Logic Fix: if marca is new, modulo must be new.
                 if (marca.Id == 0) modulo = null;
+
+                if (modulo == null)
+                {
+                    // Check if we already created this module in this session (Local Cache) to avoid duplicates
+                    // Since we don't have a dict, we iterate Local. Not optimal but safe for small batches.
+                    // Ideally we should use a Dictionary<string, Modulo> like in Koyo import.
+                    modulo = _context.Modulos.Local
+                        .FirstOrDefault(m => m.IdFornecedor == idFornecedor 
+                                          && m.Marca == marca 
+                                          && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
+                                          && m.Largura == larg); // Fix: Distinguish by Width
+                }
 
                 if (modulo == null)
                 {
@@ -549,13 +563,16 @@ public class ExcelImportService
                         Altura = alt,
                         Pa = pa,
                         // M3 computed by trigger or class (not here)
-                        M3 = (larg * prof * alt) / 1000000m
+                        M3 = (larg * prof * alt) / 1000000m,
+                        ModulosTecidos = new List<ModuloTecido>()
                     };
                     _context.Modulos.Add(modulo);
                 }
                 else
                 {
                     // Update
+                    if(modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>(); // Ensure collection init
+                    
                     modulo.Categoria = categoria; // Link Object to ensure consistency
                     modulo.Marca = marca;
                     modulo.Largura = larg;
@@ -578,19 +595,9 @@ public class ExcelImportService
 
                     if (decimal.TryParse(priceText, out var price) && price > 0)
                     {
-                        // Upsert ModuloTecido
-                        // Check local list first (memory) for new items added in loop
-                        // To allow concurrent adds of same tecido to multiple modules
-                        
-                        // Just Add to context? No, we need to check if exists.
-                        // Since modulo might be new or existing.
-                        
-                        ModuloTecido? mt = null;
-                        if (modulo.Id > 0)
-                        {
-                             mt = await _context.ModulosTecidos
-                                .FirstOrDefaultAsync(x => x.IdModulo == modulo.Id && x.IdTecido == tecido.Id);
-                        }
+                        // Upsert ModuloTecido using IN-MEMORY collection check
+                        // This covers both DB records (loaded via Include) and New records (added previously in loop)
+                        var mt = modulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id);
 
                         if (mt == null)
                         {
@@ -598,9 +605,16 @@ public class ExcelImportService
                             {
                                 Modulo = modulo, // Link Object
                                 Tecido = tecido,  // Link Object
+                                IdTecido = tecido.Id,
                                 ValorTecido = price
                             };
-                            _context.ModulosTecidos.Add(mt);
+                            // Add to Collection AND Context (via Fixup or explicit add)
+                            modulo.ModulosTecidos.Add(mt);
+                            // Explicit Add to context is usually not needed if added to navigation of tracked entity, 
+                            // but safest to leave it to EF fixup or add explicitly if root is new.
+                            // If modulo is new, just adding to collection is enough.
+                            // If modulo IS existing, we must ensure state is Added.
+                            if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
                         }
                         else
                         {

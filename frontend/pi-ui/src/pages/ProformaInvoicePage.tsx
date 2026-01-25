@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./ClientesPage.css";
 
-import type { Frete, ModuloTecido, Configuracao } from "../api/types";
+
 import { listFretes } from "../api/fretes";
 import { getTotalFrete } from "../api/configuracoesFreteItem";
 import { getProximaSequencia, getCotacaoUSD, createPi, getPi } from "../api/pis";
 import { getLatestConfig } from "../api/configuracoes";
-import { listModulosTecidos } from "../api/modulos";
+import { listModulosTecidos, getModuleFilters } from "../api/modulos";
 import { listClientes } from "../api/clientes";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
+import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
 
 type FormState = {
   id?: number;
@@ -67,6 +68,17 @@ export default function ProformaInvoicePage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Filters State
+  const [filterFornecedor, setFilterFornecedor] = useState("");
+  const [filterCategoria, setFilterCategoria] = useState("");
+  const [filterMarca, setFilterMarca] = useState("");
+  const [filterTecido, setFilterTecido] = useState("");
+
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [tecidos, setTecidos] = useState<Tecido[]>([]);
+
   // Novo item
   const [selModuloTecido, setSelModuloTecido] = useState("");
   const [quantidade, setQuantidade] = useState("1");
@@ -91,6 +103,27 @@ export default function ProformaInvoicePage() {
   }, []);
 
   useEffect(() => {
+    loadFilters();
+  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido]);
+
+  async function loadFilters() {
+      try {
+        const res = await getModuleFilters(
+          filterFornecedor ? Number(filterFornecedor) : undefined,
+          filterCategoria ? Number(filterCategoria) : undefined,
+          filterMarca ? Number(filterMarca) : undefined,
+          filterTecido ? Number(filterTecido) : undefined
+        );
+        setFornecedores(res.fornecedores);
+        setCategorias(res.categorias);
+        setMarcas(res.marcas);
+        setTecidos(res.tecidos);
+      } catch (e) {
+        console.error("Erro ao carregar filtros", e);
+      }
+    }
+
+  useEffect(() => {
     if (form.idFrete) {
       loadFreteTotals();
     }
@@ -100,6 +133,30 @@ export default function ProformaInvoicePage() {
     // Recalcular rateio quando itens mudarem ou totais de frete mudarem
     recalcularRateio();
   }, [itens.length, form.valorTotalFreteBRL, form.valorTotalFreteUSD]); 
+
+  // Filter ModulosTecidos in memory
+  const filteredModulosTecidos = useMemo(() => {
+      let list = modulosTecidos;
+      
+      if (filterFornecedor) {
+          const id = Number(filterFornecedor);
+          list = list.filter(mt => (mt as any).modulo?.fornecedor?.id === id);
+      }
+      if (filterCategoria) {
+          const id = Number(filterCategoria);
+          list = list.filter(mt => (mt as any).modulo?.categoria?.id === id);
+      }
+      if (filterMarca) {
+          const id = Number(filterMarca);
+          list = list.filter(mt => (mt as any).modulo?.marca?.id === id);
+      }
+      if (filterTecido) {
+          // Here we filter by the Tecido linked to the ModuloTecido
+          const id = Number(filterTecido);
+          list = list.filter(mt => mt.idTecido === id);
+      }
+      return list;
+  }, [modulosTecidos, filterFornecedor, filterCategoria, filterMarca, filterTecido]); 
 
   async function loadInitialData() {
     try {
@@ -561,13 +618,65 @@ export default function ProformaInvoicePage() {
       <div className="cl-card" style={{ marginBottom: 20, padding: 10, overflow: "visible" }}> 
         <h3 style={{ marginTop: 0 }}>Itens da PI</h3>
         
+        <div style={{ display: "flex", gap: 10, marginBottom: 15, flexWrap: "wrap", alignItems: "flex-end" }}>
+            <div style={{ width: 180 }}>
+                <label className="label" style={{marginBottom: 4, display: 'block', fontSize: '0.8em'}}>Fornecedor</label>
+                <SearchableSelect
+                    value={filterFornecedor}
+                    onChange={setFilterFornecedor}
+                    placeholder="Todos"
+                    options={[{ value: "", label: "Todos" }, ...fornecedores.map(f => ({ value: f.id, label: f.nome }))]}
+                />
+            </div>
+            <div style={{ width: 180 }}>
+                <label className="label" style={{marginBottom: 4, display: 'block', fontSize: '0.8em'}}>Categoria</label>
+                <SearchableSelect
+                    value={filterCategoria}
+                    onChange={setFilterCategoria}
+                    placeholder="Todas"
+                    options={[{ value: "", label: "Todas" }, ...categorias.map(c => ({ value: c.id, label: c.nome }))]}
+                />
+            </div>
+            <div style={{ width: 180 }}>
+                <label className="label" style={{marginBottom: 4, display: 'block', fontSize: '0.8em'}}>Marca</label>
+                <SearchableSelect
+                    value={filterMarca}
+                    onChange={setFilterMarca}
+                    placeholder="Todas"
+                    options={[{ value: "", label: "Todas" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
+                />
+            </div>
+            <div style={{ width: 180 }}>
+                <label className="label" style={{marginBottom: 4, display: 'block', fontSize: '0.8em'}}>Tecido</label>
+                <SearchableSelect
+                    value={filterTecido}
+                    onChange={setFilterTecido}
+                    placeholder="Todos"
+                    options={[{ value: "", label: "Todos" }, ...tecidos.map(t => ({ value: t.id, label: t.nome }))]}
+                />
+            </div>
+            <button 
+                className="btn btn-secondary"
+                onClick={() => {
+                    setFilterFornecedor("");
+                    setFilterCategoria("");
+                    setFilterMarca("");
+                    setFilterTecido("");
+                }}
+                style={{ height: 38 }}
+                title="Limpar Filtros"
+            >
+                🧹
+            </button>
+        </div>
+
         <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
           <div className="field" style={{ flex: 1, minWidth: 300 }}>
             <label className="label">Módulo-Tecido</label>
             <ModuloTecidoSelect
               value={selModuloTecido}
               onChange={(val) => setSelModuloTecido(val)}
-              options={modulosTecidos}
+              options={filteredModulosTecidos}
               placeholder="Selecione um módulo..."
             />
           </div>

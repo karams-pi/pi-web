@@ -68,6 +68,67 @@ public class ModulosController : ControllerBase
         });
     }
 
+    [HttpGet("filters")]
+    public async Task<ActionResult<object>> GetFilters(
+        [FromQuery] long? idFornecedor,
+        [FromQuery] long? idCategoria,
+        [FromQuery] long? idMarca,
+        [FromQuery] long? idTecido)
+    {
+        // Helper to apply filters EXCEPT the one being loaded (exclusion logic)
+        IQueryable<Modulo> ApplyFilters(IQueryable<Modulo> q, string exclude)
+        {
+             if (exclude != "fornecedor" && idFornecedor.HasValue) q = q.Where(x => x.IdFornecedor == idFornecedor.Value);
+             if (exclude != "categoria" && idCategoria.HasValue) q = q.Where(x => x.IdCategoria == idCategoria.Value);
+             if (exclude != "marca" && idMarca.HasValue) q = q.Where(x => x.IdMarca == idMarca.Value);
+             if (exclude != "tecido" && idTecido.HasValue) q = q.Where(x => x.ModulosTecidos.Any(mt => mt.IdTecido == idTecido.Value));
+             return q;
+        }
+
+        // Available Fornecedores
+        var qForn = _db.Modulos.AsNoTracking();
+        qForn = ApplyFilters(qForn, "fornecedor");
+        var fornecedores = await qForn
+            .Select(x => x.Fornecedor)
+            .Distinct()
+            .OrderBy(x => x.Nome)
+            .ToListAsync();
+
+        // Available Categorias
+        var qCat = _db.Modulos.AsNoTracking();
+        qCat = ApplyFilters(qCat, "categoria");
+        var categorias = await qCat
+            .Select(x => x.Categoria)
+            .Distinct()
+            .OrderBy(x => x.Nome)
+            .ToListAsync();
+
+        // Available Marcas
+        var qMarca = _db.Modulos.AsNoTracking();
+        qMarca = ApplyFilters(qMarca, "marca");
+        var marcas = await qMarca
+            .Select(x => x.Marca)
+            .Distinct()
+            .OrderBy(x => x.Nome)
+            .ToListAsync();
+
+        // Available Tecidos (via ModuloTecido)
+        var qTec = _db.ModulosTecidos.AsNoTracking().Include(mt => mt.Tecido).AsQueryable();
+        // Manually apply parent filters to the junction query 
+        if (idFornecedor.HasValue) qTec = qTec.Where(mt => mt.Modulo.IdFornecedor == idFornecedor.Value);
+        if (idCategoria.HasValue) qTec = qTec.Where(mt => mt.Modulo.IdCategoria == idCategoria.Value);
+        if (idMarca.HasValue) qTec = qTec.Where(mt => mt.Modulo.IdMarca == idMarca.Value);
+        // exclude "tecido" -> we don't filter by idTecido here, naturally
+
+        var tecidos = await qTec
+            .Select(mt => mt.Tecido)
+            .Distinct()
+            .OrderBy(x => x.Nome)
+            .ToListAsync();
+
+        return Ok(new { fornecedores, categorias, marcas, tecidos });
+    }
+
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Modulo>> GetById(long id)
     {

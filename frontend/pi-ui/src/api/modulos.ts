@@ -58,6 +58,27 @@ export async function updateModuloTecido(id: number, input: Omit<ModuloTecido, "
   return apiPut<void>(`/api/modulostecidos/${id}`, input);
 }
 
+
 export async function deleteModuloTecido(id: number) {
   return apiDelete(`/api/modulostecidos/${id}`);
+}
+
+export async function getModuleFilters(
+  idFornecedor?: number,
+  idCategoria?: number,
+  idMarca?: number,
+  idTecido?: number
+) {
+  const query = new URLSearchParams();
+  if (idFornecedor) query.append("idFornecedor", String(idFornecedor));
+  if (idCategoria) query.append("idCategoria", String(idCategoria));
+  if (idMarca) query.append("idMarca", String(idMarca));
+  if (idTecido) query.append("idTecido", String(idTecido));
+
+  return apiGet<{
+    fornecedores: import("./types").Fornecedor[];
+    categorias: import("./types").Categoria[];
+    marcas: import("./types").Marca[];
+    tecidos: import("./types").Tecido[];
+  }>(`/api/modulos/filters?${query.toString()}`);
 }

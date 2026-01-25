@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./ClientesPage.css";
 
 import type { Categoria, Fornecedor, Marca, Modulo, ModuloTecido, Tecido } from "../api/types";
-import { listCategorias } from "../api/categorias";
-import { listFornecedores } from "../api/fornecedores";
-import { listMarcas } from "../api/marcas";
-import { listTecidos } from "../api/tecidos";
+
 import {
   createModulo,
   deleteModulo,
@@ -15,6 +12,7 @@ import {
   createModuloTecido,
   deleteModuloTecido,
   updateModuloTecido,
+  getModuleFilters,
 } from "../api/modulos";
 import { SearchableSelect } from "../components/SearchableSelect";
 
@@ -70,19 +68,32 @@ export default function ModulosPage() {
   // const tecidoMap = useMemo(() => new Map(tecidos.map((x) => [x.id, x.nome])), [tecidos]); // Not needed if nested has names
 
   // Basic lists (small tables)
+  // Basic lists - NOW DYNAMIC
+  // Replaced static Promise.all with loadFilters below
+
+  // Dynamic Filters Loader
+  async function loadFilters() {
+    try {
+      const res = await getModuleFilters(
+        filterFornecedor ? Number(filterFornecedor) : undefined,
+        filterCategoria ? Number(filterCategoria) : undefined,
+        filterMarca ? Number(filterMarca) : undefined,
+        filterTecido ? Number(filterTecido) : undefined
+      );
+      setFornecedores(res.fornecedores);
+      setCategorias(res.categorias);
+      setMarcas(res.marcas);
+      setTecidos(res.tecidos);
+    } catch (e) {
+      console.error("Erro ao carregar filtros", e);
+    }
+  }
+
+  // Load filters whenever filter selection changes
   useEffect(() => {
-    Promise.all([
-      listCategorias(),
-      listFornecedores(),
-      listMarcas(),
-      listTecidos(),
-    ]).then(([c, f, ma, t]) => {
-      setCategorias(c);
-      setFornecedores(f);
-      setMarcas(ma);
-      setTecidos(t);
-    }).catch(e => console.error(e));
-  }, []);
+    loadFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido]);
 
   // Main Loader
   async function loadItems() {
@@ -109,7 +120,7 @@ export default function ModulosPage() {
     }
   }
 
-  // Effect: reload when page or search changes
+  // Effect: reload items when page or search changes (and filters)
   useEffect(() => {
     // Debounce search could be added here, but for now simple effect
     const timer = setTimeout(() => {
@@ -256,7 +267,24 @@ export default function ModulosPage() {
           className="cl-input"
         />
 
-        <button className="btn btn-primary" onClick={openCreate}>Novo</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+            <button 
+                className="btn btn-secondary" 
+                onClick={() => {
+                    setFilterFornecedor("");
+                    setFilterCategoria("");
+                    setFilterMarca("");
+                    setFilterTecido("");
+                    setSearch("");
+                    setPage(1);
+                }}
+                style={{ height: '38px', whiteSpace: 'nowrap' }}
+                title="Limpar todos os filtros"
+            >
+                🧹 Limpar
+            </button>
+            <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
+        </div>
       </div>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
