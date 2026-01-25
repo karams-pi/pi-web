@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { importTable } from '../api/importacao';
+import { importKarams } from '../api/importacao';
 import { listFornecedores } from '../api/fornecedores';
 import type { Fornecedor } from '../api/types';
 import './ClientesPage.css';
@@ -7,6 +7,7 @@ import './ClientesPage.css';
 export default function ImportacaoPage() {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [selectedFornecedor, setSelectedFornecedor] = useState<number | ''>('');
+  const [importType, setImportType] = useState<'karams'>('karams'); // Prepared for more types
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -40,10 +41,13 @@ export default function ImportacaoPage() {
     setMessage(null);
 
     try {
-      await importTable(file, Number(selectedFornecedor));
+      if (importType === 'karams') {
+        await importKarams(file, Number(selectedFornecedor));
+      }
+      // Future types go here
+      
       setMessage({ type: 'success', text: 'Importação realizada com sucesso!' });
       setFile(null);
-      // Reset input manually if needed or let user pick another
     } catch (err: any) {
         const msg = err.response?.data?.message || err.message || 'Erro desconhecido na importação.';
         setMessage({ type: 'error', text: msg });
@@ -71,6 +75,22 @@ export default function ImportacaoPage() {
         )}
         
         <form onSubmit={handleSubmit}>
+          
+          <div className="field" style={{ marginBottom: '24px' }}>
+            <label className="label">Tipo de Importação</label>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                className={`btn ${importType === 'karams' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setImportType('karams')}
+                style={{ flex: 1 }}
+              >
+                Karam's
+              </button>
+              {/* Future buttons will be added here */}
+            </div>
+          </div>
+
           <div className="field" style={{ marginBottom: '16px' }}>
             <label className="label">Fornecedor</label>
             <select 
@@ -118,10 +138,10 @@ export default function ImportacaoPage() {
 
         <div style={{ marginTop: '32px', borderTop: '1px solid var(--line)', paddingTop: '24px' }}>
           <h3 style={{ marginTop: 0, fontSize: '18px', color: 'var(--text)', marginBottom: '16px' }}>
-            Instruções de Layout
+            Instruções de Layout (Karam's)
           </h3>
           <p style={{ color: 'var(--muted)', marginBottom: '12px' }}>
-            O arquivo Excel deve seguir rigorosamente a seguinte estrutura de colunas:
+            O arquivo Excel deve seguir a seguinte estrutura de colunas:
           </p>
           <div style={{ 
             background: 'rgba(0,0,0,0.2)', 
@@ -131,14 +151,13 @@ export default function ImportacaoPage() {
             color: 'var(--text)'
           }}>
             <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
-              <li><strong>A</strong>: Categoria do Produto</li>
-              <li><strong>B</strong>: Marca</li>
-              <li><strong>C</strong>: Descrição do Módulo</li>
-              <li><strong>D</strong>: Largura (cm)</li>
-              <li><strong>E</strong>: Profundidade (cm)</li>
-              <li><strong>F</strong>: Altura (cm)</li>
-              <li><strong>G</strong>: PA</li>
-              <li><strong>H em diante</strong>: Nomes dos Tecidos (Cabeçalho) e Preços (Linhas)</li>
+              <li><strong>Aba</strong>: Nome da Categoria</li>
+              <li><strong>A</strong>: Marca (Distinct)</li>
+              <li><strong>B</strong>: Descrição (Ignora "Descrição" ou vazio)</li>
+              <li><strong>C</strong>: Largura (Ignora "Larg" ou vazio)</li>
+              <li><strong>D</strong>: Profundidade (Ignora "Prof" ou vazio)</li>
+              <li><strong>F</strong>: Altura (Ignora "Altura" ou vazio)</li>
+              <li><strong>H a P</strong>: Tecidos G0 a G8</li>
             </ul>
           </div>
         </div>
