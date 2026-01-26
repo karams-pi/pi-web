@@ -216,10 +216,27 @@ export default function ModulosPage() {
     }
   }, [items]);
 
+  function calcEXW(valorTecido: number) {
+    if (!config || !cotacao) return 0;
+    const cotacaoRisco = cotacao - config.valorReducaoDolar;
+    if (cotacaoRisco <= 0) return 0;
+    const valorBase = valorTecido / cotacaoRisco;
+    const comissao = valorBase * (config.percentualComissao / 100);
+    const gordura = valorBase * (config.percentualGordura / 100);
+    return valorBase + comissao + gordura;
+  }
+
+  // --- Render ---
+
+  if (loading && page === 1 && items.length === 0) return <div style={{ padding: 16 }}>Carregando...</div>;
+
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Módulos</h1>
-      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+    <div className="list-container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1>Módulos</h1>
+      </div>
+
+      <div style={{ background: '#1a1a2e', padding: 16, borderRadius: 8, marginBottom: 16, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ width: 220 }}>
           <SearchableSelect
             value={filterFornecedor}
@@ -228,7 +245,6 @@ export default function ModulosPage() {
             options={[{ value: "", label: "Fornecedor (Todos)" }, ...fornecedores.map(f => ({ value: f.id, label: f.nome }))]}
           />
         </div>
-
         <div style={{ width: 220 }}>
           <SearchableSelect
             value={filterCategoria}
@@ -237,7 +253,6 @@ export default function ModulosPage() {
             options={[{ value: "", label: "Categoria (Todas)" }, ...categorias.map(c => ({ value: c.id, label: c.nome }))]}
           />
         </div>
-
         <div style={{ width: 220 }}>
           <SearchableSelect
             value={filterMarca}
@@ -246,7 +261,6 @@ export default function ModulosPage() {
             options={[{ value: "", label: "Marca (Todas)" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
           />
         </div>
-
         <div style={{ width: 220 }}>
           <SearchableSelect
             value={filterTecido}
@@ -303,6 +317,7 @@ export default function ModulosPage() {
                 <th style={th}>Módulo</th>
                 <th style={th}>Dimensões (LxPxA)</th>
                 <th style={th}>M³</th>
+                <th style={th}>EXW (Parcial)</th>
                 <th style={th}>Tecidos / Valores</th>
                 <th style={th}>Ações</th>
                 </tr>
@@ -327,6 +342,21 @@ export default function ModulosPage() {
                         </td>
                         <td style={td}>{fmt(x.m3)}</td>
                         <td style={td}>
+                             {myTecidos.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {myTecidos.map(mt => (
+                                        <div key={mt.id + '_exw'} style={{ fontSize: '0.9em', textAlign: 'right' }}>
+                                            <span style={{ color: '#10b981' }}>
+                                                $ {fmt(calcEXW(mt.valorTecido), 2)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                             ) : (
+                                 <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
+                             )}
+                        </td>
+                        <td style={td}>
                             {myTecidos.length > 0 ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                     {myTecidos.map(mt => (
@@ -336,7 +366,343 @@ export default function ModulosPage() {
                                             </span>
                                             {' '}
                                             <span style={{ color: '#e5e7eb' }}>
-                                                R$ {fmt(mt.valorTecido, 3)}
+                                                R$ {fmt(mt.valorTecido, 2)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
+                            )}
+                        </td>
+                        <td style={td}>
+                        <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
+                        <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
+                            Remover
+                        </button>
+                        </td>
+                    </tr>
+                );
+                })}
+            </tbody>
+            </table>
+
+            {/* Pagination Controls */}
+            <div style={{ marginTop: 16, display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center' }}>
+                <button 
+                    className="btn btn-secondary" 
+                    disabled={page <= 1} 
+                    onClick={() => setPage(p => p - 1)}
+                >
+                    Anterior
+                </button>
+                <span>Página {page} de {totalPages || 1} (Total: {totalItems})</span>
+                <button 
+                    className="btn btn-secondary" 
+                    disabled={page >= totalPages} 
+                    onClick={() => setPage(p => p + 1)}
+                >
+                    Próxima
+                </button>
+            </div>
+        </>
+      )}
+
+      {isOpen && (
+        <div className="modalOverlay" onMouseDown={() => setIsOpen(false)}>
+          <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modalHeader">
+              <h3 className="modalTitle">
+                {editing ? "Editar Módulo" : "Novo Módulo"}
+              </h3>
+              <button className="btn btn-sm" onClick={() => setIsOpen(false)}>
+                Fechar
+              </button>
+            </div>
+
+            <div style={{ padding: "0 16px", borderBottom: "1px solid #ddd" }}>
+              <div style={{ display: "flex", gap: 16 }}>
+                <button
+                  className="btn"
+                  style={tabStyle(activeTab === "geral")}
+                  onClick={() => setActiveTab("geral")}
+                >
+                  Geral
+                </button>
+                <button
+                  className="btn"
+                  style={tabStyle(activeTab === "tecidos")}
+                  onClick={() => {
+                    if (!editing) alert("Salve o módulo antes de adicionar tecidos.");
+                    else setActiveTab("tecidos");
+                  }}
+                  disabled={!editing}
+                >
+                  Tecidos
+                </button>
+              </div>
+            </div>
+
+            <div className="modalBody">
+              {activeTab === "geral" ? (
+                <form onSubmit={onSaveGeral}>
+                  <div className="formGrid">
+                    <div className="field">
+                      <label className="label">Descrição*</label>
+                      <input
+                        className="cl-input"
+                        value={form.descricao}
+                        onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">Fornecedor*</label>
+                      <SearchableSelect
+                        value={form.idFornecedor || ""}
+                        onChange={(val) => setForm({ ...form, idFornecedor: Number(val) })}
+                        options={fornecedores.map(f => ({ value: f.id, label: f.nome }))}
+                        placeholder="Selecione..."
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">Categoria*</label>
+                      <SearchableSelect
+                        value={form.idCategoria || ""}
+                        onChange={(val) => setForm({ ...form, idCategoria: Number(val) })}
+                        options={categorias.map(c => ({ value: c.id, label: c.nome }))}
+                        placeholder="Selecione..."
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">Marca*</label>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <div style={{ flex: 1 }}>
+                          <SearchableSelect
+                            value={form.idMarca || ""}
+                            onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
+                            options={marcas.map(m => ({ value: m.id, label: m.nome }))}
+                            placeholder="Selecione..."
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          onClick={() => navigate("/marcas")}
+                          title="Cadastrar nova marca"
+                          style={{ minWidth: "40px" }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="field">
+                      <label className="label">Largura</label>
+                      <input
+                        className="cl-input"
+                        value={form.larguraStr}
+                        onChange={(e) => setForm({ ...form, larguraStr: e.target.value })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">Profundidade</label>
+                      <input
+                        className="cl-input"
+                        value={form.profundidadeStr}
+                        onChange={(e) => setForm({ ...form, profundidadeStr: e.target.value })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">Altura</label>
+                      <input
+                        className="cl-input"
+                        value={form.alturaStr}
+                        onChange={(e) => setForm({ ...form, alturaStr: e.target.value })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">PA</label>
+                      <input
+                        className="cl-input"
+                        value={form.paStr}
+                        onChange={(e) => setForm({ ...form, paStr: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                    <button className="btn btn-primary" type="submit" disabled={saving}>
+                      {saving ? "Salvando..." : "Salvar Geral"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <TecidosTab
+                  moduloId={editing!.id}
+                  allTecidos={tecidos}
+                  currentLinks={editing?.modulosTecidos || []}
+                  onUpdate={onFabricsUpdated}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+  function calcEXW(valorTecido: number) {
+        if (!config || !cotacao) return 0;
+        const cotacaoRisco = cotacao - config.valorReducaoDolar;
+        if (cotacaoRisco <= 0) return 0;
+        const valorBase = valorTecido / cotacaoRisco;
+        const comissao = valorBase * (config.percentualComissao / 100);
+        const gordura = valorBase * (config.percentualGordura / 100);
+        return valorBase + comissao + gordura;
+  }
+
+  // --- Render ---
+
+  if (loading && page === 1 && items.length === 0) return <div style={{ padding: 16 }}>Carregando...</div>;
+
+  return (
+    <div className="list-container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1>Módulos</h1>
+      </div>
+
+      <div style={{ background: '#1a1a2e', padding: 16, borderRadius: 8, marginBottom: 16, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterFornecedor}
+            onChange={(val) => { setFilterFornecedor(val); setPage(1); }}
+            placeholder="Fornecedor (Todos)"
+            options={[{ value: "", label: "Fornecedor (Todos)" }, ...fornecedores.map(f => ({ value: f.id, label: f.nome }))]}
+          />
+        </div>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterCategoria}
+            onChange={(val) => { setFilterCategoria(val); setPage(1); }}
+            placeholder="Categoria (Todas)"
+            options={[{ value: "", label: "Categoria (Todas)" }, ...categorias.map(c => ({ value: c.id, label: c.nome }))]}
+          />
+        </div>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterMarca}
+            onChange={(val) => { setFilterMarca(val); setPage(1); }}
+            placeholder="Marca (Todas)"
+            options={[{ value: "", label: "Marca (Todas)" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
+          />
+        </div>
+        <div style={{ width: 220 }}>
+          <SearchableSelect
+            value={filterTecido}
+            onChange={(val) => { setFilterTecido(val); setPage(1); }}
+            placeholder="Tecido (Todos)"
+            options={[{ value: "", label: "Tecido (Todos)" }, ...tecidos.map(t => ({ value: t.id, label: t.nome }))]}
+          />
+        </div>
+
+        <input
+          placeholder="Buscar módulo..."
+          value={search}
+          onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1); // Reset to page 1 on search
+          }}
+          style={{ flex: 1, padding: 8, minWidth: 200 }}
+          className="cl-input"
+        />
+
+        <div style={{ display: 'flex', gap: 8 }}>
+            <button 
+                className="btn btn-secondary" 
+                onClick={() => {
+                    setFilterFornecedor("");
+                    setFilterCategoria("");
+                    setFilterMarca("");
+                    setFilterTecido("");
+                    setSearch("");
+                    setPage(1);
+                }}
+                style={{ height: '38px', whiteSpace: 'nowrap' }}
+                title="Limpar todos os filtros"
+            >
+                🧹 Limpar
+            </button>
+            <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
+        </div>
+      </div>
+
+      {error && <div style={{ color: "red" }}>{error}</div>}
+
+      {loading ? (
+        <div>Carregando...</div>
+      ) : (
+        <>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+                <tr>
+                <th style={th}>ID</th>
+                <th style={th}>Fornecedor</th>
+                <th style={th}>Categoria</th>
+                <th style={th}>Marca</th>
+                <th style={th}>Módulo</th>
+                <th style={th}>Dimensões (LxPxA)</th>
+                <th style={th}>M³</th>
+                <th style={th}>EXW (Parcial)</th>
+                <th style={th}>Tecidos / Valores</th>
+                <th style={th}>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {items.map((x) => {
+                // Now using nested fabrics
+                let myTecidos = x.modulosTecidos || [];
+                if (filterTecido) {
+                  myTecidos = myTecidos.filter(t => t.idTecido === Number(filterTecido));
+                }
+
+                return (
+                    <tr key={x.id}>
+                        <td style={td}>{x.id}</td>
+                        <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
+                        <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
+                        <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
+                        <td style={td}>{x.descricao}</td>
+                        <td style={td}>
+                        {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
+                        </td>
+                        <td style={td}>{fmt(x.m3)}</td>
+                        <td style={td}>
+                             {myTecidos.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {myTecidos.map(mt => (
+                                        <div key={mt.id + '_exw'} style={{ fontSize: '0.9em', textAlign: 'right' }}>
+                                            <span style={{ color: '#10b981' }}>
+                                                $ {fmt(calcEXW(mt.valorTecido), 2)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                             ) : (
+                                 <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
+                             )}
+                        </td>
+                        <td style={td}>
+                            {myTecidos.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {myTecidos.map(mt => (
+                                        <div key={mt.id} style={{ fontSize: '0.9em' }}>
+                                            <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                                                {mt.tecido?.nome || mt.idTecido}:
+                                            </span>
+                                            {' '}
+                                            <span style={{ color: '#e5e7eb' }}>
+                                                R$ {fmt(mt.valorTecido, 2)}
                                             </span>
                                         </div>
                                     ))}
