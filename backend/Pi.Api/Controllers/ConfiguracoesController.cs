@@ -117,4 +117,23 @@ public class ConfiguracoesController : ControllerBase
     {
         return (_context.Configuracoes?.Any(e => e.Id == id)).GetValueOrDefault();
     }
+
+    [HttpPost("fix-sequences")]
+    public async Task<IActionResult> FixSequences()
+    {
+        try 
+        {
+            var sql1 = "SELECT setval(pg_get_serial_sequence('frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM frete_item;";
+            await _context.Database.ExecuteSqlRawAsync(sql1);
+            
+            var sql2 = "SELECT setval(pg_get_serial_sequence('configuracoes_frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM configuracoes_frete_item;";
+            await _context.Database.ExecuteSqlRawAsync(sql2);
+
+            return Ok("Sequences reset successfully");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error resetting sequences: {ex.Message}");
+        }
+    }
 }
