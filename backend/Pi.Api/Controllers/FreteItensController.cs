@@ -42,6 +42,7 @@ public class FreteItensController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<FreteItem>> Create(FreteItem item)
     {
+        item.Id = 0; // Force EF to generate ID
         _db.FreteItens.Add(item);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
