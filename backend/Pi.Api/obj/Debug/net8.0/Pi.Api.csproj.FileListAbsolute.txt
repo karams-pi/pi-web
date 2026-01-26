@@ -114,7 +114,9 @@ C:\Portifolio\pi-web\backend\Pi.Api\obj\Debug\net8.0\ref\Pi.Api.dll
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\appsettings.Development.json
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\appsettings.json
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.staticwebassets.endpoints.json
-E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\package-lock.json
+<<<<<<< HEAD
+=======
+>>>>>>> paulo.takeda
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.exe
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.deps.json
 E:\teste\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.runtimeconfig.json
