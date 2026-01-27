@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
+import { HashRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 import HomeMenu from "./pages/HomeMenu";
 import ClientesPage from "./pages/ClientesPage";
 import FornecedoresPage from "./pages/FornecedoresPage";
@@ -45,7 +45,7 @@ function NotFound() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="app">
         <Header />
 
@@ -71,7 +71,7 @@ export default function App() {
 
         <Footer />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
