@@ -1,0 +1,14 @@
+{
+  "name": "pi-web-root",
+  "version": "1.0.0",
+  "description": "Root helper scripts",
+  "scripts": {
+    "frontend": "cd frontend/pi-ui && npm run dev",
+    "frontend:install": "cd frontend/pi-ui && npm install",
+    "backend": "dotnet run --project backend/Pi.Api/Pi.Api.csproj --urls http://0.0.0.0:5000",
+    "backend:build": "dotnet build backend/Pi.Api/Pi.Api.csproj"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

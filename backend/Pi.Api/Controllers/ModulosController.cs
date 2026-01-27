@@ -90,6 +90,7 @@ public class ModulosController : ControllerBase
         qForn = ApplyFilters(qForn, "fornecedor");
         var fornecedores = await qForn
             .Select(x => x.Fornecedor)
+            .Where(x => x != null)
             .Distinct()
             .OrderBy(x => x!.Nome)
             .ToListAsync();
@@ -99,6 +100,7 @@ public class ModulosController : ControllerBase
         qCat = ApplyFilters(qCat, "categoria");
         var categorias = await qCat
             .Select(x => x.Categoria)
+            .Where(x => x != null)
             .Distinct()
             .OrderBy(x => x!.Nome)
             .ToListAsync();
@@ -108,6 +110,7 @@ public class ModulosController : ControllerBase
         qMarca = ApplyFilters(qMarca, "marca");
         var marcas = await qMarca
             .Select(x => x.Marca)
+            .Where(x => x != null)
             .Distinct()
             .OrderBy(x => x!.Nome)
             .ToListAsync();
@@ -122,6 +125,7 @@ public class ModulosController : ControllerBase
 
         var tecidos = await qTec
             .Select(mt => mt.Tecido)
+            .Where(x => x != null)
             .Distinct()
             .OrderBy(x => x!.Nome)
             .ToListAsync();
