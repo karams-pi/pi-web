@@ -17,31 +17,33 @@ public class CotacaoService
     {
         try
         {
-            // API do Banco Central do Brasil - Cotação PTAX do dólar
-            var dataAtual = DateTime.Now.ToString("MM-dd-yyyy");
-            var url = $"https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='{dataAtual}'&$top=1&$format=json&$select=cotacaoCompra,cotacaoVenda,dataHoraCotacao";
+            // Tenta buscar cotação em tempo real via AwesomeAPI (Dólar Comercial)
+            // Documentação: https://docs.awesomeapi.com.br/api-de-moedas
+            var url = "https://economia.awesomeapi.com.br/last/USD-BRL";
             
             var response = await _httpClient.GetAsync(url);
             
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Falha ao buscar cotação USD. Usando valor padrão.");
-                return 5.50m; // Valor padrão caso a API falhe
+                 var content = await response.Content.ReadAsStringAsync();
+                 var json = JsonDocument.Parse(content);
+                 
+                 if (json.RootElement.TryGetProperty("USDBRL", out var usdElement))
+                 {
+                     if (usdElement.TryGetProperty("ask", out var askProp))
+                     {
+                         // AwesomeAPI retorna string, ex: "5.2534"
+                         var valStr = askProp.GetString();
+                         if (decimal.TryParse(valStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var valDecimal))
+                         {
+                             return valDecimal;
+                         }
+                     }
+                 }
             }
-
-            var content = await response.Content.ReadAsStringAsync();
-            var json = JsonDocument.Parse(content);
             
-            if (json.RootElement.TryGetProperty("value", out var valueArray) && valueArray.GetArrayLength() > 0)
-            {
-                var cotacao = valueArray[0];
-                if (cotacao.TryGetProperty("cotacaoVenda", out var cotacaoVenda))
-                {
-                    return cotacaoVenda.GetDecimal();
-                }
-            }
-
-            _logger.LogWarning("Cotação USD não encontrada. Usando valor padrão.");
+            // Fallback para lógica antiga ou valor fixo se a API principal falhar
+            _logger.LogWarning("Falha ao buscar cotação na AwesomeAPI. Tentando valores padrão.");
             return 5.50m;
         }
         catch (Exception ex)
