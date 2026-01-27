@@ -110,6 +110,7 @@ public class PisController : ControllerBase
     }
 
     [HttpGet("cotacao-usd")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<ActionResult<object>> GetCotacaoUSD()
     {
         var cotacao = await _cotacaoService.GetCotacaoUSD();
