@@ -17,6 +17,7 @@ import {
 import { getLatestConfig } from "../api/configuracoes";
 import { getCotacaoUSD } from "../api/pis";
 import { SearchableSelect } from "../components/SearchableSelect";
+import { ModuloSelect } from "../components/ModuloSelect";
 
 type FormState = Partial<Modulo> & {
   larguraStr?: string;
@@ -36,7 +37,7 @@ const emptyForm: FormState = {
 export default function ModulosPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Modulo[]>([]);
-  // const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]); // Removed: using nested now
+  const [allModules, setAllModules] = useState<Modulo[]>([]); // For the combo box
   
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
@@ -66,15 +67,14 @@ export default function ModulosPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"geral" | "tecidos">("geral");
 
+  // Selection state for combo
+  const [selectedModuleId, setSelectedModuleId] = useState("");
+
   // Maps for display
   const catMap = useMemo(() => new Map(categorias.map((x) => [x.id, x.nome])), [categorias]);
   const fornMap = useMemo(() => new Map(fornecedores.map((x) => [x.id, x.nome])), [fornecedores]);
   const marcaMap = useMemo(() => new Map(marcas.map((x) => [x.id, x.nome])), [marcas]);
-  // const tecidoMap = useMemo(() => new Map(tecidos.map((x) => [x.id, x.nome])), [tecidos]); // Not needed if nested has names
-
-  // Basic lists (small tables)
-  // Basic lists - NOW DYNAMIC
-  // Replaced static Promise.all with loadFilters below
+  const tecidoMap = useMemo(() => new Map(tecidos.map((x) => [x.id, x.nome])), [tecidos]);
 
   // Dynamic Filters Loader
   async function loadFilters() {
@@ -94,15 +94,34 @@ export default function ModulosPage() {
     }
   }
 
+  // Load All Modules for Combo
+  async function loadAllModules() {
+    try {
+      const res = await listModulos(
+        "", 
+        1, 
+        1000, 
+        filterFornecedor ? Number(filterFornecedor) : undefined,
+        filterCategoria ? Number(filterCategoria) : undefined,
+        filterMarca ? Number(filterMarca) : undefined,
+        filterTecido ? Number(filterTecido) : undefined
+      );
+      setAllModules(res.items);
+    } catch (e) {
+      console.error("Erro ao carregar lista completa de módulos", e);
+    }
+  }
+
   // Load Config and Cotacao
   useEffect(() => {
     getLatestConfig().then(setConfig).catch(console.error);
     getCotacaoUSD().then(setCotacao).catch(console.error);
   }, []);
 
-  // Load filters whenever filter selection changes
+  // Load filters AND all modules whenever filter selection changes
   useEffect(() => {
     loadFilters();
+    loadAllModules();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterFornecedor, filterCategoria, filterMarca, filterTecido]);
 
@@ -133,7 +152,6 @@ export default function ModulosPage() {
 
   // Effect: reload items when page or search changes (and filters)
   useEffect(() => {
-    // Debounce search could be added here, but for now simple effect
     const timer = setTimeout(() => {
       loadItems();
     }, 300);
@@ -184,18 +202,13 @@ export default function ModulosPage() {
         await updateModulo(editing.id, payload);
         alert("Módulo atualizado!");
         await loadItems();
-        // Update editing ref to match the new data (to keep modal fresh)
-         // Note: loadItems updates 'items' state asynchronously. 
-         // For now, simpler to just close or let user re-open if they want.
-         setIsOpen(false); 
+        setIsOpen(false); 
       } else {
         const created = await createModulo(payload);
         alert("Módulo criado! Agora você pode adicionar tecidos.");
         await loadItems();
-        // Set editing to the NEW item so we can add fabrics
-        // But the new item doesn't have nested fabrics yet (it's empty).
         setEditing(created);
-        setActiveTab("tecidos"); // Switch to tecidos tab automatically
+        setActiveTab("tecidos"); 
       }
     } catch (e: unknown) {
       alert(getErrorMessage(e));
@@ -236,6 +249,15 @@ export default function ModulosPage() {
     const gordura = valorBase * (config.percentualGordura / 100);
     return valorBase + comissao + gordura;
   }
+
+  // Helper to handle combo selection
+  const handleModuleSelect = (idStr: string) => {
+    const mod = allModules.find(m => String(m.id) === idStr);
+    if (mod) {
+        setSearch(mod.descricao);
+        setPage(1);
+    }
+  };
 
   // --- Render ---
 
@@ -281,16 +303,21 @@ export default function ModulosPage() {
           />
         </div>
 
-        <input
-          placeholder="Buscar módulo..."
-          value={search}
-          onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1); // Reset to page 1 on search
-          }}
-          style={{ flex: 1, padding: 8, minWidth: 200 }}
-          className="cl-input"
-        />
+        <div style={{ flex: 1, minWidth: 200 }}>
+             <ModuloSelect
+                value={selectedModuleId}
+                onChange={(val) => {
+                    setSelectedModuleId(val);
+                    handleModuleSelect(val);
+                }}
+                options={allModules}
+                mapFornecedor={fornMap}
+                mapCategoria={catMap}
+                mapMarca={marcaMap}
+                mapTecido={tecidoMap}
+                calcExw={calcEXW}
+             />
+        </div>
 
         <div style={{ display: 'flex', gap: 8 }}>
             <button 
@@ -302,6 +329,7 @@ export default function ModulosPage() {
                     setFilterTecido("");
                     setSearch("");
                     setPage(1);
+                    setSelectedModuleId("");
                 }}
                 style={{ height: '38px', whiteSpace: 'nowrap' }}
                 title="Limpar todos os filtros"

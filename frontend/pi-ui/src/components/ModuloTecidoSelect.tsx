@@ -64,7 +64,12 @@ export function ModuloTecidoSelect({
     const tec = opt.tecido?.nome || "?";
     const val = opt.valorTecido.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
     
-    return `${forn} > ${cat} > ${marc} > ${mod} > ${tec} - R$ ${val}`;
+    // Dimensões
+    const l = opt.modulo?.largura || 0;
+    const p = opt.modulo?.profundidade || 0;
+    const a = opt.modulo?.altura || 0;
+
+    return `${forn} > ${cat} > ${marc} > ${mod} (${l}x${p}x${a}) > ${tec} - R$ ${val}`;
   };
 
   const currentLabel = selectedItem ? getLabel(selectedItem) : placeholder;
@@ -162,7 +167,11 @@ export function ModuloTecidoSelect({
                     {opt.modulo?.fornecedor?.nome} &gt; {opt.modulo?.categoria?.nome} &gt; {opt.modulo?.marca?.nome}
                   </div>
                   <div>
-                    {opt.modulo?.descricao} &gt; <span style={{ color: "#eee" }}>{opt.tecido?.nome}</span>
+                    {opt.modulo?.descricao} 
+                    <span style={{ color: "#aaa", marginLeft: 6, fontSize: "0.9em" }}>
+                       ({opt.modulo?.largura} x {opt.modulo?.profundidade} x {opt.modulo?.altura}) 
+                    </span>
+                    &gt; <span style={{ color: "#eee" }}>{opt.tecido?.nome}</span>
                   </div>
                   <div style={{ fontSize: "11px", color: "#888", marginTop: 2 }}>
                     Valor Tecido: R$ {opt.valorTecido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
