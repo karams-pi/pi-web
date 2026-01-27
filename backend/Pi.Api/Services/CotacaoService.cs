@@ -15,10 +15,9 @@ public class CotacaoService
 
     public async Task<decimal> GetCotacaoUSD()
     {
-        // 1. Tenta API Principal (AwesomeAPI)
+        // 1. Tenta API Principal (AwesomeAPI) - Real-time
         try
         {
-            // Documentação: https://docs.awesomeapi.com.br/api-de-moedas
             var url = "https://economia.awesomeapi.com.br/last/USD-BRL";
             
             // Usar User-Agent de navegador para evitar bloqueios
@@ -32,16 +31,14 @@ public class CotacaoService
                  var content = await response.Content.ReadAsStringAsync();
                  using var json = JsonDocument.Parse(content);
                  
-                 if (json.RootElement.TryGetProperty("USDBRL", out var usdElement))
+                 if (json.RootElement.TryGetProperty("USDBRL", out var usdElement) && 
+                     usdElement.TryGetProperty("ask", out var askProp))
                  {
-                     if (usdElement.TryGetProperty("ask", out var askProp))
+                     var valStr = askProp.GetString();
+                     if (decimal.TryParse(valStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var valDecimal))
                      {
-                         var valStr = askProp.GetString();
-                         if (decimal.TryParse(valStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var valDecimal))
-                         {
-                             _logger.LogInformation($"Cotação obtida via AwesomeAPI: {valDecimal}");
-                             return valDecimal;
-                         }
+                         _logger.LogInformation($"Cotação obtida via AwesomeAPI: {valDecimal}");
+                         return valDecimal;
                      }
                  }
             }
@@ -55,11 +52,73 @@ public class CotacaoService
             _logger.LogError(ex, $"Erro ao buscar cotação USD (AwesomeAPI): {ex.Message}");
         }
 
-        // 2. Tenta API Backup (Open Exchange Rates / ER-API)
+        // 2. Tenta HG Brasil (Secondary) - Real-time
+        try
+        {
+            var url = "https://api.hgbrasil.com/finance?key=development"; // Key 'development' is public/free with limits
+            var response = await _httpClient.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                using var json = JsonDocument.Parse(content);
+                
+                // Path: results -> currencies -> USD -> buy
+                if (json.RootElement.TryGetProperty("results", out var results) &&
+                    results.TryGetProperty("currencies", out var currencies) &&
+                    currencies.TryGetProperty("USD", out var usd) &&
+                    usd.TryGetProperty("buy", out var buyProp) && 
+                    buyProp.ValueKind == JsonValueKind.Number)
+                {
+                     var valDecimal = buyProp.GetDecimal();
+                     _logger.LogInformation($"Cotação obtida via HG Brasil: {valDecimal}");
+                     return valDecimal;
+                }
+            }
+            else
+            {
+                _logger.LogWarning($"HG Brasil retornou erro: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Erro ao buscar cotação USD (HG Brasil): {ex.Message}");
+        }
+
+        // 3. Tenta Frankfurter (Tertiary) - Daily Reference (European Central Bank)
+        try
+        {
+            var url = "https://api.frankfurter.app/latest?from=USD&to=BRL";
+            var response = await _httpClient.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                using var json = JsonDocument.Parse(content);
+                
+                // Path: rates -> BRL
+                if (json.RootElement.TryGetProperty("rates", out var rates) &&
+                    rates.TryGetProperty("BRL", out var brlProp) &&
+                    brlProp.ValueKind == JsonValueKind.Number)
+                {
+                    var valDecimal = brlProp.GetDecimal();
+                    _logger.LogInformation($"Cotação obtida via Frankfurter: {valDecimal}");
+                    return valDecimal;
+                }
+            }
+            else
+            {
+                _logger.LogWarning($"Frankfurter retornou erro: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Erro ao buscar cotação USD (Frankfurter): {ex.Message}");
+        }
+
+        // 4. Tenta API Backup (Open Exchange Rates / ER-API) - Daily Reference
         try 
         {
-            // Documentação: https://www.exchangerate-api.com/docs/free
-            // Base URL: https://open.er-api.com/v6/latest/USD
             var urlBackup = "https://open.er-api.com/v6/latest/USD";
             var responseBackup = await _httpClient.GetAsync(urlBackup);
 
@@ -68,14 +127,12 @@ public class CotacaoService
                 var content = await responseBackup.Content.ReadAsStringAsync();
                 using var json = JsonDocument.Parse(content);
                 
-                if (json.RootElement.TryGetProperty("rates", out var ratesElement))
+                if (json.RootElement.TryGetProperty("rates", out var ratesElement) && 
+                    ratesElement.TryGetProperty("BRL", out var brlProp))
                 {
-                    if (ratesElement.TryGetProperty("BRL", out var brlProp))
-                    {
-                        var valDecimal = brlProp.GetDecimal();
-                        _logger.LogInformation($"Cotação obtida via ER-API (Backup): {valDecimal}");
-                        return valDecimal;
-                    }
+                    var valDecimal = brlProp.GetDecimal();
+                    _logger.LogInformation($"Cotação obtida via ER-API (Backup): {valDecimal}");
+                    return valDecimal;
                 }
             }
             else 
@@ -88,7 +145,7 @@ public class CotacaoService
              _logger.LogError(ex, $"Erro ao buscar cotação USD (Backup ER-API): {ex.Message}");
         }
 
-        // 3. Fallback final
+        // 5. Fallback final
         _logger.LogError("Todas as tentativas de buscar cotação falharam. Usando valor fixo de segurança: 5.50");
         return 5.50m;
     }
