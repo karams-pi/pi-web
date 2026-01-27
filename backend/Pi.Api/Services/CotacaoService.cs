@@ -21,6 +21,12 @@ public class CotacaoService
             // Documentação: https://docs.awesomeapi.com.br/api-de-moedas
             var url = "https://economia.awesomeapi.com.br/last/USD-BRL";
             
+            // Alguns servidores bloqueiam requisições sem User-Agent
+            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("User-Agent", "PiWeb/1.0");
+            }
+            
             var response = await _httpClient.GetAsync(url);
             
             if (response.IsSuccessStatusCode)
@@ -43,12 +49,12 @@ public class CotacaoService
             }
             
             // Fallback para lógica antiga ou valor fixo se a API principal falhar
-            _logger.LogWarning("Falha ao buscar cotação na AwesomeAPI. Tentando valores padrão.");
+            _logger.LogWarning($"Falha ao buscar cotação na AwesomeAPI. Status: {response.StatusCode}. Tentando valores padrão.");
             return 5.50m;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao buscar cotação USD");
+            _logger.LogError(ex, $"Erro ao buscar cotação USD: {ex.Message}");
             return 5.50m; // Valor padrão em caso de erro
         }
     }
