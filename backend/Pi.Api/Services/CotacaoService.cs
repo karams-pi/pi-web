@@ -15,47 +15,81 @@ public class CotacaoService
 
     public async Task<decimal> GetCotacaoUSD()
     {
+        // 1. Tenta API Principal (AwesomeAPI)
         try
         {
-            // Tenta buscar cotação em tempo real via AwesomeAPI (Dólar Comercial)
             // Documentação: https://docs.awesomeapi.com.br/api-de-moedas
             var url = "https://economia.awesomeapi.com.br/last/USD-BRL";
             
-            // Alguns servidores bloqueiam requisições sem User-Agent
-            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
-            {
-                _httpClient.DefaultRequestHeaders.Add("User-Agent", "PiWeb/1.0");
-            }
+            // Usar User-Agent de navegador para evitar bloqueios
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
             
             var response = await _httpClient.GetAsync(url);
             
             if (response.IsSuccessStatusCode)
             {
                  var content = await response.Content.ReadAsStringAsync();
-                 var json = JsonDocument.Parse(content);
+                 using var json = JsonDocument.Parse(content);
                  
                  if (json.RootElement.TryGetProperty("USDBRL", out var usdElement))
                  {
                      if (usdElement.TryGetProperty("ask", out var askProp))
                      {
-                         // AwesomeAPI retorna string, ex: "5.2534"
                          var valStr = askProp.GetString();
                          if (decimal.TryParse(valStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var valDecimal))
                          {
+                             _logger.LogInformation($"Cotação obtida via AwesomeAPI: {valDecimal}");
                              return valDecimal;
                          }
                      }
                  }
             }
-            
-            // Fallback para lógica antiga ou valor fixo se a API principal falhar
-            _logger.LogWarning($"Falha ao buscar cotação na AwesomeAPI. Status: {response.StatusCode}. Tentando valores padrão.");
-            return 5.50m;
+            else
+            {
+                _logger.LogWarning($"AwesomeAPI retornou erro: {response.StatusCode}");
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Erro ao buscar cotação USD: {ex.Message}");
-            return 5.50m; // Valor padrão em caso de erro
+            _logger.LogError(ex, $"Erro ao buscar cotação USD (AwesomeAPI): {ex.Message}");
         }
+
+        // 2. Tenta API Backup (Open Exchange Rates / ER-API)
+        try 
+        {
+            // Documentação: https://www.exchangerate-api.com/docs/free
+            // Base URL: https://open.er-api.com/v6/latest/USD
+            var urlBackup = "https://open.er-api.com/v6/latest/USD";
+            var responseBackup = await _httpClient.GetAsync(urlBackup);
+
+            if (responseBackup.IsSuccessStatusCode)
+            {
+                var content = await responseBackup.Content.ReadAsStringAsync();
+                using var json = JsonDocument.Parse(content);
+                
+                if (json.RootElement.TryGetProperty("rates", out var ratesElement))
+                {
+                    if (ratesElement.TryGetProperty("BRL", out var brlProp))
+                    {
+                        var valDecimal = brlProp.GetDecimal();
+                        _logger.LogInformation($"Cotação obtida via ER-API (Backup): {valDecimal}");
+                        return valDecimal;
+                    }
+                }
+            }
+            else 
+            {
+                _logger.LogWarning($"ER-API retornou erro: {responseBackup.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+             _logger.LogError(ex, $"Erro ao buscar cotação USD (Backup ER-API): {ex.Message}");
+        }
+
+        // 3. Fallback final
+        _logger.LogError("Todas as tentativas de buscar cotação falharam. Usando valor fixo de segurança: 5.50");
+        return 5.50m;
     }
 }
