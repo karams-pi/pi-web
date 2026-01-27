@@ -13,11 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pi.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b78a0403d83ca80e751dfbf93be6e9112a08c624")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ddf207edadcc6e0ad67cbda956a430f6aafa97c8")]
->>>>>>> e9238fe21cc6a14f321a4a99520ea294378bedc7
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83664dcadbc93358b85998bed69f1dac7137f102")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pi.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pi.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
