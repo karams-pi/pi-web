@@ -119,18 +119,6 @@ public class ExcelImportService
         // Dicionário de tecidos (nome -> id)
         var tecidos = await _context.Tecidos.ToDictionaryAsync(x => x.Nome.ToLower().Trim(), x => x.Id);
 
-        // --- RESET SEQUENCE IF NEEDED (Fix for PK_tecido unique violation) ---
-        // Se houver dados importados manualmente, a sequence pode estar atrasada.
-        try
-        {
-             // Postgres specific: reset sequence to MAX(id) + 1
-             await _context.Database.ExecuteSqlRawAsync("SELECT setval('tecido_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM tecido), false);");
-        }
-        catch (Exception) 
-        { 
-            // Ignore if sequence name differs or permission denied, try continuing
-        }
-
         // --- PRE-CREATE KOYO FABRICS (G0-G10) ---
         // Nomes usados pela Koyo
         var koyoTecidoNames = new[] { "G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10" };
@@ -140,17 +128,13 @@ public class ExcelImportService
             {
                 var novo = new Tecido { Nome = tName };
                 _context.Tecidos.Add(novo);
-                // Precisamos salvar para gerar ID, pois usamos ID no dicionário e nos relacionamentos subsequentes
-                // Se tentarmos agrupar todos, ok, mas para garantir ID vamos salvar um batch se houver novos.
+                // Precisamos salvar para gerar ID
             }
         }
         // Save just once for all new fabrics
         if (_context.ChangeTracker.HasChanges())
         {
              await _context.SaveChangesAsync();
-             // Rebuild dict or just update it? Update is efficient.
-             // But simple way: reload or just add local.
-             // Since we saved, IDs are generated.
              foreach(var tEntry in _context.Tecidos.Local)
              {
                  var key = tEntry.Nome.ToLower().Trim();
@@ -158,7 +142,6 @@ public class ExcelImportService
                     tecidos[key] = tEntry.Id;
              }
         }
-        // ----------------------------------------
         
         // Col Mapping: G0->12, G1->13 ... G7->19, G8->8, G9->9, G10->10
         var mapping = new (string Nome, int Col)[] {
@@ -197,7 +180,7 @@ public class ExcelImportService
                 var cellLarg = worksheet.Cells[row, 3].Value?.ToString()?.Trim();
                 if (cellLarg != null && cellLarg.Equals("Larg", StringComparison.OrdinalIgnoreCase)) continue;
 
-                    // Coluna D: Prof
+                // Coluna D: Prof
                 var cellProf = worksheet.Cells[row, 4].Value?.ToString()?.Trim();
                 if (cellProf != null && cellProf.Equals("Prof", StringComparison.OrdinalIgnoreCase)) continue;
                 
@@ -277,14 +260,14 @@ public class ExcelImportService
                     decimal valor = ParseDecimal(cellVal);
                     
                     // Retrieve ID - Guaranteed to exist now
-                    if (tecidos.TryGetValue(tecidoNome.ToLower(), out var idTecido))
+                    if (valor > 0 && tecidos.TryGetValue(tecidoNome.ToLower(), out var idTecido))
                     {
                         // Upsert ModuloTecido
-                         // Check local list first (memory)
                         var modTecido = modulo.ModulosTecidos.FirstOrDefault(mt => mt.IdTecido == idTecido);
                         if (modTecido != null)
                         {
                             modTecido.ValorTecido = valor;
+                            // Ensure Modified state if value changed (optional, EF tracks it, but good to be sure with decimals)
                         }
                         else
                         {

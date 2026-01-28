@@ -35,7 +35,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Registrar HttpClient e CotacaoService
 // Registrar HttpClient e CotacaoService
-builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>();
+builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        UseProxy = false
+    });
 builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 
 builder.Services.AddCors(options =>
