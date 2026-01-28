@@ -269,9 +269,13 @@ public class ExcelImportService
                         {
                             // UPDATE
                             modTecido.ValorTecido = valor;
-                            // FORCE MODIFIED STATE
-                            var entry = _context.Entry(modTecido);
-                            entry.State = EntityState.Modified;
+                            
+                            // FORCE MODIFIED STATE ONLY IF IT EXISTS IN DB (Id > 0)
+                            if (modTecido.Id > 0)
+                            {
+                                var entry = _context.Entry(modTecido);
+                                entry.State = EntityState.Modified;
+                            }
                         }
                         else
                         {
