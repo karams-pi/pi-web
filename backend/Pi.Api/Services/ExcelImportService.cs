@@ -264,21 +264,32 @@ public class ExcelImportService
                     {
                         // Upsert ModuloTecido
                         var modTecido = modulo.ModulosTecidos.FirstOrDefault(mt => mt.IdTecido == idTecido);
+                        
                         if (modTecido != null)
                         {
+                            // UPDATE
                             modTecido.ValorTecido = valor;
-                            // Ensure Modified state if value changed (optional, EF tracks it, but good to be sure with decimals)
+                            // FORCE MODIFIED STATE
+                            var entry = _context.Entry(modTecido);
+                            entry.State = EntityState.Modified;
                         }
                         else
                         {
+                            // INSERT
                             var novoModTecido = new ModuloTecido
                             {
                                 IdModulo = modulo.Id,
                                 IdTecido = idTecido,
                                 ValorTecido = valor
                             };
-                            _context.ModulosTecidos.Add(novoModTecido);
+                            
                             modulo.ModulosTecidos.Add(novoModTecido);
+                            
+                            // Explicitly add to Context if module is not new (already tracked)
+                            if (modulo.Id > 0)
+                            {
+                                _context.ModulosTecidos.Add(novoModTecido);
+                            }
                         }
                     }
                 }
