@@ -7,6 +7,9 @@ import {
   listTecidos,
   updateTecido,
 } from "../api/tecidos";
+import { PrintExportButtons } from "../components/PrintExportButtons";
+import { printData, exportToCSV } from "../utils/printExport";
+import type { ColumnDefinition } from "../utils/printExport";
 
 type FormState = Partial<Tecido>;
 const emptyForm: FormState = { nome: "" };
@@ -88,6 +91,21 @@ export default function TecidosPage() {
     }
   }
 
+  const exportColumns: ColumnDefinition<Tecido>[] = [
+    { header: "ID", accessor: (c) => c.id },
+    { header: "Nome", accessor: (c) => c.nome },
+  ];
+
+  function handlePrint(all: boolean) {
+     const list = all ? (items || []) : filteredHelper;
+     printData(list, exportColumns, "Relatório de Tecidos");
+  }
+
+  function handleExcel(all: boolean) {
+     const list = all ? (items || []) : filteredHelper;
+     exportToCSV(list, exportColumns, "tecidos");
+  }
+
   return (
     <div style={{ padding: 16 }}>
       <h1>Tecidos</h1>
@@ -107,6 +125,13 @@ export default function TecidosPage() {
           style={{ flex: 1, padding: 8 }}
         />
         <button className="btn btn-primary" onClick={openCreate}>Novo</button>
+        <div style={{ marginLeft: "auto" }}>
+            <PrintExportButtons
+                onPrint={handlePrint}
+                onExcel={handleExcel}
+                disabled={loading}
+            />
+        </div>
       </div>
 
       <div style={{ marginBottom: 8 }}>

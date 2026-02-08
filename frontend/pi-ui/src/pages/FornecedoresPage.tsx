@@ -8,6 +8,9 @@ import {
   updateFornecedor,
   deleteFornecedor,
 } from '../api/fornecedores';
+import { PrintExportButtons } from "../components/PrintExportButtons";
+import { printData, exportToCSV } from "../utils/printExport";
+import type { ColumnDefinition } from "../utils/printExport";
 
 // Form state excluding 'id'
 type FormState = Omit<Fornecedor, 'id'>;
@@ -105,6 +108,22 @@ export default function FornecedoresPage() {
     }
   }
 
+  const exportColumns: ColumnDefinition<Fornecedor>[] = [
+    { header: "ID", accessor: (f) => f.id },
+    { header: "Nome", accessor: (f) => f.nome },
+    { header: "CNPJ", accessor: (f) => f.cnpj },
+  ];
+
+  function handlePrint(all: boolean) {
+     const list = all ? (data || []) : filteredData;
+     printData(list, exportColumns, "Relatório de Fornecedores");
+  }
+
+  function handleExcel(all: boolean) {
+     const list = all ? (data || []) : filteredData;
+     exportToCSV(list, exportColumns, "fornecedores");
+  }
+
   return (
     <div style={{ padding: 16 }}>
       <h1>Fornecedores</h1>
@@ -117,6 +136,13 @@ export default function FornecedoresPage() {
           style={{ flex: 1, padding: 8 }}
         />
         <button className="btn btn-primary" onClick={openCreate}>Novo</button>
+        <div style={{ marginLeft: "auto" }}>
+            <PrintExportButtons
+                onPrint={handlePrint}
+                onExcel={handleExcel}
+                disabled={loading}
+            />
+        </div>
       </div>
 
       <div style={{ marginBottom: 8 }}>

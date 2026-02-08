@@ -163,7 +163,7 @@ export default function ImportacaoPage() {
             {importType === 'karams' ? (
                 <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
                     <li><strong>Aba</strong>: Nome da Categoria</li>
-                    <li><strong>A</strong>: Marca (Distinct)</li>
+                    <li><strong>A</strong>: Modelo (Distinct)</li>
                     <li><strong>B</strong>: Descrição (Ignora "Descrição" ou vazio)</li>
                     <li><strong>C</strong>: Largura (Ignora "Larg" ou vazio)</li>
                     <li><strong>D</strong>: Profundidade (Ignora "Prof" ou vazio)</li>
@@ -173,7 +173,7 @@ export default function ImportacaoPage() {
             ) : (
                 <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
                     <li><strong>Aba</strong>: Nome da Categoria</li>
-                    <li><strong>Col A</strong>: Marca (Distinct)</li>
+                    <li><strong>Col A</strong>: Modelo (Distinct)</li>
                     <li><strong>Col B</strong>: Descrição (Ignora "Descrição" / Vazio)</li>
                     <li><strong>Col C</strong>: Largura (Ignora "Larg" / Vazio)</li>
                     <li><strong>Col D</strong>: Profundidade (Ignora "Prof" / Vazio)</li>

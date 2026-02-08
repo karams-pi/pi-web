@@ -143,7 +143,7 @@ function Header() {
 
             <NavLink to="/marcas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
               <Tag size={18} />
-              <span>Marcas</span>
+              <span>Modelos</span>
             </NavLink>
 
             <NavLink to="/tecidos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>

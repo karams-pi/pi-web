@@ -81,7 +81,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  overflow: hidden;
+  /* overflow: hidden; Removed to allow dropdowns to show */
 }
 
 .cl-tableWrap {
@@ -393,4 +393,31 @@
   .mobile-help-icon {
     display: inline-flex;
   }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: #1e1e2d;
+  border: 1px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 1000;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #ccc;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #2a2a35;
+  color: white;
 }

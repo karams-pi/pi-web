@@ -4,13 +4,14 @@ import "./ClientesPage.css";
 
 import { listFretes } from "../api/fretes";
 import { getTotalFrete } from "../api/configuracoesFreteItem";
-import { getProximaSequencia, getCotacaoUSD, createPi, getPi } from "../api/pis";
+import { getProximaSequencia, getCotacaoUSD, createPi, updatePi, getPi } from "../api/pis";
 import { getLatestConfig } from "../api/configuracoes";
 import { listModulosTecidos, getModuleFilters } from "../api/modulos";
 import { listClientes } from "../api/clientes";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
+import { exportToCSV, type ColumnDefinition } from "../utils/printExport";
 import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
 
 type FormState = {
@@ -27,6 +28,7 @@ type FormState = {
 };
 
 type ItemGrid = {
+  id?: number;
   tempId: number;
   idModuloTecido: number;
   moduloTecido?: ModuloTecido;
@@ -44,6 +46,7 @@ type ItemGrid = {
   exwTooltip?: string;
   freteBrlTooltip?: string;
   freteUsdTooltip?: string;
+  observacao?: string;
 };
 
 export default function ProformaInvoicePage() {
@@ -306,6 +309,7 @@ export default function ProformaInvoicePage() {
       exwTooltip,
       freteBrlTooltip: "",
       freteUsdTooltip: "",
+      observacao: "",
     };
 
     setItens(prev => [...prev, novoItem]);
@@ -322,6 +326,15 @@ export default function ProformaInvoicePage() {
       setItens(prev => prev.map(item => {
           if (item.tempId === tempId) {
              return { ...item, quantidade: qtd };
+          }
+          return item;
+      }));
+  };
+
+  const atualizarObservacao = (tempId: number, obs: string) => {
+      setItens(prev => prev.map(item => {
+          if (item.tempId === tempId) {
+             return { ...item, observacao: obs };
           }
           return item;
       }));
@@ -344,6 +357,7 @@ export default function ProformaInvoicePage() {
       const valorTecido = itens.reduce((sum, item) => sum + (item.valorEXW * item.quantidade), 0);
 
       const piData = {
+        id: form.id,
         prefixo: form.prefixo,
         piSequencia: form.piSequencia,
         dataPi: new Date(form.dataPi).toISOString(),
@@ -356,6 +370,7 @@ export default function ProformaInvoicePage() {
         cotacaoAtualUSD: form.cotacaoAtualUSD,
         cotacaoRisco: form.cotacaoRisco,
         piItens: itens.map(item => ({
+          id: item.id || 0, // Include ID for items (0 if new)
           idModuloTecido: item.idModuloTecido,
           quantidade: item.quantidade,
           largura: item.largura,
@@ -368,15 +383,19 @@ export default function ProformaInvoicePage() {
           valorFreteRateadoUSD: item.valorFreteRateadoUSD,
           valorFinalItemBRL: item.valorFinalItemBRL,
           valorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
+          observacao: item.observacao,
           rateioFrete: 0 
         })) as any[]
       };
 
-      const piCriada = await createPi(piData);
-      
-      alert(`PI ${piCriada.piSequencia} salva com sucesso!`);
-      
-      setForm(prev => ({ ...prev, id: piCriada.id }));
+      if (form.id) {
+          await updatePi(form.id, piData);
+          alert(`PI ${form.prefixo}-${form.piSequencia} atualizada com sucesso!`);
+      } else {
+          const piCriada = await createPi(piData);
+          alert(`PI ${piCriada.piSequencia} criada com sucesso!`);
+          setForm(prev => ({ ...prev, id: piCriada.id }));
+      }
     } catch (e: any) {
       alert("Erro ao salvar PI: " + getErrorMessage(e));
     } finally {
@@ -417,6 +436,7 @@ export default function ProformaInvoicePage() {
                const m3 = item.m3 || item.M3 || (mt as any)?.modulo?.m3 || (largura * profundidade * altura);
 
                return {
+                   id: item.id || item.Id,
                    tempId: Date.now() + Math.random(),
                    idModuloTecido: item.idModuloTecido || item.IdModuloTecido,
                    moduloTecido: mt,
@@ -433,7 +453,8 @@ export default function ProformaInvoicePage() {
                    valorFinalItemUSDRisco: item.valorFinalItemUSDRisco || item.ValorFinalItemUSDRisco,
                    exwTooltip: "Cálculo importado",
                    freteBrlTooltip: "Cálculo importado",
-                   freteUsdTooltip: "Cálculo importado"
+                   freteUsdTooltip: "Cálculo importado",
+                   observacao: item.observacao || item.Observacao || ""
                };
            });
            setItens(novosItens);
@@ -473,6 +494,28 @@ export default function ProformaInvoicePage() {
     return `Módulo #${item.idModuloTecido}`;
   };
 
+  const piExportColumns: ColumnDefinition<ItemGrid>[] = [
+    { header: "Item", accessor: (i) => i.tempId },
+    { header: "Modelo", accessor: (i) => i.moduloTecido?.modulo?.marca?.nome || "?" },
+    { header: "Módulo", accessor: (i) => i.moduloTecido?.modulo?.descricao || "?" },
+    { header: "Tecido", accessor: (i) => i.moduloTecido?.tecido?.nome || "?" },
+    { header: "Quantidade", accessor: (i) => i.quantidade },
+    { header: "M3 Unit", accessor: (i) => fmt(i.m3, 3) },
+    { header: "M3 Total", accessor: (i) => fmt(i.m3 * i.quantidade, 3) },
+    { header: "Vl. Unit. EXW", accessor: (i) => fmt(i.valorEXW) },
+    { header: "Frete USD", accessor: (i) => fmt(i.valorFreteRateadoUSD) },
+    { header: "Total USD", accessor: (i) => fmt(i.valorFinalItemUSDRisco) },
+    { header: "Obs", accessor: (i) => i.observacao || "" },
+  ];
+
+  function handleExportExcel() {
+      if (itens.length === 0) return alert("Não há itens para exportar.");
+      
+      // Map items to include index if needed, or just export
+      // We want to export the grid data.
+      exportToCSV(itens, piExportColumns, `PI_${form.prefixo}-${form.piSequencia}`);
+  }
+
   const totalGeralBRL = useMemo(() => {
     return itens.reduce((sum, item) => sum + item.valorFinalItemBRL, 0);
   }, [itens]);
@@ -492,10 +535,20 @@ export default function ProformaInvoicePage() {
             {form.id && (
                 <button
                     className="btn btn-secondary"
-                    onClick={() => window.open(`/print-pi/${form.id}`, "_blank")}
+                    onClick={() => window.open(`#/print-pi/${form.id}`, "_blank")}
                     style={{ height: 40, background: "#10b981", borderColor: "#10b981", color: "white" }}
                 >
                     🖨️ Imprimir
+                </button>
+            )}
+            {form.id && (
+                <button
+                    className="btn btn-secondary"
+                    onClick={handleExportExcel}
+                    style={{ height: 40, background: "#2563eb", borderColor: "#2563eb", color: "white" }}
+                    disabled={itens.length === 0}
+                >
+                    📊 Excel
                 </button>
             )}
             <button 
@@ -638,12 +691,12 @@ export default function ProformaInvoicePage() {
                 />
             </div>
             <div style={{ width: 180 }}>
-                <label className="label" style={{marginBottom: 4, display: 'block', fontSize: '0.8em'}}>Marca</label>
+                <label className="label" style={{marginBottom: 4, display: 'block', fontSize: '0.8em'}}>Modelo</label>
                 <SearchableSelect
                     value={filterMarca}
                     onChange={setFilterMarca}
-                    placeholder="Todas"
-                    options={[{ value: "", label: "Todas" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
+                    placeholder="Todos"
+                    options={[{ value: "", label: "Todos" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
                 />
             </div>
             <div style={{ width: 180 }}>
@@ -698,7 +751,8 @@ export default function ProformaInvoicePage() {
             <thead>
               <tr style={{ background: "#f8f9fa", borderBottom: "2px solid #dee2e6" }}>
                 <th style={{...th, width: "30px", textAlign: "center"}}>#</th>
-                <th style={{...th, minWidth: "250px"}}>Descrição</th>
+                <th style={{...th, minWidth: "200px"}}>Descrição</th>
+                <th style={{...th, minWidth: "150px"}}>Observação</th>
                 <th style={{...th, width: "70px"}}>Qtd</th>
                 <th style={{...th, width: "60px"}}>Larg</th>
                 <th style={{...th, width: "60px"}}>Prof</th>
@@ -706,8 +760,8 @@ export default function ProformaInvoicePage() {
                 <th style={{...th, width: "50px"}}>PA</th>
                 <th style={{...th, width: "70px"}}>m³</th>
                 <th style={{...th, textAlign:"right", minWidth: "100px"}}>Valor EXW</th>
-                <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete R$</th>
-                <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete $</th>
+                <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete ({fretes.find(f => f.id === form.idFrete)?.nome || "FOB"}) R$</th>
+                <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete ({fretes.find(f => f.id === form.idFrete)?.nome || "FOB"}) $</th>
                 <th style={{...th, textAlign:"right", minWidth: "100px"}}>Total R$</th>
                 <th style={{...th, textAlign:"right", minWidth: "100px"}}>Total $</th>
               </tr>
@@ -727,6 +781,24 @@ export default function ProformaInvoicePage() {
                   </td>
                   <td style={td} title={getItemDescriptionFull(item)}>
                       {getItemDescription(item)}
+                  </td>
+                  <td style={td}>
+                      <textarea
+                        value={item.observacao || ""}
+                        onChange={(e) => atualizarObservacao(item.tempId, e.target.value)}
+                        style={{ 
+                            width: "100%", 
+                            minHeight: "30px",
+                            padding: "4px", 
+                            border: "1px solid #ddd", 
+                            borderRadius: "4px", 
+                            background: "rgba(255,255,255,0.05)", 
+                            color: "var(--text)",
+                            resize: "vertical",
+                            fontSize: "11px"
+                        }}
+                        placeholder="Obs..."
+                      />
                   </td>
                   <td style={td}>
                       <input 
@@ -765,14 +837,14 @@ export default function ProformaInvoicePage() {
               ))}
               {itens.length === 0 && (
                 <tr>
-                  <td colSpan={13} style={{ ...td, textAlign: "center", color: "#888", padding: 20 }}>
+                  <td colSpan={14} style={{ ...td, textAlign: "center", color: "#888", padding: 20 }}>
                     Nenhum item adicionado
                   </td>
                 </tr>
               )}
               {itens.length > 0 && (
                 <tr style={{ fontWeight: "bold", background: "rgba(37, 99, 235, 0.1)" }}>
-                  <td colSpan={11} style={{ ...td, textAlign: "right" }}>TOTAL:</td>
+                  <td colSpan={12} style={{ ...td, textAlign: "right" }}>TOTAL:</td>
                   <td style={td}>R$ {fmt(totalGeralBRL)}</td>
                   <td style={td}>$ {fmt(totalGeralUSD)}</td>
                 </tr>

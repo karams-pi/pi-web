@@ -156,7 +156,9 @@ export default function PrintPiPage() {
         <thead>
             <tr>
                 <th style={{ width: 40 }}>Item</th>
-                <th>Descrição</th>
+                <th>Modelo</th>
+                <th>Módulo/Tecido</th>
+                <th>Obs</th>
                 <th style={{ width: 60 }}>Qtd</th>
                 <th style={{ width: 80 }}>m³ Unit.</th>
                 <th style={{ width: 80 }}>m³ Total</th>
@@ -166,25 +168,77 @@ export default function PrintPiPage() {
             </tr>
         </thead>
         <tbody>
-            {(pi.piItens || []).map((item: any, idx: number) => {
-                const desc = getDescricao(item.idModuloTecido);
-                return (
-                    <tr key={idx}>
-                        <td style={{ textAlign: "center" }}>{idx + 1}</td>
-                        <td>{desc}</td>
-                        <td style={{ textAlign: "center" }}>{fmt(item.quantidade)}</td>
-                        <td style={{ textAlign: "center" }}>{fmt3(item.m3)}</td>
-                        <td style={{ textAlign: "center" }}>{fmt3(item.m3 * item.quantidade)}</td>
-                        <td style={{ textAlign: "right" }}>$ {fmt(item.valorEXW)}</td>
-                        <td style={{ textAlign: "right" }}>$ {fmt(item.valorFreteRateadoUSD)}</td>
-                        <td style={{ textAlign: "right" }}>$ {fmt(item.valorFinalItemUSDRisco)}</td>
-                    </tr>
-                );
-            })}
+            {(() => {
+                // 1. Sort items by Model Name -> Module Description
+                const sortedItems = [...(pi.piItens || [])].sort((a, b) => {
+                     const descA = getDescricao(a.idModuloTecido);
+                     const descB = getDescricao(b.idModuloTecido);
+                     return descA.localeCompare(descB);
+                });
+
+                // 2. Render with grouping
+                return sortedItems.map((item: any, idx: number) => {
+                    const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+                    const modelName = mt?.modulo?.marca?.nome || "?";
+                    const moduleName = mt?.modulo?.descricao || "?";
+                    const tecidoName = mt?.tecido?.nome || "?";
+                    
+                    // Determine if we need to render the model cell (new group)
+                    // We need to look backward to see if previous item had same model
+                    const prevItem = idx > 0 ? sortedItems[idx - 1] : null;
+                    const prevMt = prevItem ? modulosTecidos.find(m => m.id === prevItem.idModuloTecido) : null;
+                    const prevModel = prevMt?.modulo?.marca?.nome || "?";
+                    
+                    const isNewGroup = idx === 0 || modelName !== prevModel;
+                    
+                    // Calculate rowSpan if it is a new group
+                    let rowSpan = 1;
+                    if (isNewGroup) {
+                        for (let i = idx + 1; i < sortedItems.length; i++) {
+                            const nextItem = sortedItems[i];
+                            const nextMt = modulosTecidos.find(m => m.id === nextItem.idModuloTecido);
+                            const nextModel = nextMt?.modulo?.marca?.nome || "?";
+                            if (nextModel === modelName) {
+                                rowSpan++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+
+                    return (
+                        <tr key={idx}>
+                            <td style={{ textAlign: "center" }}>{idx + 1}</td>
+                            
+                            {/* Model Column with RowSpan */}
+                            {isNewGroup && (
+                                <td rowSpan={rowSpan} style={{ verticalAlign: "middle", background: "#f9f9f9" }}>
+                                    <strong>{modelName}</strong>
+                                </td>
+                            )}
+                            
+                            {/* Module/Fabric Column */}
+                            <td>
+                                <div>{moduleName}</div>
+                                <div style={{ fontSize: "0.9em", color: "#555" }}>{tecidoName}</div>
+                            </td>
+
+                            <td style={{ fontSize: "0.85em", color: "#444" }}>{item.observacao || ""}</td>
+                            
+                            <td style={{ textAlign: "center" }}>{fmt(item.quantidade)}</td>
+                            <td style={{ textAlign: "center" }}>{fmt3(item.m3)}</td>
+                            <td style={{ textAlign: "center" }}>{fmt3(item.m3 * item.quantidade)}</td>
+                            <td style={{ textAlign: "right" }}>$ {fmt(item.valorEXW)}</td>
+                            <td style={{ textAlign: "right" }}>$ {fmt(item.valorFreteRateadoUSD)}</td>
+                            <td style={{ textAlign: "right" }}>$ {fmt(item.valorFinalItemUSDRisco)}</td>
+                        </tr>
+                    );
+                });
+            })()}
         </tbody>
         <tfoot>
             <tr style={{ background: "#f9f9f9", fontWeight: "bold" }}>
-                <td colSpan={2} style={{ textAlign: "right" }}>TOTAIS:</td>
+                <td colSpan={4} style={{ textAlign: "right" }}>TOTAIS:</td>
                 <td style={{ textAlign: "center" }}>
                     {fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + i.quantidade, 0))}
                 </td>

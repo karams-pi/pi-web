@@ -7,6 +7,9 @@ import {
   listCategorias,
   updateCategoria,
 } from "../api/categorias";
+import { PrintExportButtons } from "../components/PrintExportButtons";
+import { printData, exportToCSV } from "../utils/printExport";
+import type { ColumnDefinition } from "../utils/printExport";
 
 type FormState = Partial<Categoria>;
 const emptyForm: FormState = { nome: "" };
@@ -89,6 +92,22 @@ export default function CategoriasPage() {
     }
   }
 
+
+  const exportColumns: ColumnDefinition<Categoria>[] = [
+    { header: "ID", accessor: (c) => c.id },
+    { header: "Nome", accessor: (c) => c.nome },
+  ];
+
+  function handlePrint(all: boolean) {
+     const list = all ? (items || []) : filteredHelper;
+     printData(list, exportColumns, "Relatório de Categorias");
+  }
+
+  function handleExcel(all: boolean) {
+     const list = all ? (items || []) : filteredHelper;
+     exportToCSV(list, exportColumns, "categorias");
+  }
+
   return (
     <div style={{ padding: 16 }}>
       <h1>Categorias</h1>
@@ -108,6 +127,13 @@ export default function CategoriasPage() {
           style={{ flex: 1, padding: 8 }}
         />
         <button className="btn btn-primary" onClick={openCreate}>Nova</button>
+        <div style={{ marginLeft: "auto" }}>
+            <PrintExportButtons
+                onPrint={handlePrint}
+                onExcel={handleExcel}
+                disabled={loading}
+            />
+        </div>
       </div>
 
       <div style={{ marginBottom: 8 }}>

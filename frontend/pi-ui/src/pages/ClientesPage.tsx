@@ -11,6 +11,9 @@ import {
   updateCliente,
   deleteCliente,
 } from '../api/clientes';
+import { PrintExportButtons } from "../components/PrintExportButtons";
+import { printData, exportToCSV } from "../utils/printExport";
+import type { ColumnDefinition } from "../utils/printExport";
 
 type FormState = Partial<Cliente>;
 
@@ -115,6 +118,54 @@ export default function ClientesPage() {
     [data, pageSize]
   );
 
+
+  const exportColumns: ColumnDefinition<Cliente>[] = [
+    { header: "Nome", accessor: (c) => c.nome },
+    { header: "Empresa", accessor: (c) => c.empresa },
+    { header: "Email", accessor: (c) => c.email },
+    { header: "Telefone", accessor: (c) => c.telefone },
+    { header: "País", accessor: (c) => c.pais },
+    { header: "Cidade", accessor: (c) => c.cidade },
+    { header: "Endereço", accessor: (c) => c.endereco },
+    { header: "CEP", accessor: (c) => c.cep },
+    { header: "Contato", accessor: (c) => c.pessoaContato },
+    { header: "Cargo", accessor: (c) => c.cargoFuncao },
+    { header: "Obs", accessor: (c) => c.observacoes },
+    { header: "Ativo", accessor: (c) => c.ativo ? "Sim" : "Não" },
+  ];
+
+  async function handlePrint(all: boolean) {
+    if (all) {
+      try {
+        setLoading(true);
+        const res = await listClientes({ pageSize: 100000 });
+        printData(res.items, exportColumns, "Relatório Geral de Clientes");
+      } catch (e) {
+        alert("Erro ao carregar dados completos");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      printData(data?.items || [], exportColumns, "Relatório de Clientes (Tela)");
+    }
+  }
+
+  async function handleExcel(all: boolean) {
+    if (all) {
+      try {
+        setLoading(true);
+        const res = await listClientes({ pageSize: 100000 });
+        exportToCSV(res.items, exportColumns, "clientes_completo");
+      } catch (e) {
+        alert("Erro ao carregar dados completos");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      exportToCSV(data?.items || [], exportColumns, "clientes_tela");
+    }
+  }
+
   return (
     <div style={{ padding: 16 }}>
       <h1>Clientes</h1>
@@ -136,6 +187,14 @@ export default function ClientesPage() {
           style={{ flex: 1, padding: 8 }}
         />
         <button className="btn btn-primary" onClick={openCreate}>Novo</button>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+          <PrintExportButtons
+            onPrint={handlePrint}
+            onExcel={handleExcel}
+            disabled={loading}
+          />
       </div>
 
       <div

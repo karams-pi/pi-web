@@ -14,6 +14,9 @@ import {
   updateModuloTecido,
   getModuleFilters,
 } from "../api/modulos";
+import { PrintExportButtons } from "../components/PrintExportButtons";
+import { printData, exportToCSV } from "../utils/printExport";
+import type { ColumnDefinition } from "../utils/printExport";
 import { getLatestConfig } from "../api/configuracoes";
 import { getCotacaoUSD } from "../api/pis";
 import { SearchableSelect } from "../components/SearchableSelect";
@@ -185,7 +188,7 @@ export default function ModulosPage() {
       if (!form.descricao) throw new Error("Descrição é obrigatória");
       if (!form.idFornecedor) throw new Error("Fornecedor é obrigatório");
       if (!form.idCategoria) throw new Error("Categoria é obrigatória");
-      if (!form.idMarca) throw new Error("Marca é obrigatória");
+      if (!form.idMarca) throw new Error("Modelo é obrigatório");
 
       const payload = {
         idFornecedor: Number(form.idFornecedor),
@@ -259,6 +262,63 @@ export default function ModulosPage() {
     }
   };
 
+  const exportColumns = useMemo<ColumnDefinition<Modulo>[]>(() => [
+    { header: "ID", accessor: (m) => m.id },
+    { header: "Fornecedor", accessor: (m) => fornMap.get(m.idFornecedor) || m.idFornecedor },
+    { header: "Categoria", accessor: (m) => catMap.get(m.idCategoria) || m.idCategoria },
+    { header: "Modelo", accessor: (m) => marcaMap.get(m.idMarca) || m.idMarca },
+    { header: "Descrição", accessor: (m) => m.descricao },
+    { header: "Dimensões", accessor: (m) => `${fmt(m.largura)}x${fmt(m.profundidade)}x${fmt(m.altura)}` },
+    { header: "M3", accessor: (m) => fmt(m.m3) },
+  ], [fornMap, catMap, marcaMap]);
+
+  async function handlePrint(all: boolean) {
+     let list = items;
+     if (all) {
+         try {
+             setLoading(true);
+             const res = await listModulos(
+                search,
+                1, 100000,
+                filterFornecedor ? Number(filterFornecedor) : undefined,
+                filterCategoria ? Number(filterCategoria) : undefined,
+                filterMarca ? Number(filterMarca) : undefined,
+                filterTecido ? Number(filterTecido) : undefined
+             );
+             list = res.items;
+         } catch(e) {
+             alert("Erro ao carregar tudo");
+             return;
+         } finally {
+             setLoading(false);
+         }
+     }
+     printData(list, exportColumns, "Relatório de Módulos");
+  }
+
+  async function handleExcel(all: boolean) {
+     let list = items;
+     if (all) {
+         try {
+             setLoading(true);
+             const res = await listModulos(
+                search, 1, 100000,
+                filterFornecedor ? Number(filterFornecedor) : undefined,
+                filterCategoria ? Number(filterCategoria) : undefined,
+                filterMarca ? Number(filterMarca) : undefined,
+                filterTecido ? Number(filterTecido) : undefined
+             );
+             list = res.items;
+         } catch(e) {
+             alert("Erro ao carregar tudo");
+             return;
+         } finally {
+             setLoading(false);
+         }
+     }
+     exportToCSV(list, exportColumns, "modulos");
+  }
+
   // --- Render ---
 
   if (loading && page === 1 && items.length === 0) return <div style={{ padding: 16 }}>Carregando...</div>;
@@ -290,8 +350,8 @@ export default function ModulosPage() {
           <SearchableSelect
             value={filterMarca}
             onChange={(val) => { setFilterMarca(val); setPage(1); }}
-            placeholder="Marca (Todas)"
-            options={[{ value: "", label: "Marca (Todas)" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
+            placeholder="Modelo (Todos)"
+            options={[{ value: "", label: "Modelo (Todos)" }, ...marcas.map(m => ({ value: m.id, label: m.nome }))]}
           />
         </div>
         <div style={{ width: 220 }}>
@@ -337,6 +397,11 @@ export default function ModulosPage() {
                 🧹 Limpar
             </button>
             <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
+            <PrintExportButtons
+                onPrint={handlePrint}
+                onExcel={handleExcel}
+                disabled={loading}
+            />
         </div>
       </div>
 
@@ -352,7 +417,7 @@ export default function ModulosPage() {
                 <th style={th}>ID</th>
                 <th style={th}>Fornecedor</th>
                 <th style={th}>Categoria</th>
-                <th style={th}>Marca</th>
+                <th style={th}>Modelo</th>
                 <th style={th}>Módulo</th>
                 <th style={th}>Dimensões (LxPxA)</th>
                 <th style={th}>M³</th>
@@ -363,64 +428,84 @@ export default function ModulosPage() {
             </thead>
             <tbody>
                 {items.map((x) => {
-                // Now using nested fabrics
                 let myTecidos = x.modulosTecidos || [];
                 if (filterTecido) {
                   myTecidos = myTecidos.filter(t => t.idTecido === Number(filterTecido));
                 }
 
-                return (
-                    <tr key={x.id}>
-                        <td style={td}>{x.id}</td>
-                        <td style={td}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
-                        <td style={td}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
-                        <td style={td}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
-                        <td style={td}>{x.descricao}</td>
+                const rowSpan = myTecidos.length > 0 ? myTecidos.length : 1;
+
+                // First row (contains all module info + first fabric if exists)
+                const firstRow = (
+                  <tr key={`${x.id}-row-0`}>
+                    <td style={td} rowSpan={rowSpan}>{x.id}</td>
+                    <td style={td} rowSpan={rowSpan}>{fornMap.get(x.idFornecedor) || x.idFornecedor}</td>
+                    <td style={td} rowSpan={rowSpan}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
+                    <td style={td} rowSpan={rowSpan}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
+                    <td style={td} rowSpan={rowSpan}>{x.descricao}</td>
+                    <td style={td} rowSpan={rowSpan}>
+                      {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
+                    </td>
+                    <td style={td} rowSpan={rowSpan}>{fmt(x.m3)}</td>
+                    
+                    {/* EXW */}
+                    <td style={td}>
+                        {myTecidos.length > 0 ? (
+                             <span style={{ color: '#10b981', display: 'block', textAlign: 'right' }}>
+                                $ {fmt(calcEXW(myTecidos[0].valorTecido), 2)}
+                             </span>
+                        ) : "-"}
+                    </td>
+
+                    {/* Tecidos/Valores */}
+                    <td style={td}>
+                        {myTecidos.length > 0 ? (
+                            <div>
+                                <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                                    {myTecidos[0].tecido?.nome || myTecidos[0].idTecido}:
+                                </span>{' '}
+                                <span style={{ color: '#e5e7eb' }}>
+                                    R$ {fmt(myTecidos[0].valorTecido, 2)}
+                                </span>
+                            </div>
+                        ) : "-"}
+                    </td>
+
+                    <td style={td} rowSpan={rowSpan}>
+                      <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
+                      <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
+                        Remover
+                      </button>
+                    </td>
+                  </tr>
+                );
+
+                // Additional rows for remaining fabrics
+                const otherRows = myTecidos.slice(1).map((mt, i) => (
+                    <tr key={`${x.id}-row-${i+1}`}>
                         <td style={td}>
-                        {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
+                             <span style={{ color: '#10b981', display: 'block', textAlign: 'right' }}>
+                                $ {fmt(calcEXW(mt.valorTecido), 2)}
+                             </span>
                         </td>
-                        <td style={td}>{fmt(x.m3)}</td>
                         <td style={td}>
-                             {myTecidos.length > 0 ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {myTecidos.map(mt => (
-                                        <div key={mt.id + '_exw'} style={{ fontSize: '0.9em', textAlign: 'right' }}>
-                                            <span style={{ color: '#10b981' }}>
-                                                $ {fmt(calcEXW(mt.valorTecido), 2)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                             ) : (
-                                 <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
-                             )}
-                        </td>
-                        <td style={td}>
-                            {myTecidos.length > 0 ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                    {myTecidos.map(mt => (
-                                        <div key={mt.id} style={{ fontSize: '0.9em' }}>
-                                            <span style={{ fontWeight: 500, color: '#94a3b8' }}>
-                                                {mt.tecido?.nome || mt.idTecido}:
-                                            </span>
-                                            {' '}
-                                            <span style={{ color: '#e5e7eb' }}>
-                                                R$ {fmt(mt.valorTecido, 2)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <span style={{ color: '#666', fontSize: '0.85em' }}>-</span>
-                            )}
-                        </td>
-                        <td style={td}>
-                        <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
-                        <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
-                            Remover
-                        </button>
+                            <div>
+                                <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                                    {mt.tecido?.nome || mt.idTecido}:
+                                </span>{' '}
+                                <span style={{ color: '#e5e7eb' }}>
+                                    R$ {fmt(mt.valorTecido, 2)}
+                                </span>
+                            </div>
                         </td>
                     </tr>
+                ));
+
+                return (
+                    <React.Fragment key={x.id}>
+                        {firstRow}
+                        {otherRows}
+                    </React.Fragment>
                 );
                 })}
             </tbody>
@@ -513,28 +598,28 @@ export default function ModulosPage() {
                         placeholder="Selecione..."
                       />
                     </div>
-                    <div className="field">
-                      <label className="label">Marca*</label>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <div style={{ flex: 1 }}>
-                          <SearchableSelect
-                            value={form.idMarca || ""}
-                            onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
-                            options={marcas.map(m => ({ value: m.id, label: m.nome }))}
-                            placeholder="Selecione..."
-                          />
+                      <div className="field">
+                        <label className="label">Modelo*</label>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <div style={{ flex: 1 }}>
+                            <SearchableSelect
+                              value={form.idMarca || ""}
+                              onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
+                              options={marcas.map(m => ({ value: m.id, label: m.nome }))}
+                              placeholder="Selecione..."
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            className="btn btn-sm"
+                            onClick={() => navigate("/marcas")}
+                            title="Cadastrar novo modelo"
+                            style={{ minWidth: "40px" }}
+                          >
+                            +
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          className="btn btn-sm"
-                          onClick={() => navigate("/marcas")}
-                          title="Cadastrar nova marca"
-                          style={{ minWidth: "40px" }}
-                        >
-                          +
-                        </button>
                       </div>
-                    </div>
 
                     <div className="field">
                       <label className="label">Largura</label>

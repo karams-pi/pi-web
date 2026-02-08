@@ -66,6 +66,10 @@ public class PiItem
     [Column("valor_final_item_usd_risco")]
     public decimal ValorFinalItemUSDRisco { get; set; }
 
+    [Column("observacao")]
+    [StringLength(500)]
+    public string? Observacao { get; set; }
+
     // Navigation
     public ProformaInvoice? Pi { get; set; }
     public ModuloTecido? ModuloTecido { get; set; }

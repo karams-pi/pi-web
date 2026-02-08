@@ -79,7 +79,8 @@ public class PisController : ControllerBase
                     i.ValorFreteRateadoBRL,
                     i.ValorFreteRateadoUSD,
                     i.ValorFinalItemBRL,
-                    i.ValorFinalItemUSDRisco
+                    i.ValorFinalItemUSDRisco,
+                    i.Observacao
                 })
             })
             .FirstOrDefaultAsync();
@@ -146,7 +147,8 @@ public class PisController : ControllerBase
                 i.ValorFreteRateadoBRL,
                 i.ValorFreteRateadoUSD,
                 i.ValorFinalItemBRL,
-                i.ValorFinalItemUSDRisco
+                i.ValorFinalItemUSDRisco,
+                i.Observacao
             })
         });
     }
@@ -156,7 +158,67 @@ public class PisController : ControllerBase
     {
         if (id != pi.Id) return BadRequest();
         
-        _db.Entry(pi).State = EntityState.Modified;
+        var existingPi = await _db.Pis
+            .Include(p => p.PiItens)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (existingPi == null) return NotFound();
+
+        // Update parent properties
+        existingPi.Prefixo = pi.Prefixo;
+        existingPi.PiSequencia = pi.PiSequencia;
+        existingPi.DataPi = pi.DataPi;
+        existingPi.IdCliente = pi.IdCliente;
+        existingPi.IdConfiguracoes = pi.IdConfiguracoes;
+        existingPi.IdFrete = pi.IdFrete;
+        existingPi.ValorTecido = pi.ValorTecido;
+        existingPi.ValorTotalFreteBRL = pi.ValorTotalFreteBRL;
+        existingPi.ValorTotalFreteUSD = pi.ValorTotalFreteUSD;
+        existingPi.CotacaoAtualUSD = pi.CotacaoAtualUSD;
+        existingPi.CotacaoRisco = pi.CotacaoRisco;
+
+        // Handle Items
+        // 1. Identification
+        var incomingItemIds = pi.PiItens.Where(i => i.Id > 0).Select(i => i.Id).ToList();
+        
+        // 2. Deletions (items in DB but not in payload)
+        var itemsToDelete = existingPi.PiItens.Where(i => !incomingItemIds.Contains(i.Id)).ToList();
+        foreach (var item in itemsToDelete)
+        {
+            _db.PiItens.Remove(item);
+        }
+
+        // 3. Updates and Adds
+        foreach (var item in pi.PiItens)
+        {
+            if (item.Id > 0)
+            {
+                // Update
+                var existingItem = existingPi.PiItens.FirstOrDefault(i => i.Id == item.Id);
+                if (existingItem != null)
+                {
+                   existingItem.IdModuloTecido = item.IdModuloTecido;
+                   existingItem.Quantidade = item.Quantidade;
+                   existingItem.Largura = item.Largura;
+                   existingItem.Profundidade = item.Profundidade;
+                   existingItem.Altura = item.Altura;
+                   existingItem.Pa = item.Pa;
+                   existingItem.M3 = item.M3;
+                   existingItem.ValorEXW = item.ValorEXW;
+                   existingItem.ValorFreteRateadoBRL = item.ValorFreteRateadoBRL;
+                   existingItem.ValorFreteRateadoUSD = item.ValorFreteRateadoUSD;
+                   existingItem.ValorFinalItemBRL = item.ValorFinalItemBRL;
+                   existingItem.ValorFinalItemUSDRisco = item.ValorFinalItemUSDRisco;
+                   existingItem.Observacao = item.Observacao;
+                }
+            }
+            else
+            {
+                // Add (by adding to the collection)
+                existingPi.PiItens.Add(item);
+            }
+        }
+
         await _db.SaveChangesAsync();
         
         return NoContent();

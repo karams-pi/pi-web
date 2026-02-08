@@ -8,6 +8,9 @@ import {
   listMarcas,
   updateMarca,
 } from "../api/marcas";
+import { PrintExportButtons } from "../components/PrintExportButtons";
+import { printData, exportToCSV } from "../utils/printExport";
+import type { ColumnDefinition } from "../utils/printExport";
 
 type FormState = Partial<Marca>;
 const emptyForm: FormState = {
@@ -90,7 +93,7 @@ export default function MarcasPage() {
   }
 
   async function onDelete(x: Marca) {
-    if (!confirm(`Remover marca "${x.nome}"?`)) return;
+    if (!confirm(`Remover modelo "${x.nome}"?`)) return;
     try {
       await deleteMarca(x.id);
       await load();
@@ -99,18 +102,42 @@ export default function MarcasPage() {
     }
   }
 
+  const exportColumns: ColumnDefinition<Marca>[] = [
+    { header: "ID", accessor: (m) => m.id },
+    { header: "Nome", accessor: (m) => m.nome },
+    { header: "URL", accessor: (m) => m.urlImagem },
+    { header: "Obs", accessor: (m) => m.observacao },
+  ];
+
+  function handlePrint(all: boolean) {
+     const list = all ? (items || []) : filteredItems;
+     printData(list, exportColumns, "Relatório de Modelos");
+  }
+
+  function handleExcel(all: boolean) {
+     const list = all ? (items || []) : filteredItems;
+     exportToCSV(list, exportColumns, "modelos");
+  }
+
   return (
     <div style={{ padding: 16 }}>
-      <h1>Marcas</h1>
+      <h1>Modelos</h1>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <input
-          placeholder="Buscar marca..."
+          placeholder="Buscar modelo..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: 8 }}
         />
         <button className="btn btn-primary" onClick={openCreate}>Nova</button>
+        <div style={{ marginLeft: "auto" }}>
+            <PrintExportButtons
+                onPrint={handlePrint}
+                onExcel={handleExcel}
+                disabled={loading}
+            />
+        </div>
       </div>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
@@ -154,7 +181,7 @@ export default function MarcasPage() {
             {filteredItems.length === 0 && (
               <tr>
                 <td colSpan={5} style={{ padding: 12, textAlign: "center" }}>
-                  Nenhuma marca encontrada
+                  Nenhum modelo encontrado
                 </td>
               </tr>
             )}
@@ -167,7 +194,7 @@ export default function MarcasPage() {
           <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
             <div className="modalHeader">
               <h3 className="modalTitle">
-                {editing ? "Editar Marca" : "Nova Marca"}
+                {editing ? "Editar Modelo" : "Novo Modelo"}
               </h3>
               <button className="btn btn-sm" onClick={() => setIsOpen(false)}>
                 Fechar
