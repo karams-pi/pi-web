@@ -73,4 +73,7 @@ public class PiItem
     // Navigation
     public ProformaInvoice? Pi { get; set; }
     public ModuloTecido? ModuloTecido { get; set; }
+
+    [NotMapped]
+    public string? TempCodigoModuloTecido { get; set; }
 }

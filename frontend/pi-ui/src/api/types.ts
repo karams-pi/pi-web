@@ -36,6 +36,7 @@ export type ModuloTecido = {
   idModulo: number;
   idTecido: number;
   valorTecido: number;
+  codigoModuloTecido?: string;
   modulo?: {
     id: number;
     descricao: string;
@@ -146,5 +147,6 @@ export type PiItem = {
   valorFreteRateadoUSD: number;
   valorFinalItemBRL: number;
   valorFinalItemUSDRisco: number;
+  tempCodigoModuloTecido?: string;
 };
 

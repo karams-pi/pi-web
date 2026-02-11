@@ -43,6 +43,7 @@ type ItemGrid = {
   valorFreteRateadoUSD: number;
   valorFinalItemBRL: number;
   valorFinalItemUSDRisco: number;
+  codigoModuloTecido?: string;
   exwTooltip?: string;
   freteBrlTooltip?: string;
   freteUsdTooltip?: string;
@@ -85,6 +86,7 @@ export default function ProformaInvoicePage() {
   // Novo item
   const [selModuloTecido, setSelModuloTecido] = useState("");
   const [quantidade, setQuantidade] = useState("1");
+  const [codigoModuloTecido, setCodigoModuloTecido] = useState("");
 
   // Modal State
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -136,6 +138,22 @@ export default function ProformaInvoicePage() {
     // Recalcular rateio quando itens mudarem ou totais de frete mudarem
     recalcularRateio();
   }, [itens.length, form.valorTotalFreteBRL, form.valorTotalFreteUSD]); 
+
+
+
+  // Pre-fill code when a module-tecido is selected
+  useEffect(() => {
+    if (selModuloTecido) {
+        const mt = modulosTecidos.find(m => m.id === Number(selModuloTecido));
+        if (mt?.codigoModuloTecido) {
+            setCodigoModuloTecido(mt.codigoModuloTecido);
+        } else {
+            setCodigoModuloTecido("");
+        }
+    } else {
+        setCodigoModuloTecido("");
+    }
+  }, [selModuloTecido, modulosTecidos]);
 
   // Filter ModulosTecidos in memory
   const filteredModulosTecidos = useMemo(() => {
@@ -306,6 +324,7 @@ export default function ProformaInvoicePage() {
       valorFreteRateadoUSD: 0,
       valorFinalItemBRL: 0,
       valorFinalItemUSDRisco: 0,
+      codigoModuloTecido: codigoModuloTecido,
       exwTooltip,
       freteBrlTooltip: "",
       freteUsdTooltip: "",
@@ -384,6 +403,7 @@ export default function ProformaInvoicePage() {
           valorFinalItemBRL: item.valorFinalItemBRL,
           valorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
           observacao: item.observacao,
+          tempCodigoModuloTecido: item.codigoModuloTecido,
           rateioFrete: 0 
         })) as any[]
       };
@@ -454,7 +474,8 @@ export default function ProformaInvoicePage() {
                    exwTooltip: "Cálculo importado",
                    freteBrlTooltip: "Cálculo importado",
                    freteUsdTooltip: "Cálculo importado",
-                   observacao: item.observacao || item.Observacao || ""
+                   observacao: item.observacao || item.Observacao || "",
+                   codigoModuloTecido: mt?.codigoModuloTecido || ""
                };
            });
            setItens(novosItens);
@@ -733,6 +754,16 @@ export default function ProformaInvoicePage() {
               placeholder="Selecione um módulo..."
             />
           </div>
+
+          <div className="field" style={{ width: 120 }}>
+            <label className="label">Código</label>
+            <input
+              className="cl-input"
+              value={codigoModuloTecido}
+              onChange={(e) => setCodigoModuloTecido(e.target.value.substring(0, 10))}
+              maxLength={10}
+            />
+          </div>
           <div className="field" style={{ width: 80 }}>
             <label className="label">Qtd</label>
             <input
@@ -752,6 +783,7 @@ export default function ProformaInvoicePage() {
               <tr style={{ background: "#f8f9fa", borderBottom: "2px solid #dee2e6" }}>
                 <th style={{...th, width: "30px", textAlign: "center"}}>#</th>
                 <th style={{...th, minWidth: "200px"}}>Descrição</th>
+                <th style={{...th, width: "80px"}}>Código</th>
                 <th style={{...th, minWidth: "150px"}}>Observação</th>
                 <th style={{...th, width: "70px"}}>Qtd</th>
                 <th style={{...th, width: "60px"}}>Larg</th>
@@ -781,6 +813,9 @@ export default function ProformaInvoicePage() {
                   </td>
                   <td style={td} title={getItemDescriptionFull(item)}>
                       {getItemDescription(item)}
+                  </td>
+                  <td style={td} align="center">
+                      {item.codigoModuloTecido || "-"}
                   </td>
                   <td style={td}>
                       <textarea

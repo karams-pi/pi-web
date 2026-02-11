@@ -125,6 +125,16 @@ public class PisController : ControllerBase
         pi.PiSequencia = await GenerateNextSequenceString();
 
         _db.Pis.Add(pi);
+        
+        // Update product codes if provided
+        if (pi.PiItens != null)
+        {
+            foreach (var item in pi.PiItens)
+            {
+                await UpdateModuleCode(item.IdModuloTecido, item.TempCodigoModuloTecido);
+            }
+        }
+
         await _db.SaveChangesAsync();
         
         return CreatedAtAction(nameof(GetById), new { id = pi.Id }, new 
@@ -217,6 +227,9 @@ public class PisController : ControllerBase
                 // Add (by adding to the collection)
                 existingPi.PiItens.Add(item);
             }
+            
+            // Update code whenever we save/update an item
+            await UpdateModuleCode(item.IdModuloTecido, item.TempCodigoModuloTecido);
         }
 
         await _db.SaveChangesAsync();
@@ -234,5 +247,19 @@ public class PisController : ControllerBase
         await _db.SaveChangesAsync();
         
         return NoContent();
+    }
+    private async Task UpdateModuleCode(long idModuloTecido, string? codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo)) return;
+        
+        var moduloTecido = await _db.ModulosTecidos.FirstOrDefaultAsync(x => x.Id == idModuloTecido);
+        if (moduloTecido != null)
+        {
+            moduloTecido.CodigoModuloTecido = codigo.Trim();
+            // We don't need to call SaveChanges here if it's called in the parent method, 
+            // but for safety in case it's not tracked or we want to be sure:
+            // Actually, in Create/Update we call SaveChanges at the end. 
+            // Since this context is the same, tracking changes should work.
+        }
     }
 }

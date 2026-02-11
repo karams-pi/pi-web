@@ -155,6 +155,8 @@ public class AppDbContext : DbContext
 
             entity.Property(x => x.ValorTecido).HasColumnType("numeric(18,3)");
 
+    entity.Property(x => x.CodigoModuloTecido).HasColumnName("codigo_modulo_tecido").HasMaxLength(10);
+
             entity.HasOne(x => x.Modulo)
                 .WithMany(x => x.ModulosTecidos)
                 .HasForeignKey(x => x.IdModulo)

@@ -28,4 +28,8 @@ public class ModuloTecido
     [Required]
     [Column("valor_tecido", TypeName = "numeric(18,3)")]
     public decimal ValorTecido { get; set; }
+
+    [Column("codigo_modulo_tecido")]
+    [StringLength(10)]
+    public string? CodigoModuloTecido { get; set; }
 }

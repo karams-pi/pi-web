@@ -23,6 +23,7 @@ public class ModulosTecidosController : ControllerBase
                 x.IdModulo,
                 x.IdTecido,
                 x.ValorTecido,
+                x.CodigoModuloTecido,
                 Modulo = new
                 {
                     x.Modulo!.Id,
