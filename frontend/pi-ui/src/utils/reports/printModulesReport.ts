@@ -14,6 +14,8 @@ interface PrintModulesReportOptions {
   };
 }
 
+
+
 export function printModulesReport({
   modules,
   currency,
@@ -26,15 +28,13 @@ export function printModulesReport({
     return;
   }
 
-  const title = `Relatório de Módulos - ${currency}`;
+  const title = `Relatório de Módulos - ${currency === 'BRL' ? 'Valores em Reais (R$)' : 'Valores em Dólar (EXW)'}`;
   const date = new Date().toLocaleDateString("pt-BR") + " " + new Date().toLocaleTimeString("pt-BR");
 
-  // Helper to Calculate EXW (duplicated from page, but good for isolation)
   function calcPrice(valorTecido: number): number {
     if (currency === "BRL") {
-      return valorTecido; // In BRL, we just show the base fabric value (as per current grid logic g0: R$ X)
+      return valorTecido;
     } else {
-        // EXW Logic
         if (!config || !cotacao) return 0;
         const cotacaoRisco = cotacao - config.valorReducaoDolar;
         if (cotacaoRisco <= 0) return 0;
@@ -55,67 +55,160 @@ export function printModulesReport({
       return val.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
   }
 
-  let tableRows = "";
+  // 1. Identify all unique fabrics
+  const uniqueFabricIds = new Set<number>();
+  modules.forEach(m => {
+      if (m.modulosTecidos) {
+          m.modulosTecidos.forEach(mt => uniqueFabricIds.add(mt.idTecido));
+      }
+  });
 
-  modules.forEach((mod) => {
-    const tecidos = mod.modulosTecidos || [];
-    const rowSpan = tecidos.length > 0 ? tecidos.length : 1;
+  const sortedFabricIds = Array.from(uniqueFabricIds).sort((a, b) => {
+      const nameA = maps.tecido.get(a) || "";
+      const nameB = maps.tecido.get(b) || "";
+      return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+  });
 
-    // Common columns
-    const colId = `<td rowspan="${rowSpan}">${mod.id}</td>`;
-    const colForn = `<td rowspan="${rowSpan}">${maps.fornecedor.get(mod.idFornecedor) || mod.idFornecedor}</td>`;
-    const colCat = `<td rowspan="${rowSpan}">${maps.categoria.get(mod.idCategoria) || mod.idCategoria}</td>`;
-    const colMarca = `<td rowspan="${rowSpan}">${maps.marca.get(mod.idMarca) || mod.idMarca}</td>`;
-    const colDesc = `<td rowspan="${rowSpan}" class="desc">${mod.descricao}</td>`;
-    const colDim = `<td rowspan="${rowSpan}" class="center">${fmtDim(mod.largura)} x ${fmtDim(mod.profundidade)} x ${fmtDim(mod.altura)}</td>`;
-    const colM3 = `<td rowspan="${rowSpan}" class="center">${fmt(mod.m3)}</td>`;
+  // 2. Group Data
+  type ModuloGroup = {
+      key: string;
+      fornName: string;
+      catName: string;
+      marcas: {
+          idMarca: number;
+          marcaName: string;
+          items: Modulo[];
+      }[];
+  };
 
-    // First row
-    let firstTecidoCols = "";
-    if (tecidos.length > 0) {
-        const t = tecidos[0];
-        const nomeTecido = maps.tecido.get(t.idTecido) || t.idTecido;
-        const valor = calcPrice(t.valorTecido);
-        const symbol = currency === "BRL" ? "R$" : "$";
-        
-        firstTecidoCols = `
-            <td>${nomeTecido}</td>
-            <td class="right">${symbol} ${fmt(valor)}</td>
-        `;
-    } else {
-        firstTecidoCols = `
-            <td>-</td>
-            <td>-</td>
-        `;
-    }
+  const groups = new Map<string, ModuloGroup>();
 
-    tableRows += `
-        <tr>
-            ${colId}
-            ${colForn}
-            ${colCat}
-            ${colMarca}
-            ${colDesc}
-            ${colDim}
-            ${colM3}
-            ${firstTecidoCols}
-        </tr>
-    `;
+  modules.forEach(mod => {
+      const fornName = maps.fornecedor.get(mod.idFornecedor) || String(mod.idFornecedor);
+      const catName = maps.categoria.get(mod.idCategoria) || String(mod.idCategoria);
+      const groupKey = `${fornName}||${catName}`;
 
-    // Other rows (tecidos only)
-    for (let i = 1; i < tecidos.length; i++) {
-        const t = tecidos[i];
-        const nomeTecido = maps.tecido.get(t.idTecido) || t.idTecido;
-        const valor = calcPrice(t.valorTecido);
-        const symbol = currency === "BRL" ? "R$" : "$";
+      if (!groups.has(groupKey)) {
+          groups.set(groupKey, {
+              key: groupKey,
+              fornName,
+              catName,
+              marcas: []
+          });
+      }
+      const group = groups.get(groupKey)!;
 
-        tableRows += `
-            <tr>
-                <td>${nomeTecido}</td>
-                <td class="right">${symbol} ${fmt(valor)}</td>
-            </tr>
-        `;
-    }
+      let marcaGroup = group.marcas.find(m => m.idMarca === mod.idMarca);
+      if (!marcaGroup) {
+          marcaGroup = {
+              idMarca: mod.idMarca,
+              marcaName: maps.marca.get(mod.idMarca) || String(mod.idMarca),
+              items: []
+          };
+          group.marcas.push(marcaGroup);
+      }
+      marcaGroup.items.push(mod);
+  });
+
+  const sortedGroups = Array.from(groups.values()).sort((a, b) => a.key.localeCompare(b.key));
+  sortedGroups.forEach(g => {
+      g.marcas.sort((a, b) => a.marcaName.localeCompare(b.marcaName));
+      g.marcas.forEach(m => {
+          m.items.sort((i1, i2) => i1.descricao.localeCompare(i2.descricao));
+      });
+  });
+
+  // 3. Prepare Header Rows (reused for each table)
+  const standardHeaders = [
+      "Modelo", "Módulo", "Larg", "Prof", "Alt", "M³"
+  ];
+
+  const headerRow1 = `
+    <tr>
+        ${standardHeaders.map(h => `<th rowspan="2">${h}</th>`).join("")}
+        <th colspan="${sortedFabricIds.length}" class="center" style="text-align: center;">
+            Valor (${currency === 'BRL' ? 'Reais' : 'EXW'})
+        </th>
+    </tr>
+  `;
+
+  const headerRow2 = `
+    <tr>
+        ${sortedFabricIds.map(fid => {
+            const name = maps.tecido.get(fid) || fid;
+            return `<th class="center">${name}</th>`;
+        }).join("")}
+    </tr>
+  `;
+
+  const tableHead = `
+    <thead>
+        ${headerRow1}
+        ${headerRow2}
+    </thead>
+  `;
+
+  // 4. Generate Content (Modules separated by groups)
+  let reportContent = "";
+
+  sortedGroups.forEach(group => {
+      // Group Title
+      reportContent += `
+        <div class="group-block">
+            <div class="group-title">${group.fornName} - ${group.catName}</div>
+            <table>
+                ${tableHead}
+                <tbody>
+      `;
+
+      // Rows for this group
+      group.marcas.forEach(marca => {
+          marca.items.forEach((mod, index) => {
+              // Columns
+              // Modelo (RowSpan only on first item)
+              let colMarca = "";
+              if (index === 0) {
+                  colMarca = `<td rowspan="${marca.items.length}">${marca.marcaName}</td>`;
+              }
+
+              const colDesc = `<td class="desc">${mod.descricao}</td>`;
+              const colLarg = `<td class="center">${fmtDim(mod.largura)}</td>`;
+              const colProf = `<td class="center">${fmtDim(mod.profundidade)}</td>`;
+              const colAlt = `<td class="center">${fmtDim(mod.altura)}</td>`;
+              const colM3 = `<td class="center">${fmt(mod.m3)}</td>`;
+
+              // Fabrics
+              let fabricCols = "";
+              sortedFabricIds.forEach(fid => {
+                  const mt = mod.modulosTecidos?.find(x => x.idTecido === fid);
+                  if (mt) {
+                      const val = calcPrice(mt.valorTecido);
+                      const symbol = currency === "BRL" ? "R$" : "$";
+                      fabricCols += `<td class="right">${symbol} ${fmt(val)}</td>`;
+                  } else {
+                       fabricCols += `<td class="center">-</td>`;
+                  }
+              });
+
+              reportContent += `
+                  <tr>
+                      ${colMarca}
+                      ${colDesc}
+                      ${colLarg}
+                      ${colProf}
+                      ${colAlt}
+                      ${colM3}
+                      ${fabricCols}
+                  </tr>
+              `;
+          });
+      });
+
+      reportContent += `
+                </tbody>
+            </table>
+        </div>
+      `;
   });
 
   const html = `
@@ -123,52 +216,63 @@ export function printModulesReport({
       <head>
         <title>${title}</title>
         <style>
-          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11px; color: #333; }
-          h1 { font-size: 18px; margin-bottom: 5px; color: #1e293b; }
-          .meta { font-size: 10px; color: #64748b; margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-          th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-align: left; padding: 8px; border-bottom: 2px solid #e2e8f0; font-size: 10px; text-transform: uppercase; }
-          td { border-bottom: 1px solid #e2e8f0; padding: 6px 8px; vertical-align: top; }
-          tr:nth-child(even) { background-color: #f8fafc; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 10px; color: #000; }
+          h1 { font-size: 16px; margin-bottom: 5px; color: #000; }
+          .meta { font-size: 10px; color: #444; margin-bottom: 15px; }
+          
+          .group-block { margin-bottom: 25px; break-inside: avoid; }
+          
+          .group-title {
+              font-size: 14px;
+              font-weight: 800;
+              background-color: #d1d5db; /* Gray-300 */
+              padding: 8px;
+              border: 1px solid #000;
+              border-bottom: none; /* Merge with table border visual */
+              text-transform: uppercase;
+          }
+
+          table { width: 100%; border-collapse: collapse; }
+          
+          th, td { 
+            border: 1px solid #000;
+            padding: 4px 6px; 
+            vertical-align: middle;
+          }
+          
+          th { 
+            background-color: #e0e0e0; 
+            font-weight: 700; 
+            text-transform: uppercase;
+            font-size: 9px;
+          }
+
+          tr:nth-child(even) { background-color: #f9f9f9; }
           
           .center { text-align: center; }
-          .right { text-align: right; font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
-          .desc { max-width: 250px; }
+          .right { text-align: right; white-space: nowrap; }
+          .desc { max-width: 200px; }
 
           @media print {
             .no-print { display: none; }
-            body { margin: 0; padding: 10px; }
-            th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+            body { margin: 0; padding: 0mm; }
+            @page { margin: 10mm; size: landscape; }
+            th, .group-title { background-color: #ccc !important; -webkit-print-color-adjust: exact; }
+            .group-block { page-break-inside: avoid; }
           }
         </style>
       </head>
       <body>
         <div class="header">
-            <h1>${title}</h1>
-            <div class="meta">Gerado em ${date}</div>
+            <h1 style="float: left; margin-right: 20px;">${title}</h1>
+            <div class="meta" style="float: left; margin-top: 5px;">${date}</div>
+            <div style="clear: both;"></div>
         </div>
         
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 40px">ID</th>
-              <th>Fornecedor</th>
-              <th>Categoria</th>
-              <th>Modelo</th>
-              <th>Descrição</th>
-              <th class="center">Dimensões</th>
-              <th class="center">M³</th>
-              <th>Tecido</th>
-              <th class="right">Valor</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
+        ${reportContent}
 
         <div class="no-print" style="position: fixed; top: 10px; right: 10px; background: white; padding: 10px; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 4px;">
-             <button onclick="window.print()" style="padding: 8px 16px; background: #0f172a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Imprimir</button>
+             <button onclick="window.print()" style="padding: 8px 16px; background: #000; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🖨️ Imprimir</button>
         </div>
       </body>
     </html>
@@ -183,3 +287,5 @@ export function printModulesReport({
   printWindow.document.write(html);
   printWindow.document.close();
 }
+
+
