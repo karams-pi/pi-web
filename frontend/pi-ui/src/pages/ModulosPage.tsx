@@ -15,12 +15,14 @@ import {
   getModuleFilters,
 } from "../api/modulos";
 import { PrintExportButtons } from "../components/PrintExportButtons";
-import { printData, exportToCSV } from "../utils/printExport";
+import { exportToCSV } from "../utils/printExport";
 import type { ColumnDefinition } from "../utils/printExport";
 import { getLatestConfig } from "../api/configuracoes";
 import { getCotacaoUSD } from "../api/pis";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { ModuloSelect } from "../components/ModuloSelect";
+import { PrintModulesModal } from "../components/PrintModulesModal";
+import { printModulesReport } from "../utils/reports/printModulesReport";
 
 type FormState = Partial<Modulo> & {
   larguraStr?: string;
@@ -69,6 +71,7 @@ export default function ModulosPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"geral" | "tecidos">("geral");
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // Selection state for combo
   const [selectedModuleId, setSelectedModuleId] = useState("");
@@ -272,28 +275,45 @@ export default function ModulosPage() {
     { header: "M3", accessor: (m) => fmt(m.m3) },
   ], [fornMap, catMap, marcaMap]);
 
-  async function handlePrint(all: boolean) {
-     let list = items;
-     if (all) {
-         try {
-             setLoading(true);
-             const res = await listModulos(
-                search,
-                1, 100000,
-                filterFornecedor ? Number(filterFornecedor) : undefined,
-                filterCategoria ? Number(filterCategoria) : undefined,
-                filterMarca ? Number(filterMarca) : undefined,
-                filterTecido ? Number(filterTecido) : undefined
-             );
-             list = res.items;
-         } catch(e) {
-             alert("Erro ao carregar tudo");
-             return;
-         } finally {
-             setLoading(false);
-         }
-     }
-     printData(list, exportColumns, "Relatório de Módulos");
+  function handlePrint() {
+      setIsPrintModalOpen(true);
+  }
+
+  async function onConfirmPrint(scope: 'screen' | 'all', currency: 'BRL' | 'EXW') {
+      let list = items;
+      if (scope === 'all') {
+          try {
+              setLoading(true);
+              const res = await listModulos(
+                 search,
+                 1, 100000,
+                 filterFornecedor ? Number(filterFornecedor) : undefined,
+                 filterCategoria ? Number(filterCategoria) : undefined,
+                 filterMarca ? Number(filterMarca) : undefined,
+                 filterTecido ? Number(filterTecido) : undefined
+              );
+              list = res.items;
+          } catch(e) {
+              alert("Erro ao carregar tudo");
+              return;
+          } finally {
+              setLoading(false);
+          }
+      }
+
+      printModulesReport({
+          modules: list,
+          currency,
+          cotacao,
+          config,
+          maps: {
+              fornecedor: fornMap,
+              categoria: catMap,
+              marca: marcaMap,
+              tecido: tecidoMap
+          }
+      });
+      setIsPrintModalOpen(false);
   }
 
   async function handleExcel(all: boolean) {
@@ -398,7 +418,7 @@ export default function ModulosPage() {
             </button>
             <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
             <PrintExportButtons
-                onPrint={handlePrint}
+                onPrint={() => handlePrint()}
                 onExcel={handleExcel}
                 disabled={loading}
             />
@@ -672,6 +692,13 @@ export default function ModulosPage() {
           </div>
         </div>
       )}
+
+      <PrintModulesModal 
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        onConfirm={onConfirmPrint}
+        loading={loading}
+      />
     </div>
   );
 }
