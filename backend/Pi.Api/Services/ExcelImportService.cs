@@ -2,6 +2,9 @@ using OfficeOpenXml;
 using Pi.Api.Data;
 using Pi.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace Pi.Api.Services;
 
@@ -430,200 +433,328 @@ public class ExcelImportService
 
         mt.ValorTecido = price;
     }
+    private Stream SanitizeExcelFile(Stream originalStream)
+    {
+        var memoryStream = new MemoryStream();
+        originalStream.CopyTo(memoryStream);
+        memoryStream.Position = 0;
+
+        try
+        {
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Update, leaveOpen: true))
+            {
+                var entriesToUpdate = new List<(string Name, string Content)>();
+
+                foreach (var entry in archive.Entries)
+                {
+                    if (entry.FullName.StartsWith("xl/worksheets/") && entry.FullName.EndsWith(".xml"))
+                    {
+                        using var reader = new StreamReader(entry.Open());
+                        var content = reader.ReadToEnd();
+                        
+                        // Fix for semicolon in mergeCell refs (e.g. ref="D1260;D214")
+                        // Also handles inverted ranges (e.g. D1260:D214 -> D214:D1260) which cause EPPlus errors
+                        if (content.Contains("ref=") && (content.Contains(";") || content.Contains(":")))
+                        {
+                            // Regex to capture two cell addresses separated by ; or :
+                            // Groups: 1=Col1, 2=Row1, 3=Col2, 4=Row2
+                            var pattern = "ref=\"([A-Za-z]+)([0-9]+)[;:]([A-Za-z]+)([0-9]+)\"";
+                            
+                            var newContent = Regex.Replace(content, pattern, match =>
+                            {
+                                string col1 = match.Groups[1].Value;
+                                int row1 = int.Parse(match.Groups[2].Value);
+                                string col2 = match.Groups[3].Value;
+                                int row2 = int.Parse(match.Groups[4].Value);
+
+                                // Determine correct order (Top-Left : Bottom-Right)
+                                bool swap = false;
+
+                                // Compare Columns (Length first for A vs AA, then lexicographical)
+                                if (col1.Length > col2.Length) swap = true;
+                                else if (col1.Length < col2.Length) swap = false;
+                                else 
+                                {
+                                    // Same length, compare letters
+                                    int colCompare = string.Compare(col1, col2, StringComparison.OrdinalIgnoreCase);
+                                    if (colCompare > 0) swap = true;
+                                    else if (colCompare == 0)
+                                    {
+                                        // Same column, compare rows
+                                        if (row1 > row2) swap = true;
+                                    }
+                                }
+
+                                if (swap)
+                                {
+                                    return $"ref=\"{col2}{row2}:{col1}{row1}\"";
+                                }
+                                else
+                                {
+                                    return $"ref=\"{col1}{row1}:{col2}{row2}\"";
+                                }
+                            });
+
+                            if (content != newContent)
+                            {
+                                entriesToUpdate.Add((entry.FullName, newContent));
+                            }
+                        }
+                    }
+                }
+
+                foreach (var tool in entriesToUpdate)
+                {
+                    var entry = archive.GetEntry(tool.Name);
+                    entry?.Delete();
+                    var newEntry = archive.CreateEntry(tool.Name);
+                    using var writer = new StreamWriter(newEntry.Open());
+                    writer.Write(tool.Content);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // If sanitization fails, ignore and try processing original (rewound)
+             Console.WriteLine($"Sanitization Warning: {ex.Message}");
+        }
+
+        memoryStream.Position = 0;
+        return memoryStream;
+    }
+
+    private async Task ResetSequencesAsync()
+    {
+        // Categorias
+        var maxIdCategorias = await _context.Categorias.MaxAsync(c => (long?)c.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('categoria', 'id'), {maxIdCategorias + 1}, false);");
+
+        // Marcas
+        var maxIdMarcas = await _context.Marcas.MaxAsync(m => (long?)m.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('marca', 'id'), {maxIdMarcas + 1}, false);");
+
+        // Tecidos
+        var maxIdTecidos = await _context.Tecidos.MaxAsync(t => (long?)t.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('tecido', 'id'), {maxIdTecidos + 1}, false);");
+        
+        // Modulos
+        var maxIdModulos = await _context.Modulos.MaxAsync(m => (long?)m.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('modulo', 'id'), {maxIdModulos + 1}, false);");
+        
+            // ModulosTecidos
+        var maxIdModulosTecidos = await _context.ModulosTecidos.MaxAsync(mt => (long?)mt.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('modulo_tecido', 'id'), {maxIdModulosTecidos + 1}, false);");
+    }
+
     public async Task ImportarKaramsAsync(Stream fileStream, long idFornecedor)
     {
-        using var package = new ExcelPackage(fileStream);
+        // 0. Reset Sequences to avoid PK violation (manual inserts desync fix)
+        await ResetSequencesAsync();
 
-        // 1. Validate Fornecedor
-        var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
-        if (fornecedor == null)
-            throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
-
-        // === PRE-LOADING CACHES ===
-        // Load all Categories and Marcas to memory to avoid N+1 queries
-        var categoriasCache = await _context.Categorias.ToListAsync();
-        var marcasCache = await _context.Marcas.ToListAsync();
-        var tecidosCache = await _context.Tecidos.ToListAsync();
-        
-        // Dictionary for fast lookup (Case Insensitive)
-        var categoriasMap = new Dictionary<string, Categoria>(StringComparer.OrdinalIgnoreCase);
-        foreach (var c in categoriasCache) categoriasMap[c.Nome] = c;
-
-        var marcasMap = new Dictionary<string, Marca>(StringComparer.OrdinalIgnoreCase);
-        foreach (var m in marcasCache) marcasMap[m.Nome] = m;
-        
-        var tecidosMap = new Dictionary<string, Tecido>(StringComparer.OrdinalIgnoreCase);
-        foreach (var t in tecidosCache) tecidosMap[t.Nome] = t;
-
-        // Modulos mapping is complex (Descricao + Marca + Fornecedor). 
-        // We will query DB + Local for Modulos as needed or try to preload.
-        // Preloading all modulos might be heavy. Let's use tracked lookup.
-
-        foreach (var worksheet in package.Workbook.Worksheets)
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
         {
-            var categoriaNome = worksheet.Name.Trim();
-            
-            // Get/Create Categoria
-            if (!categoriasMap.TryGetValue(categoriaNome, out var categoria))
-            {
-                categoria = new Categoria { Nome = categoriaNome };
-                _context.Categorias.Add(categoria);
-                categoriasMap[categoriaNome] = categoria; // Cache it
-            }
+            CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
 
-            var rowCount = worksheet.Dimension.Rows;
+            // Sanitize stream to fix "Invalid Address format" (semicolon in merged cells)
+            using var sanitizedStream = SanitizeExcelFile(fileStream);
+            using var package = new ExcelPackage(sanitizedStream);
 
-            var tecidoMappings = new Dictionary<string, int>
+            // 1. Validate Fornecedor
+            var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
+            if (fornecedor == null)
+                throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
+
+            // === PRE-LOADING CACHES ===
+            // Load all Categories and Marcas to memory to avoid N+1 queries
+            var categoriasCache = await _context.Categorias.ToListAsync();
+            var marcasCache = await _context.Marcas.ToListAsync();
+            var tecidosCache = await _context.Tecidos.ToListAsync();
+
+            // Dictionary for fast lookup (Case Insensitive)
+            var categoriasMap = new Dictionary<string, Categoria>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in categoriasCache) categoriasMap[c.Nome] = c;
+
+            var marcasMap = new Dictionary<string, Marca>(StringComparer.OrdinalIgnoreCase);
+            foreach (var m in marcasCache) marcasMap[m.Nome] = m;
+
+            var tecidosMap = new Dictionary<string, Tecido>(StringComparer.OrdinalIgnoreCase);
+            foreach (var t in tecidosCache) tecidosMap[t.Nome] = t;
+
+            // Modulos mapping is complex (Descricao + Marca + Fornecedor). 
+            // We will query DB + Local for Modulos as needed or try to preload.
+            // Preloading all modulos might be heavy. Let's use tracked lookup.
+
+            foreach (var worksheet in package.Workbook.Worksheets)
             {
+                var categoriaNome = worksheet.Name.Trim();
+
+                // Get/Create Categoria
+                if (!categoriasMap.TryGetValue(categoriaNome, out var categoria))
+                {
+                    categoria = new Categoria { Nome = categoriaNome };
+                    _context.Categorias.Add(categoria);
+                    categoriasMap[categoriaNome] = categoria; // Cache it
+                }
+
+                var rowCount = worksheet.Dimension.Rows;
+
+                var tecidoMappings = new Dictionary<string, int>
+                {
                 { "G0", 8 }, { "G1", 9 }, { "G2", 10 }, { "G3", 11 }, { "G4", 12 },
                 { "G5", 13 }, { "G6", 14 }, { "G7", 15 }, { "G8", 16 }
-            };
+                };
 
-            // Ensure Tecidos G0-G8 exist in cache
-            foreach (var tecidoName in tecidoMappings.Keys)
-            {
-                if (!tecidosMap.ContainsKey(tecidoName))
+                // Ensure Tecidos G0-G8 exist in cache
+                foreach (var tecidoName in tecidoMappings.Keys)
                 {
-                    var newTecido = new Tecido { Nome = tecidoName };
-                    _context.Tecidos.Add(newTecido);
-                    tecidosMap[tecidoName] = newTecido;
-                }
-            }
-
-            for (int row = 2; row <= rowCount; row++)
-            {
-                // === Reads & Validations ===
-                var marcaNome = worksheet.Cells[row, 1].Text?.Trim();
-                if (string.IsNullOrEmpty(marcaNome) || marcaNome == "Marca") continue;
-
-                var descricao = worksheet.Cells[row, 2].Text?.Trim();
-                if (string.IsNullOrEmpty(descricao) || descricao == "Descrição") continue;
-
-                var largText = worksheet.Cells[row, 3].Text?.Trim();
-                if (string.IsNullOrEmpty(largText) || largText == "Larg") continue;
-                decimal.TryParse(largText, out var larg);
-
-                var profText = worksheet.Cells[row, 4].Text?.Trim();
-                if (string.IsNullOrEmpty(profText) || profText == "Prof") continue;
-                decimal.TryParse(profText, out var prof);
-
-                decimal pa = 0;
-
-                var altText = worksheet.Cells[row, 6].Text?.Trim();
-                if (string.IsNullOrEmpty(altText) || altText == "Altura") continue;
-                decimal.TryParse(altText, out var alt);
-
-                // === Get/Create Marca ===
-                if (!marcasMap.TryGetValue(marcaNome, out var marca))
-                {
-                    marca = new Marca { Nome = marcaNome };
-                    _context.Marcas.Add(marca);
-                    marcasMap[marcaNome] = marca;
-                }
-
-                // === Get/Create Modulo ===
-                // Check Local then DB (Use Local cache if possible)
-                // For simplified tracked lookup in loop:
-                var modulo = await _context.Modulos
-                     .Include(m => m.ModulosTecidos) // Fix: Include relations to check duplicates
-                     .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor 
-                                            && m.IdMarca == marca.Id // Issue: marca.Id might be 0 if new.
-                                            && m.Descricao.ToUpper() == descricao.ToUpper()
-                                            && m.Largura == larg); // Fix: Distinguish by Width
-                                            
-                // Logic Fix: if marca is new, modulo must be new.
-                if (marca.Id == 0) modulo = null;
-
-                if (modulo == null)
-                {
-                    // Check if we already created this module in this session (Local Cache) to avoid duplicates
-                    // Since we don't have a dict, we iterate Local. Not optimal but safe for small batches.
-                    // Ideally we should use a Dictionary<string, Modulo> like in Koyo import.
-                    modulo = _context.Modulos.Local
-                        .FirstOrDefault(m => m.IdFornecedor == idFornecedor 
-                                          && m.Marca == marca 
-                                          && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
-                                          && m.Largura == larg); // Fix: Distinguish by Width
-                }
-
-                if (modulo == null)
-                {
-                    modulo = new Modulo
+                    if (!tecidosMap.ContainsKey(tecidoName))
                     {
-                        IdFornecedor = idFornecedor,
-                        Marca = marca,   // Link Object
-                        Categoria = categoria, // Link Object
-                        IdMarca = marca.Id, // Might be 0 but EF fixes link
-                        IdCategoria = categoria.Id,
-                        Descricao = descricao,
-                        Largura = larg,
-                        Profundidade = prof,
-                        Altura = alt,
-                        Pa = pa,
-                        // M3 computed by trigger or class (not here)
-                        M3 = (larg * prof * alt) / 1000000m,
-                        ModulosTecidos = new List<ModuloTecido>()
-                    };
-                    _context.Modulos.Add(modulo);
-                }
-                else
-                {
-                    // Update
-                    if(modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>(); // Ensure collection init
-                    
-                    modulo.Categoria = categoria; // Link Object to ensure consistency
-                    modulo.Marca = marca;
-                    modulo.Largura = larg;
-                    modulo.Profundidade = prof;
-                    modulo.Altura = alt;
-                    modulo.Pa = pa;
-                    modulo.M3 = (larg * prof * alt) / 1000000m;
+                        var newTecido = new Tecido { Nome = tecidoName };
+                        _context.Tecidos.Add(newTecido);
+                        tecidosMap[tecidoName] = newTecido;
+                    }
                 }
 
-                // === Process Tecidos (G0-G8) ===
-                foreach (var kvp in tecidoMappings)
+                for (int row = 2; row <= rowCount; row++)
                 {
-                    var tecName = kvp.Key;
-                    var colIndex = kvp.Value;
-                    var tecido = tecidosMap[tecName]; // Object
+                    // === Reads & Validations ===
+                    var marcaNome = worksheet.Cells[row, 1].Text?.Trim();
+                    if (string.IsNullOrEmpty(marcaNome) || marcaNome == "Marca") continue;
 
-                    var priceText = worksheet.Cells[row, colIndex].Text?.Trim();
-                    if (string.IsNullOrEmpty(priceText) || priceText == tecName || priceText == "Tecido") 
-                        continue;
+                    var descricao = worksheet.Cells[row, 2].Text?.Trim();
+                    if (string.IsNullOrEmpty(descricao) || descricao == "Descrição") continue;
 
-                    if (decimal.TryParse(priceText, out var price) && price > 0)
+                    var largText = worksheet.Cells[row, 3].Text?.Trim();
+                    if (string.IsNullOrEmpty(largText) || largText == "Larg") continue;
+                    decimal.TryParse(largText, out var larg);
+
+                    var profText = worksheet.Cells[row, 4].Text?.Trim();
+                    if (string.IsNullOrEmpty(profText) || profText == "Prof") continue;
+                    decimal.TryParse(profText, out var prof);
+
+                    decimal pa = 0;
+
+                    var altText = worksheet.Cells[row, 6].Text?.Trim();
+                    if (string.IsNullOrEmpty(altText) || altText == "Altura") continue;
+                    decimal.TryParse(altText, out var alt);
+
+                    // === Get/Create Marca ===
+                    if (!marcasMap.TryGetValue(marcaNome, out var marca))
                     {
-                        // Upsert ModuloTecido using IN-MEMORY collection check
-                        // This covers both DB records (loaded via Include) and New records (added previously in loop)
-                        var mt = modulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id);
+                        marca = new Marca { Nome = marcaNome };
+                        _context.Marcas.Add(marca);
+                        marcasMap[marcaNome] = marca;
+                    }
 
-                        if (mt == null)
+                    // === Get/Create Modulo ===
+                    // Check Local then DB (Use Local cache if possible)
+                    // For simplified tracked lookup in loop:
+                    var modulo = await _context.Modulos
+                         .Include(m => m.ModulosTecidos) // Fix: Include relations to check duplicates
+                         .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor
+                                                && m.IdMarca == marca.Id // Issue: marca.Id might be 0 if new.
+                                                && m.Descricao.ToUpper() == descricao.ToUpper()
+                                                && m.Largura == larg); // Fix: Distinguish by Width
+
+                    // Logic Fix: if marca is new, modulo must be new.
+                    if (marca.Id == 0) modulo = null;
+
+                    if (modulo == null)
+                    {
+                        // Check if we already created this module in this session (Local Cache) to avoid duplicates
+                        // Since we don't have a dict, we iterate Local. Not optimal but safe for small batches.
+                        // Ideally we should use a Dictionary<string, Modulo> like in Koyo import.
+                        modulo = _context.Modulos.Local
+                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor
+                                              && m.Marca == marca
+                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
+                                              && m.Largura == larg); // Fix: Distinguish by Width
+                    }
+
+                    if (modulo == null)
+                    {
+                        modulo = new Modulo
                         {
-                            mt = new ModuloTecido
+                            IdFornecedor = idFornecedor,
+                            Marca = marca,   // Link Object
+                            Categoria = categoria, // Link Object
+                            IdMarca = marca.Id, // Might be 0 but EF fixes link
+                            IdCategoria = categoria.Id,
+                            Descricao = descricao,
+                            Largura = larg,
+                            Profundidade = prof,
+                            Altura = alt,
+                            Pa = pa,
+                            // M3 computed by trigger or class (not here)
+                            M3 = (larg * prof * alt) / 1000000m,
+                            ModulosTecidos = new List<ModuloTecido>()
+                        };
+                        _context.Modulos.Add(modulo);
+                    }
+                    else
+                    {
+                        // Update
+                        if (modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>(); // Ensure collection init
+
+                        modulo.Categoria = categoria; // Link Object to ensure consistency
+                        modulo.Marca = marca;
+                        modulo.Largura = larg;
+                        modulo.Profundidade = prof;
+                        modulo.Altura = alt;
+                        modulo.Pa = pa;
+                        modulo.M3 = (larg * prof * alt) / 1000000m;
+                    }
+
+                    // === Process Tecidos (G0-G8) ===
+                    foreach (var kvp in tecidoMappings)
+                    {
+                        var tecName = kvp.Key;
+                        var colIndex = kvp.Value;
+                        var tecido = tecidosMap[tecName]; // Object
+
+                        var priceText = worksheet.Cells[row, colIndex].Text?.Trim();
+                        if (string.IsNullOrEmpty(priceText) || priceText == tecName || priceText == "Tecido")
+                            continue;
+
+                        if (decimal.TryParse(priceText, out var price) && price > 0)
+                        {
+                            // Upsert ModuloTecido using IN-MEMORY collection check
+                            // This covers both DB records (loaded via Include) and New records (added previously in loop)
+                            var mt = modulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id);
+
+                            if (mt == null)
                             {
-                                Modulo = modulo, // Link Object
-                                Tecido = tecido,  // Link Object
-                                IdTecido = tecido.Id,
-                                ValorTecido = price
-                            };
-                            // Add to Collection AND Context (via Fixup or explicit add)
-                            modulo.ModulosTecidos.Add(mt);
-                            // Explicit Add to context is usually not needed if added to navigation of tracked entity, 
-                            // but safest to leave it to EF fixup or add explicitly if root is new.
-                            // If modulo is new, just adding to collection is enough.
-                            // If modulo IS existing, we must ensure state is Added.
-                            if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
-                        }
-                        else
-                        {
-                             mt.ValorTecido = price;
+                                mt = new ModuloTecido
+                                {
+                                    Modulo = modulo, // Link Object
+                                    Tecido = tecido,  // Link Object
+                                    IdTecido = tecido.Id,
+                                    ValorTecido = price
+                                };
+                                // Add to Collection AND Context (via Fixup or explicit add)
+                                modulo.ModulosTecidos.Add(mt);
+                                // Explicit Add to context is usually not needed if added to navigation of tracked entity, 
+                                // but safest to leave it to EF fixup or add explicitly if root is new.
+                                // If modulo is new, just adding to collection is enough.
+                                // If modulo IS existing, we must ensure state is Added.
+                                if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
+                            }
+                            else
+                            {
+                                mt.ValorTecido = price;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // ONE SAVE TO RULE THEM ALL
-        await _context.SaveChangesAsync();
+            // ONE SAVE TO RULE THEM ALL
+            await _context.SaveChangesAsync();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 }
