@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { HelpCircle, Calculator } from "lucide-react"; // Import icons
 import "./ClientesPage.css";
 
 import type { Categoria, Fornecedor, Marca, Modulo, ModuloTecido, Tecido, Configuracao } from "../api/types";
@@ -72,6 +73,7 @@ export default function ModulosPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"geral" | "tecidos">("geral");
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [calcModalData, setCalcModalData] = useState<{ valorTecido: number } | null>(null);
 
   // Selection state for combo
   const [selectedModuleId, setSelectedModuleId] = useState("");
@@ -471,9 +473,19 @@ export default function ModulosPage() {
                     {/* EXW */}
                     <td style={td}>
                         {myTecidos.length > 0 ? (
-                             <span style={{ color: '#10b981', display: 'block', textAlign: 'right' }}>
-                                $ {fmt(calcEXW(myTecidos[0].valorTecido), 2)}
-                             </span>
+                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+                                 <span style={{ color: '#10b981' }}>
+                                    $ {fmt(calcEXW(myTecidos[0].valorTecido), 2)}
+                                 </span>
+                                 <button 
+                                    className="btn-icon" 
+                                    onClick={() => setCalcModalData({ valorTecido: myTecidos[0].valorTecido })}
+                                    title="Ver memória de cálculo"
+                                    style={{ padding: 2, display: 'flex' }}
+                                 >
+                                    <HelpCircle size={14} color="#94a3b8" />
+                                 </button>
+                             </div>
                         ) : "-"}
                     </td>
 
@@ -504,9 +516,19 @@ export default function ModulosPage() {
                 const otherRows = myTecidos.slice(1).map((mt, i) => (
                     <tr key={`${x.id}-row-${i+1}`}>
                         <td style={td}>
-                             <span style={{ color: '#10b981', display: 'block', textAlign: 'right' }}>
-                                $ {fmt(calcEXW(mt.valorTecido), 2)}
-                             </span>
+                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+                                 <span style={{ color: '#10b981' }}>
+                                    $ {fmt(calcEXW(mt.valorTecido), 2)}
+                                 </span>
+                                 <button 
+                                    className="btn-icon" 
+                                    onClick={() => setCalcModalData({ valorTecido: mt.valorTecido })}
+                                    title="Ver memória de cálculo"
+                                    style={{ padding: 2, display: 'flex' }}
+                                 >
+                                    <HelpCircle size={14} color="#94a3b8" />
+                                 </button>
+                             </div>
                         </td>
                         <td style={td}>
                             <div>
@@ -699,6 +721,16 @@ export default function ModulosPage() {
         onConfirm={onConfirmPrint}
         loading={loading}
       />
+
+      {calcModalData && config && (
+          <CalculationDetailsModal
+            isOpen={!!calcModalData}
+            onClose={() => setCalcModalData(null)}
+            valorTecido={calcModalData.valorTecido}
+            config={config}
+            cotacao={cotacao}
+          />
+      )}
     </div>
   );
 }
@@ -798,80 +830,57 @@ function TecidosTab({
           />
         </div>
         <button className="btn btn-primary" onClick={add} disabled={adding} style={{ marginBottom: 0 }}>
-          Adicionar
+          {adding ? "Adicionando..." : "Adicionar"}
         </button>
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16 }}>
         <thead>
           <tr>
-            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, color: "var(--muted)", borderBottom: "1px solid var(--line)", padding: 12 }}>Tecido</th>
-            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, color: "var(--muted)", borderBottom: "1px solid var(--line)", padding: 12 }}>Valor</th>
-            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, color: "var(--muted)", borderBottom: "1px solid var(--line)", padding: 12 }}>Ações</th>
+            <th style={{ ...th, textAlign: "left" }}>Tecido</th>
+            <th style={{ ...th, textAlign: "right" }}>Valor (R$)</th>
+            <th style={{ ...th, width: 100 }}>Ações</th>
           </tr>
         </thead>
         <tbody>
           {currentLinks.map((link) => {
-            const t = link.tecido || allTecidos.find((x) => x.id === link.idTecido);
             const isEditing = editingId === link.id;
-            
             return (
-              <tr key={link.id}>
-                <td style={{ borderBottom: "1px solid rgba(148, 163, 184, 0.14)", padding: 12, fontSize: 14 }}>{t?.nome || link.idTecido}</td>
-                <td style={{ borderBottom: "1px solid rgba(148, 163, 184, 0.14)", padding: 12, fontSize: 14 }}>
+              <tr key={link.id} style={{ borderBottom: "1px solid #333" }}>
+                <td style={{ ...td, textAlign: "left" }}>
+                  {link.tecido?.nome || link.idTecido}
+                </td>
+                <td style={{ ...td, textAlign: "right" }}>
                   {isEditing ? (
-                    <input
-                      className="cl-input"
-                      value={editingValor}
-                      onChange={(e) => setEditingValor(e.target.value)}
-                      style={{ width: "120px" }}
-                      autoFocus
-                    />
+                     <input 
+                        className="cl-input" 
+                        style={{ width: 80, padding: 4, height: 28 }}
+                        value={editingValor}
+                        onChange={e => setEditingValor(e.target.value)}
+                     /> 
                   ) : (
-                    fmt(link.valorTecido, 3)
+                    fmt(link.valorTecido, 2)
                   )}
                 </td>
-                <td style={{ borderBottom: "1px solid rgba(148, 163, 184, 0.14)", padding: 12, fontSize: 14 }}>
-                  {isEditing ? (
-                    <>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => saveEdit(link.id)}
-                        style={{ marginRight: 4 }}
-                      >
-                        Salvar
-                      </button>
-                      <button
-                        className="btn btn-sm"
-                        onClick={cancelEdit}
-                      >
-                        Cancelar
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className="btn btn-sm"
-                        onClick={() => startEdit(link)}
-                        style={{ marginRight: 4 }}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => remove(link.id)}
-                      >
-                        Remover
-                      </button>
-                    </>
-                  )}
+                <td style={{ ...td, textAlign: "center" }}>
+                   {isEditing ? (
+                       <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                           <button className="btn btn-sm btn-primary" onClick={() => saveEdit(link.id)} style={{ padding: '2px 6px' }}>✔️</button>
+                           <button className="btn btn-sm btn-secondary" onClick={cancelEdit} style={{ padding: '2px 6px' }}>❌</button>
+                       </div>
+                   ) : (
+                       <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                            <button className="btn btn-sm" onClick={() => startEdit(link)} title="Editar valor">✏️</button>
+                            <button className="btn btn-sm btn-danger" onClick={() => remove(link.id)} title="Remover">🗑️</button>
+                       </div>
+                   )}
                 </td>
               </tr>
             );
           })}
           {currentLinks.length === 0 && (
             <tr>
-              <td colSpan={3} style={{ textAlign: "center", padding: 12, color: "#888" }}>
+              <td colSpan={3} style={{ padding: 16, textAlign: "center", color: "#888" }}>
                 Nenhum tecido vinculado.
               </td>
             </tr>
@@ -881,6 +890,99 @@ function TecidosTab({
     </div>
   );
 }
+
+function CalculationDetailsModal({
+    isOpen,
+    onClose,
+    valorTecido,
+    config,
+    cotacao
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    valorTecido: number;
+    config: Configuracao;
+    cotacao: number;
+}) {
+    if (!isOpen) return null;
+
+    // Recalculate Logic to display
+    const cotacaoRisco = cotacao - config.valorReducaoDolar;
+    // Safety check div by zero
+    const safeCotacao = cotacaoRisco <= 0 ? 1 : cotacaoRisco;
+
+    const valorBase = valorTecido / safeCotacao;
+    const comissao = valorBase * (config.percentualComissao / 100);
+    const gordura = valorBase * (config.percentualGordura / 100);
+    const total = valorBase + comissao + gordura;
+
+    return (
+        <div className="modalOverlay" onMouseDown={onClose}>
+            <div className="modalCard" style={{ maxWidth: 500 }} onMouseDown={e => e.stopPropagation()}>
+                <div className="modalHeader">
+                    <h3 className="modalTitle" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <Calculator size={20} /> Memória de Cálculo EXW
+                    </h3>
+                    <button className="btn btn-sm" onClick={onClose}>Fechar</button>
+                </div>
+                <div className="modalBody" style={{ padding: 24 }}>
+                    <div style={{ background: '#0f172a', padding: 16, borderRadius: 8, marginBottom: 16 }}>
+                        <h4 style={{ margin: '0 0 12px 0', color: '#94a3b8', fontSize: 14 }}>PARÂMETROS</h4>
+                        <div style={rowStyle}>
+                            <span>Cotação do Dia:</span>
+                            <strong>R$ {fmt(cotacao, 2)}</strong>
+                        </div>
+                        <div style={rowStyle}>
+                            <span>Redução Dólar (Config):</span>
+                            <span style={{ color: '#ef4444' }}>- R$ {fmt(config.valorReducaoDolar, 2)}</span>
+                        </div>
+                        <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 8, marginTop: 8 }}>
+                            <span>Cotação de Risco:</span>
+                            <strong style={{ color: '#3b82f6' }}>R$ {fmt(cotacaoRisco, 2)}</strong>
+                        </div>
+                    </div>
+
+                    <div style={{ background: '#0f172a', padding: 16, borderRadius: 8 }}>
+                        <h4 style={{ margin: '0 0 12px 0', color: '#94a3b8', fontSize: 14 }}>CÁLCULO DO PREÇO</h4>
+                        
+                        <div style={rowStyle}>
+                            <span>Valor do Tecido:</span>
+                            <strong>R$ {fmt(valorTecido, 2)}</strong>
+                        </div>
+                        <div style={rowStyle}>
+                            <span>Valor Base (Tecido / Cotação Risco):</span>
+                            <strong>$ {fmt(valorBase, 2)}</strong>
+                        </div>
+                        
+                        <div style={{ margin: '8px 0', borderLeft: '2px solid #334155', paddingLeft: 12 }}>
+                            <div style={rowStyle}>
+                                <span>Comissão ({fmt(config.percentualComissao)}%):</span>
+                                <span>+ $ {fmt(comissao, 2)}</span>
+                            </div>
+                            <div style={rowStyle}>
+                                <span>Gordura ({fmt(config.percentualGordura)}%):</span>
+                                <span style={{ color: '#10b981' }}>+ $ {fmt(gordura, 2)}</span>
+                            </div>
+                        </div>
+
+                        <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 12, marginTop: 12, fontSize: 18 }}>
+                            <span>Preço EXW Final:</span>
+                            <strong style={{ color: '#10b981' }}>$ {fmt(total, 2)}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const rowStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+    fontSize: 14
+};
+
 
 // Helpers
 const th: React.CSSProperties = {
