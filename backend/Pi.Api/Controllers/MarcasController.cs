@@ -40,6 +40,7 @@ public class MarcasController : ControllerBase
         item.Nome = input.Nome;
         item.UrlImagem = input.UrlImagem;
         item.Observacao = input.Observacao;
+        item.FlAtivo = input.FlAtivo;
 
         await _db.SaveChangesAsync();
         return NoContent();

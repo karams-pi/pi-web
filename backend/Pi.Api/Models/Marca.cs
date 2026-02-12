@@ -24,6 +24,9 @@ public class Marca
     [MaxLength(1000)]
     public string? Observacao { get; set; }
 
+    [Column("fl_ativo")]
+    public bool FlAtivo { get; set; } = true;
+
     // 1 marca -> N módulos
     public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();
 }

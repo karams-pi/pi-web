@@ -17,6 +17,7 @@ const emptyForm: FormState = {
   nome: "",
   urlImagem: "",
   observacao: "",
+  flAtivo: true,
 };
 
 export default function MarcasPage() {
@@ -75,6 +76,7 @@ export default function MarcasPage() {
         nome: form.nome.trim(),
         urlImagem: form.urlImagem || null,
         observacao: form.observacao || null,
+        flAtivo: form.flAtivo !== undefined ? form.flAtivo : true,
       };
 
       if (editing) {
@@ -105,6 +107,7 @@ export default function MarcasPage() {
   const exportColumns: ColumnDefinition<Marca>[] = [
     { header: "ID", accessor: (m) => m.id },
     { header: "Nome", accessor: (m) => m.nome },
+    { header: "Ativo", accessor: (m) => m.flAtivo ? "Sim" : "Não" },
     { header: "URL", accessor: (m) => m.urlImagem },
     { header: "Obs", accessor: (m) => m.observacao },
   ];
@@ -150,6 +153,7 @@ export default function MarcasPage() {
             <tr>
               <th style={th}>ID</th>
               <th style={th}>Nome</th>
+              <th style={th}>Ativo</th>
               <th style={th}>Imagem (URL)</th>
               <th style={th}>Observação</th>
               <th style={th}>Ações</th>
@@ -160,6 +164,13 @@ export default function MarcasPage() {
               <tr key={x.id}>
                 <td style={td}>{x.id}</td>
                 <td style={td}>{x.nome}</td>
+                <td style={td}>
+                    {x.flAtivo !== false ? (
+                        <span style={{ color: "#10b981", fontWeight: 500 }}>Sim</span>
+                    ) : (
+                        <span style={{ color: "#ef4444", fontWeight: 500 }}>Não</span>
+                    )}
+                </td>
                 <td style={td}>
                   {x.urlImagem ? (
                     <a href={x.urlImagem} target="_blank" rel="noreferrer">
@@ -180,7 +191,7 @@ export default function MarcasPage() {
             ))}
             {filteredItems.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ padding: 12, textAlign: "center" }}>
+                <td colSpan={6} style={{ padding: 12, textAlign: "center" }}>
                   Nenhum modelo encontrado
                 </td>
               </tr>
@@ -214,6 +225,20 @@ export default function MarcasPage() {
                       }
                       required
                     />
+                  </div>
+                  <div className="field">
+                    <label className="label">Ativo</label>
+                    <div style={{ display: "flex", alignItems: "center", height: "38px" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                            <input 
+                                type="checkbox"
+                                checked={form.flAtivo !== false}
+                                onChange={(e) => setForm({ ...form, flAtivo: e.target.checked })}
+                                style={{ width: 18, height: 18 }}
+                            />
+                            <span>{form.flAtivo !== false ? "Sim" : "Não"}</span>
+                        </label>
+                    </div>
                   </div>
                   <div className="field">
                     <label className="label">URL Imagem</label>

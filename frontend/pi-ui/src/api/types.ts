@@ -15,6 +15,7 @@ export type Marca = {
   nome: string;
   urlImagem?: string | null;
   observacao?: string | null;
+  flAtivo?: boolean;
 };
 
 export type Modulo = {

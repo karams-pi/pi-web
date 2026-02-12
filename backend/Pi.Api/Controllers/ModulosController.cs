@@ -29,7 +29,12 @@ public class ModulosController : ControllerBase
             .AsNoTracking()
             .Include(m => m.ModulosTecidos)
             .ThenInclude(mt => mt.Tecido)
+            .Include(m => m.Marca) // Include Marca to filter by FlAtivo
             .AsQueryable();
+
+        // Filter out inactive brands by default (or always, based on requirements)
+        // User said: "Caso o Modelo/Marca esteja inativo, não liste mais na tela de módulo"
+        query = query.Where(x => x.Marca != null && x.Marca.FlAtivo);
 
         if (!string.IsNullOrEmpty(search))
         {
@@ -106,9 +111,11 @@ public class ModulosController : ControllerBase
             .ToListAsync();
 
         // Available Marcas
-        var qMarca = _db.Modulos.AsNoTracking();
+        // Use explicitly typed variable to accept both IIncludableQueryable from Include and IQueryable from ApplyFilters
+        IQueryable<Modulo> qMarca = _db.Modulos.AsNoTracking().Include(m => m.Marca); 
         qMarca = ApplyFilters(qMarca, "marca");
         var marcas = await qMarca
+            .Where(x => x.Marca != null && x.Marca.FlAtivo) // Only Show active brands in filter
             .Select(x => x.Marca)
             .Where(x => x != null)
             .Distinct()
