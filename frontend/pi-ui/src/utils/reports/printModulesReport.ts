@@ -14,8 +14,6 @@ interface PrintModulesReportOptions {
   };
 }
 
-
-
 export function printModulesReport({
   modules,
   currency,
@@ -40,8 +38,11 @@ export function printModulesReport({
         if (cotacaoRisco <= 0) return 0;
         const valorBase = valorTecido / cotacaoRisco;
         const comissao = valorBase * (config.percentualComissao / 100);
-        const gordura = valorBase * (config.percentualGordura / 100);
-        return valorBase + comissao + gordura;
+        // New Formula: Gordura on (Base + Comissao)
+        const baseComComissao = valorBase + comissao;
+        const gordura = baseComComissao * (config.percentualGordura / 100);
+        
+        return baseComComissao + gordura;
     }
   }
 
@@ -123,6 +124,17 @@ export function printModulesReport({
       "Modelo", "Módulo", "Larg", "Prof", "Alt", "M³"
   ];
 
+  const colGroup = `
+    <colgroup>
+        <col style="width: 15%">
+        <col style="width: 25%">
+        <col style="width: 5%">
+        <col style="width: 5%">
+        <col style="width: 5%">
+        <col style="width: 5%">
+    </colgroup>
+  `;
+
   const headerRow1 = `
     <tr>
         ${standardHeaders.map(h => `<th rowspan="2">${h}</th>`).join("")}
@@ -142,6 +154,7 @@ export function printModulesReport({
   `;
 
   const tableHead = `
+    ${colGroup}
     <thead>
         ${headerRow1}
         ${headerRow2}
@@ -156,13 +169,15 @@ export function printModulesReport({
       reportContent += `
         <div class="group-block">
             <div class="group-title">${group.fornName} - ${group.catName}</div>
-            <table>
-                ${tableHead}
-                <tbody>
       `;
 
-      // Rows for this group
       group.marcas.forEach(marca => {
+          reportContent += `
+            <table style="margin-top: 10px;">
+                ${tableHead}
+                <tbody>
+          `;
+
           marca.items.forEach((mod, index) => {
               // Columns
               // Modelo (RowSpan only on first item)
@@ -184,7 +199,11 @@ export function printModulesReport({
                   if (mt) {
                       const val = calcPrice(mt.valorTecido);
                       const symbol = currency === "BRL" ? "R$" : "$";
-                      fabricCols += `<td class="right">${symbol} ${fmt(val)}</td>`;
+                      if (currency === "EXW") {
+                           fabricCols += `<td class="right">${symbol} ${fmt(val)}</td>`;
+                      } else {
+                           fabricCols += `<td class="right">${symbol} ${fmt(val)}</td>`;
+                      }
                   } else {
                        fabricCols += `<td class="center">-</td>`;
                   }
@@ -202,11 +221,14 @@ export function printModulesReport({
                   </tr>
               `;
           });
+
+          reportContent += `
+                </tbody>
+            </table>
+          `;
       });
 
       reportContent += `
-                </tbody>
-            </table>
         </div>
       `;
   });
@@ -232,7 +254,7 @@ export function printModulesReport({
               text-transform: uppercase;
           }
 
-          table { width: 100%; border-collapse: collapse; }
+          table { width: 100%; border-collapse: collapse; table-layout: fixed; }
           
           th, td { 
             border: 1px solid #000;
@@ -287,5 +309,3 @@ export function printModulesReport({
   printWindow.document.write(html);
   printWindow.document.close();
 }
-
-

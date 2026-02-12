@@ -300,13 +300,15 @@ export default function ProformaInvoicePage() {
     // Calculation
     const valorBase = form.cotacaoRisco > 0 ? valorModuloTecido / form.cotacaoRisco : 0;
     const vComissao = valorBase * (comissao / 100);
-    const vGordura = valorBase * (gordura / 100);
-    const valorEXW = valorBase + vComissao + vGordura;
+    // New Formula: Gordura on (Base + Comissao)
+    const baseComComissao = valorBase + vComissao;
+    const vGordura = baseComComissao * (gordura / 100);
+    const valorEXW = baseComComissao + vGordura;
 
     const exwTooltip = 
       `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(form.cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
       `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
-      `+ Gordura (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
+      `+ Gordura (Sobre Base+Com) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
       `= $ ${fmt(valorEXW)}`;
 
     const novoItem: ItemGrid = {
