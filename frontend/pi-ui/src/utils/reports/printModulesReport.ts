@@ -126,12 +126,12 @@ export function printModulesReport({
 
   const colGroup = `
     <colgroup>
-        <col style="width: 15%">
-        <col style="width: 25%">
-        <col style="width: 5%">
-        <col style="width: 5%">
-        <col style="width: 5%">
-        <col style="width: 5%">
+        <col style="width: 12%">
+        <col style="width: 18%">
+        <col style="width: 4%">
+        <col style="width: 4%">
+        <col style="width: 4%">
+        <col style="width: 4%">
     </colgroup>
   `;
 
@@ -238,17 +238,17 @@ export function printModulesReport({
       <head>
         <title>${title}</title>
         <style>
-          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 10px; color: #000; }
-          h1 { font-size: 16px; margin-bottom: 5px; color: #000; }
-          .meta { font-size: 10px; color: #444; margin-bottom: 15px; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 9px; color: #000; }
+          h1 { font-size: 14px; margin-bottom: 5px; color: #000; }
+          .meta { font-size: 9px; color: #444; margin-bottom: 15px; }
           
           .group-block { margin-bottom: 25px; break-inside: avoid; }
           
           .group-title {
-              font-size: 14px;
+              font-size: 12px;
               font-weight: 800;
               background-color: #d1d5db; /* Gray-300 */
-              padding: 8px;
+              padding: 4px;
               border: 1px solid #000;
               border-bottom: none; /* Merge with table border visual */
               text-transform: uppercase;
@@ -258,7 +258,7 @@ export function printModulesReport({
           
           th, td { 
             border: 1px solid #000;
-            padding: 4px 6px; 
+            padding: 2px 2px; 
             vertical-align: middle;
           }
           
@@ -266,19 +266,19 @@ export function printModulesReport({
             background-color: #e0e0e0; 
             font-weight: 700; 
             text-transform: uppercase;
-            font-size: 9px;
+            font-size: 8px;
           }
 
           tr:nth-child(even) { background-color: #f9f9f9; }
           
           .center { text-align: center; }
           .right { text-align: right; white-space: nowrap; }
-          .desc { max-width: 200px; }
+          .desc { max-width: 150px; }
 
           @media print {
             .no-print { display: none; }
             body { margin: 0; padding: 0mm; }
-            @page { margin: 10mm; size: landscape; }
+            @page { margin: 5mm; size: landscape; }
             th, .group-title { background-color: #ccc !important; -webkit-print-color-adjust: exact; }
             .group-block { page-break-inside: avoid; }
           }
