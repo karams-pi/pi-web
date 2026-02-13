@@ -22,10 +22,11 @@ type FormState = {
   idCliente: string;
   idFrete: number;
   cotacaoAtualUSD: number;
-  cotacaoRisco: number;
+  cotacaoRisco: number | string;
   valorTotalFreteBRL: number;
   valorTotalFreteUSD: number;
 };
+
 
 type ItemGrid = {
   id?: number;
@@ -204,7 +205,7 @@ export default function ProformaInvoicePage() {
       setModulosTecidos(modulosTecidosData);
       setConfig(configData);
 
-      const cotacaoRisco = cotacao - (configData?.valorReducaoDolar || 0);
+      const cotacaoRisco = Number((cotacao - (configData?.valorReducaoDolar || 0)).toFixed(2));
 
       setForm(prev => ({
         ...prev,
@@ -221,10 +222,93 @@ export default function ProformaInvoicePage() {
     }
   }
 
+  function handleCotacaoRiscoChange(val: string) {
+    if (val === "") {
+        setForm(prev => ({ ...prev, cotacaoRisco: "", valorTotalFreteUSD: 0 }));
+        recalculateAllItems(0, 0, form.valorTotalFreteBRL);
+        return;
+    }
+
+    const newCotacao = parseFloat(val);
+    
+    // Recalculate Total Frete USD based on new cotacao
+    const newTotalFreteUSD = newCotacao > 0 ? form.valorTotalFreteBRL / newCotacao : 0;
+
+    setForm(prev => ({
+      ...prev,
+      cotacaoRisco: val, 
+      valorTotalFreteUSD: newTotalFreteUSD
+    }));
+
+    recalculateAllItems(newCotacao, newTotalFreteUSD, form.valorTotalFreteBRL);
+  }
+
+  function recalculateAllItems(cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number) {
+     if (itens.length === 0) return;
+
+     const comissao = config?.percentualComissao || 0;
+     const gordura = config?.percentualGordura || 0;
+     const totalM3 = itens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
+
+     const novosItens = itens.map(item => {
+        // 1. Recalculate EXW
+        let valorEXW = item.valorEXW;
+        let exwTooltip = item.exwTooltip;
+
+        if (item.moduloTecido) {
+             const valorModuloTecido = item.moduloTecido.valorTecido;
+             const valorBase = cotacaoRisco > 0 ? valorModuloTecido / cotacaoRisco : 0;
+             const vComissao = valorBase * (comissao / 100);
+             const baseComComissao = valorBase + vComissao;
+             const vGordura = baseComComissao * (gordura / 100);
+             valorEXW = baseComComissao + vGordura;
+
+             exwTooltip = 
+               `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
+               `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
+               `+ Gordura (Sobre Base+Com) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
+               `= $ ${fmt(valorEXW)}`;
+        }
+
+        // 2. Recalculate Frete Rateio
+        const custoPorM3BRL = totalM3 > 0 ? totalFreteBRL / totalM3 : 0;
+        const custoPorM3USD = totalM3 > 0 ? totalFreteUSD / totalM3 : 0;
+
+        const freteUnitarioBRL = custoPorM3BRL * item.m3;
+        const freteUnitarioUSD = custoPorM3USD * item.m3;
+        
+        const valorFinalBRL = (valorEXW + freteUnitarioBRL) * item.quantidade;
+        const valorFinalUSD = (valorEXW + freteUnitarioUSD) * item.quantidade;
+
+        const freteBrlTooltip = 
+          `Total Frete R$ ${fmt(totalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(custoPorM3BRL)}/m³\n` +
+          `x Item M³ ${fmt(item.m3)} = R$ ${fmt(freteUnitarioBRL)}`;
+        
+        const freteUsdTooltip = 
+          `Total Frete $ ${fmt(totalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(custoPorM3USD)}/m³\n` +
+          `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
+
+        return {
+          ...item,
+          valorEXW,
+          valorFreteRateadoBRL: freteUnitarioBRL,
+          valorFreteRateadoUSD: freteUnitarioUSD,
+          valorFinalItemBRL: valorFinalBRL,
+          valorFinalItemUSDRisco: valorFinalUSD,
+          exwTooltip,
+          freteBrlTooltip,
+          freteUsdTooltip
+        };
+     });
+
+     setItens(novosItens);
+  }
+
   async function loadFreteTotals() {
     try {
       const total = await getTotalFrete(form.idFrete);
-      const totalUSD = form.cotacaoRisco > 0 ? total / form.cotacaoRisco : 0;
+      const cotacao = Number(form.cotacaoRisco) || 0;
+      const totalUSD = cotacao > 0 ? total / cotacao : 0;
 
       setForm(prev => ({
         ...prev,
@@ -273,7 +357,10 @@ export default function ProformaInvoicePage() {
     if (JSON.stringify(novosItens) !== JSON.stringify(itens)) {
         setItens(novosItens);
     }
+
   }
+
+
 
   function adicionarItem() {
     if (!selModuloTecido) {
@@ -298,7 +385,8 @@ export default function ProformaInvoicePage() {
     const gordura = config?.percentualGordura || 0;
     
     // Calculation
-    const valorBase = form.cotacaoRisco > 0 ? valorModuloTecido / form.cotacaoRisco : 0;
+    const cotacao = Number(form.cotacaoRisco) || 0;
+    const valorBase = cotacao > 0 ? valorModuloTecido / cotacao : 0;
     const vComissao = valorBase * (comissao / 100);
     // New Formula: Gordura on (Base + Comissao)
     const baseComComissao = valorBase + vComissao;
@@ -306,7 +394,7 @@ export default function ProformaInvoicePage() {
     const valorEXW = baseComComissao + vGordura;
 
     const exwTooltip = 
-      `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(form.cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
+      `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(cotacao)}) = $ ${fmt(valorBase)}\n` +
       `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
       `+ Gordura (Sobre Base+Com) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
       `= $ ${fmt(valorEXW)}`;
@@ -389,7 +477,7 @@ export default function ProformaInvoicePage() {
         valorTotalFreteBRL: form.valorTotalFreteBRL,
         valorTotalFreteUSD: form.valorTotalFreteUSD,
         cotacaoAtualUSD: form.cotacaoAtualUSD,
-        cotacaoRisco: form.cotacaoRisco,
+        cotacaoRisco: Number(form.cotacaoRisco),
         piItens: itens.map(item => ({
           id: item.id || 0, // Include ID for items (0 if new)
           idModuloTecido: item.idModuloTecido,
@@ -439,7 +527,7 @@ export default function ProformaInvoicePage() {
             idCliente: String(pi.idCliente),
             idFrete: pi.idFrete,
             cotacaoAtualUSD: pi.cotacaoAtualUSD,
-            cotacaoRisco: pi.cotacaoRisco,
+            cotacaoRisco: Number((pi.cotacaoRisco || 0).toFixed(2)),
             valorTotalFreteBRL: pi.valorTotalFreteBRL,
             valorTotalFreteUSD: pi.valorTotalFreteUSD
         });
@@ -665,9 +753,15 @@ export default function ProformaInvoicePage() {
             <label className="label">Cotação Risco</label>
             <input
               className="cl-input"
-              value={fmt(form.cotacaoRisco)}
-              readOnly
-              style={{ background: "#1a1a2e" }}
+              type="number"
+              step="0.01"
+              value={form.cotacaoRisco}
+              onChange={(e) => handleCotacaoRiscoChange(e.target.value)}
+              onBlur={() => {
+                  if (form.cotacaoRisco !== "" && !isNaN(Number(form.cotacaoRisco))) {
+                      handleCotacaoRiscoChange(Number(form.cotacaoRisco).toFixed(2));
+                  }
+              }}
             />
           </div>
           <div className="field">
