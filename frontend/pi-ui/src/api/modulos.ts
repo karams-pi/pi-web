@@ -10,12 +10,14 @@ export async function listModulos(
   idFornecedor?: number,
   idCategoria?: number,
   idMarca?: number,
-  idTecido?: number
+  idTecido?: number,
+  status: 'ativos' | 'inativos' | 'todos' = 'ativos'
 ) {
   const query = new URLSearchParams({
     search,
     page: String(page),
     pageSize: String(pageSize),
+    status
   });
 
   if (idFornecedor) query.append("idFornecedor", String(idFornecedor));

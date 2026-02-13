@@ -9,6 +9,7 @@ export default function ImportacaoPage() {
   const [selectedFornecedor, setSelectedFornecedor] = useState<number | ''>('');
   const [importType, setImportType] = useState<'karams' | 'koyo'>('karams');
   const [file, setFile] = useState<File | null>(null);
+  const [dtRevisao, setDtRevisao] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -37,19 +38,25 @@ export default function ImportacaoPage() {
       return;
     }
 
+    if (!dtRevisao) {
+      setMessage({ type: 'error', text: 'Informe a data de revisão.' });
+      return;
+    }
+    
     setLoading(true);
     setMessage(null);
 
     try {
       if (importType === 'karams') {
-        await importKarams(file, Number(selectedFornecedor));
+        await importKarams(file, Number(selectedFornecedor), dtRevisao);
         setMessage({ type: 'success', text: "Importação Karam's realizada com sucesso!" });
       } else if (importType === 'koyo') {
-        await importKoyo(file, Number(selectedFornecedor));
+        await importKoyo(file, Number(selectedFornecedor), dtRevisao);
         setMessage({ type: 'success', text: "Importação Koyo realizada com sucesso!" });
       }
       
       setFile(null);
+      // setDtRevisao(''); // Optional: clear date after import
     } catch (err: any) {
         const msg = err.response?.data?.message || err.message || 'Erro desconhecido na importação.';
         setMessage({ type: 'error', text: msg });
@@ -117,6 +124,18 @@ export default function ImportacaoPage() {
           </div>
 
           <div className="field" style={{ marginBottom: '24px' }}>
+            <label className="label">Data de Revisão</label>
+            <input 
+              type="date" 
+              className="cl-input"
+              value={dtRevisao}
+              onChange={e => setDtRevisao(e.target.value)}
+              style={{ width: '100%' }}
+              required
+            />
+          </div>
+
+          <div className="field" style={{ marginBottom: '24px' }}>
             <label className="label">Arquivo (.xlsm, .xlsx)</label>
             <div style={{ 
                 border: '1px dashed var(--line)', 
@@ -138,7 +157,7 @@ export default function ImportacaoPage() {
           <button 
             type="submit" 
             className="btn btn-primary" 
-            disabled={loading || !file || !selectedFornecedor}
+            disabled={loading || !file || !selectedFornecedor || !dtRevisao}
             style={{ width: '100%', height: '48px', fontSize: '16px' }}
           >
             {loading ? 'Processando...' : 'Iniciar Importação'}

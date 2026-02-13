@@ -32,4 +32,10 @@ public class ModuloTecido
     [Column("codigo_modulo_tecido")]
     [StringLength(10)]
     public string? CodigoModuloTecido { get; set; }
+
+    [Column("fl_ativo")]
+    public bool FlAtivo { get; set; } = true;
+
+    [Column("dt_ultima_revisao")]
+    public DateTime? DtUltimaRevisao { get; set; }
 }

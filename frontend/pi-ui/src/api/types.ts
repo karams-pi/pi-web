@@ -38,6 +38,8 @@ export type ModuloTecido = {
   idTecido: number;
   valorTecido: number;
   codigoModuloTecido?: string;
+  flAtivo: boolean;
+  dtUltimaRevisao?: string;
   modulo?: {
     id: number;
     descricao: string;
