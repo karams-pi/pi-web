@@ -62,6 +62,7 @@ export default function ModulosPage() {
   const [filterCategoria, setFilterCategoria] = useState("");
   const [filterMarca, setFilterMarca] = useState("");
   const [filterTecido, setFilterTecido] = useState("");
+  const [filterStatus, setFilterStatus] = useState<'ativos' | 'inativos' | 'todos'>('ativos');
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -112,7 +113,8 @@ export default function ModulosPage() {
         filterFornecedor ? Number(filterFornecedor) : undefined,
         filterCategoria ? Number(filterCategoria) : undefined,
         filterMarca ? Number(filterMarca) : undefined,
-        filterTecido ? Number(filterTecido) : undefined
+        filterTecido ? Number(filterTecido) : undefined,
+        filterStatus
       );
       setAllModules(res.items);
     } catch (e) {
@@ -131,7 +133,7 @@ export default function ModulosPage() {
     loadFilters();
     loadAllModules();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido]);
+  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido, filterStatus]);
 
   // Main Loader
   async function loadItems() {
@@ -146,7 +148,8 @@ export default function ModulosPage() {
         filterFornecedor ? Number(filterFornecedor) : undefined,
         filterCategoria ? Number(filterCategoria) : undefined,
         filterMarca ? Number(filterMarca) : undefined,
-        filterTecido ? Number(filterTecido) : undefined
+        filterTecido ? Number(filterTecido) : undefined,
+        filterStatus
       );
       setItems(res.items);
       setTotalPages(res.totalPages);
@@ -164,7 +167,7 @@ export default function ModulosPage() {
       loadItems();
     }, 300);
     return () => clearTimeout(timer);
-  }, [page, search, filterFornecedor, filterCategoria, filterMarca, filterTecido]);
+  }, [page, search, filterFornecedor, filterCategoria, filterMarca, filterTecido, filterStatus]);
 
   function openCreate() {
     setEditing(null);
@@ -294,7 +297,8 @@ export default function ModulosPage() {
                  filterFornecedor ? Number(filterFornecedor) : undefined,
                  filterCategoria ? Number(filterCategoria) : undefined,
                  filterMarca ? Number(filterMarca) : undefined,
-                 filterTecido ? Number(filterTecido) : undefined
+                 filterTecido ? Number(filterTecido) : undefined,
+                 filterStatus
               );
               list = res.items;
           } catch(e) {
@@ -330,7 +334,8 @@ export default function ModulosPage() {
                 filterFornecedor ? Number(filterFornecedor) : undefined,
                 filterCategoria ? Number(filterCategoria) : undefined,
                 filterMarca ? Number(filterMarca) : undefined,
-                filterTecido ? Number(filterTecido) : undefined
+                filterTecido ? Number(filterTecido) : undefined,
+                filterStatus
              );
              list = res.items;
          } catch(e) {
@@ -387,6 +392,19 @@ export default function ModulosPage() {
           />
         </div>
 
+        <div style={{ width: 140 }}>
+           <select 
+              className="cl-input"
+              value={filterStatus}
+              onChange={(e) => { setFilterStatus(e.target.value as any); setPage(1); }}
+              style={{ height: 38, color: 'var(--text)' }}
+           >
+              <option value="ativos" style={{ color: 'black' }}>Status: Ativos</option>
+              <option value="inativos" style={{ color: 'black' }}>Status: Inativos</option>
+              <option value="todos" style={{ color: 'black' }}>Status: Todos</option>
+           </select>
+        </div>
+
         <div style={{ flex: 1, minWidth: 200 }}>
              <ModuloSelect
                 value={selectedModuleId}
@@ -411,6 +429,7 @@ export default function ModulosPage() {
                     setFilterCategoria("");
                     setFilterMarca("");
                     setFilterTecido("");
+                    setFilterStatus("ativos");
                     setSearch("");
                     setPage(1);
                     setSelectedModuleId("");
@@ -447,6 +466,7 @@ export default function ModulosPage() {
                 <th style={th}>M³</th>
                 <th style={th}>EXW (Parcial)</th>
                 <th style={th}>Tecidos / Valores</th>
+                <th style={th}>Status</th>
                 <th style={th}>Ações</th>
                 </tr>
             </thead>
@@ -505,6 +525,18 @@ export default function ModulosPage() {
                         ) : "-"}
                     </td>
 
+                    <td style={td}>
+                        {myTecidos.length > 0 ? (
+                             <span style={{ 
+                                 color: myTecidos[0].flAtivo ? '#4ade80' : '#f87171',
+                                 fontWeight: 500,
+                                 fontSize: '0.85rem'
+                             }}>
+                                {myTecidos[0].flAtivo ? 'Ativo' : 'Inativo'}
+                             </span>
+                        ) : "-"}
+                    </td>
+
                     <td style={td} rowSpan={rowSpan}>
                       <button className="btn btn-sm" onClick={() => openEdit(x)}>Editar</button>{" "}
                       <button className="btn btn-danger btn-sm" onClick={() => onDelete(x)}>
@@ -541,6 +573,15 @@ export default function ModulosPage() {
                                     R$ {fmt(mt.valorTecido, 2)}
                                 </span>
                             </div>
+                        </td>
+                        <td style={td}>
+                             <span style={{ 
+                                 color: mt.flAtivo ? '#4ade80' : '#f87171',
+                                 fontWeight: 500,
+                                 fontSize: '0.85rem'
+                             }}>
+                                {mt.flAtivo ? 'Ativo' : 'Inativo'}
+                             </span>
                         </td>
                     </tr>
                 ));
@@ -751,8 +792,13 @@ function TecidosTab({
   const [selTecido, setSelTecido] = useState("");
   const [valor, setValor] = useState("0,000");
   const [adding, setAdding] = useState(false);
+  
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValor, setEditingValor] = useState("");
+  const [editingFlAtivo, setEditingFlAtivo] = useState(true);
+  const [editingDtRevisao, setEditingDtRevisao] = useState("");
+  
+  const [filterStatus, setFilterStatus] = useState<'todos' | 'ativos' | 'inativos'>('todos');
 
   async function add() {
     if (!selTecido) return alert("Selecione um tecido");
@@ -762,6 +808,8 @@ function TecidosTab({
         idModulo: moduloId,
         idTecido: Number(selTecido),
         valorTecido: parse(valor),
+        flAtivo: true,
+        dtUltimaRevisao: new Date().toISOString()
       });
       setSelTecido("");
       setValor("0,000");
@@ -785,12 +833,16 @@ function TecidosTab({
 
   function startEdit(link: ModuloTecido) {
     setEditingId(link.id);
-    setEditingValor(fmt(link.valorTecido, 3));
+    setEditingValor(fmt(link.valorTecido, 2));
+    setEditingFlAtivo(link.flAtivo !== false); 
+    setEditingDtRevisao(link.dtUltimaRevisao ? link.dtUltimaRevisao.split('T')[0] : "");
   }
 
   function cancelEdit() {
     setEditingId(null);
     setEditingValor("");
+    setEditingFlAtivo(true);
+    setEditingDtRevisao("");
   }
 
   async function saveEdit(id: number) {
@@ -802,6 +854,8 @@ function TecidosTab({
         idModulo: link.idModulo,
         idTecido: link.idTecido,
         valorTecido: parse(editingValor),
+        flAtivo: editingFlAtivo,
+        dtUltimaRevisao: editingDtRevisao ? new Date(editingDtRevisao).toISOString() : undefined
       });
       setEditingId(null);
       setEditingValor("");
@@ -811,14 +865,21 @@ function TecidosTab({
     }
   }
 
+  // Filter links
+  const filteredLinks = (currentLinks || []).filter(l => {
+      if (filterStatus === 'ativos') return l.flAtivo !== false;
+      if (filterStatus === 'inativos') return l.flAtivo === false;
+      return true;
+  });
+
   return (
     <div>
       <div style={{ display: "flex", gap: 12, alignItems: "flex-end", marginBottom: 16 }}>
         <div className="field" style={{ flex: 1 }}>
           <label className="label">Tecido</label>
           <SearchableSelect
-            value={selTecido}
-            onChange={(val) => setSelTecido(val)}
+            value={selTecido ? Number(selTecido) : ""}
+            onChange={(val) => setSelTecido(String(val))}
             options={allTecidos.map(t => ({ value: t.id, label: t.nome }))}
             placeholder="Selecione..."
           />
@@ -836,19 +897,35 @@ function TecidosTab({
         </button>
       </div>
 
+      <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+          <label style={{ fontSize: 14, color: '#aaa' }}>Filtro:</label>
+          <select 
+            className="cl-input" 
+            style={{ width: 120, padding: 4, height: 30 }}
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value as any)}
+          >
+              <option value="todos">Todos</option>
+              <option value="ativos">Ativos</option>
+              <option value="inativos">Inativos</option>
+          </select>
+      </div>
+
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16 }}>
         <thead>
           <tr>
             <th style={{ ...th, textAlign: "left" }}>Tecido</th>
             <th style={{ ...th, textAlign: "right" }}>Valor (R$)</th>
+            <th style={{ ...th, textAlign: "center", width: 80 }}>Ativo?</th>
+            <th style={{ ...th, textAlign: "center", width: 100 }}>Data Rev.</th>
             <th style={{ ...th, width: 100 }}>Ações</th>
           </tr>
         </thead>
         <tbody>
-          {currentLinks.map((link) => {
+          {filteredLinks.map((link) => {
             const isEditing = editingId === link.id;
             return (
-              <tr key={link.id} style={{ borderBottom: "1px solid #333" }}>
+              <tr key={link.id} style={{ borderBottom: "1px solid #333", opacity: (link.flAtivo === false && !isEditing) ? 0.5 : 1 }}>
                 <td style={{ ...td, textAlign: "left" }}>
                   {link.tecido?.nome || link.idTecido}
                 </td>
@@ -863,6 +940,32 @@ function TecidosTab({
                   ) : (
                     fmt(link.valorTecido, 2)
                   )}
+                </td>
+                <td style={{ ...td, textAlign: "center" }}>
+                    {isEditing ? (
+                        <input 
+                            type="checkbox"
+                            checked={editingFlAtivo}
+                            onChange={e => setEditingFlAtivo(e.target.checked)}
+                        />
+                    ) : (
+                        <span>{link.flAtivo !== false ? "✅" : "❌"}</span>
+                    )}
+                </td>
+                 <td style={{ ...td, textAlign: "center" }}>
+                    {isEditing ? (
+                        <input 
+                            type="date"
+                            className="cl-input"
+                            style={{ width: 110, padding: 2, fontSize: 12 }}
+                            value={editingDtRevisao}
+                            onChange={e => setEditingDtRevisao(e.target.value)}
+                        />
+                    ) : (
+                        <span style={{ fontSize: 12 }}>
+                            {link.dtUltimaRevisao ? new Date(link.dtUltimaRevisao).toLocaleDateString() : '-'}
+                        </span>
+                    )}
                 </td>
                 <td style={{ ...td, textAlign: "center" }}>
                    {isEditing ? (
@@ -880,10 +983,10 @@ function TecidosTab({
               </tr>
             );
           })}
-          {currentLinks.length === 0 && (
+          {filteredLinks.length === 0 && (
             <tr>
-              <td colSpan={3} style={{ padding: 16, textAlign: "center", color: "#888" }}>
-                Nenhum tecido vinculado.
+              <td colSpan={5} style={{ padding: 16, textAlign: "center", color: "#888" }}>
+                {filterStatus === 'todos' ? 'Nenhum tecido vinculado.' : 'Nenhum registro encontrado para este filtro.'}
               </td>
             </tr>
           )}

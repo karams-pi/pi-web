@@ -18,7 +18,7 @@ public class ImportController : ControllerBase
     }
 
     [HttpPost("tabela-precos")]
-    public async Task<IActionResult> ImportarTabelaPrecos(IFormFile file, [FromForm] long idFornecedor)
+    public async Task<IActionResult> ImportarTabelaPrecos(IFormFile file, [FromForm] long idFornecedor, [FromForm] DateTime? dtRevisao)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Arquivo inválido.");
@@ -30,7 +30,7 @@ public class ImportController : ControllerBase
         try
         {
             using var stream = file.OpenReadStream();
-            await _importService.ImportarTabelaPrecosAsync(stream, idFornecedor);
+            await _importService.ImportarTabelaPrecosAsync(stream, idFornecedor, dtRevisao);
             
             await transaction.CommitAsync();
             return Ok(new { message = "Importação concluída com sucesso!" });
@@ -42,7 +42,7 @@ public class ImportController : ControllerBase
         }
     }
     [HttpPost("karams")]
-    public async Task<IActionResult> ImportarKarams(IFormFile file, [FromForm] long idFornecedor)
+    public async Task<IActionResult> ImportarKarams(IFormFile file, [FromForm] long idFornecedor, [FromForm] DateTime? dtRevisao)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Arquivo inválido.");
@@ -56,7 +56,7 @@ public class ImportController : ControllerBase
         try
         {
             using var stream = file.OpenReadStream();
-            await _importService.ImportarKaramsAsync(stream, idFornecedor);
+            await _importService.ImportarKaramsAsync(stream, idFornecedor, dtRevisao);
 
             await transaction.CommitAsync();
             return Ok(new { message = "Importação Karams concluída com sucesso!" });
@@ -78,7 +78,7 @@ public class ImportController : ControllerBase
         }
     }
     [HttpPost("koyo")]
-    public async Task<IActionResult> ImportarKoyo(IFormFile file, [FromForm] long idFornecedor)
+    public async Task<IActionResult> ImportarKoyo(IFormFile file, [FromForm] long idFornecedor, [FromForm] DateTime? dtRevisao)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Arquivo inválido.");
@@ -89,7 +89,7 @@ public class ImportController : ControllerBase
         try
         {
             using var stream = file.OpenReadStream();
-            await _importService.ImportarKoyoAsync(stream, idFornecedor);
+            await _importService.ImportarKoyoAsync(stream, idFornecedor, dtRevisao);
 
             await transaction.CommitAsync();
             return Ok(new { message = "Importação Koyo concluída com sucesso!" });

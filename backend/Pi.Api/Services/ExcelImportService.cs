@@ -17,8 +17,11 @@ public class ExcelImportService
         _context = context;
     }
 
-    public async Task ImportarTabelaPrecosAsync(Stream fileStream, long idFornecedor)
+    public async Task ImportarTabelaPrecosAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao = null)
     {
+        if (dtRevisao.HasValue) 
+             dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
+
         using var package = new ExcelPackage(fileStream);
         var worksheet = package.Workbook.Worksheets[0]; // Assume first sheet
         var rowCount = worksheet.Dimension.Rows;
@@ -82,7 +85,7 @@ public class ExcelImportService
                     
                     if (decimal.TryParse(priceText, out var price) && price > 0)
                     {
-                        await UpdateModuloTecidoAsync(modulo.Id, tecidoId, price);
+                        await UpdateModuloTecidoAsync(modulo.Id, tecidoId, price, dtRevisao);
                     }
                 }
             }
@@ -95,8 +98,11 @@ public class ExcelImportService
         await _context.SaveChangesAsync();
     }
 
-    public async Task ImportarKoyoAsync(Stream stream, long idFornecedor)
+    public async Task ImportarKoyoAsync(Stream stream, long idFornecedor, DateTime? dtRevisao = null)
     {
+        if (dtRevisao.HasValue) 
+             dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
+
         using var package = new ExcelPackage(stream);
 
         // Pre-carregar dados para evitar N+1 queries (Cache)
@@ -272,6 +278,8 @@ public class ExcelImportService
                         {
                             // UPDATE
                             modTecido.ValorTecido = valor;
+                            if (dtRevisao.HasValue) modTecido.DtUltimaRevisao = dtRevisao;
+                            modTecido.FlAtivo = true; // Reactivate on import if revisions logic dictates, OR keep as is? Request says: "A data... deverá ser atualizada... assim como para os novos registros". Implies touch.
                             
                             // FORCE MODIFIED STATE ONLY IF IT EXISTS IN DB (Id > 0)
                             if (modTecido.Id > 0)
@@ -287,7 +295,9 @@ public class ExcelImportService
                             {
                                 IdModulo = modulo.Id,
                                 IdTecido = idTecido,
-                                ValorTecido = valor
+                                ValorTecido = valor,
+                                DtUltimaRevisao = dtRevisao,
+                                FlAtivo = true
                             };
                             
                             modulo.ModulosTecidos.Add(novoModTecido);
@@ -408,7 +418,7 @@ public class ExcelImportService
         return modulo;
     }
 
-    private async Task UpdateModuloTecidoAsync(long idModulo, long idTecido, decimal price)
+    private async Task UpdateModuloTecidoAsync(long idModulo, long idTecido, decimal price, DateTime? dtRevisao = null)
     {
         // First, check Local (tracked) entities to avoid "duplicate key" if we just added it in this transaction context
         var mt = _context.ModulosTecidos.Local
@@ -426,12 +436,16 @@ public class ExcelImportService
             mt = new ModuloTecido
             {
                 IdModulo = idModulo,
-                IdTecido = idTecido
+                IdTecido = idTecido,
+                FlAtivo = true,
+                DtUltimaRevisao = dtRevisao
             };
             _context.ModulosTecidos.Add(mt);
         }
 
         mt.ValorTecido = price;
+        if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
+        mt.FlAtivo = true; // Ensure active on import
     }
     private Stream SanitizeExcelFile(Stream originalStream)
     {
@@ -546,8 +560,11 @@ public class ExcelImportService
         await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('modulo_tecido', 'id'), {maxIdModulosTecidos + 1}, false);");
     }
 
-    public async Task ImportarKaramsAsync(Stream fileStream, long idFornecedor)
+    public async Task ImportarKaramsAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao = null)
     {
+        if (dtRevisao.HasValue) 
+             dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
+
         // 0. Reset Sequences to avoid PK violation (manual inserts desync fix)
         await ResetSequencesAsync();
 
@@ -730,7 +747,9 @@ public class ExcelImportService
                                     Modulo = modulo, // Link Object
                                     Tecido = tecido,  // Link Object
                                     IdTecido = tecido.Id,
-                                    ValorTecido = price
+                                    ValorTecido = price,
+                                    DtUltimaRevisao = dtRevisao,
+                                    FlAtivo = true
                                 };
                                 // Add to Collection AND Context (via Fixup or explicit add)
                                 modulo.ModulosTecidos.Add(mt);
@@ -743,6 +762,8 @@ public class ExcelImportService
                             else
                             {
                                 mt.ValorTecido = price;
+                                if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
+                                mt.FlAtivo = true;
                             }
                         }
                     }
