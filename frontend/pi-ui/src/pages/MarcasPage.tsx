@@ -15,7 +15,7 @@ import type { ColumnDefinition } from "../utils/printExport";
 type FormState = Partial<Marca>;
 const emptyForm: FormState = {
   nome: "",
-  urlImagem: "",
+  imagem: "",
   observacao: "",
   flAtivo: true,
 };
@@ -61,7 +61,7 @@ export default function MarcasPage() {
 
   function openEdit(x: Marca) {
     setEditing(x);
-    setForm({ ...x });
+    setForm({ ...x, imagem: x.imagem ?? "" });
     setIsOpen(true);
   }
 
@@ -74,7 +74,7 @@ export default function MarcasPage() {
 
       const payload = {
         nome: form.nome.trim(),
-        urlImagem: form.urlImagem || null,
+        imagem: form.imagem || null,
         observacao: form.observacao || null,
         flAtivo: form.flAtivo !== undefined ? form.flAtivo : true,
       };
@@ -108,7 +108,7 @@ export default function MarcasPage() {
     { header: "ID", accessor: (m) => m.id },
     { header: "Nome", accessor: (m) => m.nome },
     { header: "Ativo", accessor: (m) => m.flAtivo ? "Sim" : "Não" },
-    { header: "URL", accessor: (m) => m.urlImagem },
+    { header: "Imagem (Base64)", accessor: (m) => m.imagem ? "Sim" : "Não" },
     { header: "Obs", accessor: (m) => m.observacao },
   ];
 
@@ -154,7 +154,7 @@ export default function MarcasPage() {
               <th style={th}>ID</th>
               <th style={th}>Nome</th>
               <th style={th}>Ativo</th>
-              <th style={th}>Imagem (URL)</th>
+              <th style={th}>Imagem</th>
               <th style={th}>Observação</th>
               <th style={th}>Ações</th>
             </tr>
@@ -172,10 +172,12 @@ export default function MarcasPage() {
                     )}
                 </td>
                 <td style={td}>
-                  {x.urlImagem ? (
-                    <a href={x.urlImagem} target="_blank" rel="noreferrer">
-                      Link
-                    </a>
+                  {x.imagem ? (
+                    <img 
+                      src={`data:image/png;base64,${x.imagem}`} 
+                      alt="Modelo" 
+                      style={{ maxWidth: 50, maxHeight: 50, objectFit: "contain" }} 
+                    />
                   ) : (
                     "-"
                   )}
@@ -240,15 +242,37 @@ export default function MarcasPage() {
                         </label>
                     </div>
                   </div>
-                  <div className="field">
-                    <label className="label">URL Imagem</label>
-                    <input
-                      className="cl-input"
-                      value={form.urlImagem || ""}
-                      onChange={(e) =>
-                        setForm({ ...form, urlImagem: e.target.value })
-                      }
-                    />
+                  <div className="field fieldFull">
+                    <div className="label">Imagem</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                        const result = reader.result as string;
+                                        const base64 = result.split(",")[1];
+                                        setForm({ ...form, imagem: base64 });
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }} 
+                            className="cl-input"
+                        />
+                        {form.imagem && (
+                            <img 
+                                src={`data:image/png;base64,${form.imagem}`} 
+                                alt="Preview" 
+                                style={{ height: 40, border: "1px solid #444" }} 
+                            />
+                        )}
+                        {form.imagem && (
+                            <button type="button" className="btn btn-sm btn-danger" onClick={() => setForm({...form, imagem: ""})}>X</button>
+                        )}
+                    </div>
                   </div>
                   <div className="field fieldFull">
                     <label className="label">Observação</label>

@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Tecido> Tecidos => Set<Tecido>();
 
     // NOVO MODELO (remodelado)
+    public DbSet<Modelo> Modelos => Set<Modelo>();
     public DbSet<Modulo> Modulos => Set<Modulo>();
     public DbSet<ModuloTecido> ModulosTecidos => Set<ModuloTecido>();
 
@@ -33,6 +34,7 @@ public class AppDbContext : DbContext
     {
         // ===== Tabelas já existentes =====
         modelBuilder.Entity<Cliente>().ToTable("clientes");
+        modelBuilder.Entity<Modelo>().ToTable("modelo");
 
         modelBuilder.Entity<ListaPreco>(e =>
         {

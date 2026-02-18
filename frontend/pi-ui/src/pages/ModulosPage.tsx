@@ -319,7 +319,8 @@ export default function ModulosPage() {
               categoria: catMap,
               marca: marcaMap,
               tecido: tecidoMap
-          }
+          },
+          marcasFull: new Map(marcas.map(m => [m.id, m]))
       });
       setIsPrintModalOpen(false);
   }

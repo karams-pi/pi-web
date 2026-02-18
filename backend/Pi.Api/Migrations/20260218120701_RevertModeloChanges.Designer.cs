@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pi.Api.Data;
@@ -11,9 +12,11 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260218120701_RevertModeloChanges")]
+    partial class RevertModeloChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,10 +426,6 @@ namespace Pi.Api.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("fl_ativo");
 
-                    b.Property<byte[]>("Imagem")
-                        .HasColumnType("bytea")
-                        .HasColumnName("imagem");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -437,6 +436,11 @@ namespace Pi.Api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("observacao");
+
+                    b.Property<string>("UrlImagem")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("url_imagem");
 
                     b.HasKey("Id");
 

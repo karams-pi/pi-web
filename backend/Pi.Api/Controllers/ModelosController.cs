@@ -13,41 +13,47 @@ public class ModelosController : ControllerBase
     public ModelosController(AppDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Modulo>>> GetAll()
-        => await _db.Modulos.AsNoTracking().OrderBy(x => x.Id).ToListAsync();
+    public async Task<ActionResult<object>> GetAll(
+        [FromQuery] long? idFornecedor,
+        [FromQuery] long? idCategoria)
+    {
+        var query = _db.Modelos
+            .AsNoTracking()
+            .Include(x => x.Fornecedor)
+            .Include(x => x.Categoria)
+            .AsQueryable();
+
+        if (idFornecedor.HasValue) query = query.Where(x => x.IdFornecedor == idFornecedor.Value);
+        if (idCategoria.HasValue) query = query.Where(x => x.IdCategoria == idCategoria.Value);
+
+        return await query.OrderBy(x => x.Descricao).ToListAsync();
+    }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<Modulo>> GetById(long id)
+    public async Task<ActionResult<Modelo>> GetById(long id)
     {
-        var item = await _db.Modulos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Modelos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         return item is null ? NotFound() : item;
     }
 
     [HttpPost]
-    public async Task<ActionResult<Modulo>> Create([FromBody] Modulo input)
+    public async Task<ActionResult<Modelo>> Create([FromBody] Modelo input)
     {
-        // m3 está computed no banco (HasComputedColumnSql stored:true),
-        // então não precisa setar aqui.
-        _db.Modulos.Add(input);
+        _db.Modelos.Add(input);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = input.Id }, input);
     }
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Update(long id, [FromBody] Modulo input)
+    public async Task<IActionResult> Update(long id, [FromBody] Modelo input)
     {
-        var item = await _db.Modulos.FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Modelos.FirstOrDefaultAsync(x => x.Id == id);
         if (item is null) return NotFound();
 
         item.IdFornecedor = input.IdFornecedor;
         item.IdCategoria = input.IdCategoria;
-        item.IdMarca = input.IdMarca;
         item.Descricao = input.Descricao;
-
-        item.Largura = input.Largura;
-        item.Profundidade = input.Profundidade;
-        item.Altura = input.Altura;
-        item.Pa = input.Pa;
+        item.UrlImagem = input.UrlImagem;
 
         await _db.SaveChangesAsync();
         return NoContent();
@@ -56,10 +62,10 @@ public class ModelosController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
     {
-        var item = await _db.Modulos.FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Modelos.FindAsync(id);
         if (item is null) return NotFound();
 
-        _db.Modulos.Remove(item);
+        _db.Modelos.Remove(item);
         await _db.SaveChangesAsync();
         return NoContent();
     }

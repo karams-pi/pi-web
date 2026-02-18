@@ -1,5 +1,5 @@
 
-import type { Modulo, Configuracao } from "../../api/types";
+import type { Modulo, Configuracao, Marca } from "../../api/types";
 
 interface PrintModulesReportOptions {
   modules: Modulo[];
@@ -12,6 +12,7 @@ interface PrintModulesReportOptions {
     marca: Map<number, string>;
     tecido: Map<number, string>;
   };
+  marcasFull?: Map<number, Marca>;
 }
 
 export function printModulesReport({
@@ -20,6 +21,7 @@ export function printModulesReport({
   cotacao,
   config,
   maps,
+  marcasFull,
 }: PrintModulesReportOptions) {
   if (!modules || modules.length === 0) {
     alert("Sem dados para imprimir");
@@ -183,7 +185,16 @@ export function printModulesReport({
               // Modelo (RowSpan only on first item)
               let colMarca = "";
               if (index === 0) {
-                  colMarca = `<td rowspan="${marca.items.length}">${marca.marcaName}</td>`;
+                  let imgHtml = "";
+                  if (marcasFull) {
+                      const marcaObj = marcasFull.get(marca.idMarca);
+                      if (marcaObj && marcaObj.imagem) {
+                          // Increased size and margin bottom to separate from text
+                          imgHtml = `<img src="data:image/png;base64,${marcaObj.imagem}" style="max-width: 150px; max-height: 100px; margin-bottom: 6px;" /><br/>`;
+                      }
+                  }
+                  // Image first, then Bold Name
+                  colMarca = `<td rowspan="${marca.items.length}" class="center">${imgHtml}<strong>${marca.marcaName}</strong></td>`;
               }
 
               const colDesc = `<td class="desc">${mod.descricao}</td>`;

@@ -30,8 +30,8 @@ public class Modelo
     [Column("descricao")]
     public string Descricao { get; set; } = string.Empty;
 
-    [MaxLength(500)]
     [Column("url_imagem")]
+    [MaxLength(500)]
     public string? UrlImagem { get; set; }
 
     public ICollection<Modulo> Modulos { get; set; } = new List<Modulo>();

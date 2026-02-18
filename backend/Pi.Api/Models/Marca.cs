@@ -16,9 +16,8 @@ public class Marca
     [MaxLength(200)]
     public string Nome { get; set; } = string.Empty;
 
-    [Column("url_imagem")]
-    [MaxLength(500)]
-    public string? UrlImagem { get; set; }
+    [Column("imagem")]
+    public byte[]? Imagem { get; set; }
 
     [Column("observacao")]
     [MaxLength(1000)]

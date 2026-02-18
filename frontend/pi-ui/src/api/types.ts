@@ -13,7 +13,7 @@ export type Modelo = {
 export type Marca = {
   id: number;
   nome: string;
-  urlImagem?: string | null;
+  imagem?: string | null;
   observacao?: string | null;
   flAtivo?: boolean;
 };

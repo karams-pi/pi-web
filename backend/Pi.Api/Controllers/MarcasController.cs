@@ -38,7 +38,7 @@ public class MarcasController : ControllerBase
         if (item is null) return NotFound();
 
         item.Nome = input.Nome;
-        item.UrlImagem = input.UrlImagem;
+        item.Imagem = input.Imagem;
         item.Observacao = input.Observacao;
         item.FlAtivo = input.FlAtivo;
 
