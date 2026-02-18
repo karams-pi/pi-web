@@ -190,7 +190,7 @@ export function printModulesReport({
                       const marcaObj = marcasFull.get(marca.idMarca);
                       if (marcaObj && marcaObj.imagem) {
                           // Increased size and margin bottom to separate from text
-                          imgHtml = `<img src="data:image/png;base64,${marcaObj.imagem}" style="max-width: 150px; max-height: 100px; margin-bottom: 6px;" /><br/>`;
+                          imgHtml = `<img src="data:image/png;base64,${marcaObj.imagem}" style="max-width: 100%; max-height: 100px; margin-bottom: 6px;" /><br/>`;
                       }
                   }
                   // Image first, then Bold Name
@@ -253,7 +253,7 @@ export function printModulesReport({
           h1 { font-size: 14px; margin-bottom: 5px; color: #000; }
           .meta { font-size: 9px; color: #444; margin-bottom: 15px; }
           
-          .group-block { margin-bottom: 25px; break-inside: avoid; }
+          .group-block { margin-bottom: 25px; } /* Removed break-inside: avoid to fix blank page */
           
           .group-title {
               font-size: 12px;
@@ -263,6 +263,7 @@ export function printModulesReport({
               border: 1px solid #000;
               border-bottom: none; /* Merge with table border visual */
               text-transform: uppercase;
+              page-break-inside: avoid; /* Keep title together */
           }
 
           table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -271,6 +272,7 @@ export function printModulesReport({
             border: 1px solid #000;
             padding: 2px 2px; 
             vertical-align: middle;
+            overflow: hidden; /* Fix image overflow */
           }
           
           th { 
@@ -280,18 +282,21 @@ export function printModulesReport({
             font-size: 8px;
           }
 
+          td { font-size: 8px; } /* Reduced font size for content */
+
           tr:nth-child(even) { background-color: #f9f9f9; }
           
           .center { text-align: center; }
           .right { text-align: right; white-space: nowrap; }
-          .desc { max-width: 150px; }
+          .desc { max-width: 150px; white-space: normal; } /* Allow desc to wrap if needed */
 
           @media print {
             .no-print { display: none; }
             body { margin: 0; padding: 0mm; }
             @page { margin: 5mm; size: landscape; }
             th, .group-title { background-color: #ccc !important; -webkit-print-color-adjust: exact; }
-            .group-block { page-break-inside: avoid; }
+            .group-block { page-break-inside: auto; } /* Allow breaking inside groups */
+            tr { page-break-inside: avoid; } /* Avoid breaking inside rows */
           }
         </style>
       </head>
