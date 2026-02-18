@@ -116,6 +116,7 @@ export type ConfiguracoesFreteItem = {
   idFreteItem: number;
   valor: number;
   flDesconsidera: boolean;
+  idFornecedor?: number | null;
 };
 
 export type ProformaInvoice = {
@@ -124,6 +125,7 @@ export type ProformaInvoice = {
   piSequencia: string;
   dataPi: string;
   idCliente: string;
+  idFornecedor?: number | null;
   idConfiguracoes: number;
   idFrete: number;
   valorTecido: number;

@@ -22,6 +22,12 @@ public class ConfiguracoesFreteItem
     [Column("fl_desconsidera")]
     public bool FlDesconsidera { get; set; } = false;
 
+    [Column("id_fornecedor")]
+    public long? IdFornecedor { get; set; }
+
+    [ForeignKey(nameof(IdFornecedor))]
+    public Fornecedor? Fornecedor { get; set; }
+
     // Navigation
     public FreteItem? FreteItem { get; set; }
 }

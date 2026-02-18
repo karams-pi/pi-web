@@ -37,6 +37,8 @@ public class PisController : ControllerBase
                 x.ValorTotalFreteUSD,
                 x.CotacaoAtualUSD,
                 x.CotacaoRisco,
+
+                Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome } : null,
                 Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null
             })
@@ -63,6 +65,9 @@ public class PisController : ControllerBase
                 x.ValorTotalFreteUSD,
                 x.CotacaoAtualUSD,
                 x.CotacaoRisco,
+
+                x.IdFornecedor,
+                Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome } : null,
                 Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
                 PiItens = x.PiItens.Select(i => new
@@ -142,7 +147,9 @@ public class PisController : ControllerBase
             pi.Id, 
             pi.Prefixo, 
             pi.PiSequencia,
+
             pi.IdCliente,
+            pi.IdFornecedor,
             PiItens = pi.PiItens?.Select(i => new
             {
                 i.Id,
@@ -179,6 +186,7 @@ public class PisController : ControllerBase
         existingPi.PiSequencia = pi.PiSequencia;
         existingPi.DataPi = pi.DataPi;
         existingPi.IdCliente = pi.IdCliente;
+        existingPi.IdFornecedor = pi.IdFornecedor;
         existingPi.IdConfiguracoes = pi.IdConfiguracoes;
         existingPi.IdFrete = pi.IdFrete;
         existingPi.ValorTecido = pi.ValorTecido;

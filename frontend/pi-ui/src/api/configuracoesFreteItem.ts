@@ -5,12 +5,16 @@ export async function listConfiguracoesFreteItem() {
   return apiGet<ConfiguracoesFreteItem[]>("/api/configuracoesfreteitem");
 }
 
-export async function getConfiguracoesFreteItemByFrete(idFrete: number) {
-  return apiGet<ConfiguracoesFreteItem[]>(`/api/configuracoesfreteitem/by-frete/${idFrete}`);
+export async function getConfiguracoesFreteItemByFrete(idFrete: number, fornecedorId?: number) {
+  let url = `/api/configuracoesfreteitem/by-frete/${idFrete}`;
+  if (fornecedorId) url += `?fornecedorId=${fornecedorId}`;
+  return apiGet<ConfiguracoesFreteItem[]>(url);
 }
 
-export async function getTotalFrete(idFrete: number) {
-  return apiGet<number>(`/api/configuracoesfreteitem/total-frete/${idFrete}`);
+export async function getTotalFrete(idFrete: number, fornecedorId?: number) {
+  let url = `/api/configuracoesfreteitem/total-frete/${idFrete}`;
+  if (fornecedorId) url += `?fornecedorId=${fornecedorId}`;
+  return apiGet<number>(url);
 }
 
 export async function getConfiguracoesFreteItem(id: number) {

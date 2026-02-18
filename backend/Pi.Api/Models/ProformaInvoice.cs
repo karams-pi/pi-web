@@ -57,6 +57,11 @@ public class ProformaInvoice
     public decimal CotacaoRisco { get; set; }
 
     // Navigation
+    [Column("id_fornecedor")]
+    public long? IdFornecedor { get; set; }
+
+    [ForeignKey(nameof(IdFornecedor))]
+    public Fornecedor? Fornecedor { get; set; }
     public Cliente? Cliente { get; set; }
     public Configuracao? Configuracoes { get; set; }
     public Frete? Frete { get; set; }

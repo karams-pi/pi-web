@@ -4,9 +4,11 @@ import {
   createConfig,
   getLatestConfig,
 } from "../api/configuracoes";
+import { listFornecedores } from "../api/fornecedores";
 import { createConfiguracoesFreteItem, deleteConfiguracoesFreteItem, getConfiguracoesFreteItemByFrete, updateConfiguracoesFreteItem } from "../api/configuracoesFreteItem";
 import { createFreteItem, deleteFreteItem, updateFreteItem } from "../api/freteItens";
-import type { ConfiguracoesFreteItem } from "../api/types";
+import type { ConfiguracoesFreteItem, Fornecedor } from "../api/types";
+import { SearchableSelect } from "../components/SearchableSelect"; 
 import "./ConfiguracoesPage.css";
 
 // --- Components ---
@@ -180,24 +182,37 @@ interface FreightGridProps {
   title: string;
   color: string;
   idFrete: number;
+  fornecedores: Fornecedor[];
 }
 
-const FreightGrid = ({ title, color, idFrete }: FreightGridProps) => {
+const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) => {
   const [items, setItems] = useState<(ConfiguracoesFreteItem & { freteItem?: { nome: string } })[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const [selectedFornecedor, setSelectedFornecedor] = useState<string>("");
+
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<(ConfiguracoesFreteItem & { freteItem?: { nome: string } }) | null>(null);
 
   useEffect(() => {
-    loadItems();
-  }, [idFrete]);
+    if (fornecedores.length > 0 && !selectedFornecedor) {
+        setSelectedFornecedor(String(fornecedores[0].id));
+    }
+  }, [fornecedores]);
+
+  useEffect(() => {
+    if (selectedFornecedor) {
+        loadItems();
+    } else {
+        setItems([]);
+    }
+  }, [idFrete, selectedFornecedor]);
 
   const loadItems = async () => {
     try {
       setLoading(true);
-      const data = await getConfiguracoesFreteItemByFrete(idFrete);
+      const idForn = selectedFornecedor ? Number(selectedFornecedor) : undefined;
+      const data = await getConfiguracoesFreteItemByFrete(idFrete, idForn);
       setItems(data);
     } catch (error) {
       console.error(`[FreightGrid] Erro ao carregar itens de frete ${title}:`, error);
@@ -271,7 +286,8 @@ const FreightGrid = ({ title, color, idFrete }: FreightGridProps) => {
           await createConfiguracoesFreteItem({
               idFreteItem: newItem.id,
               valor: valor,
-              flDesconsidera: false
+              flDesconsidera: false,
+              idFornecedor: selectedFornecedor ? Number(selectedFornecedor) : null
           });
       }
       await loadItems();
@@ -305,9 +321,19 @@ const FreightGrid = ({ title, color, idFrete }: FreightGridProps) => {
             </svg>
             <h3 className="cfg-section-title">{title}</h3>
         </div>
-        <button className="btn btn-sm btn-primary" onClick={handleAdd} style={{ fontSize: 12 }}>
-            + Adicionar
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 250 }}>
+                <SearchableSelect 
+                    value={selectedFornecedor}
+                    onChange={setSelectedFornecedor}
+                    options={fornecedores.map(f => ({ value: String(f.id), label: f.nome }))}
+                    placeholder="Selecione um fornecedor..."
+                />
+            </div>
+            <button className="btn btn-sm btn-primary" onClick={handleAdd} style={{ fontSize: 12 }}>
+                + Adicionar
+            </button>
+        </div>
       </div>
       
       {items.length === 0 ? (
@@ -419,8 +445,11 @@ export default function ConfiguracoesPage() {
     text: string;
   } | null>(null);
 
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+
   useEffect(() => {
     loadConfig();
+    listFornecedores().then(data => setFornecedores(data || []));
   }, []);
 
   const loadConfig = async () => {
@@ -581,10 +610,11 @@ export default function ConfiguracoesPage() {
       </form>
 
       {/* Freight Grids - Outside form */}
+      {/* Freight Grids - Outside form */}
       <div style={{ marginTop: 32 }}>
-        <FreightGrid title="Custos FOB" color="#10b981" idFrete={1} />
-        <FreightGrid title="Custos FCA" color="#8b5cf6" idFrete={2} />
-        <FreightGrid title="Custos CIF" color="#f59e0b" idFrete={3} />
+        <FreightGrid title="Custos FOB" color="#10b981" idFrete={1} fornecedores={fornecedores} />
+        <FreightGrid title="Custos FCA" color="#8b5cf6" idFrete={2} fornecedores={fornecedores} />
+        <FreightGrid title="Custos CIF" color="#f59e0b" idFrete={3} fornecedores={fornecedores} />
       </div>
     </div>
   );

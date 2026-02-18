@@ -20,6 +20,7 @@ type FormState = {
   piSequencia: string;
   dataPi: string;
   idCliente: string;
+  idFornecedor?: string;
   idFrete: number;
   cotacaoAtualUSD: number;
   cotacaoRisco: number | string;
@@ -58,6 +59,7 @@ export default function ProformaInvoicePage() {
     piSequencia: "00001",
     dataPi: new Date().toISOString().split('T')[0],
     idCliente: "",
+    idFornecedor: "",
     idFrete: 1,
     cotacaoAtualUSD: 0,
     cotacaoRisco: 0,
@@ -129,11 +131,12 @@ export default function ProformaInvoicePage() {
       }
     }
 
+
   useEffect(() => {
     if (form.idFrete) {
       loadFreteTotals();
     }
-  }, [form.idFrete, form.cotacaoRisco]);
+  }, [form.idFrete, form.cotacaoRisco, form.idFornecedor]);
 
   useEffect(() => {
     // Recalcular rateio quando itens mudarem ou totais de frete mudarem
@@ -306,7 +309,7 @@ export default function ProformaInvoicePage() {
 
   async function loadFreteTotals() {
     try {
-      const total = await getTotalFrete(form.idFrete);
+      const total = await getTotalFrete(form.idFrete, form.idFornecedor ? Number(form.idFornecedor) : undefined);
       const cotacao = Number(form.cotacaoRisco) || 0;
       const totalUSD = cotacao > 0 ? total / cotacao : 0;
 
@@ -471,6 +474,7 @@ export default function ProformaInvoicePage() {
         piSequencia: form.piSequencia,
         dataPi: new Date(form.dataPi).toISOString(),
         idCliente: form.idCliente,
+        idFornecedor: form.idFornecedor ? Number(form.idFornecedor) : null,
         idConfiguracoes: config?.id || 0,
         idFrete: form.idFrete,
         valorTecido,
@@ -525,6 +529,7 @@ export default function ProformaInvoicePage() {
             piSequencia: pi.piSequencia,
             dataPi: pi.dataPi.split('T')[0],
             idCliente: String(pi.idCliente),
+            idFornecedor: pi.idFornecedor ? String(pi.idFornecedor) : "",
             idFrete: pi.idFrete,
             cotacaoAtualUSD: pi.cotacaoAtualUSD,
             cotacaoRisco: Number((pi.cotacaoRisco || 0).toFixed(2)),
@@ -720,6 +725,15 @@ export default function ProformaInvoicePage() {
               type="date"
               value={form.dataPi}
               onChange={(e) => setForm({ ...form, dataPi: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label className="label">Fornecedor (Custos)</label>
+            <SearchableSelect
+              value={form.idFornecedor || ""}
+              onChange={(val) => setForm({ ...form, idFornecedor: String(val) })}
+              options={[{ value: "", label: "Todos (Padrão)" }, ...fornecedores.map((f) => ({ value: String(f.id), label: f.nome }))]}
+              placeholder="Selecione..."
             />
           </div>
           <div className="field">
