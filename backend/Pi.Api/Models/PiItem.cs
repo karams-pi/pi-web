@@ -70,6 +70,12 @@ public class PiItem
     [StringLength(500)]
     public string? Observacao { get; set; }
 
+    [Column("feet")]
+    public string? Feet { get; set; }
+
+    [Column("finishing")]
+    public string? Finishing { get; set; }
+
     // Navigation
     public ProformaInvoice? Pi { get; set; }
     public ModuloTecido? ModuloTecido { get; set; }

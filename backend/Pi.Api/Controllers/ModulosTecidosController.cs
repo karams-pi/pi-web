@@ -30,7 +30,7 @@ public class ModulosTecidosController : ControllerBase
                     x.Modulo.Descricao,
                     Categoria = new { x.Modulo.Categoria!.Id, x.Modulo.Categoria.Nome },
                     Fornecedor = new { x.Modulo.Fornecedor!.Id, x.Modulo.Fornecedor.Nome },
-                    Marca = new { x.Modulo.Marca!.Id, x.Modulo.Marca.Nome },
+                    Marca = new { x.Modulo.Marca!.Id, x.Modulo.Marca.Nome, x.Modulo.Marca.Imagem },
                     x.Modulo.Largura,
                     x.Modulo.Profundidade,
                     x.Modulo.Altura,

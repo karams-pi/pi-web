@@ -36,6 +36,7 @@ public class ClientesController : ControllerBase
             q = q.Where(x =>
                 x.Nome.ToLower().Contains(s) ||
                 (x.Empresa ?? "").ToLower().Contains(s) ||
+                (x.Nit ?? "").ToLower().Contains(s) ||
                 (x.Email ?? "").ToLower().Contains(s));
         }
 
@@ -76,7 +77,9 @@ public class ClientesController : ControllerBase
         if (c is null) return NotFound();
 
         c.Nome = input.Nome;
+        c.Nome = input.Nome;
         c.Empresa = input.Empresa;
+        c.Nit = input.Nit;
         c.Email = input.Email;
         c.Telefone = input.Telefone;
         c.Ativo = input.Ativo;

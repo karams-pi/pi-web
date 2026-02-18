@@ -85,7 +85,10 @@ public class PisController : ControllerBase
                     i.ValorFreteRateadoUSD,
                     i.ValorFinalItemBRL,
                     i.ValorFinalItemUSDRisco,
-                    i.Observacao
+
+                    i.Observacao,
+                    i.Feet,
+                    i.Finishing
                 })
             })
             .FirstOrDefaultAsync();
@@ -165,7 +168,9 @@ public class PisController : ControllerBase
                 i.ValorFreteRateadoUSD,
                 i.ValorFinalItemBRL,
                 i.ValorFinalItemUSDRisco,
-                i.Observacao
+                i.Observacao,
+                i.Feet,
+                i.Finishing
             })
         });
     }
@@ -227,7 +232,10 @@ public class PisController : ControllerBase
                    existingItem.ValorFreteRateadoUSD = item.ValorFreteRateadoUSD;
                    existingItem.ValorFinalItemBRL = item.ValorFinalItemBRL;
                    existingItem.ValorFinalItemUSDRisco = item.ValorFinalItemUSDRisco;
+
                    existingItem.Observacao = item.Observacao;
+                   existingItem.Feet = item.Feet;
+                   existingItem.Finishing = item.Finishing;
                 }
             }
             else

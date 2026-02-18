@@ -20,6 +20,7 @@ type FormState = Partial<Cliente>;
 const emptyForm: FormState = {
   nome: '',
   empresa: '',
+  nit: '',
   email: '',
   telefone: '',
   ativo: true,
@@ -122,6 +123,7 @@ export default function ClientesPage() {
   const exportColumns: ColumnDefinition<Cliente>[] = [
     { header: "Nome", accessor: (c) => c.nome },
     { header: "Empresa", accessor: (c) => c.empresa },
+    { header: "NIT", accessor: (c) => c.nit },
     { header: "Email", accessor: (c) => c.email },
     { header: "Telefone", accessor: (c) => c.telefone },
     { header: "País", accessor: (c) => c.pais },
@@ -231,6 +233,7 @@ export default function ClientesPage() {
             <tr>
               <th style={th}>Nome</th>
               <th style={th}>Empresa</th>
+              <th style={th}>NIT</th>
               <th style={th}>E-mail</th>
               <th style={th}>Telefone</th>
               <th style={th}>País</th>
@@ -249,6 +252,7 @@ export default function ClientesPage() {
               <tr key={c.id}>
                 <td style={td}>{c.nome}</td>
                 <td style={td}>{c.empresa || '-'}</td>
+                <td style={td}>{c.nit || '-'}</td>
                 <td style={td}>{c.email || '-'}</td>
                 <td style={td}>{c.telefone || '-'}</td>
                 <td style={td}>{c.pais || "-"}</td>

@@ -54,6 +54,7 @@ export type ModuloTecido = {
     marca?: {
       id: number;
       nome: string;
+      imagem?: string | null;
     };
     largura?: number;
     profundidade?: number;
@@ -71,6 +72,7 @@ export type Cliente = {
   id: string;
   nome: string;
   empresa?: string | null;
+  nit?: string | null;
   email?: string | null;
   telefone?: string | null;
   ativo: boolean;
@@ -152,6 +154,9 @@ export type PiItem = {
   valorFreteRateadoUSD: number;
   valorFinalItemBRL: number;
   valorFinalItemUSDRisco: number;
+  feet?: string;
+  finishing?: string;
+  observacao?: string;
   tempCodigoModuloTecido?: string;
 };
 

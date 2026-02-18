@@ -257,10 +257,9 @@ export default function ModulosPage() {
     if (cotacaoRisco <= 0) return 0;
     const valorBase = valorTecido / cotacaoRisco;
     const comissao = valorBase * (config.percentualComissao / 100);
-    // New Formula: Gordura on (Base + Comissao)
-    const baseComComissao = valorBase + comissao;
-    const gordura = baseComComissao * (config.percentualGordura / 100);
-    return baseComComissao + gordura;
+    // Reverted: Gordura on Base Only
+    const gordura = valorBase * (config.percentualGordura / 100);
+    return valorBase + comissao + gordura;
   }
 
   // Helper to handle combo selection
@@ -1019,10 +1018,9 @@ function CalculationDetailsModal({
 
     const valorBase = valorTecido / safeCotacao;
     const comissao = valorBase * (config.percentualComissao / 100);
-    // New Formula: Gordura on (Base + Comissao)
-    const baseComComissao = valorBase + comissao;
-    const gordura = baseComComissao * (config.percentualGordura / 100);
-    const total = baseComComissao + gordura;
+    // Reverted: Gordura on Base Only
+    const gordura = valorBase * (config.percentualGordura / 100);
+    const total = valorBase + comissao + gordura;
 
     return (
         <div className="modalOverlay" onMouseDown={onClose}>
@@ -1068,7 +1066,7 @@ function CalculationDetailsModal({
                                 <span>+ $ {fmt(comissao, 2)}</span>
                             </div>
                             <div style={rowStyle}>
-                                <span>Gordura (Sobre Base+Comissão) ({fmt(config.percentualGordura)}%):</span>
+                                <span>Gordura (Sobre Base) ({fmt(config.percentualGordura)}%):</span>
                                 <span style={{ color: '#10b981' }}>+ $ {fmt(gordura, 2)}</span>
                             </div>
                         </div>

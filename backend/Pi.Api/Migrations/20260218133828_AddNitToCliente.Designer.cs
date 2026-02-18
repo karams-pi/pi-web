@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pi.Api.Data;
@@ -11,9 +12,11 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260218133828_AddNitToCliente")]
+    partial class AddNitToCliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -617,14 +620,6 @@ namespace Pi.Api.Migrations
                     b.Property<decimal>("Altura")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("altura");
-
-                    b.Property<string>("Feet")
-                        .HasColumnType("text")
-                        .HasColumnName("feet");
-
-                    b.Property<string>("Finishing")
-                        .HasColumnType("text")
-                        .HasColumnName("finishing");
 
                     b.Property<long>("IdModuloTecido")
                         .HasColumnType("bigint")

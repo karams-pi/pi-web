@@ -40,11 +40,10 @@ export function printModulesReport({
         if (cotacaoRisco <= 0) return 0;
         const valorBase = valorTecido / cotacaoRisco;
         const comissao = valorBase * (config.percentualComissao / 100);
-        // New Formula: Gordura on (Base + Comissao)
-        const baseComComissao = valorBase + comissao;
-        const gordura = baseComComissao * (config.percentualGordura / 100);
+        // Reverted: Gordura on Base Only
+        const gordura = valorBase * (config.percentualGordura / 100);
         
-        return baseComComissao + gordura;
+        return valorBase + comissao + gordura;
     }
   }
 
@@ -306,7 +305,7 @@ export function printModulesReport({
             <div style="float: right; text-align: right;">
                 <div class="meta" style="margin-bottom: 2px;"><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString("pt-BR")}</div>
                 <div style="font-size: 11px; color: #d9534f; font-weight: bold;">
-                    * Este orçamento é válido por 30 dias após data de emissão.
+                    * Esta lista de precios es válida por 30 días a partir de la fecha de emisión.
                 </div>
             </div>
             <div style="clear: both;"></div>

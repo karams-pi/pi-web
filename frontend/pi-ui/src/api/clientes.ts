@@ -2,6 +2,7 @@ export interface Cliente {
   id: string;
   nome: string;
   empresa?: string | null;
+  nit?: string | null;
   email?: string | null;
   telefone?: string | null;
   ativo: boolean;

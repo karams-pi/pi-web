@@ -50,6 +50,8 @@ type ItemGrid = {
   freteBrlTooltip?: string;
   freteUsdTooltip?: string;
   observacao?: string;
+  feet?: string;
+  finishing?: string;
 };
 
 export default function ProformaInvoicePage() {
@@ -262,14 +264,13 @@ export default function ProformaInvoicePage() {
              const valorModuloTecido = item.moduloTecido.valorTecido;
              const valorBase = cotacaoRisco > 0 ? valorModuloTecido / cotacaoRisco : 0;
              const vComissao = valorBase * (comissao / 100);
-             const baseComComissao = valorBase + vComissao;
-             const vGordura = baseComComissao * (gordura / 100);
-             valorEXW = baseComComissao + vGordura;
+             const vGordura = valorBase * (gordura / 100);
+             valorEXW = valorBase + vComissao + vGordura;
 
              exwTooltip = 
                `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
                `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
-               `+ Gordura (Sobre Base+Com) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
+               `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
                `= $ ${fmt(valorEXW)}`;
         }
 
@@ -391,15 +392,14 @@ export default function ProformaInvoicePage() {
     const cotacao = Number(form.cotacaoRisco) || 0;
     const valorBase = cotacao > 0 ? valorModuloTecido / cotacao : 0;
     const vComissao = valorBase * (comissao / 100);
-    // New Formula: Gordura on (Base + Comissao)
-    const baseComComissao = valorBase + vComissao;
-    const vGordura = baseComComissao * (gordura / 100);
-    const valorEXW = baseComComissao + vGordura;
+    // Reverted: Gordura on Base Only
+    const vGordura = valorBase * (gordura / 100);
+    const valorEXW = valorBase + vComissao + vGordura;
 
     const exwTooltip = 
       `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(cotacao)}) = $ ${fmt(valorBase)}\n` +
       `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
-      `+ Gordura (Sobre Base+Com) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
+      `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
       `= $ ${fmt(valorEXW)}`;
 
     const novoItem: ItemGrid = {
@@ -447,6 +447,24 @@ export default function ProformaInvoicePage() {
       setItens(prev => prev.map(item => {
           if (item.tempId === tempId) {
              return { ...item, observacao: obs };
+          }
+          return item;
+      }));
+  };
+
+  const atualizarFeet = (tempId: number, val: string) => {
+      setItens(prev => prev.map(item => {
+          if (item.tempId === tempId) {
+             return { ...item, feet: val };
+          }
+          return item;
+      }));
+  };
+
+  const atualizarFinishing = (tempId: number, val: string) => {
+      setItens(prev => prev.map(item => {
+          if (item.tempId === tempId) {
+             return { ...item, finishing: val };
           }
           return item;
       }));
@@ -570,6 +588,8 @@ export default function ProformaInvoicePage() {
                    freteBrlTooltip: "Cálculo importado",
                    freteUsdTooltip: "Cálculo importado",
                    observacao: item.observacao || item.Observacao || "",
+                   feet: item.feet || item.Feet || "",
+                   finishing: item.finishing || item.Finishing || "",
                    codigoModuloTecido: mt?.codigoModuloTecido || ""
                };
            });
@@ -895,6 +915,8 @@ export default function ProformaInvoicePage() {
                 <th style={{...th, minWidth: "200px"}}>Descrição</th>
                 <th style={{...th, width: "80px"}}>Código</th>
                 <th style={{...th, minWidth: "150px"}}>Observação</th>
+                <th style={{...th, minWidth: "100px"}}>Pés</th>
+                <th style={{...th, minWidth: "100px"}}>Acabamento</th>
                 <th style={{...th, width: "70px"}}>Qtd</th>
                 <th style={{...th, width: "60px"}}>Larg</th>
                 <th style={{...th, width: "60px"}}>Prof</th>
@@ -943,6 +965,24 @@ export default function ProformaInvoicePage() {
                             fontSize: "11px"
                         }}
                         placeholder="Obs..."
+                      />
+                  </td>
+                  <td style={td}>
+                      <input
+                        className="cl-input"
+                        value={item.feet || ""}
+                        onChange={(e) => atualizarFeet(item.tempId, e.target.value)}
+                        style={{ width: "100%", minWidth: "80px", padding: "4px", fontSize: "12px" }}
+                        placeholder="Pés..."
+                      />
+                  </td>
+                  <td style={td}>
+                      <input
+                        className="cl-input"
+                        value={item.finishing || ""}
+                        onChange={(e) => atualizarFinishing(item.tempId, e.target.value)}
+                        style={{ width: "100%", minWidth: "80px", padding: "4px", fontSize: "12px" }}
+                        placeholder="Acabamento..."
                       />
                   </td>
                   <td style={td}>
