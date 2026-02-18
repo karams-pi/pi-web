@@ -25,6 +25,7 @@ export default function MarcasPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState<'ativos' | 'inativos' | 'todos'>('ativos');
 
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState<Marca | null>(null);
@@ -48,10 +49,20 @@ export default function MarcasPage() {
   }, []);
 
   const filteredItems = useMemo(() => {
-    if (!search) return items;
-    const lower = search.toLowerCase();
-    return items.filter((x) => x.nome.toLowerCase().includes(lower));
-  }, [items, search]);
+    let res = items;
+
+    if (filterStatus === 'ativos') {
+        res = res.filter(x => x.flAtivo !== false);
+    } else if (filterStatus === 'inativos') {
+        res = res.filter(x => x.flAtivo === false);
+    }
+
+    if (search) {
+        const lower = search.toLowerCase();
+        res = res.filter((x) => x.nome.toLowerCase().includes(lower));
+    }
+    return res;
+  }, [items, search, filterStatus]);
 
   function openCreate() {
     setEditing(null);
@@ -64,6 +75,8 @@ export default function MarcasPage() {
     setForm({ ...x, imagem: x.imagem ?? "" });
     setIsOpen(true);
   }
+
+
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
@@ -126,13 +139,37 @@ export default function MarcasPage() {
     <div style={{ padding: 16 }}>
       <h1>Modelos</h1>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
         <input
           placeholder="Buscar modelo..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ flex: 1, padding: 8 }}
+          style={{ flex: 1, padding: 8, minWidth: 200, maxWidth: 400 }}
+          className="cl-input"
         />
+
+        <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
+            style={{ padding: 8, width: 150 }}
+            className="cl-input"
+        >
+            <option value="ativos">Ativos</option>
+            <option value="inativos">Inativos</option>
+            <option value="todos">Todos</option>
+        </select>
+
+        {(search || filterStatus !== 'ativos') && (
+            <button 
+                className="btn btn-secondary" 
+                onClick={() => { setSearch(""); setFilterStatus("ativos"); }}
+                title="Limpar filtros"
+                style={{ padding: "8px 12px" }}
+            >
+                Limpar
+            </button>
+        )}
+
         <button className="btn btn-primary" onClick={openCreate}>Nova</button>
         <div style={{ marginLeft: "auto" }}>
             <PrintExportButtons

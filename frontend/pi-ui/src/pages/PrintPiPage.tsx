@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
 import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
@@ -52,26 +52,144 @@ export default function PrintPiPage() {
     load();
   }, [id]);
 
-  if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
-  if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
-
   const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   const fmt3 = (n: number) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-  const dateObj = new Date(pi.dataPi);
-
-  // Calculate total items quantity for "Product" field
-  const totalItemsQty = (pi.piItens || []).reduce((acc: number, i: any) => acc + i.quantidade, 0);
+  
+  // Safe Date Handling
+  const safeDate = (dateStr: string | undefined) => {
+      if (!dateStr) return new Date();
+      const d = new Date(dateStr);
+      return isNaN(d.getTime()) ? new Date() : d;
+  };
+  const dateObj = safeDate(pi?.dataPi);
 
   // Fallback if explicit fetch fails but PI has nested client (legacy check)
-  const displayClient = cliente || (pi as any).cliente;
-  console.log(dateObj); // Use dateObj to avoid unused warning or remove if strictly not needed, but it is used in render.
+  const displayClient = cliente || (pi as any)?.cliente;
+  console.log("PI Date:", dateObj); 
+
+  const processedData = useMemo(() => {
+    if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0 };
+
+    const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
+    pi.piItens.forEach(item => {
+        const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+        const marca = mt?.modulo?.marca?.nome || "Outros";
+        if (!itemsByMarca[marca]) itemsByMarca[marca] = [];
+        itemsByMarca[marca].push({ item, mt });
+    });
+
+    let totalSofaQty = 0;
+    
+    // Process each brand group
+    const brandGroups = Object.entries(itemsByMarca).map(([_, brandItems]) => {
+         // Sort Logic
+         const sortedItems = [...brandItems].sort((a, b) => {
+             const fabKeyA = (a.mt?.tecido?.nome || "ZZBase").toLowerCase();
+             const fabKeyB = (b.mt?.tecido?.nome || "ZZBase").toLowerCase();
+             if (fabKeyA !== fabKeyB) return fabKeyA.localeCompare(fabKeyB);
+             
+             const descA = a.mt?.modulo?.descricao || "";
+             const descB = b.mt?.modulo?.descricao || "";
+             return descA.localeCompare(descB);
+         });
+
+         // Calculate Spans
+         const spans: any = {
+             description: new Array(sortedItems.length).fill(0),
+             fabric: new Array(sortedItems.length).fill(0),
+             feet: new Array(sortedItems.length).fill(0),
+             finishing: new Array(sortedItems.length).fill(0),
+             observation: new Array(sortedItems.length).fill(0),
+             qtySofa: new Array(sortedItems.length).fill(0),
+             totalExw: new Array(sortedItems.length).fill(0)
+         };
+
+         const getMergeVal = (idx: number, type: string) => {
+             const entry = sortedItems[idx];
+             if (type === 'fabric_group') { 
+                  return entry.mt?.tecido?.nome || "Sem Tecido";
+             }
+             if (type === 'feet') return entry.item.feet || (entry.item as any).Feet || "";
+             if (type === 'finishing') return entry.item.finishing || (entry.item as any).Finishing || "";
+             if (type === 'observation') return entry.item.observacao || "";
+             return "";
+         };
+
+         // Calculate spans
+         ['feet', 'finishing', 'observation'].forEach(field => {
+             for (let i = 0; i < sortedItems.length; i++) {
+                 if (spans[field][i] === -1) continue; 
+                 let span = 1;
+                 const val = getMergeVal(i, field);
+                 for (let j = i + 1; j < sortedItems.length; j++) {
+                     if (getMergeVal(j, field) === val) {
+                         span++;
+                         spans[field][j] = -1;
+                     } else { break; }
+                 }
+                 spans[field][i] = span;
+             }
+         });
+         
+         // Fabric & Description & Qty Sofa & Total EXW (Group by Fabric Name)
+         for (let i = 0; i < sortedItems.length; i++) {
+             if (spans['fabric'][i] === -1) continue;
+             
+             let span = 1;
+             const val = getMergeVal(i, 'fabric_group');
+             for (let j = i + 1; j < sortedItems.length; j++) {
+                 if (getMergeVal(j, 'fabric_group') === val) {
+                     span++;
+                     spans['fabric'][j] = -1; 
+                 } else { break; }
+             }
+             
+             spans['fabric'][i] = span;
+             spans['description'][i] = span; // Sync
+             spans['qtySofa'][i] = span;     // Sync
+             spans['totalExw'][i] = span;    // Sync
+             
+             // Add Qty of the main item of the group to the Total Sofa Count
+             totalSofaQty += sortedItems[i].item.quantidade;
+         }
+
+         // Copy -1s for synced columns
+         for (let i = 0; i < sortedItems.length; i++) {
+              if (spans['fabric'][i] === -1) {
+                  spans['description'][i] = -1;
+                  spans['qtySofa'][i] = -1;
+                  spans['totalExw'][i] = -1;
+              }
+         }
+
+         const firstBrandItem = brandItems[0];
+         let photoUrl = firstBrandItem.mt?.modulo?.marca?.imagem || "";
+         if (photoUrl && !photoUrl.startsWith("http") && !photoUrl.startsWith("data:")) {
+             photoUrl = `data:image/png;base64,${photoUrl}`;
+         }
+         const brandName = firstBrandItem.mt?.modulo?.marca?.nome || "";
+         
+         return {
+             sortedItems,
+             spans,
+             totalBrandRows: sortedItems.length,
+             photoUrl,
+             brandName
+         };
+    });
+
+    return { brandGroups, totalSofaQty };
+  }, [pi, modulosTecidos]);
+
+  if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
+  if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
   return (
     <div className="print-container" style={{ padding: 40, fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", maxWidth: "1100px", margin: "0 auto" }}>
       <style>{`
         @media print {
             @page { margin: 0.5cm; size: landscape; }
-            body { background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+            html, body { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact; }
             
             /* Hide App Header/Footer and other non-print elements */
             .topbar, .footer, .no-print { display: none !important; }
@@ -85,9 +203,11 @@ export default function PrintPiPage() {
                 border: none !important;
                 box-shadow: none !important;
                 overflow: visible !important;
+                height: auto !important;
+                display: block !important;
             }
 
-            .print-container { padding: 0 !important; max-width: none !important; margin: 0 !important; }
+            .print-container { padding: 0 !important; max-width: none !important; margin: 0 !important; display: block !important; }
         }
         
         .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
@@ -238,6 +358,7 @@ export default function PrintPiPage() {
               <th rowSpan={2} style={{ width: "25%" }}>Description</th>
               <th colSpan={3}>DIMENSIONS (m)</th>
               <th rowSpan={2} style={{ width: "5%" }}>Qty Module</th>
+              <th rowSpan={2} style={{ width: "5%" }}>Qty Sofa</th>
               <th rowSpan={2} style={{ width: "5%" }}>Total Vol M³</th>
               <th rowSpan={2} style={{ width: "10%" }}>Fabric</th>
               <th rowSpan={2} style={{ width: "10%" }}>Feet</th>
@@ -253,213 +374,124 @@ export default function PrintPiPage() {
             </tr>
           </thead>
           <tbody>
-            {(function() {
-                // Grouping Logic:
-                // 1. Group by Marca (Brand)
-                const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
+            {processedData.brandGroups.map(({ sortedItems, spans, totalBrandRows, photoUrl, brandName }, brandIndex) => {
                 
-                (pi.piItens || []).forEach(item => {
-                    const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
-                    const marca = mt?.modulo?.marca?.nome || "Outros";
-                    if (!itemsByMarca[marca]) itemsByMarca[marca] = [];
-                    itemsByMarca[marca].push({ item, mt });
-                });
-
-                return Object.entries(itemsByMarca).map(([_, brandItems], brandIndex) => {
-                    // 2. Sort items within Brand
-                    // Primary Sort: Fabric NAME (Group broad fabric types together)
-                    // Secondary Sort: Description
-                    const sortedItems = [...brandItems].sort((a, b) => {
-                        const fabKeyA = (a.mt?.tecido?.nome || "ZZBase").toLowerCase();
-                        const fabKeyB = (b.mt?.tecido?.nome || "ZZBase").toLowerCase();
-                        if (fabKeyA !== fabKeyB) return fabKeyA.localeCompare(fabKeyB);
-                        
-                        const descA = a.mt?.modulo?.descricao || "";
-                        const descB = b.mt?.modulo?.descricao || "";
-                        return descA.localeCompare(descB);
-                    });
-
-                    // 3. Calculate Independent RowSpans
-                    // Strategy:
-                    // - Description & Fabric: Merge based on Fabric Name Group (List of items).
-                    // - Feet & Finishing & Observation: Merge based on strict value equality.
+                const renderGroupListCell = (field: 'description' | 'fabric', index: number) => {
+                    const span = spans[field][index];
+                    if (span === -1) return null;
                     
-                    const spans: any = {
-                        description: new Array(sortedItems.length).fill(0),
-                        fabric: new Array(sortedItems.length).fill(0),
-                        feet: new Array(sortedItems.length).fill(0),
-                        finishing: new Array(sortedItems.length).fill(0),
-                        observation: new Array(sortedItems.length).fill(0)
-                    };
-
-                    const getMergeVal = (idx: number, type: string) => {
-                        const entry = sortedItems[idx];
-                        if (type === 'fabric_group') { // For Description & Fabric Columns
-                             return entry.mt?.tecido?.nome || "Sem Tecido";
-                        }
-                        if (type === 'feet') return entry.item.feet || (entry.item as any).Feet || "";
-                        if (type === 'finishing') return entry.item.finishing || (entry.item as any).Finishing || "";
-                        if (type === 'observation') return entry.item.observacao || "";
-                        return "";
-                    };
-
-                    // Calculate spans
-                    // Feet, Finishing, Observation (Strict Value)
-                    ['feet', 'finishing', 'observation'].forEach(field => {
-                        for (let i = 0; i < sortedItems.length; i++) {
-                            if (spans[field][i] === -1) continue; 
-                            let span = 1;
-                            const val = getMergeVal(i, field);
-                            for (let j = i + 1; j < sortedItems.length; j++) {
-                                if (getMergeVal(j, field) === val) {
-                                    span++;
-                                    spans[field][j] = -1;
-                                } else {
-                                    break;
-                                }
-                            }
-                            spans[field][i] = span;
-                        }
-                    });
+                    const groupItems = sortedItems.slice(index, index + span);
                     
-                    // Fabric (Group by Fabric Name)
-                    for (let i = 0; i < sortedItems.length; i++) {
-                        if (spans['fabric'][i] === -1) continue;
-                        let span = 1;
-                        const val = getMergeVal(i, 'fabric_group');
-                        for (let j = i + 1; j < sortedItems.length; j++) {
-                            if (getMergeVal(j, 'fabric_group') === val) {
-                                span++;
-                                spans['fabric'][j] = -1; 
-                            } else {
-                                break;
-                            }
-                        }
-                        spans['fabric'][i] = span;
-                    }
-
-                    // Description (Group by Fabric Name - Copied from Fabric Span)
-                    for (let i = 0; i < sortedItems.length; i++) {
-                        spans['description'][i] = spans['fabric'][i];
-                    }
-
-
-                    // Calculate Total EXW for Brand
-                    const brandTotalEXW = brandItems.reduce((sum, { item }) => sum + ((item.valorEXW || 0) * (item.quantidade || 0)), 0);
-
-                    const firstBrandItem = brandItems[0];
-                    let photoUrl = firstBrandItem.mt?.modulo?.marca?.imagem || "";
-                    if (photoUrl && !photoUrl.startsWith("http") && !photoUrl.startsWith("data:")) {
-                        photoUrl = `data:image/png;base64,${photoUrl}`;
-                    }
-                    const brandName = firstBrandItem.mt?.modulo?.marca?.nome || "";
-                    const totalBrandRows = sortedItems.length;
+                    const cellStyle: React.CSSProperties = {
+                        border: "1px solid #000", 
+                        padding: "2px 5px", 
+                        verticalAlign: "middle", 
+                        textAlign: field === 'fabric' ? "center" : "left",
+                        background: field === 'fabric' ? '#f0fdf4' : 'inherit',
+                        color: field === 'fabric' ? '#166534' : 'inherit',
+                        fontWeight: field === 'fabric' ? 'bold' : 'normal'
+                    };
 
                     return (
-                        <React.Fragment key={brandIndex}>
-                            {sortedItems.map(({ item }, index) => {
-                                const isFirstInBrand = index === 0;
-
-                                const renderMergedCell = (field: string, content: React.ReactNode, extraStyle: React.CSSProperties = {}) => {
-                                    const span = spans[field][index];
-                                    if (span === -1) return null;
-                                    return (
-                                        <td rowSpan={span} style={{ border: "1px solid #000", verticalAlign: "middle", ...extraStyle }}>
-                                            {content}
-                                        </td>
-                                    );
-                                };
-                                
-                                const renderGroupListCell = (field: 'description' | 'fabric') => {
-                                    const span = spans[field][index];
-                                    if (span === -1) return null;
-                                    
-                                    const groupItems = sortedItems.slice(index, index + span);
-                                    
-                                    // Style overrides for Fabric column
-                                    const cellStyle: React.CSSProperties = {
-                                        border: "1px solid #000", 
-                                        padding: "2px 5px", 
-                                        verticalAlign: "middle", 
-                                        textAlign: field === 'fabric' ? "center" : "left",
-                                        background: field === 'fabric' ? '#f0fdf4' : 'inherit', // Light Green for Fabric
-                                        color: field === 'fabric' ? '#166534' : 'inherit',     // Green Text for Fabric
-                                        fontWeight: field === 'fabric' ? 'bold' : 'normal'
-                                    };
-
-                                    return (
-                                        <td rowSpan={span} style={cellStyle}>
-                                            {groupItems.map((g, i) => {
-                                                let text = "";
-                                                if (field === 'description') {
-                                                    text = (g.item.quantidade > 1 ? `${g.item.quantidade} ` : "") + (g.mt?.modulo?.descricao || `Modulo #${g.item.idModuloTecido}`);
-                                                } else { // fabric
-                                                    const fName = g.mt?.tecido?.nome || "Sem Tecido";
-                                                    const fCode = g.item.tempCodigoModuloTecido || g.mt?.codigoModuloTecido || "";
-                                                    text = fCode ? `${fName} - ${fCode}` : fName;
-                                                }
-                                                return (
-                                                    <div key={i} style={{ marginBottom: 4, borderBottom: i < groupItems.length - 1 ? "1px dashed #ccc" : "none" }}>
-                                                        {text}
-                                                    </div>
-                                                );
-                                            })}
-                                        </td>
-                                    );
-                                };
-
+                        <td rowSpan={span} style={cellStyle}>
+                            {groupItems.map((g, i) => {
+                                let text = "";
+                                if (field === 'description') {
+                                    text = (g.item.quantidade > 1 ? `${g.item.quantidade} ` : "") + (g.mt?.modulo?.descricao || `Modulo #${g.item.idModuloTecido}`);
+                                } else { // fabric
+                                    const fName = g.mt?.tecido?.nome || "Sem Tecido";
+                                    const fCode = g.item.tempCodigoModuloTecido || g.mt?.codigoModuloTecido || "";
+                                    text = fCode ? `${fName} - ${fCode}` : fName;
+                                }
                                 return (
-                                    <tr key={item.id || Math.random()} style={{ borderBottom: "1px solid #ccc" }}>
-                                        {/* Photo & Name */}
-                                        {isFirstInBrand && (
-                                            <React.Fragment>
-                                                <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", padding: 5, verticalAlign: "middle" }}>
-                                                    {photoUrl && <img src={photoUrl} alt={brandName} style={{ maxWidth: "80px", maxHeight: "80px" }} />}
-                                                </td>
-                                                <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", fontWeight: "bold", verticalAlign: "middle", background: "#eff6ff" }}>
-                                                    {brandName}
-                                                </td>
-                                            </React.Fragment>
-                                        )}
-                                        
-                                        {/* Description: Merged by Fabric Name Group (List) */}
-                                        {renderGroupListCell('description')}
-
-                                        {/* Dimensions: Per Item */}
-                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.largura)}</td>
-                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.profundidade)}</td>
-                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.altura)}</td>
-                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
-                                        <td className="col-m3" style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
-                                        
-                                        {/* Fabric: Merged by Fabric Name Group (List) */}
-                                        {renderGroupListCell('fabric')}
-                                        
-                                        {/* Feet: Merged by Strict Equality */}
-                                        {renderMergedCell('feet', item.feet || (item as any).Feet || "", { textAlign: "center" })}
-
-                                        {/* Finishing: Merged by Strict Equality */}
-                                        {renderMergedCell('finishing', item.finishing || (item as any).Finishing || "", { textAlign: "center" })}
-                                        
-                                        {/* Observation: Merged by Strict Equality */}
-                                        {renderMergedCell('observation', item.observacao || "", { })}
-                                        
-                                        {/* Unit EXW: Per Item */}
-                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW)}</td>
-                                        
-                                        {/* Total Group EXW */}
-                                        {isFirstInBrand && (
-                                            <td rowSpan={totalBrandRows} className="col-total" style={{ border: "1px solid #000", textAlign: "right", fontWeight: "bold", verticalAlign: "middle", background: "#fff1f2" }}>
-                                                $ {fmt(brandTotalEXW)}
-                                            </td>
-                                        )}
-                                    </tr>
+                                    <div key={i} style={{ marginBottom: 4, borderBottom: i < groupItems.length - 1 ? "1px dashed #ccc" : "none" }}>
+                                        {text}
+                                    </div>
                                 );
                             })}
-                        </React.Fragment>
+                        </td>
                     );
-                });
-            })()}
+                };
+
+                return (
+                    <React.Fragment key={brandIndex}>
+                        {sortedItems.map((entry, index) => {
+                            const { item } = entry;
+                            const isFirstInBrand = index === 0;
+
+                            // Calculate Fabric Group Total EXW
+                            let fabricGroupTotal = 0;
+                            if (spans['totalExw'][index] > 0) {
+                                const span = spans['totalExw'][index];
+                                const groupRange = sortedItems.slice(index, index + span);
+                                fabricGroupTotal = groupRange.reduce((sum, g) => sum + ((Number(g.item.valorEXW) || 0) * (Number(g.item.quantidade) || 0)), 0);
+                            }
+
+                            const renderMergedCellForCurrentRow = (field: string, content: React.ReactNode, extraStyle: React.CSSProperties = {}) => {
+                                const span = spans[field][index];
+                                if (span === -1) return null;
+                                return (
+                                    <td rowSpan={span} style={{ border: "1px solid #000", verticalAlign: "middle", ...extraStyle }}>
+                                        {content}
+                                    </td>
+                                );
+                            };
+                            
+                            return (
+                                <tr key={item.id || Math.random()} style={{ borderBottom: "1px solid #ccc" }}>
+                                    {/* Photo & Name */}
+                                    {isFirstInBrand && (
+                                        <React.Fragment>
+                                            <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", padding: 5, verticalAlign: "middle" }}>
+                                                {photoUrl && <img src={photoUrl} alt={brandName} style={{ maxWidth: "80px", maxHeight: "80px" }} />}
+                                            </td>
+                                            <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", fontWeight: "bold", verticalAlign: "middle", background: "#eff6ff" }}>
+                                                {brandName}
+                                            </td>
+                                        </React.Fragment>
+                                    )}
+                                    
+                                    {/* Description */}
+                                    {renderGroupListCell('description', index)}
+
+                                    {/* Dimensions: Per Item */}
+                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.largura)}</td>
+                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.profundidade)}</td>
+                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.altura)}</td>
+                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
+                                    
+                                    {/* Qty Sofa: Mapped to Fabric Group. User says "distinct das quantidades... sempre iguais" -> item.quantidade */}
+                                    {renderMergedCellForCurrentRow('qtySofa', fmt(item.quantidade, 0), { textAlign: "center", fontWeight: "bold" })}
+
+                                    <td className="col-m3" style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
+                                    
+                                    {/* Fabric */}
+                                    {renderGroupListCell('fabric', index)}
+                                    
+                                    {/* Feet */}
+                                    {renderMergedCellForCurrentRow('feet', item.feet || (item as any).Feet || "", { textAlign: "center" })}
+
+                                    {/* Finishing */}
+                                    {renderMergedCellForCurrentRow('finishing', item.finishing || (item as any).Finishing || "", { textAlign: "center" })}
+                                    
+                                    {/* Observation */}
+                                    {renderMergedCellForCurrentRow('observation', item.observacao || "", { })}
+                                    
+                                    {/* Unit EXW: Per Item */}
+                                    <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW)}</td>
+                                    
+                                    {/* Total Group EXW: Broken down by Fabric */}
+                                    {renderMergedCellForCurrentRow('totalExw', `$ ${fmt(fabricGroupTotal)}`, { 
+                                        textAlign: "right", 
+                                        fontWeight: "bold", 
+                                        background: "#fff1f2" 
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </React.Fragment>
+                );
+            })}
           </tbody>
         </table>
       </div>
@@ -487,11 +519,11 @@ export default function PrintPiPage() {
               <h3 style={{ borderBottom: "none", marginBottom: 5 }}>GENERAL PRODUCT DATA</h3>
               <p><strong>Brand:</strong> Karams</p>
               <p><strong>NCM:</strong> 94016100</p>
-              <p><strong>PRODUCTO:</strong> {fmt(totalItemsQty, 0)}</p>
-              <p><strong>CBM M³:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + (i.m3 * i.quantidade), 0))}</p>
+              <p><strong>Product:</strong> {fmt(processedData.totalSofaQty, 0)}</p>
+              <p><strong>CBM M³:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
               <p><strong>P.N. TOTAL:</strong></p>
               <p><strong>P.B. TOTAL:</strong></p>
-              <p><strong>VOLUMEN TOTAL:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + (i.m3 * i.quantidade), 0))}</p>
+              <p><strong>VOLUMEN TOTAL:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
               <p><strong>Productos originales de fabrica</strong></p>
               <p><strong>Made in Brasil</strong></p>
           </div>
