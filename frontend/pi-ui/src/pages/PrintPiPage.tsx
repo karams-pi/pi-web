@@ -55,25 +55,10 @@ export default function PrintPiPage() {
   if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
   if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
-  const getDescricao = (idModuloTecido: number) => {
-    const mt = modulosTecidos.find(m => m.id === idModuloTecido);
-    if (!mt) return `Item #${idModuloTecido}`;
-    
-    const forn = mt.modulo?.fornecedor?.nome || "?";
-    const cat = mt.modulo?.categoria?.nome || "?";
-    const marc = mt.modulo?.marca?.nome || "?";
-    const mod = mt.modulo?.descricao || "?";
-    const tec = mt.tecido?.nome || "?";
-    
-    return `${forn} > ${cat} > ${marc} > ${mod} > ${tec}`;
-  };
-
   const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   const fmt3 = (n: number) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   const dateObj = new Date(pi.dataPi);
 
-  const totalGeralUSD = (pi.piItens || []).reduce((acc: number, i: any) => acc + i.valorFinalItemUSDRisco, 0);
-  
   // Calculate total items quantity for "Product" field
   const totalItemsQty = (pi.piItens || []).reduce((acc: number, i: any) => acc + i.quantidade, 0);
 
@@ -85,14 +70,34 @@ export default function PrintPiPage() {
     <div className="print-container" style={{ padding: 40, fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", maxWidth: "1100px", margin: "0 auto" }}>
       <style>{`
         @media print {
-            @page { margin: 1cm; size: landscape; }
+            @page { margin: 0.5cm; size: landscape; }
             body { background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact; }
-            .no-print { display: none !important; }
+            
+            /* Hide App Header/Footer and other non-print elements */
+            .topbar, .footer, .no-print { display: none !important; }
+            
+            /* Reset Main Layout Constraints */
+            .app, .main, .container { 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                width: 100% !important; 
+                max-width: none !important; 
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+            }
+
             .print-container { padding: 0 !important; max-width: none !important; margin: 0 !important; }
         }
+        
         .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-        .print-table th, .print-table td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
-        .print-table th { background: #f0f0f0; font-weight: bold; text-align: center; }
+        .print-table th, .print-table td { border: 1px solid #000; padding: 4px 6px; text-align: left; }
+        .print-table th { background: #2c3e50 !important; color: #fff !important; font-weight: bold; text-align: center; -webkit-print-color-adjust: exact; }
+        
+        /* Print Pagination Control */
+        thead { display: table-header-group; }
+        tfoot { display: table-footer-group; }
+        tr { break-inside: avoid; page-break-inside: avoid; }
         
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 20px; }
         .print-header-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 20px; }
@@ -103,7 +108,7 @@ export default function PrintPiPage() {
 
         .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; font-size: 12px; }
         .footer-col h3 { border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; }
-        .bank-details p { margin: 2px 0; }
+        .footer-col p { margin: 2px 0; }
         
         .btn-print {
             position: fixed; top: 20px; right: 20px; 
@@ -122,11 +127,11 @@ export default function PrintPiPage() {
       {/* Blue Top Bar */}
       <div style={{ height: "4px", background: "#003366", marginBottom: "10px" }} className="no-print-border"></div>
 
-      <div className="print-header" style={{ alignItems: "center", borderBottom: "none", marginBottom: "10px" }}>
+      <div className="print-header" style={{ display: "flex", alignItems: "center", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "0px" }}>
         {/* Left: Logo */}
-        <div style={{ flex: "0 0 120px" }}>
+        <div style={{ width: "150px" }}>
              <img src="/logo-karams.png" alt="Karams Logo" style={{ maxWidth: "100%", height: "auto" }} />
-             <div style={{ fontSize: 9, textAlign: "center", marginTop: 5 }}>{dateObj.toLocaleDateString()}</div>
+             {/* Date removed from here as per new layout */}
         </div>
 
         {/* Center: Company Info */}
@@ -139,49 +144,82 @@ export default function PrintPiPage() {
            </div>
         </div>
         
-        {/* Right Spacer for checking centering - optional, or just let flex 1 take space. 
-            If we want true center relative to page, we might need a spacer or absolute positioning.
-            Flex 1 usually centers between the other two items. If right item is missing, it centers between left and edge.
-            To allow text to be truly centered, we can add a dummy div of same width as logo.
-        */}
-        <div style={{ flex: "0 0 120px" }}></div>
+        {/* Right Spacer to balance Logo for centering */}
+        <div style={{ width: "150px" }}></div>
       </div>
 
-      <div className="print-header-grid" style={{ marginBottom: "10px" }}>
+      <div className="print-header-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "20px" }}>
           {/* Left: Importer */}
-          <div style={{ paddingRight: "20px" }}>
-              <h3 style={{ borderBottom: "1px solid #000", paddingBottom: "5px", marginBottom: "10px", fontSize: "12px" }}>IMPORTER</h3>
-              <div style={{ fontSize: "11px", lineHeight: "1.4em" }}>
-                  <p style={{ margin: 0 }}><strong>{displayClient?.nome || (pi as any).cliente?.nome}</strong></p>
-                  <p style={{ margin: 0 }}>{displayClient?.endereco || (pi as any).cliente?.endereco}</p>
-                  <p style={{ margin: 0 }}>{displayClient?.cidade || (pi as any).cliente?.cidade} - {displayClient?.estado || (pi as any).cliente?.estado}</p>
-                  <p style={{ margin: 0 }}>{displayClient?.pais || (pi as any).cliente?.pais}</p>
-                  <p style={{ margin: 0 }}>CNPJ/Tax ID: {displayClient?.cnpj || (pi as any).cliente?.cnpj}</p>
+          <div style={{ paddingRight: "10px", fontSize: "11px", lineHeight: "1.4em" }}>
+              <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>IMPORTER:</div>
+              <div style={{ textTransform: "uppercase" }}>{displayClient?.nome || (pi as any).cliente?.nome}</div>
+              
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>ADDRESS:</span>
+                  <span>{displayClient?.endereco || (pi as any).cliente?.endereco}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>CITY:</span>
+                  <span>{displayClient?.cidade || (pi as any).cliente?.cidade}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>COUNTRY:</span>
+                  <span>{displayClient?.pais || (pi as any).cliente?.pais}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>NIT:</span>
+                  <span>{displayClient?.nit || (pi as any).cliente?.nit || ""}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>FONE:</span>
+                  <span>{displayClient?.telefone || (pi as any).cliente?.telefone}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>RES. PERSON:</span>
+                  <span>{displayClient?.pessoaContato || (pi as any).cliente?.pessoaContato || ".."}</span>
+              </div>
+              <div style={{ display: "flex" }}>
+                  <span style={{ width: "70px" }}>E-MAIL:</span>
+                  <span>{displayClient?.email || (pi as any).cliente?.email}</span>
               </div>
           </div>
 
-          {/* Right: Proforma Invoice Details */}
-          <div style={{ paddingLeft: "20px", borderLeft: "1px solid #ccc" }}>
-              <h3 style={{ borderBottom: "1px solid #000", paddingBottom: "5px", marginBottom: "10px", fontSize: "12px", textAlign: "right" }}>PROFORMA INVOICE</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "11px", lineHeight: "1.4em" }}>
-                  <div style={{ textAlign: "right", fontWeight: "bold" }}>DATE:</div>
-                  <div>{dateObj.toLocaleDateString()}</div>
-                  
-                  <div style={{ textAlign: "right", fontWeight: "bold" }}>INVOICE N°:</div>
-                  <div>{pi.prefixo}-{pi.piSequencia}</div>
-                  
-                  <div style={{ textAlign: "right", fontWeight: "bold" }}>PAYMENT TERM:</div>
-                  <div>{pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</div>
-                  
-                  <div style={{ textAlign: "right", fontWeight: "bold" }}>INCOTERM:</div>
-                  <div>{pi.frete?.nome || "FOB"}</div>
-                  
-                  <div style={{ textAlign: "right", fontWeight: "bold" }}>PORT OF LOADING:</div>
-                  <div>{pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || "PARANAGUA"}</div>
-                  
-                  <div style={{ textAlign: "right", fontWeight: "bold" }}>PORT OF DISCHARGE:</div>
-                  <div>{pi.cliente?.portoDestino || (pi as any).portoDestino || ""}</div>
-              </div>
+          {/* Right: PI Details */}
+          <div style={{ paddingLeft: "10px", fontSize: "11px", lineHeight: "1.4em", borderLeft: "1px solid #000" }}>
+               <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>PROFORMA INVOICE: {pi.prefixo}-{pi.piSequencia}</div>
+               
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span>DATE:</span>
+                   <span>{dateObj.toLocaleDateString("pt-BR")}</span>
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span>PROFORMA INVOICE:</span>
+                   <span>{pi.prefixo}-{pi.piSequencia}</span>
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span>ORDER DATE:</span>
+                   <span>{new Date(pi.dataPi).toLocaleDateString("pt-BR")}</span> 
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span style={{ width: "130px" }}>PLACE OF LOADING:</span>
+                   <span>{pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || "PARANAGUA"}</span>
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span style={{ width: "130px" }}>PLACE OF DISCHARGE:</span>
+                   <span>{displayClient?.portoDestino || pi.cliente?.portoDestino || ""}</span>
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span style={{ width: "130px" }}>DELIVERY TIME:</span>
+                   <span>50 days after first payment</span>
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span style={{ width: "130px" }}>INCOTERM:</span>
+                   <span>FOB {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || ""}</span>
+               </div>
+               <div style={{ display: "flex", justifyContent: "space-between" }}>
+                   <span style={{ width: "130px" }}>PAYMENT TERM:</span>
+                   <span>{pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
+               </div>
           </div>
       </div>
 
@@ -195,35 +233,29 @@ export default function PrintPiPage() {
         <table className="print-table" style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", fontSize: "10px" }}>
           <thead style={{ background: "#1a2e44", color: "white", textTransform: "uppercase" }}>
             <tr>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>Photo</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>Name</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "25%" }}>Description</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "5%" }}>Width</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "5%" }}>Depth</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "5%" }}>Height</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "5%" }}>Qty Module</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "5%" }}>Total Vol M³</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>Fabric</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>Feet</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>Finishing</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>Observation</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>EXW DOLAR {fmt(pi.cotacaoRisco)}</th>
-              <th style={{ border: "1px solid #000", padding: 5, width: "10%" }}>TOTAL EXW</th>
+              <th rowSpan={2} style={{ width: "10%" }}>Photo</th>
+              <th rowSpan={2} style={{ width: "10%" }}>Name</th>
+              <th rowSpan={2} style={{ width: "25%" }}>Description</th>
+              <th colSpan={3}>DIMENSIONS (m)</th>
+              <th rowSpan={2} style={{ width: "5%" }}>Qty Module</th>
+              <th rowSpan={2} style={{ width: "5%" }}>Total Vol M³</th>
+              <th rowSpan={2} style={{ width: "10%" }}>Fabric</th>
+              <th rowSpan={2} style={{ width: "10%" }}>Feet</th>
+              <th rowSpan={2} style={{ width: "10%" }}>Finishing</th>
+              <th rowSpan={2} style={{ width: "10%" }}>Observation</th>
+              <th rowSpan={2} style={{ width: "10%" }}>EXW DOLAR {fmt(pi.cotacaoAtualUSD)}</th>
+              <th rowSpan={2} style={{ width: "10%" }}>TOTAL EXW</th>
+            </tr>
+            <tr>
+               <th style={{ width: "5%" }}>Width</th>
+               <th style={{ width: "5%" }}>Depth</th>
+               <th style={{ width: "5%" }}>Height</th>
             </tr>
           </thead>
           <tbody>
             {(function() {
                 // Grouping Logic:
                 // 1. Group by Marca (Brand)
-                // 2. Inside Marca, Group by Fabric Code (tecido + cor?? User said: "baseado no tecido dos módulos" and "codigo informado no lançamento")
-                //    The "codigo informado" is likely `moduloTecido.codigoModuloTecido` or just strict Fabric ID.
-                //    Let's group by `idModuloTecido` (since that defines the variant) OR by specific fabric if different modules have same fabric?
-                //    User said: "Os campos Description e Fabric devem ser mesclados baseado no tecido dos módulos"
-                //    This likely means: If I have Module A with Fabric X and Module B with Fabric X, they should be listed together?
-                //    Or does it mean: If I have 2 units of Module A with Fabric X, show "2 Module A"?
-                //    Given "Qty Sofa" (from reference) and "Qty Module" columns, it seems we list unique Module+Fabric combinations.
-                
-                // Let's first group by Marca.
                 const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
                 
                 (pi.piItens || []).forEach(item => {
@@ -234,39 +266,85 @@ export default function PrintPiPage() {
                 });
 
                 return Object.entries(itemsByMarca).map(([_, brandItems], brandIndex) => {
-                    // Sort items by Description to match "Description" order? Or by Fabric?
-                    // User said "merged based on fabric".
-                    // Let's group by Fabric Code within the Brand.
-                    const itemsByFabric: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
-                    
-                    brandItems.forEach(entry => {
-                         // User said: "No campo Fabric deve trazer G0 - (Codigo informado no lançamento da PI)"
-                         // G0 suggests a price group, but "Codigo informado" might be `observacao` or `codigoModuloTecido`?
-                         // In `PiItem` we have `tempCodigoModuloTecido`? Or `moduloTecido.codigoModuloTecido`?
-                         // Let's assume `mt.codigoModuloTecido` or create a composite key.
-                         // Actually, looking at previous context, we might treat `mt.idTecido` as the grouping key for "Fabric".
-                         const fabricKey = entry.mt?.tecido?.nome || "Sem Tecido"; 
-                         if (!itemsByFabric[fabricKey]) itemsByFabric[fabricKey] = [];
-                         itemsByFabric[fabricKey].push(entry);
+                    // 2. Sort items within Brand
+                    // Primary Sort: Fabric NAME (Group broad fabric types together)
+                    // Secondary Sort: Description
+                    const sortedItems = [...brandItems].sort((a, b) => {
+                        const fabKeyA = (a.mt?.tecido?.nome || "ZZBase").toLowerCase();
+                        const fabKeyB = (b.mt?.tecido?.nome || "ZZBase").toLowerCase();
+                        if (fabKeyA !== fabKeyB) return fabKeyA.localeCompare(fabKeyB);
+                        
+                        const descA = a.mt?.modulo?.descricao || "";
+                        const descB = b.mt?.modulo?.descricao || "";
+                        return descA.localeCompare(descB);
                     });
 
-                    // Flatten back to list for rendering, but we need to know boundaries for spans.
-                    // Actually, the request says "Description and Fabric must be merged".
-                    // This is ambiguous. Does it mean "Description RowSpan" and "Fabric RowSpan"?
-                    // Or "Fabric Column shows X" and "Description Column shows Y" for the whole group?
-                    // Reference image 2 shows:
-                    // Photo | Name | Description (List of modules) | ... | Fabric (One Value) | ...
-                    // If multiple modules have SAME fabric, they share the Fabric Cell?
+                    // 3. Calculate Independent RowSpans
+                    // Strategy:
+                    // - Description & Fabric: Merge based on Fabric Name Group (List of items).
+                    // - Feet & Finishing & Observation: Merge based on strict value equality.
                     
-                    // Let's try to interpret "Description e Fabric devem ser mesclados baseado no tecido":
-                    // It likely means: Group by Fabric. For each Fabric group, show 1 Fabric Cell.
-                    // AND inside that Fabric group, list the modules in the Description column? 
-                    // NO, Description column is per module. Fabric column is "mesclado" (merged/spanned).
+                    const spans: any = {
+                        description: new Array(sortedItems.length).fill(0),
+                        fabric: new Array(sortedItems.length).fill(0),
+                        feet: new Array(sortedItems.length).fill(0),
+                        finishing: new Array(sortedItems.length).fill(0),
+                        observation: new Array(sortedItems.length).fill(0)
+                    };
+
+                    const getMergeVal = (idx: number, type: string) => {
+                        const entry = sortedItems[idx];
+                        if (type === 'fabric_group') { // For Description & Fabric Columns
+                             return entry.mt?.tecido?.nome || "Sem Tecido";
+                        }
+                        if (type === 'feet') return entry.item.feet || (entry.item as any).Feet || "";
+                        if (type === 'finishing') return entry.item.finishing || (entry.item as any).Finishing || "";
+                        if (type === 'observation') return entry.item.observacao || "";
+                        return "";
+                    };
+
+                    // Calculate spans
+                    // Feet, Finishing, Observation (Strict Value)
+                    ['feet', 'finishing', 'observation'].forEach(field => {
+                        for (let i = 0; i < sortedItems.length; i++) {
+                            if (spans[field][i] === -1) continue; 
+                            let span = 1;
+                            const val = getMergeVal(i, field);
+                            for (let j = i + 1; j < sortedItems.length; j++) {
+                                if (getMergeVal(j, field) === val) {
+                                    span++;
+                                    spans[field][j] = -1;
+                                } else {
+                                    break;
+                                }
+                            }
+                            spans[field][i] = span;
+                        }
+                    });
                     
-                    // Let's group brandItems by Fabric for the render loop.
-                    const fabricGroups = Object.entries(itemsByFabric);
-                    
-                    // Calculate Total EXW for the visual Brand Group
+                    // Fabric (Group by Fabric Name)
+                    for (let i = 0; i < sortedItems.length; i++) {
+                        if (spans['fabric'][i] === -1) continue;
+                        let span = 1;
+                        const val = getMergeVal(i, 'fabric_group');
+                        for (let j = i + 1; j < sortedItems.length; j++) {
+                            if (getMergeVal(j, 'fabric_group') === val) {
+                                span++;
+                                spans['fabric'][j] = -1; 
+                            } else {
+                                break;
+                            }
+                        }
+                        spans['fabric'][i] = span;
+                    }
+
+                    // Description (Group by Fabric Name - Copied from Fabric Span)
+                    for (let i = 0; i < sortedItems.length; i++) {
+                        spans['description'][i] = spans['fabric'][i];
+                    }
+
+
+                    // Calculate Total EXW for Brand
                     const brandTotalEXW = brandItems.reduce((sum, { item }) => sum + ((item.valorEXW || 0) * (item.quantidade || 0)), 0);
 
                     const firstBrandItem = brandItems[0];
@@ -275,118 +353,108 @@ export default function PrintPiPage() {
                         photoUrl = `data:image/png;base64,${photoUrl}`;
                     }
                     const brandName = firstBrandItem.mt?.modulo?.marca?.nome || "";
-                    
-                    // Determine total rows for Brand (to span Photo/Name/Total)
-                    const totalBrandRows = brandItems.length;
-                    
-                    let renderedRows = 0;
+                    const totalBrandRows = sortedItems.length;
 
                     return (
                         <React.Fragment key={brandIndex}>
-                            {fabricGroups.map(([fabricName, fabItems], fabIndex) => {
-                                // fabItems is list of modules with same fabric
-                                const fabRowSpan = fabItems.length;
+                            {sortedItems.map(({ item }, index) => {
+                                const isFirstInBrand = index === 0;
+
+                                const renderMergedCell = (field: string, content: React.ReactNode, extraStyle: React.CSSProperties = {}) => {
+                                    const span = spans[field][index];
+                                    if (span === -1) return null;
+                                    return (
+                                        <td rowSpan={span} style={{ border: "1px solid #000", verticalAlign: "middle", ...extraStyle }}>
+                                            {content}
+                                        </td>
+                                    );
+                                };
                                 
-                                return fabItems.map(({ item, mt }, itemIndex) => {
-                                    const isFirstInBrand = renderedRows === 0; // First row of the entire Brand group
-                                    const isFirstInFabric = itemIndex === 0; // First row of this Fabric sub-group
-
-                                    // Fabric Format: "Name - Code"
-                                    // Code: item.tempCodigoModuloTecido (most likely) or mt.codigoModuloTecido
-                                    const fabricName = mt?.tecido?.nome || "";
-                                    const fabricCode = item.tempCodigoModuloTecido || mt?.codigoModuloTecido || "";
-                                    const fabricDisplay = fabricCode ? `${fabricName} - ${fabricCode}` : fabricName;
-
-                                    renderedRows++;
+                                const renderGroupListCell = (field: 'description' | 'fabric') => {
+                                    const span = spans[field][index];
+                                    if (span === -1) return null;
+                                    
+                                    const groupItems = sortedItems.slice(index, index + span);
+                                    
+                                    // Style overrides for Fabric column
+                                    const cellStyle: React.CSSProperties = {
+                                        border: "1px solid #000", 
+                                        padding: "2px 5px", 
+                                        verticalAlign: "middle", 
+                                        textAlign: field === 'fabric' ? "center" : "left",
+                                        background: field === 'fabric' ? '#f0fdf4' : 'inherit', // Light Green for Fabric
+                                        color: field === 'fabric' ? '#166534' : 'inherit',     // Green Text for Fabric
+                                        fontWeight: field === 'fabric' ? 'bold' : 'normal'
+                                    };
 
                                     return (
-                                        <tr key={item.id} style={{ borderBottom: "1px solid #ccc" }}>
-                                            {/* Photo & Name: Span across ALL Brand items */}
-                                            {isFirstInBrand && (
-                                                <React.Fragment>
-                                                    <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", padding: 5, verticalAlign: "middle" }}>
-                                                        {photoUrl && <img src={photoUrl} alt={brandName} style={{ maxWidth: "80px", maxHeight: "80px" }} />}
-                                                    </td>
-                                                    <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", fontWeight: "bold", verticalAlign: "middle" }}>
-                                                        {brandName}
-                                                    </td>
-                                                </React.Fragment>
-                                            )}
-                                            
-                                            {/* Module Description: Per Item or Merged?
-                                                User said: "Os campos Description e Fabric devem ser mesclados baseado no tecido"
-                                                If we merge Description, we must list all items in one cell?
-                                                OR we just remove borders to look merged?
-                                                Given the columns Width/Depth/Height are per item, merging Description PHYSICALLY is tricky if height doesn't match.
-                                                However, if we rowSpan Description, we must ensure the height covers the rows.
-                                                Let's try rowSpan and render the content of THIS item only? No, that's regular.
-                                                If we rowSpan, we render content for ALL items in this fabric group in one cell.
-                                                BUT we have Width/Depth columns to the right which are 1 row each.
-                                                So the Description cell will be tall. Inside it, we list the modules.
-                                                We need to make sure the list lines up with the rows?
-                                                Actually, if I look at the reference image, the Description text is centered vertically if it was merged?
-                                                No, the reference image shows Description as "Modulo...".
-                                                If the user wants MERGED Description, maybe they want the TEXT to be just the "Base Module Name" once?
-                                                And then Qty is summed?
-                                                No, "Qty Module" is a column.
-                                                If I merge Description, I will list the modules with <br/> to try and align.
-                                                BUT this is risky for alignment with Width/Depth.
-                                                
-                                                ALTERNATIVE INTERPRETATION: "Mesclados" means visual grouping.
-                                                I will apply rowSpan to Description and list the items.
-                                            */}
-                                            {isFirstInFabric && (
-                                                <td rowSpan={fabRowSpan} style={{ border: "1px solid #000", padding: 2, verticalAlign: "middle" }}>
-                                                    {fabItems.map((f, i) => (
-                                                        <div key={i} style={{ height: "20px", overflow: "hidden" }}> 
-                                                            {/* Fixed height to try to align? No, unsafe. 
-                                                                Let's just list them. The row heights of the other columns will stretch this cell 
-                                                                BUT this cell is spanning multiple rows.
-                                                                Wait, if I span, the other columns (Width etc) will be rendered in subsequent Trs.
-                                                                The browser handles the height.
-                                                                If I put all descriptions here, they might not align with the Widths visually if text wraps.
-                                                                But let's do what asked.
-                                                            */}
-                                                            {(f.item.quantidade > 1 ? `${f.item.quantidade} ` : "") + (f.mt?.modulo?.descricao || "")}
-                                                        </div>
-                                                    ))}
-                                                </td>
-                                            )} 
-                                            {/* If not first in fabric, we skip Description cell (it's spanned) */}
-                                            
-                                            {/* Dimensions: Per Item */}
-                                            <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.largura)}</td>
-                                            <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.profundidade)}</td>
-                                            <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.altura)}</td>
-                                            <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
-                                            <td className="col-m3" style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
-                                            
-                                            {/* Fabric: Span across Fabric Group */}
-                                            {isFirstInFabric && (
-                                                <td rowSpan={fabRowSpan} className="col-fabric" style={{ border: "1px solid #000", textAlign: "center", verticalAlign: "middle" }}>
-                                                    {fabricDisplay}
-                                                </td>
-                                            )}
-                                            
-                                            {/* Feet & Finishing: Per Item (Data from PiItem, fallback to empty) */}
-                                            <td style={{ border: "1px solid #000", textAlign: "center" }}>{item.feet || (item as any).Feet || ""}</td>
-                                            <td style={{ border: "1px solid #000", textAlign: "center" }}>{item.finishing || (item as any).Finishing || ""}</td>
-                                            
-                                            {/* Observation: Per Item */}
-                                            <td style={{ border: "1px solid #000" }}>{item.observacao || ""}</td>
-                                            
-                                            {/* Unit EXW: Per Item */}
-                                            <td style={{ border: "1px solid #000", textAlign: "right" }}>$ {fmt(item.valorEXW)}</td>
-                                            
-                                            {/* Total Group EXW: Span across ALL Brand items */}
-                                            {isFirstInBrand && (
-                                                <td rowSpan={totalBrandRows} className="col-total" style={{ border: "1px solid #000", textAlign: "right", fontWeight: "bold", verticalAlign: "middle" }}>
-                                                    $ {fmt(brandTotalEXW)}
-                                                </td>
-                                            )}
-                                        </tr>
+                                        <td rowSpan={span} style={cellStyle}>
+                                            {groupItems.map((g, i) => {
+                                                let text = "";
+                                                if (field === 'description') {
+                                                    text = (g.item.quantidade > 1 ? `${g.item.quantidade} ` : "") + (g.mt?.modulo?.descricao || `Modulo #${g.item.idModuloTecido}`);
+                                                } else { // fabric
+                                                    const fName = g.mt?.tecido?.nome || "Sem Tecido";
+                                                    const fCode = g.item.tempCodigoModuloTecido || g.mt?.codigoModuloTecido || "";
+                                                    text = fCode ? `${fName} - ${fCode}` : fName;
+                                                }
+                                                return (
+                                                    <div key={i} style={{ marginBottom: 4, borderBottom: i < groupItems.length - 1 ? "1px dashed #ccc" : "none" }}>
+                                                        {text}
+                                                    </div>
+                                                );
+                                            })}
+                                        </td>
                                     );
-                                });
+                                };
+
+                                return (
+                                    <tr key={item.id || Math.random()} style={{ borderBottom: "1px solid #ccc" }}>
+                                        {/* Photo & Name */}
+                                        {isFirstInBrand && (
+                                            <React.Fragment>
+                                                <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", padding: 5, verticalAlign: "middle" }}>
+                                                    {photoUrl && <img src={photoUrl} alt={brandName} style={{ maxWidth: "80px", maxHeight: "80px" }} />}
+                                                </td>
+                                                <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", fontWeight: "bold", verticalAlign: "middle", background: "#eff6ff" }}>
+                                                    {brandName}
+                                                </td>
+                                            </React.Fragment>
+                                        )}
+                                        
+                                        {/* Description: Merged by Fabric Name Group (List) */}
+                                        {renderGroupListCell('description')}
+
+                                        {/* Dimensions: Per Item */}
+                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.largura)}</td>
+                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.profundidade)}</td>
+                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.altura)}</td>
+                                        <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
+                                        <td className="col-m3" style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
+                                        
+                                        {/* Fabric: Merged by Fabric Name Group (List) */}
+                                        {renderGroupListCell('fabric')}
+                                        
+                                        {/* Feet: Merged by Strict Equality */}
+                                        {renderMergedCell('feet', item.feet || (item as any).Feet || "", { textAlign: "center" })}
+
+                                        {/* Finishing: Merged by Strict Equality */}
+                                        {renderMergedCell('finishing', item.finishing || (item as any).Finishing || "", { textAlign: "center" })}
+                                        
+                                        {/* Observation: Merged by Strict Equality */}
+                                        {renderMergedCell('observation', item.observacao || "", { })}
+                                        
+                                        {/* Unit EXW: Per Item */}
+                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW)}</td>
+                                        
+                                        {/* Total Group EXW */}
+                                        {isFirstInBrand && (
+                                            <td rowSpan={totalBrandRows} className="col-total" style={{ border: "1px solid #000", textAlign: "right", fontWeight: "bold", verticalAlign: "middle", background: "#fff1f2" }}>
+                                                $ {fmt(brandTotalEXW)}
+                                            </td>
+                                        )}
+                                    </tr>
+                                );
                             })}
                         </React.Fragment>
                     );

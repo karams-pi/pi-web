@@ -515,6 +515,8 @@ export default function ProformaInvoicePage() {
           valorFinalItemBRL: item.valorFinalItemBRL,
           valorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
           observacao: item.observacao,
+          feet: item.feet,
+          finishing: item.finishing,
           tempCodigoModuloTecido: item.codigoModuloTecido,
           rateioFrete: 0 
         })) as any[]

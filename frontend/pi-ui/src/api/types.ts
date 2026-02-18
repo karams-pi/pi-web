@@ -83,6 +83,7 @@ export type Cliente = {
   pessoaContato?: string | null;
   cargoFuncao?: string | null;
   observacoes?: string | null;
+  portoDestino?: string | null;
   criadoEm: string;
   atualizadoEm: string;
 };
@@ -100,6 +101,8 @@ export type Configuracao = {
   valorFOBDespPortRegDoc: number;
   valorFOBDespDespacAduaneiro: number;
   valorFOBDespCourier: number;
+  portoEmbarque?: string;
+  condicoesPagamento?: string;
 };
 
 export type Frete = {
@@ -136,6 +139,9 @@ export type ProformaInvoice = {
   cotacaoAtualUSD: number;
   cotacaoRisco: number;
   piItens?: PiItem[];
+  cliente?: Cliente;
+  configuracoes?: Configuracao;
+  frete?: Frete;
 };
 
 export type PiItem = {

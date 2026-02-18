@@ -303,7 +303,7 @@ export function printModulesReport({
         <div class="header">
             <h1 style="float: left; margin-right: 20px;">${title}</h1>
             <div style="float: right; text-align: right;">
-                <div class="meta" style="margin-bottom: 2px;"><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString("pt-BR")}</div>
+                <div class="meta" style="margin-bottom: 2px;"><strong>Fecha de Emisión:</strong> ${new Date().toLocaleDateString("pt-BR")}</div>
                 <div style="font-size: 11px; color: #d9534f; font-weight: bold;">
                     * Esta lista de precios es válida por 30 días a partir de la fecha de emisión.
                 </div>
