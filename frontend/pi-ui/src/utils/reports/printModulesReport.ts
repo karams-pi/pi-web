@@ -29,7 +29,7 @@ export function printModulesReport({
   }
 
   const title = `Relatório de Módulos - ${currency === 'BRL' ? 'Valores em Reais (R$)' : 'Valores em Dólar (EXW)'}`;
-  const date = new Date().toLocaleDateString("pt-BR") + " " + new Date().toLocaleTimeString("pt-BR");
+
 
   function calcPrice(valorTecido: number): number {
     if (currency === "BRL") {
@@ -298,7 +298,12 @@ export function printModulesReport({
       <body>
         <div class="header">
             <h1 style="float: left; margin-right: 20px;">${title}</h1>
-            <div class="meta" style="float: left; margin-top: 5px;">${date}</div>
+            <div style="float: right; text-align: right;">
+                <div class="meta" style="margin-bottom: 2px;"><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString("pt-BR")}</div>
+                <div style="font-size: 11px; color: #d9534f; font-weight: bold;">
+                    * Este orçamento é válido por 30 dias após data de emissão.
+                </div>
+            </div>
             <div style="clear: both;"></div>
         </div>
         
