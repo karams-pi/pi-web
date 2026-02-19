@@ -778,4 +778,18 @@ public class ExcelImportService
             CultureInfo.CurrentCulture = originalCulture;
         }
     }
+
+    public async Task ImportarFerguileAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao)
+    {
+        // TODO: Implement when column mappings are provided
+        await Task.CompletedTask;
+        throw new NotImplementedException("Importação Ferguile: mapeamento de colunas pendente.");
+    }
+
+    public async Task ImportarLivintusAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao)
+    {
+        // TODO: Implement when column mappings are provided
+        await Task.CompletedTask;
+        throw new NotImplementedException("Importação Livintus: mapeamento de colunas pendente.");
+    }
 }

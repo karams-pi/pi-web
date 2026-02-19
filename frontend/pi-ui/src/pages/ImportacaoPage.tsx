@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { importKarams, importKoyo } from '../api/importacao';
+import { importKarams, importKoyo, importFerguile, importLivintus } from '../api/importacao';
 import { listFornecedores } from '../api/fornecedores';
 import type { Fornecedor } from '../api/types';
 import './ClientesPage.css';
@@ -7,7 +7,7 @@ import './ClientesPage.css';
 export default function ImportacaoPage() {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [selectedFornecedor, setSelectedFornecedor] = useState<number | ''>('');
-  const [importType, setImportType] = useState<'karams' | 'koyo'>('karams');
+  const [importType, setImportType] = useState<'karams' | 'koyo' | 'ferguile' | 'livintus'>('karams');
   const [file, setFile] = useState<File | null>(null);
   const [dtRevisao, setDtRevisao] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,6 +53,12 @@ export default function ImportacaoPage() {
       } else if (importType === 'koyo') {
         await importKoyo(file, Number(selectedFornecedor), dtRevisao);
         setMessage({ type: 'success', text: "Importação Koyo realizada com sucesso!" });
+      } else if (importType === 'ferguile') {
+        await importFerguile(file, Number(selectedFornecedor), dtRevisao);
+        setMessage({ type: 'success', text: "Importação Ferguile realizada com sucesso!" });
+      } else if (importType === 'livintus') {
+        await importLivintus(file, Number(selectedFornecedor), dtRevisao);
+        setMessage({ type: 'success', text: "Importação Livintus realizada com sucesso!" });
       }
       
       setFile(null);
@@ -87,12 +93,12 @@ export default function ImportacaoPage() {
           
           <div className="field" style={{ marginBottom: '24px' }}>
             <label className="label">Tipo de Importação</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className={`btn ${importType === 'karams' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setImportType('karams')}
-                style={{ flex: 1 }}
+                style={{ flex: 1, minWidth: '120px' }}
               >
                 Karam's
               </button>
@@ -100,9 +106,25 @@ export default function ImportacaoPage() {
                 type="button"
                 className={`btn ${importType === 'koyo' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setImportType('koyo')}
-                style={{ flex: 1 }}
+                style={{ flex: 1, minWidth: '120px' }}
               >
                 Koyo
+              </button>
+              <button
+                type="button"
+                className={`btn ${importType === 'ferguile' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setImportType('ferguile')}
+                style={{ flex: 1, minWidth: '120px' }}
+              >
+                Ferguile
+              </button>
+              <button
+                type="button"
+                className={`btn ${importType === 'livintus' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setImportType('livintus')}
+                style={{ flex: 1, minWidth: '120px' }}
+              >
+                Livintus
               </button>
             </div>
           </div>
@@ -166,7 +188,7 @@ export default function ImportacaoPage() {
 
         <div style={{ marginTop: '32px', borderTop: '1px solid var(--line)', paddingTop: '24px' }}>
           <h3 style={{ marginTop: 0, fontSize: '18px', color: 'var(--text)', marginBottom: '16px' }}>
-            Instruções de Layout ({importType === 'karams' ? "Karam's" : "Koyo"})
+            Instruções de Layout ({importType === 'karams' ? "Karam's" : importType === 'koyo' ? 'Koyo' : importType === 'ferguile' ? 'Ferguile' : 'Livintus'})
           </h3>
           <p style={{ color: 'var(--muted)', marginBottom: '12px' }}>
             O arquivo Excel deve seguir a seguinte estrutura de colunas:
@@ -189,7 +211,7 @@ export default function ImportacaoPage() {
                     <li><strong>F</strong>: Altura (Ignora "Altura" ou vazio)</li>
                     <li><strong>H a P</strong>: Tecidos G0 a G8</li>
                 </ul>
-            ) : (
+            ) : importType === 'koyo' ? (
                 <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
                     <li><strong>Aba</strong>: Nome da Categoria</li>
                     <li><strong>Col A</strong>: Modelo (Distinct)</li>
@@ -199,6 +221,14 @@ export default function ImportacaoPage() {
                     <li><strong>Col E</strong>: Altura (Ignora "Altura" / Vazio)</li>
                     <li><strong>PA</strong>: Sempre Zero (0)</li>
                     <li><strong>Tecidos</strong>: Mapeamento Especial (G1..G10 nas colunas H..S)</li>
+                </ul>
+            ) : importType === 'ferguile' ? (
+                <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
+                    <li><em>Mapeamento pendente — será configurado em breve.</em></li>
+                </ul>
+            ) : (
+                <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
+                    <li><em>Mapeamento pendente — será configurado em breve.</em></li>
                 </ul>
             )}
           </div>

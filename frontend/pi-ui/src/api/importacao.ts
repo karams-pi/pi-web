@@ -26,3 +26,21 @@ export const importKoyo = async (file: File, idFornecedor: number, dtRevisao?: s
 
   return apiPostFormData<any>('/api/Import/koyo', formData);
 };
+
+export const importFerguile = async (file: File, idFornecedor: number, dtRevisao?: string) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('idFornecedor', String(idFornecedor));
+  if (dtRevisao) formData.append('dtRevisao', dtRevisao);
+
+  return apiPostFormData<any>('/api/Import/ferguile', formData);
+};
+
+export const importLivintus = async (file: File, idFornecedor: number, dtRevisao?: string) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('idFornecedor', String(idFornecedor));
+  if (dtRevisao) formData.append('dtRevisao', dtRevisao);
+
+  return apiPostFormData<any>('/api/Import/livintus', formData);
+};

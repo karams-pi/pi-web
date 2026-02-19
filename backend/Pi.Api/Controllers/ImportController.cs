@@ -107,4 +107,66 @@ public class ImportController : ControllerBase
             return StatusCode(500, new { message = $"Erro na importação Koyo: {sb}" });
         }
     }
+
+    [HttpPost("ferguile")]
+    public async Task<IActionResult> ImportarFerguile(IFormFile file, [FromForm] long idFornecedor, [FromForm] DateTime? dtRevisao)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Arquivo inválido.");
+        if (idFornecedor <= 0)
+            return BadRequest("Fornecedor inválido.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            using var stream = file.OpenReadStream();
+            await _importService.ImportarFerguileAsync(stream, idFornecedor, dtRevisao);
+
+            await transaction.CommitAsync();
+            return Ok(new { message = "Importação Ferguile concluída com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            var sb = new System.Text.StringBuilder();
+            var current = ex;
+            while (current != null)
+            {
+                sb.Append(current.Message + " | ");
+                current = current.InnerException;
+            }
+            return StatusCode(500, new { message = $"Erro na importação Ferguile: {sb}" });
+        }
+    }
+
+    [HttpPost("livintus")]
+    public async Task<IActionResult> ImportarLivintus(IFormFile file, [FromForm] long idFornecedor, [FromForm] DateTime? dtRevisao)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Arquivo inválido.");
+        if (idFornecedor <= 0)
+            return BadRequest("Fornecedor inválido.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            using var stream = file.OpenReadStream();
+            await _importService.ImportarLivintusAsync(stream, idFornecedor, dtRevisao);
+
+            await transaction.CommitAsync();
+            return Ok(new { message = "Importação Livintus concluída com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            var sb = new System.Text.StringBuilder();
+            var current = ex;
+            while (current != null)
+            {
+                sb.Append(current.Message + " | ");
+                current = current.InnerException;
+            }
+            return StatusCode(500, new { message = $"Erro na importação Livintus: {sb}" });
+        }
+    }
 }
