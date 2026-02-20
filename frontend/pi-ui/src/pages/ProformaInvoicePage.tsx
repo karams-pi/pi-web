@@ -4,14 +4,13 @@ import "./ClientesPage.css";
 
 import { listFretes } from "../api/fretes";
 import { getTotalFrete } from "../api/configuracoesFreteItem";
-import { getProximaSequencia, getCotacaoUSD, createPi, updatePi, getPi } from "../api/pis";
+import { getProximaSequencia, getCotacaoUSD, createPi, updatePi, getPi, exportPiExcel } from "../api/pis";
 import { getLatestConfig } from "../api/configuracoes";
 import { listModulosTecidos, getModuleFilters } from "../api/modulos";
 import { listClientes } from "../api/clientes";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
-import { exportToCSV, type ColumnDefinition } from "../utils/printExport";
 import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
 
 type FormState = {
@@ -157,7 +156,22 @@ export default function ProformaInvoicePage() {
             recalculateAllItems(risk, form.valorTotalFreteBRL / risk, form.valorTotalFreteBRL, newConfig);
         }
     }).catch(console.error);
-  }, [form.idFornecedor]);
+
+    // Dynamic Prefix
+    if (idForn) {
+      const supplier = fornecedores.find(f => f.id === idForn);
+      if (supplier) {
+        const name = supplier.nome.toLowerCase();
+        if (name.includes("ferguile") || name.includes("livintus")) {
+          const year = new Date(form.dataPi).getFullYear();
+          const newPrefix = `FRG${year}-PO`;
+          if (form.prefixo !== newPrefix) {
+            setForm(prev => ({ ...prev, prefixo: newPrefix }));
+          }
+        }
+      }
+    }
+  }, [form.idFornecedor, form.dataPi, fornecedores]);
 
 
 
@@ -647,26 +661,29 @@ export default function ProformaInvoicePage() {
     return `Módulo #${item.idModuloTecido}`;
   };
 
-  const piExportColumns: ColumnDefinition<ItemGrid>[] = [
-    { header: "Item", accessor: (i) => i.tempId },
-    { header: "Modelo", accessor: (i) => i.moduloTecido?.modulo?.marca?.nome || "?" },
-    { header: "Módulo", accessor: (i) => i.moduloTecido?.modulo?.descricao || "?" },
-    { header: "Tecido", accessor: (i) => i.moduloTecido?.tecido?.nome || "?" },
-    { header: "Quantidade", accessor: (i) => i.quantidade },
-    { header: "M3 Unit", accessor: (i) => fmt(i.m3, 3) },
-    { header: "M3 Total", accessor: (i) => fmt(i.m3 * i.quantidade, 3) },
-    { header: "Vl. Unit. EXW", accessor: (i) => fmt(i.valorEXW) },
-    { header: "Frete USD", accessor: (i) => fmt(i.valorFreteRateadoUSD) },
-    { header: "Total USD", accessor: (i) => fmt(i.valorFinalItemUSDRisco) },
-    { header: "Obs", accessor: (i) => i.observacao || "" },
-  ];
 
-  function handleExportExcel() {
-      if (itens.length === 0) return alert("Não há itens para exportar.");
-      
-      // Map items to include index if needed, or just export
-      // We want to export the grid data.
-      exportToCSV(itens, piExportColumns, `PI_${form.prefixo}-${form.piSequencia}`);
+
+  async function handleExportExcel() {
+    if (!form.id) return alert("Salve a PI primeiro para exportar com o layout correto.");
+    if (itens.length === 0) return alert("Não há itens para exportar.");
+    
+    try {
+      setLoading(true);
+      const blob = await exportPiExcel(form.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `PI_${form.prefixo}-${form.piSequencia}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      alert("Erro ao exportar Excel.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const totalGeralBRL = useMemo(() => {
@@ -757,8 +774,7 @@ export default function ProformaInvoicePage() {
             <input
               className="cl-input"
               value={form.piSequencia}
-              readOnly
-              style={{ background: "#1a1a2e" }}
+              onChange={(e) => setForm({ ...form, piSequencia: e.target.value })}
             />
           </div>
           <div className="field">

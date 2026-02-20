@@ -181,6 +181,25 @@ export default function PrintPiPage() {
     return { brandGroups, totalSofaQty };
   }, [pi, modulosTecidos]);
 
+  const formattedPiNumber = useMemo(() => {
+    if (!pi) return "";
+    const base = `${pi.prefixo}-${pi.piSequencia}`;
+    
+    // Check if supplier is Karams or Koyo
+    const firstItem = pi.piItens?.[0];
+    if (firstItem) {
+        const mt = modulosTecidos.find(m => m.id === firstItem.idModuloTecido);
+        const supplierName = (mt?.modulo?.fornecedor?.nome || "").toLowerCase();
+        if (supplierName.includes("karams") || supplierName.includes("koyo")) {
+            const year = dateObj.getFullYear();
+            const yearShort = String(year).slice(-2);
+            return `${base}/${yearShort}`;
+        }
+    }
+    
+    return base;
+  }, [pi, modulosTecidos, dateObj]);
+
   if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
   if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
@@ -306,7 +325,7 @@ export default function PrintPiPage() {
 
           {/* Right: PI Details */}
           <div style={{ paddingLeft: "10px", fontSize: "11px", lineHeight: "1.4em", borderLeft: "1px solid #000" }}>
-               <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>PROFORMA INVOICE: {pi.prefixo}-{pi.piSequencia}</div>
+               <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>PROFORMA INVOICE: {formattedPiNumber}</div>
                
                <div style={{ display: "flex", justifyContent: "space-between" }}>
                    <span>DATE:</span>
@@ -314,7 +333,7 @@ export default function PrintPiPage() {
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
                    <span>PROFORMA INVOICE:</span>
-                   <span>{pi.prefixo}-{pi.piSequencia}</span>
+                   <span>{formattedPiNumber}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
                    <span>ORDER DATE:</span>

@@ -12,11 +12,29 @@ public class PisController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly CotacaoService _cotacaoService;
+    private readonly PiExportService _exportService;
 
-    public PisController(AppDbContext db, CotacaoService cotacaoService)
+    public PisController(AppDbContext db, CotacaoService cotacaoService, PiExportService exportService)
     {
         _db = db;
         _cotacaoService = cotacaoService;
+        _exportService = exportService;
+    }
+
+    [HttpGet("{id}/excel")]
+    public async Task<IActionResult> ExportExcel(long id)
+    {
+        try
+        {
+            var bytes = await _exportService.ExportToExcelAsync(id);
+            var pi = await _db.Pis.FindAsync(id);
+            string fileName = $"PI_{pi?.Prefixo}-{pi?.PiSequencia}.xlsx";
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]

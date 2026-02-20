@@ -183,6 +183,25 @@ export default function PrintPiFerguilePage() {
     return { rows, brandSpans, descSpans, totalValue, totalM3, totalQty };
   }, [pi, modulosTecidos]);
 
+  const formattedPiNumber = useMemo(() => {
+    if (!pi) return "";
+    const base = `${pi.prefixo}-${pi.piSequencia}`;
+    
+    // Check if supplier is Karams or Koyo
+    const firstItem = pi.piItens?.[0];
+    if (firstItem) {
+        const mt = modulosTecidos.find(m => m.id === firstItem.idModuloTecido);
+        const supplierName = (mt?.modulo?.fornecedor?.nome || "").toLowerCase();
+        if (supplierName.includes("karams") || supplierName.includes("koyo")) {
+            const year = dateObj.getFullYear();
+            const yearShort = String(year).slice(-2);
+            return `${base}/${yearShort}`;
+        }
+    }
+    
+    return base;
+  }, [pi, modulosTecidos, dateObj]);
+
   if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
   if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
@@ -282,14 +301,14 @@ export default function PrintPiFerguilePage() {
         <div style={{ padding: "10px 15px", fontSize: "11px", lineHeight: "1.5em" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontWeight: "bold", fontSize: "13px" }}>
-              PROFORMA INVOICE: {pi.prefixo}-{pi.piSequencia}
+              PROFORMA INVOICE: {formattedPiNumber}
             </span>
           </div>
           <div>
             DATA: {dateObj.toLocaleDateString("pt-BR")}
           </div>
           <div>
-            PROFORMA INVOICE: {pi.prefixo}-{pi.piSequencia}
+            PROFORMA INVOICE: {formattedPiNumber}
           </div>
           <div>
             ORDER DATE: {formatDateEN(dateObj)}
