@@ -30,6 +30,9 @@ public class AppDbContext : DbContext
     public DbSet<ProformaInvoice> Pis => Set<ProformaInvoice>();
     public DbSet<PiItem> PiItens => Set<PiItem>();
 
+    // Versionamento
+    public DbSet<VersaoSistema> VersoesDoSistema => Set<VersaoSistema>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ===== Tabelas já existentes =====

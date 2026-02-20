@@ -798,6 +798,30 @@ namespace Pi.Api.Migrations
                     b.ToTable("tecido", (string)null);
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.VersaoSistema", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data");
+
+                    b.Property<string>("Versao")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("versao");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("versao_sistema");
+                });
+
             modelBuilder.Entity("Pi.Api.Models.ConfiguracoesFreteItem", b =>
                 {
                     b.HasOne("Pi.Api.Models.Fornecedor", "Fornecedor")

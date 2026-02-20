@@ -781,15 +781,404 @@ public class ExcelImportService
 
     public async Task ImportarFerguileAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao)
     {
-        // TODO: Implement when column mappings are provided
-        await Task.CompletedTask;
-        throw new NotImplementedException("Importação Ferguile: mapeamento de colunas pendente.");
+        if (dtRevisao.HasValue)
+            dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
+
+        await ResetSequencesAsync();
+
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
+
+            // Skip SanitizeExcelFile — Ferguile files have thousands of columns
+            // and sanitization would consume too much memory/time
+            using var ms = new MemoryStream();
+            fileStream.CopyTo(ms);
+            ms.Position = 0;
+            using var package = new ExcelPackage(ms);
+
+            // Validate Fornecedor
+            var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
+            if (fornecedor == null)
+                throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
+
+            // === CACHES ===
+            var categoriasCache = await _context.Categorias.ToListAsync();
+            var marcasCache = await _context.Marcas.ToListAsync();
+            var tecidosCache = await _context.Tecidos.ToListAsync();
+
+            var categoriasMap = new Dictionary<string, Categoria>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in categoriasCache) categoriasMap[c.Nome] = c;
+
+            var marcasMap = new Dictionary<string, Marca>(StringComparer.OrdinalIgnoreCase);
+            foreach (var m in marcasCache) marcasMap[m.Nome] = m;
+
+            var tecidosMap = new Dictionary<string, Tecido>(StringComparer.OrdinalIgnoreCase);
+            foreach (var t in tecidosCache) tecidosMap[t.Nome] = t;
+
+            // Fixed category: "Ferguile"
+            const string categoriaNome = "Ferguile";
+            if (!categoriasMap.TryGetValue(categoriaNome, out var categoria))
+            {
+                categoria = new Categoria { Nome = categoriaNome };
+                _context.Categorias.Add(categoria);
+                categoriasMap[categoriaNome] = categoria;
+            }
+
+            foreach (var worksheet in package.Workbook.Worksheets)
+            {
+                if (worksheet.Dimension == null) continue;
+                var rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++) // Start at row 2 (skip header)
+                {
+                    // === Col B (2): Marca (skip "MODELO" or empty) ===
+                    var marcaNome = worksheet.Cells[row, 2].Text?.Trim();
+                    if (string.IsNullOrEmpty(marcaNome) || marcaNome.Equals("MODELO", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // === Col L (12): Descrição do Módulo (skip "COMPOSIÇÃO" or empty) ===
+                    var descricao = worksheet.Cells[row, 12].Text?.Trim();
+                    if (string.IsNullOrEmpty(descricao) ||
+                        descricao.Equals("COMPOSIÇÃO", StringComparison.OrdinalIgnoreCase) ||
+                        descricao.Equals("COMPOSICAO", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // === Col F (6): Largura (skip header) ===
+                    var largText = worksheet.Cells[row, 6].Text?.Trim();
+                    if (string.IsNullOrEmpty(largText) || largText.Contains("COMP", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!decimal.TryParse(largText, NumberStyles.Any, new CultureInfo("pt-BR"), out var larg))
+                        continue;
+
+                    // === Col G (7): Profundidade (skip header) ===
+                    var profText = worksheet.Cells[row, 7].Text?.Trim();
+                    if (string.IsNullOrEmpty(profText) || profText.Contains("PROF", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!decimal.TryParse(profText, NumberStyles.Any, new CultureInfo("pt-BR"), out var prof))
+                        continue;
+
+                    // === Col H (8): Altura (skip header) ===
+                    var altText = worksheet.Cells[row, 8].Text?.Trim();
+                    if (string.IsNullOrEmpty(altText) || altText.Contains("ALTURA", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!decimal.TryParse(altText, NumberStyles.Any, new CultureInfo("pt-BR"), out var alt))
+                        continue;
+
+                    // === Col M (13): Tecido (skip "LINHA" or empty) ===
+                    var tecidoNome = worksheet.Cells[row, 13].Text?.Trim();
+                    if (string.IsNullOrEmpty(tecidoNome) || tecidoNome.Equals("LINHA", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // === Col N (14): Valor do tecido — parse currency "R$ 1.695,00" ===
+                    var valorText = worksheet.Cells[row, 14].Text?.Trim() ?? "";
+                    // Strip "R$" prefix and whitespace
+                    valorText = valorText.Replace("R$", "").Trim();
+                    if (string.IsNullOrEmpty(valorText))
+                        continue;
+                    if (!decimal.TryParse(valorText, NumberStyles.Any, new CultureInfo("pt-BR"), out var valorTecido) || valorTecido <= 0)
+                        continue;
+
+                    // === Get/Create Marca ===
+                    if (!marcasMap.TryGetValue(marcaNome, out var marca))
+                    {
+                        marca = new Marca { Nome = marcaNome };
+                        _context.Marcas.Add(marca);
+                        marcasMap[marcaNome] = marca;
+                    }
+
+                    // === Get/Create Tecido ===
+                    if (!tecidosMap.TryGetValue(tecidoNome, out var tecido))
+                    {
+                        tecido = new Tecido { Nome = tecidoNome };
+                        _context.Tecidos.Add(tecido);
+                        tecidosMap[tecidoNome] = tecido;
+                    }
+
+                    // === Get/Create Modulo ===
+                    var modulo = await _context.Modulos
+                        .Include(m => m.ModulosTecidos)
+                        .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor
+                                                && m.IdMarca == marca.Id
+                                                && m.Descricao.ToUpper() == descricao.ToUpper()
+                                                && m.Largura == larg);
+
+                    if (marca.Id == 0) modulo = null;
+
+                    if (modulo == null)
+                    {
+                        modulo = _context.Modulos.Local
+                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor
+                                              && m.Marca == marca
+                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
+                                              && m.Largura == larg);
+                    }
+
+                    if (modulo == null)
+                    {
+                        modulo = new Modulo
+                        {
+                            IdFornecedor = idFornecedor,
+                            Marca = marca,
+                            Categoria = categoria,
+                            IdMarca = marca.Id,
+                            IdCategoria = categoria.Id,
+                            Descricao = descricao,
+                            Largura = larg,
+                            Profundidade = prof,
+                            Altura = alt,
+                            Pa = 0,
+                            M3 = (larg * prof * alt) / 1000000m,
+                            ModulosTecidos = new List<ModuloTecido>()
+                        };
+                        _context.Modulos.Add(modulo);
+                    }
+                    else
+                    {
+                        if (modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>();
+                        modulo.Categoria = categoria;
+                        modulo.Marca = marca;
+                        modulo.Largura = larg;
+                        modulo.Profundidade = prof;
+                        modulo.Altura = alt;
+                        modulo.M3 = (larg * prof * alt) / 1000000m;
+                    }
+
+                    // === Upsert ModuloTecido ===
+                    var mt = modulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id);
+                    // Also check by object reference for new tecidos (Id == 0)
+                    if (mt == null && tecido.Id == 0)
+                        mt = modulo.ModulosTecidos.FirstOrDefault(x => x.Tecido == tecido);
+
+                    if (mt == null)
+                    {
+                        mt = new ModuloTecido
+                        {
+                            Modulo = modulo,
+                            Tecido = tecido,
+                            IdTecido = tecido.Id,
+                            ValorTecido = valorTecido,
+                            DtUltimaRevisao = dtRevisao,
+                            FlAtivo = true
+                        };
+                        modulo.ModulosTecidos.Add(mt);
+                        if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
+                    }
+                    else
+                    {
+                        mt.ValorTecido = valorTecido;
+                        if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
+                        mt.FlAtivo = true;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 
     public async Task ImportarLivintusAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao)
     {
-        // TODO: Implement when column mappings are provided
-        await Task.CompletedTask;
-        throw new NotImplementedException("Importação Livintus: mapeamento de colunas pendente.");
+        if (dtRevisao.HasValue)
+            dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
+
+        await ResetSequencesAsync();
+
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
+
+            // Skip SanitizeExcelFile — direct load (file is small)
+            using var ms = new MemoryStream();
+            fileStream.CopyTo(ms);
+            ms.Position = 0;
+            using var package = new ExcelPackage(ms);
+
+            // Validate Fornecedor
+            var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
+            if (fornecedor == null)
+                throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
+
+            // === CACHES ===
+            var categoriasCache = await _context.Categorias.ToListAsync();
+            var marcasCache = await _context.Marcas.ToListAsync();
+            var tecidosCache = await _context.Tecidos.ToListAsync();
+
+            var categoriasMap = new Dictionary<string, Categoria>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in categoriasCache) categoriasMap[c.Nome] = c;
+
+            var marcasMap = new Dictionary<string, Marca>(StringComparer.OrdinalIgnoreCase);
+            foreach (var m in marcasCache) marcasMap[m.Nome] = m;
+
+            var tecidosMap = new Dictionary<string, Tecido>(StringComparer.OrdinalIgnoreCase);
+            foreach (var t in tecidosCache) tecidosMap[t.Nome] = t;
+
+            // Fixed category: "Livintus"
+            const string categoriaNome = "Livintus";
+            if (!categoriasMap.TryGetValue(categoriaNome, out var categoria))
+            {
+                categoria = new Categoria { Nome = categoriaNome };
+                _context.Categorias.Add(categoria);
+                categoriasMap[categoriaNome] = categoria;
+            }
+
+            foreach (var worksheet in package.Workbook.Worksheets)
+            {
+                if (worksheet.Dimension == null) continue;
+                var rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++) // Skip header row
+                {
+                    // === Col B (2): Marca (skip "MODELO" or empty) ===
+                    var marcaNome = worksheet.Cells[row, 2].Text?.Trim();
+                    if (string.IsNullOrEmpty(marcaNome) || marcaNome.Equals("MODELO", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // === Col F (6): Descrição do Módulo (skip "COMPOSIÇÃO" or empty) ===
+                    var descricao = worksheet.Cells[row, 6].Text?.Trim();
+                    if (string.IsNullOrEmpty(descricao) ||
+                        descricao.Equals("COMPOSIÇÃO", StringComparison.OrdinalIgnoreCase) ||
+                        descricao.Equals("COMPOSICAO", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // === Col C (3): Largura — strip "m" suffix (e.g. "1,08m") ===
+                    var largText = worksheet.Cells[row, 3].Text?.Trim().TrimEnd('m', 'M') ?? "";
+                    if (string.IsNullOrEmpty(largText) || largText.Contains("COMP", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!decimal.TryParse(largText, NumberStyles.Any, new CultureInfo("pt-BR"), out var larg))
+                        continue;
+
+                    // === Col E (5): Profundidade — strip "m" suffix ===
+                    var profText = worksheet.Cells[row, 5].Text?.Trim().TrimEnd('m', 'M') ?? "";
+                    if (string.IsNullOrEmpty(profText) || profText.Contains("PROF", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!decimal.TryParse(profText, NumberStyles.Any, new CultureInfo("pt-BR"), out var prof))
+                        continue;
+
+                    // === Col D (4): Altura — strip "m" suffix ===
+                    var altText = worksheet.Cells[row, 4].Text?.Trim().TrimEnd('m', 'M') ?? "";
+                    if (string.IsNullOrEmpty(altText) || altText.Contains("ALTURA", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!decimal.TryParse(altText, NumberStyles.Any, new CultureInfo("pt-BR"), out var alt))
+                        continue;
+
+                    // === Col G (7): Tecido (skip "LINHA" or empty) ===
+                    var tecidoNome = worksheet.Cells[row, 7].Text?.Trim();
+                    if (string.IsNullOrEmpty(tecidoNome) || tecidoNome.Equals("LINHA", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // === Col H (8): Valor do tecido — parse currency "R$ 2.160,00" ===
+                    var valorText = worksheet.Cells[row, 8].Text?.Trim() ?? "";
+                    valorText = valorText.Replace("R$", "").Trim();
+                    if (string.IsNullOrEmpty(valorText))
+                        continue;
+                    if (!decimal.TryParse(valorText, NumberStyles.Any, new CultureInfo("pt-BR"), out var valorTecido) || valorTecido <= 0)
+                        continue;
+
+                    // === Get/Create Marca ===
+                    if (!marcasMap.TryGetValue(marcaNome, out var marca))
+                    {
+                        marca = new Marca { Nome = marcaNome };
+                        _context.Marcas.Add(marca);
+                        marcasMap[marcaNome] = marca;
+                    }
+
+                    // === Get/Create Tecido ===
+                    if (!tecidosMap.TryGetValue(tecidoNome, out var tecido))
+                    {
+                        tecido = new Tecido { Nome = tecidoNome };
+                        _context.Tecidos.Add(tecido);
+                        tecidosMap[tecidoNome] = tecido;
+                    }
+
+                    // === Get/Create Modulo ===
+                    var modulo = await _context.Modulos
+                        .Include(m => m.ModulosTecidos)
+                        .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor
+                                                && m.IdMarca == marca.Id
+                                                && m.Descricao.ToUpper() == descricao.ToUpper()
+                                                && m.Largura == larg);
+
+                    if (marca.Id == 0) modulo = null;
+
+                    if (modulo == null)
+                    {
+                        modulo = _context.Modulos.Local
+                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor
+                                              && m.Marca == marca
+                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
+                                              && m.Largura == larg);
+                    }
+
+                    if (modulo == null)
+                    {
+                        modulo = new Modulo
+                        {
+                            IdFornecedor = idFornecedor,
+                            Marca = marca,
+                            Categoria = categoria,
+                            IdMarca = marca.Id,
+                            IdCategoria = categoria.Id,
+                            Descricao = descricao,
+                            Largura = larg,
+                            Profundidade = prof,
+                            Altura = alt,
+                            Pa = 0,
+                            M3 = (larg * prof * alt) / 1000000m,
+                            ModulosTecidos = new List<ModuloTecido>()
+                        };
+                        _context.Modulos.Add(modulo);
+                    }
+                    else
+                    {
+                        if (modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>();
+                        modulo.Categoria = categoria;
+                        modulo.Marca = marca;
+                        modulo.Largura = larg;
+                        modulo.Profundidade = prof;
+                        modulo.Altura = alt;
+                        modulo.M3 = (larg * prof * alt) / 1000000m;
+                    }
+
+                    // === Upsert ModuloTecido ===
+                    var mt = modulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id);
+                    if (mt == null && tecido.Id == 0)
+                        mt = modulo.ModulosTecidos.FirstOrDefault(x => x.Tecido == tecido);
+
+                    if (mt == null)
+                    {
+                        mt = new ModuloTecido
+                        {
+                            Modulo = modulo,
+                            Tecido = tecido,
+                            IdTecido = tecido.Id,
+                            ValorTecido = valorTecido,
+                            DtUltimaRevisao = dtRevisao,
+                            FlAtivo = true
+                        };
+                        modulo.ModulosTecidos.Add(mt);
+                        if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
+                    }
+                    else
+                    {
+                        mt.ValorTecido = valorTecido;
+                        if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
+                        mt.FlAtivo = true;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 }

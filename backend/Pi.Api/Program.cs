@@ -8,6 +8,12 @@ ExcelPackage.License.SetNonCommercialPersonal("PI Web User");
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Aumentar limite de upload para importações grandes (default 30MB)
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 104857600; // 100 MB
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -67,6 +73,33 @@ using (var scope = app.Services.CreateScope())
     {
         // Se falhar a migração, logar, mas tentar continuar (ou falhar de vez se preferir)
         Console.WriteLine($"Erro ao aplicar Migrations: {ex.Message}");
+    }
+
+    // AUTO-VERSION: Registra a versão atual no banco se ainda não existir
+    try
+    {
+        var asm = System.Reflection.Assembly.GetExecutingAssembly();
+        var attr = (System.Reflection.AssemblyInformationalVersionAttribute?)
+            System.Attribute.GetCustomAttribute(asm, typeof(System.Reflection.AssemblyInformationalVersionAttribute));
+        var rawVersion = attr?.InformationalVersion ?? asm.GetName().Version?.ToString() ?? "0.0.0";
+        // Strip git hash suffix (e.g. "1.0.0+abc123..." → "1.0.0")
+        var currentVersion = rawVersion.Contains('+') ? rawVersion.Split('+')[0] : rawVersion;
+
+        var exists = dbContext.VersoesDoSistema.Any(v => v.Versao == currentVersion);
+        if (!exists)
+        {
+            dbContext.VersoesDoSistema.Add(new Pi.Api.Models.VersaoSistema
+            {
+                Versao = currentVersion,
+                Data = DateTime.UtcNow
+            });
+            dbContext.SaveChanges();
+            Console.WriteLine($"Versão {currentVersion} registrada no banco.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Aviso: Erro ao registrar versão: {ex.Message}");
     }
 }
 

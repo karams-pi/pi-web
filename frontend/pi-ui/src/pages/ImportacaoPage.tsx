@@ -224,11 +224,25 @@ export default function ImportacaoPage() {
                 </ul>
             ) : importType === 'ferguile' ? (
                 <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
-                    <li><em>Mapeamento pendente — será configurado em breve.</em></li>
+                    <li><strong>Categoria</strong>: Sempre "Ferguile" (criada automaticamente)</li>
+                    <li><strong>Col B</strong>: Modelo (Marca) — Ignora "MODELO"</li>
+                    <li><strong>Col F</strong>: Largura — Ignora "COMP (m)"</li>
+                    <li><strong>Col G</strong>: Profundidade — Ignora "PROF (m)"</li>
+                    <li><strong>Col H</strong>: Altura — Ignora "ALTURA (m)"</li>
+                    <li><strong>Col L</strong>: Descrição do Módulo — Ignora "COMPOSIÇÃO"</li>
+                    <li><strong>Col M</strong>: Nome do Tecido — Ignora "LINHA"</li>
+                    <li><strong>Col N</strong>: Valor do Tecido por Módulo</li>
                 </ul>
             ) : (
                 <ul style={{ margin: 0, paddingLeft: '24px', lineHeight: '1.6' }}>
-                    <li><em>Mapeamento pendente — será configurado em breve.</em></li>
+                    <li><strong>Categoria</strong>: Sempre "Livintus" (criada automaticamente)</li>
+                    <li><strong>Col B</strong>: Modelo (Marca) — Ignora "MODELO"</li>
+                    <li><strong>Col C</strong>: Largura — Ignora "COMP (m)"</li>
+                    <li><strong>Col D</strong>: Altura — Ignora "ALTURA (m)"</li>
+                    <li><strong>Col E</strong>: Profundidade — Ignora "PROF (m)"</li>
+                    <li><strong>Col F</strong>: Descrição do Módulo — Ignora "COMPOSIÇÃO"</li>
+                    <li><strong>Col G</strong>: Nome do Tecido — Ignora "LINHA"</li>
+                    <li><strong>Col H</strong>: Valor do Tecido por Módulo</li>
                 </ul>
             )}
           </div>

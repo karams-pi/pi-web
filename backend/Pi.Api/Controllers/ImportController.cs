@@ -6,6 +6,7 @@ namespace Pi.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[RequestSizeLimit(104857600)] // 100 MB
 public class ImportController : ControllerBase
 {
     private readonly ExcelImportService _importService;

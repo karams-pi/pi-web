@@ -9,6 +9,7 @@ import MarcasPage from "./pages/MarcasPage";
 import ProformaInvoicePage from "./pages/ProformaInvoicePage";
 import PrintPiPage from "./pages/PrintPiPage";
 import ImportacaoPage from "./pages/ImportacaoPage";
+import SobrePage from "./pages/SobrePage";
 
 // function ProdutosPage() {
 //   return (
@@ -63,6 +64,7 @@ export default function App() {
               <Route path="/print-pi/:id" element={<PrintPiPage />} />
               <Route path="/importacao" element={<ImportacaoPage />} />
               <Route path="/config" element={<ConfiguracoesPage />} />
+              <Route path="/sobre" element={<SobrePage />} />
               {/* <Route path="/precos" element={<PrecosPage />} /> */}
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -92,7 +94,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { 
   Menu, X, Home, Users, Truck, Layers, Tag, Scissors, 
-  Grid, FileText, Download, Settings 
+  Grid, FileText, Download, Settings, Info 
 } from "lucide-react";
 
 function Header() {
@@ -169,6 +171,11 @@ function Header() {
             <NavLink to="/config" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
               <Settings size={18} />
               <span>Config</span>
+            </NavLink>
+
+            <NavLink to="/sobre" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+              <Info size={18} />
+              <span>Sobre</span>
             </NavLink>
           </nav>
         </div>
