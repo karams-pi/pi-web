@@ -481,36 +481,29 @@ export default function PrintPiFerguilePage() {
       >
         <div style={{ padding: 10, borderRight: "1px solid #000" }}>
           <h3 style={{ margin: "0 0 5px 0", fontSize: "12px", textTransform: "uppercase" }}>
-            ACCOUNTING DETAILS: INTERMEDIARY BANK
+            ACCOUNTING DETAILS:
           </h3>
-          <p style={{ margin: "2px 0" }}>BANK OF AMERICA, N.A.</p>
-          <p style={{ margin: "2px 0" }}>ADDRESS: NEW YORK - US</p>
-          <p style={{ margin: "2px 0" }}>SWIFT CODE: BOFAUS3N</p>
-          <p style={{ margin: "2px 0" }}>ACCOUNT: 6550925836</p>
-          <p style={{ margin: "10px 0 2px 0" }}>
-            <strong>BENEFICIARY BANK:</strong>
-          </p>
-          <p style={{ margin: "2px 0" }}>BANCO RENDIMENTO S/A</p>
-          <p style={{ margin: "2px 0" }}>ADDRESS: SÃO PAULO - BR</p>
-          <p style={{ margin: "2px 0" }}>SWIFT CODE: RENDBRSP</p>
-          <p style={{ margin: "2px 0" }}>IBAN: BR4468900810000010025069901i1</p>
-          <p style={{ margin: "2px 0" }}>ACCOUNT: 00250699000148</p>
-          <p style={{ margin: "2px 0" }}>NAME: FERGUILE ESTOFADOS LTDA</p>
+          <p style={{ margin: "2px 0" }}><strong>Beneficiary:</strong> FERGUILE ESTOFADOS LTDA</p>
+          <p style={{ margin: "2px 0" }}><strong>CNPJ:</strong> 27.499.537/0001-02</p>
+          <p style={{ margin: "2px 0" }}><strong>BANK:</strong> SICREDI 748</p>
+          <p style={{ margin: "2px 0" }}><strong>BENEFICIARY ACCOUNT:</strong> 0723/032524</p>
+          <p style={{ margin: "2px 0" }}><strong>IBAN CODE:</strong> BR7001181521007230000003252C1</p>
+          <p style={{ margin: "2px 0" }}><strong>SWIFT CODE:</strong> BCSIBRRS748</p>
         </div>
         <div style={{ padding: 10 }}>
-          <h3 style={{ margin: "0 0 5px 0", fontSize: "12px", textTransform: "uppercase" }}>
-            GENERAL PRODUCT DATA
-          </h3>
           <p style={{ margin: "2px 0" }}>
-            <strong>Brand:</strong> Ferguile / Livintus
+            <strong>Volume:</strong> {processedData.totalQty}
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>NCM:</strong> 94016100
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Product:</strong> {processedData.totalQty} Upholstered furniture products
+            <strong>Brand:</strong> Ferguile / Livintus
           </p>
           <p style={{ margin: "2px 0" }}>
+            <strong>Factory original products</strong>
+          </p>
+          <p style={{ margin: "10px 0 2px 0" }}>
             <strong>CBM M³:</strong> {fmtBR(processedData.totalM3, 3)}
           </p>
           <p style={{ margin: "2px 0" }}>
@@ -518,12 +511,6 @@ export default function PrintPiFerguilePage() {
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>P.B. TOTAL (KG):</strong> {fmtBR(processedData.totalM3 * 165, 2)}
-          </p>
-          <p style={{ margin: "2px 0" }}>
-            <strong>VOLUMEN TOTAL (M³):</strong> {fmtBR(processedData.totalM3, 3)}
-          </p>
-          <p style={{ margin: "2px 0" }}>
-            <strong>Productos originales de fabrica</strong>
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>Made in Brasil</strong>

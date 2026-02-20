@@ -10,7 +10,76 @@ namespace Pi.Api.Controllers;
 public class ModulosController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public ModulosController(AppDbContext db) => _db = db;
+    private readonly Services.ModuloExportService _exportService;
+
+    public ModulosController(AppDbContext db, Services.ModuloExportService exportService)
+    {
+        _db = db;
+        _exportService = exportService;
+    }
+
+    [HttpPost("excel")]
+    public async Task<IActionResult> ExportExcel([FromBody] ModuloExportRequest request)
+    {
+        var query = _db.Modulos
+            .Include(m => m.Fornecedor)
+            .Include(m => m.Categoria)
+            .Include(m => m.Marca)
+            .Include(m => m.ModulosTecidos)
+                .ThenInclude(mt => mt.Tecido)
+            .AsQueryable();
+
+        if (request.Ids != null && request.Ids.Any())
+        {
+            query = query.Where(m => request.Ids.Contains(m.Id));
+        }
+        else
+        {
+            // Apply same filters as GetAll if no IDs provided
+            if (!string.IsNullOrEmpty(request.Search))
+                query = query.Where(m => m.Descricao.Contains(request.Search));
+            
+            if (request.IdFornecedor.HasValue)
+                query = query.Where(m => m.IdFornecedor == request.IdFornecedor);
+            
+            if (request.IdCategoria.HasValue)
+                query = query.Where(m => m.IdCategoria == request.IdCategoria);
+            
+            if (request.IdMarca.HasValue)
+                query = query.Where(m => m.IdMarca == request.IdMarca);
+
+            if (request.IdTecido.HasValue)
+                query = query.Where(m => m.ModulosTecidos.Any(mt => mt.IdTecido == request.IdTecido));
+
+            if (request.Status == "ativos")
+                query = query.Where(m => m.ModulosTecidos.Any(mt => mt.FlAtivo));
+            else if (request.Status == "inativos")
+                query = query.Where(m => m.ModulosTecidos.Any(mt => !mt.FlAtivo));
+        }
+
+        var modules = await query.ToListAsync();
+        
+        // Load latest config if needed
+        var config = await _db.Configuracoes
+            .OrderByDescending(c => c.DataConfig)
+            .FirstOrDefaultAsync();
+
+        var fileBytes = _exportService.ExportToExcel(modules, request.Currency, request.Cotacao, config);
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RelatorioModulos.xlsx");
+    }
+
+    public class ModuloExportRequest
+    {
+        public List<long>? Ids { get; set; }
+        public string Currency { get; set; } = "BRL";
+        public decimal Cotacao { get; set; }
+        public string? Search { get; set; }
+        public long? IdFornecedor { get; set; }
+        public long? IdCategoria { get; set; }
+        public long? IdMarca { get; set; }
+        public long? IdTecido { get; set; }
+        public string? Status { get; set; }
+    }
 
     private static decimal CalcM3(Modulo m)
         => Math.Round(m.Largura * m.Profundidade * m.Altura, 2);

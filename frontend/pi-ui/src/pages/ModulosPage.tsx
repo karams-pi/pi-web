@@ -14,16 +14,13 @@ import {
   deleteModuloTecido,
   updateModuloTecido,
   getModuleFilters,
+  exportModulosExcel,
 } from "../api/modulos";
-import { PrintExportButtons } from "../components/PrintExportButtons";
-import { exportToCSV } from "../utils/printExport";
-import type { ColumnDefinition } from "../utils/printExport";
-
-import { getCotacaoUSD } from "../api/pis";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { ModuloSelect } from "../components/ModuloSelect";
 import { PrintModulesModal } from "../components/PrintModulesModal";
 import { printModulesReport } from "../utils/reports/printModulesReport";
+import { getCotacaoUSD } from "../api/pis";
 
 type FormState = Partial<Modulo> & {
   larguraStr?: string;
@@ -291,15 +288,6 @@ export default function ModulosPage() {
     }
   };
 
-  const exportColumns = useMemo<ColumnDefinition<Modulo>[]>(() => [
-    { header: "ID", accessor: (m) => m.id },
-    { header: "Fornecedor", accessor: (m) => fornMap.get(m.idFornecedor) || m.idFornecedor },
-    { header: "Categoria", accessor: (m) => catMap.get(m.idCategoria) || m.idCategoria },
-    { header: "Modelo", accessor: (m) => marcaMap.get(m.idMarca) || m.idMarca },
-    { header: "Descrição", accessor: (m) => m.descricao },
-    { header: "Dimensões", accessor: (m) => `${fmt(m.largura)}x${fmt(m.profundidade)}x${fmt(m.altura)}` },
-    { header: "M3", accessor: (m) => fmt(m.m3) },
-  ], [fornMap, catMap, marcaMap]);
 
   function handlePrint() {
       setIsPrintModalOpen(true);
@@ -344,29 +332,41 @@ export default function ModulosPage() {
       setIsPrintModalOpen(false);
   }
 
-  async function handleExcel(all: boolean) {
-     let list = items;
-     if (all) {
-         try {
-             setLoading(true);
-             const res = await listModulos(
-                search, 1, 100000,
-                filterFornecedor ? Number(filterFornecedor) : undefined,
-                filterCategoria ? Number(filterCategoria) : undefined,
-                filterMarca ? Number(filterMarca) : undefined,
-                filterTecido ? Number(filterTecido) : undefined,
-                filterStatus
-             );
-             list = res.items;
-         } catch(e) {
-             alert("Erro ao carregar tudo");
-             return;
-         } finally {
-             setLoading(false);
-         }
-     }
-     exportToCSV(list, exportColumns, "modulos");
-  }
+  async function onConfirmExcel(scope: 'screen' | 'all', currency: 'BRL' | 'EXW') {
+    try {
+        setLoading(true);
+        const params: any = {
+            currency,
+            cotacao,
+            search,
+            idFornecedor: filterFornecedor ? Number(filterFornecedor) : undefined,
+            idCategoria: filterCategoria ? Number(filterCategoria) : undefined,
+            idMarca: filterMarca ? Number(filterMarca) : undefined,
+            idTecido: filterTecido ? Number(filterTecido) : undefined,
+            status: filterStatus
+        };
+
+        if (scope === 'screen') {
+            params.ids = items.map(m => m.id);
+        }
+
+        const blob = await exportModulosExcel(params);
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `RelatorioModulos_${currency}_${new Date().getTime()}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (e) {
+        alert("Erro ao exportar Excel");
+    } finally {
+        setLoading(false);
+        setIsPrintModalOpen(false);
+    }
+}
+
 
   // --- Render ---
 
@@ -460,11 +460,9 @@ export default function ModulosPage() {
                 🧹 Limpar
             </button>
             <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
-            <PrintExportButtons
-                onPrint={() => handlePrint()}
-                onExcel={handleExcel}
-                disabled={loading}
-            />
+            <button className="btn btn-secondary" onClick={() => handlePrint()} style={{ height: '38px' }} disabled={loading}>
+                🖨️ Relatório
+            </button>
         </div>
       </div>
 
@@ -782,6 +780,7 @@ export default function ModulosPage() {
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
         onConfirm={onConfirmPrint}
+        onExcelConfirm={onConfirmExcel}
         loading={loading}
       />
 

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface PrintModulesModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW') => void;
+  onExcelConfirm?: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW') => void;
   loading?: boolean;
 }
 
-export function PrintModulesModal({ isOpen, onClose, onConfirm, loading }: PrintModulesModalProps) {
+export function PrintModulesModal({ isOpen, onClose, onConfirm, onExcelConfirm, loading }: PrintModulesModalProps) {
   const [scope, setScope] = useState<'screen' | 'all'>('screen');
   const [currency, setCurrency] = useState<'BRL' | 'EXW'>('BRL');
 
@@ -15,9 +16,9 @@ export function PrintModulesModal({ isOpen, onClose, onConfirm, loading }: Print
 
   return (
     <div className="modalOverlay" onMouseDown={onClose}>
-      <div className="modalCard" style={{ maxWidth: 400 }} onMouseDown={(e) => e.stopPropagation()}>
+      <div className="modalCard" style={{ maxWidth: 450 }} onMouseDown={(e) => e.stopPropagation()}>
         <div className="modalHeader">
-          <h3 className="modalTitle">Imprimir Relatório de Módulos</h3>
+          <h3 className="modalTitle">Imprimir / Exportar Módulos</h3>
           <button className="btn btn-sm" onClick={onClose} disabled={loading}>
             Fechar
           </button>
@@ -25,7 +26,7 @@ export function PrintModulesModal({ isOpen, onClose, onConfirm, loading }: Print
 
         <div className="modalBody">
           <div className="field">
-            <label className="label">O que imprimir?</label>
+            <label className="label">O que processar?</label>
             <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                 <input 
@@ -80,9 +81,20 @@ export function PrintModulesModal({ isOpen, onClose, onConfirm, loading }: Print
               className="btn btn-primary" 
               onClick={() => onConfirm(scope, currency)}
               disabled={loading}
+              style={{ background: '#333' }}
             >
-              {loading ? 'Gerando...' : 'Imprimir'}
+              {loading ? 'Processando...' : '🖨️ Imprimir'}
             </button>
+            {onExcelConfirm && (
+                <button 
+                className="btn btn-primary" 
+                onClick={() => onExcelConfirm(scope, currency)}
+                disabled={loading}
+                style={{ background: '#1d6f42' }} // Excel Green
+                >
+                {loading ? 'Gerando...' : '📊 Excel'}
+                </button>
+            )}
           </div>
         </div>
       </div>

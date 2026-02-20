@@ -333,6 +333,37 @@ public class PiExportService
 
         ws.Column(3).Width = 35;
         ws.Column(10).Width = 20;
+
+        // ═══════════════ FOOTER ═══════════════
+        currentRow += 1;
+        var footerRange = ws.Cells[currentRow, 1, currentRow + 6, 14];
+        footerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        
+        // Accounting Details (Left)
+        ws.Cells[currentRow, 1].Value = "ACCOUNTING DETAILS:";
+        ws.Cells[currentRow, 1].Style.Font.Bold = true;
+        ws.Cells[currentRow + 1, 1].Value = "Beneficiary: FERGUILE ESTOFADOS LTDA";
+        ws.Cells[currentRow + 2, 1].Value = "CNPJ: 27.499.537/0001-02";
+        ws.Cells[currentRow + 3, 1].Value = "BANK: SICREDI 748";
+        ws.Cells[currentRow + 4, 1].Value = "BENEFICIARY ACCOUNT: 0723/032524";
+        ws.Cells[currentRow + 5, 1].Value = "IBAN CODE: BR7001181521007230000003252C1";
+        ws.Cells[currentRow + 6, 1].Value = "SWIFT CODE: BCSIBRRS748";
+
+        // Product Data (Right)
+        int rightCol = 8;
+        decimal totalQty = pi.PiItens.Sum(i => i.Quantidade);
+        decimal totalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
+
+        ws.Cells[currentRow, rightCol].Value = "Volume: " + totalQty;
+        ws.Cells[currentRow, rightCol].Style.Font.Bold = true;
+        ws.Cells[currentRow + 1, rightCol].Value = "NCM: 94016100";
+        ws.Cells[currentRow + 2, rightCol].Value = "Brand: Ferguile / Livintus";
+        ws.Cells[currentRow + 3, rightCol].Value = "Factory original products";
+        ws.Cells[currentRow + 4, rightCol].Value = "CBM M³: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 5, rightCol].Value = "P.B. TOTAL (KG): " + (totalM3 * 165).ToString("N2");
+        ws.Cells[currentRow + 6, rightCol].Value = "Made in Brasil";
+
+        ws.Cells[currentRow, 1, currentRow + 6, 14].Style.Font.Size = 9;
     }
 
     private string GetFormattedPiNumber(ProformaInvoice pi)

@@ -84,3 +84,23 @@ export async function getModuleFilters(
     tecidos: import("./types").Tecido[];
   }>(`/api/modulos/filters?${query.toString()}`);
 }
+export async function exportModulosExcel(params: {
+  ids?: number[];
+  currency: "BRL" | "EXW";
+  cotacao: number;
+  search?: string;
+  idFornecedor?: number;
+  idCategoria?: number;
+  idMarca?: number;
+  idTecido?: number;
+  status?: string;
+}) {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/modulos/excel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) throw new Error("Erro ao exportar Excel");
+  return res.blob();
+}

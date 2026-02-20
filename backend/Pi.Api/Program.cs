@@ -48,6 +48,7 @@ builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>()
     });
 builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 builder.Services.AddScoped<Pi.Api.Services.PiExportService>();
+builder.Services.AddScoped<Pi.Api.Services.ModuloExportService>();
 
 builder.Services.AddCors(options =>
 {
