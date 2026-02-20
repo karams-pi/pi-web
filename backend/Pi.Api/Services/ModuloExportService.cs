@@ -9,7 +9,6 @@ public class ModuloExportService
 {
     public byte[] ExportToExcel(List<Modulo> modules, string currency, decimal cotacao, Configuracao? config)
     {
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Relatório de Módulos");
 
