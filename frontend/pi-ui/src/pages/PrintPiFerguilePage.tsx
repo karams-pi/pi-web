@@ -258,15 +258,9 @@ export default function PrintPiFerguilePage() {
         {/* LEFT: Exporter */}
         <div style={{ padding: "10px 15px", fontSize: "11px", lineHeight: "1.5em", borderRight: "2px solid #000" }}>
           <div style={{ fontWeight: "bold", fontSize: "13px", marginBottom: "4px", textTransform: "uppercase" }}>
-            {(pi as any)?.fornecedor?.nome || "FERGUILE ESTOFADOS LTDA"}
+            FERGUILE ESTOFADOS LTDA
           </div>
-          <div>CNPJ: {(() => {
-            const cnpj = (pi as any)?.fornecedor?.cnpj || "27499537000102";
-            if (cnpj.length === 14) {
-              return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
-            }
-            return cnpj;
-          })()}</div>
+          <div>CNPJ: 27.499.537/0001-02</div>
           <div>ADDRESS: RUA CANÁRIO DO BREJO, 630</div>
           <div>RIBEIRÃO BANDEIRANTE DO NORTE</div>
           <div>ZIP CODE: 86703-797</div>
@@ -482,14 +476,14 @@ export default function PrintPiFerguilePage() {
           <p style={{ margin: "2px 0" }}>SWIFT CODE: RENDBRSP</p>
           <p style={{ margin: "2px 0" }}>IBAN: BR4468900810000010025069901i1</p>
           <p style={{ margin: "2px 0" }}>ACCOUNT: 00250699000148</p>
-          <p style={{ margin: "2px 0" }}>NAME: {(pi as any)?.fornecedor?.nome || "FERGUILE ESTOFADOS LTDA"}</p>
+          <p style={{ margin: "2px 0" }}>NAME: FERGUILE ESTOFADOS LTDA</p>
         </div>
         <div style={{ padding: 10 }}>
           <h3 style={{ margin: "0 0 5px 0", fontSize: "12px", textTransform: "uppercase" }}>
             GENERAL PRODUCT DATA
           </h3>
           <p style={{ margin: "2px 0" }}>
-            <strong>Brand:</strong> {(pi as any)?.fornecedor?.nome || "Ferguile / Livintus"}
+            <strong>Brand:</strong> Ferguile / Livintus
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>NCM:</strong> 94016100

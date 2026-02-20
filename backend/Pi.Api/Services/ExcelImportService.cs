@@ -910,7 +910,7 @@ public class ExcelImportService
 
                     // === Get/Create Modulo ===
                     string modKey = $"{marca.Id}|{descricao.ToUpper().Trim()}|{larg}";
-                    Modulo modulo = null;
+                    Modulo? modulo = null;
 
                     // If marca is existing (Id > 0), we can check the dictionary
                     if (marca.Id > 0 && modulosDict.TryGetValue(modKey, out var existingMod))
@@ -1134,7 +1134,7 @@ public class ExcelImportService
 
                     // === Get/Create Modulo ===
                     string modKey = $"{marca.Id}|{descricao.ToUpper().Trim()}|{larg}";
-                    Modulo modulo = null;
+                    Modulo? modulo = null;
 
                     if (marca.Id > 0 && modulosDict.TryGetValue(modKey, out var existingMod))
                     {
