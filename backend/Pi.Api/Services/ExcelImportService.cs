@@ -841,11 +841,11 @@ public class ExcelImportService
                 .Include(m => m.ModulosTecidos)
                 .ToListAsync();
 
-            // Dictionary for fast lookup: "marcaId|descricao|largura"
+            // Dictionary for fast lookup: "marcaId|descricao"
             var modulosDict = new Dictionary<string, Modulo>();
             foreach (var m in modulosDb)
             {
-                string key = $"{m.IdMarca}|{m.Descricao.ToUpper().Trim()}|{m.Largura}";
+                string key = $"{m.IdMarca}|{m.Descricao.ToUpper().Trim()}";
                 if (!modulosDict.ContainsKey(key))
                     modulosDict[key] = m;
             }
@@ -878,23 +878,34 @@ public class ExcelImportService
                         descricao.Equals("COMPOSICAO", StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    // === Col F (6): Largura (skip header) ===
-                    var largText = worksheet.Cells[row, 6].Text?.Trim();
-                    if (string.IsNullOrEmpty(largText) || largText.Contains("COMP", StringComparison.OrdinalIgnoreCase))
+                    // === Col C (3): Largura (skip header) ===
+                    var largText = worksheet.Cells[row, 3].Text?.Trim();
+                    if (string.IsNullOrEmpty(largText) || largText.Contains("LARG", StringComparison.OrdinalIgnoreCase))
                         continue;
                     if (!decimal.TryParse(largText, NumberStyles.Any, new CultureInfo("pt-BR"), out var larg))
                         continue;
 
-                    // === Col G (7): Profundidade (skip header) ===
-                    var profText = worksheet.Cells[row, 7].Text?.Trim();
-                    if (string.IsNullOrEmpty(profText) || profText.Contains("PROF", StringComparison.OrdinalIgnoreCase))
-                        continue;
-                    if (!decimal.TryParse(profText, NumberStyles.Any, new CultureInfo("pt-BR"), out var prof))
-                        continue;
+                    // === Col D (4): Profundidade (extract value after "F:") ===
+                    var profTextRaw = worksheet.Cells[row, 4].Text?.Trim() ?? "";
+                    decimal prof = 0;
+                    if (!string.IsNullOrEmpty(profTextRaw))
+                    {
+                        // Match F: followed by numbers (possible comma/dot)
+                        var match = Regex.Match(profTextRaw, @"F:\s*([0-9,.]+)");
+                        if (match.Success)
+                        {
+                            decimal.TryParse(match.Groups[1].Value, NumberStyles.Any, new CultureInfo("pt-BR"), out prof);
+                        }
+                        else
+                        {
+                            // Fallback to direct parse if "F:" is not found
+                            decimal.TryParse(profTextRaw, NumberStyles.Any, new CultureInfo("pt-BR"), out prof);
+                        }
+                    }
 
-                    // === Col H (8): Altura (skip header) ===
-                    var altText = worksheet.Cells[row, 8].Text?.Trim();
-                    if (string.IsNullOrEmpty(altText) || altText.Contains("ALTURA", StringComparison.OrdinalIgnoreCase))
+                    // === Col E (5): Altura (skip header) ===
+                    var altText = worksheet.Cells[row, 5].Text?.Trim();
+                    if (string.IsNullOrEmpty(altText) || altText.Contains("ALT", StringComparison.OrdinalIgnoreCase))
                         continue;
                     if (!decimal.TryParse(altText, NumberStyles.Any, new CultureInfo("pt-BR"), out var alt))
                         continue;
@@ -930,33 +941,19 @@ public class ExcelImportService
                     }
 
                     // === Get/Create Modulo ===
-                    string modKey = $"{marca.Id}|{descricao.ToUpper().Trim()}|{larg}";
+                    string modKey = $"{marca.Id}|{descricao.ToUpper().Trim()}";
                     Modulo? modulo = null;
 
-                    // If marca is existing (Id > 0), we can check the dictionary
                     if (marca.Id > 0 && modulosDict.TryGetValue(modKey, out var existingMod))
                     {
                         modulo = existingMod;
                     }
                     else if (marca.Id == 0)
                     {
-                        // Marca is new, check local tracking
                         modulo = _context.Modulos.Local
                             .FirstOrDefault(m => m.IdFornecedor == idFornecedor
                                               && m.Marca == marca
-                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
-                                              && m.Largura == larg);
-                    }
-
-                    if (marca.Id == 0) modulo = null;
-
-                    if (modulo == null)
-                    {
-                        modulo = _context.Modulos.Local
-                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor
-                                              && m.Marca == marca
-                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
-                                              && m.Largura == larg);
+                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase));
                     }
 
                     if (modulo == null)
