@@ -537,8 +537,12 @@ public class ExcelImportService
         return memoryStream;
     }
 
-    private async Task ResetSequencesAsync()
+    public async Task ResetSequencesAsync()
     {
+        // Fornecedores
+        var maxIdFornecedores = await _context.Fornecedores.MaxAsync(f => (long?)f.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('fornecedor', 'id'), {maxIdFornecedores + 1}, false);");
+
         // Categorias
         var maxIdCategorias = await _context.Categorias.MaxAsync(c => (long?)c.Id) ?? 0;
         await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('categoria', 'id'), {maxIdCategorias + 1}, false);");
@@ -558,6 +562,29 @@ public class ExcelImportService
             // ModulosTecidos
         var maxIdModulosTecidos = await _context.ModulosTecidos.MaxAsync(mt => (long?)mt.Id) ?? 0;
         await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('modulo_tecido', 'id'), {maxIdModulosTecidos + 1}, false);");
+
+        // FreteItem
+        var maxIdFreteItem = await _context.FreteItens.MaxAsync(f => (long?)f.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('frete_item', 'id'), {maxIdFreteItem + 1}, false);");
+
+        // ConfiguracoesFreteItem
+        var maxIdCfgFrete = await _context.ConfiguracoesFreteItens.MaxAsync(c => (long?)c.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('configuracoes_frete_item', 'id'), {maxIdCfgFrete + 1}, false);");
+
+        // Pis
+        var maxIdPis = await _context.Pis.MaxAsync(p => (long?)p.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('pi', 'id'), {maxIdPis + 1}, false);");
+
+        // PiItens
+        var maxIdPiItens = await _context.PiItens.MaxAsync(p => (long?)p.Id) ?? 0;
+        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('pi_item', 'id'), {maxIdPiItens + 1}, false);");
+
+        // Clientes
+        var maxIdClientes = await _context.Clientes.MaxAsync(c => (long?)c.Id) ?? 0;
+        // Check if sequence exists (clietes table usually has id)
+        try {
+            await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('clientes', 'id'), {maxIdClientes + 1}, false);");
+        } catch {}
     }
 
     public async Task ImportarKaramsAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao = null)

@@ -44,3 +44,7 @@ export const importLivintus = async (file: File, idFornecedor: number, dtRevisao
 
   return apiPostFormData<any>('/api/Import/livintus', formData);
 };
+
+export const resetSequences = async () => {
+  return apiPostFormData<any>('/api/Import/reset-sequences', new FormData());
+};

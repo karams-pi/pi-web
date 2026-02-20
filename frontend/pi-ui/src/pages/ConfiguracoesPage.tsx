@@ -7,6 +7,7 @@ import {
 import { listFornecedores } from "../api/fornecedores";
 import { createConfiguracoesFreteItem, deleteConfiguracoesFreteItem, getConfiguracoesFreteItemByFrete, updateConfiguracoesFreteItem } from "../api/configuracoesFreteItem";
 import { createFreteItem, deleteFreteItem, updateFreteItem } from "../api/freteItens";
+import { resetSequences } from "../api/importacao";
 import type { ConfiguracoesFreteItem, Fornecedor } from "../api/types";
 import { SearchableSelect } from "../components/SearchableSelect"; 
 import "./ConfiguracoesPage.css";
@@ -446,11 +447,26 @@ export default function ConfiguracoesPage() {
   } | null>(null);
 
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     loadConfig();
     listFornecedores().then(data => setFornecedores(data || []));
   }, []);
+
+  const handleSyncSequences = async () => {
+    if (!confirm("Deseja sincronizar as sequências do banco de dados? Isso resolve erros de 'Chave Duplicada' após importações.")) return;
+    setSyncing(true);
+    try {
+      await resetSequences();
+      alert("Sincronização concluída com sucesso!");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao sincronizar banco de dados.");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const loadConfig = async () => {
     try {
@@ -522,10 +538,27 @@ export default function ConfiguracoesPage() {
   return (
     <div className="cfg-page">
       <div className="cfg-header">
-        <h2 className="cfg-title">Configurações do Sistema</h2>
-        <p className="cfg-subtitle">
-          Defina os valores padrão utilizados nos cálculos do sistema. As alterações geram um novo registro histórico para auditoria.
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+                <h2 className="cfg-title">Configurações do Sistema</h2>
+                <p className="cfg-subtitle">
+                Defina os valores padrão utilizados nos cálculos do sistema. As alterações geram um novo registro histórico para auditoria.
+                </p>
+            </div>
+            <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={handleSyncSequences}
+                disabled={syncing}
+                title="Corrige erros de chave duplicada no banco de dados"
+                style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {syncing ? "Sincronizando..." : "Sincronizar Banco"}
+            </button>
+        </div>
         
         {currentConfig && (
              <div className="cfg-last-update" style={{ marginTop: 8 }}>

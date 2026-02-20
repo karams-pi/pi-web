@@ -169,5 +169,17 @@ public class ImportController : ControllerBase
             }
             return StatusCode(500, new { message = $"Erro na importação Livintus: {sb}" });
         }
+    [HttpPost("reset-sequences")]
+    public async Task<IActionResult> ResetSequences()
+    {
+        try
+        {
+            await _importService.ResetSequencesAsync();
+            return Ok(new { message = "Sequências do banco de dados sincronizadas com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Erro ao sincronizar sequências: {ex.Message}" });
+        }
     }
 }
