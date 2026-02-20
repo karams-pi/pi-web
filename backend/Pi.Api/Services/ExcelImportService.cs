@@ -579,12 +579,6 @@ public class ExcelImportService
         var maxIdPiItens = await _context.PiItens.MaxAsync(p => (long?)p.Id) ?? 0;
         await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('pi_item', 'id'), {maxIdPiItens + 1}, false);");
 
-        // Clientes
-        var maxIdClientes = await _context.Clientes.MaxAsync(c => (long?)c.Id) ?? 0;
-        // Check if sequence exists (clietes table usually has id)
-        try {
-            await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('clientes', 'id'), {maxIdClientes + 1}, false);");
-        } catch {}
     }
 
     public async Task ImportarKaramsAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao = null)

@@ -169,6 +169,8 @@ public class ImportController : ControllerBase
             }
             return StatusCode(500, new { message = $"Erro na importação Livintus: {sb}" });
         }
+    }
+
     [HttpPost("reset-sequences")]
     public async Task<IActionResult> ResetSequences()
     {
