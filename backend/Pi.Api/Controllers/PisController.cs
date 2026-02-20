@@ -38,9 +38,9 @@ public class PisController : ControllerBase
                 x.CotacaoAtualUSD,
                 x.CotacaoRisco,
 
-                Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome } : null,
+                Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
+                Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome, x.Fornecedor.Cnpj } : null,
                 Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
-                Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null
             })
             .OrderByDescending(x => x.Id)
             .ToListAsync<object>();
@@ -67,9 +67,9 @@ public class PisController : ControllerBase
                 x.CotacaoRisco,
 
                 x.IdFornecedor,
-                Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome } : null,
-                Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
+                Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome, x.Fornecedor.Cnpj } : null,
+                Cliente = x.Cliente != null ? new { x.Cliente.Id, x.Cliente.Nome } : null,
                 PiItens = x.PiItens.Select(i => new
                 {
                     i.Id,

@@ -673,7 +673,13 @@ export default function ProformaInvoicePage() {
             {form.id && (
                 <button
                     className="btn btn-secondary"
-                    onClick={() => window.open(`#/print-pi/${form.id}`, "_blank")}
+                    onClick={() => {
+                        const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
+                        const sName = (supplier?.nome || "").toLowerCase();
+                        const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
+                        const route = isFerguile ? "print-pi-ferguile" : "print-pi";
+                        window.open(`#/${route}/${form.id}`, "_blank");
+                    }}
                     style={{ height: 40, background: "#10b981", borderColor: "#10b981", color: "white" }}
                 >
                     🖨️ Imprimir

@@ -793,10 +793,7 @@ public class ExcelImportService
 
             // Skip SanitizeExcelFile — Ferguile files have thousands of columns
             // and sanitization would consume too much memory/time
-            using var ms = new MemoryStream();
-            fileStream.CopyTo(ms);
-            ms.Position = 0;
-            using var package = new ExcelPackage(ms);
+            using var package = new ExcelPackage(fileStream);
 
             // Validate Fornecedor
             var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
@@ -816,6 +813,21 @@ public class ExcelImportService
 
             var tecidosMap = new Dictionary<string, Tecido>(StringComparer.OrdinalIgnoreCase);
             foreach (var t in tecidosCache) tecidosMap[t.Nome] = t;
+
+            // Load all current modules and their fabrics for this supplier to avoid N+1 queries
+            var modulosDb = await _context.Modulos
+                .Where(m => m.IdFornecedor == idFornecedor)
+                .Include(m => m.ModulosTecidos)
+                .ToListAsync();
+
+            // Dictionary for fast lookup: "marcaId|descricao|largura"
+            var modulosDict = new Dictionary<string, Modulo>();
+            foreach (var m in modulosDb)
+            {
+                string key = $"{m.IdMarca}|{m.Descricao.ToUpper().Trim()}|{m.Largura}";
+                if (!modulosDict.ContainsKey(key))
+                    modulosDict[key] = m;
+            }
 
             // Fixed category: "Ferguile"
             const string categoriaNome = "Ferguile";
@@ -897,12 +909,23 @@ public class ExcelImportService
                     }
 
                     // === Get/Create Modulo ===
-                    var modulo = await _context.Modulos
-                        .Include(m => m.ModulosTecidos)
-                        .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor
-                                                && m.IdMarca == marca.Id
-                                                && m.Descricao.ToUpper() == descricao.ToUpper()
-                                                && m.Largura == larg);
+                    string modKey = $"{marca.Id}|{descricao.ToUpper().Trim()}|{larg}";
+                    Modulo modulo = null;
+
+                    // If marca is existing (Id > 0), we can check the dictionary
+                    if (marca.Id > 0 && modulosDict.TryGetValue(modKey, out var existingMod))
+                    {
+                        modulo = existingMod;
+                    }
+                    else if (marca.Id == 0)
+                    {
+                        // Marca is new, check local tracking
+                        modulo = _context.Modulos.Local
+                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor
+                                              && m.Marca == marca
+                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
+                                              && m.Largura == larg);
+                    }
 
                     if (marca.Id == 0) modulo = null;
 
@@ -995,10 +1018,7 @@ public class ExcelImportService
             CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
 
             // Skip SanitizeExcelFile — direct load (file is small)
-            using var ms = new MemoryStream();
-            fileStream.CopyTo(ms);
-            ms.Position = 0;
-            using var package = new ExcelPackage(ms);
+            using var package = new ExcelPackage(fileStream);
 
             // Validate Fornecedor
             var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
@@ -1018,6 +1038,21 @@ public class ExcelImportService
 
             var tecidosMap = new Dictionary<string, Tecido>(StringComparer.OrdinalIgnoreCase);
             foreach (var t in tecidosCache) tecidosMap[t.Nome] = t;
+
+            // Load all current modules and their fabrics for this supplier to avoid N+1 queries
+            var modulosDb = await _context.Modulos
+                .Where(m => m.IdFornecedor == idFornecedor)
+                .Include(m => m.ModulosTecidos)
+                .ToListAsync();
+
+            // Dictionary for fast lookup: "marcaId|descricao|largura"
+            var modulosDict = new Dictionary<string, Modulo>();
+            foreach (var m in modulosDb)
+            {
+                string key = $"{m.IdMarca}|{m.Descricao.ToUpper().Trim()}|{m.Largura}";
+                if (!modulosDict.ContainsKey(key))
+                    modulosDict[key] = m;
+            }
 
             // Fixed category: "Livintus"
             const string categoriaNome = "Livintus";
@@ -1098,12 +1133,21 @@ public class ExcelImportService
                     }
 
                     // === Get/Create Modulo ===
-                    var modulo = await _context.Modulos
-                        .Include(m => m.ModulosTecidos)
-                        .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor
-                                                && m.IdMarca == marca.Id
-                                                && m.Descricao.ToUpper() == descricao.ToUpper()
-                                                && m.Largura == larg);
+                    string modKey = $"{marca.Id}|{descricao.ToUpper().Trim()}|{larg}";
+                    Modulo modulo = null;
+
+                    if (marca.Id > 0 && modulosDict.TryGetValue(modKey, out var existingMod))
+                    {
+                        modulo = existingMod;
+                    }
+                    else if (marca.Id == 0)
+                    {
+                        modulo = _context.Modulos.Local
+                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor
+                                              && m.Marca == marca
+                                              && m.Descricao.Equals(descricao, StringComparison.OrdinalIgnoreCase)
+                                              && m.Largura == larg);
+                    }
 
                     if (marca.Id == 0) modulo = null;
 

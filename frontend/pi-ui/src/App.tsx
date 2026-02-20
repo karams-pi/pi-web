@@ -10,6 +10,8 @@ import ProformaInvoicePage from "./pages/ProformaInvoicePage";
 import PrintPiPage from "./pages/PrintPiPage";
 import ImportacaoPage from "./pages/ImportacaoPage";
 import SobrePage from "./pages/SobrePage";
+import PrintPiFerguilePage from "./pages/PrintPiFerguilePage";
+
 
 // function ProdutosPage() {
 //   return (
@@ -62,6 +64,8 @@ export default function App() {
               <Route path="/modulos" element={<ModulosPage />} />
               <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
               <Route path="/print-pi/:id" element={<PrintPiPage />} />
+              <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
+
               <Route path="/importacao" element={<ImportacaoPage />} />
               <Route path="/config" element={<ConfiguracoesPage />} />
               <Route path="/sobre" element={<SobrePage />} />
