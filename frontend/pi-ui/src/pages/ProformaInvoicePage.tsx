@@ -143,7 +143,21 @@ export default function ProformaInvoicePage() {
   useEffect(() => {
     // Recalcular rateio quando itens mudarem ou totais de frete mudarem
     recalcularRateio();
-  }, [itens.length, form.valorTotalFreteBRL, form.valorTotalFreteUSD]); 
+  }, [itens.length, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config]); 
+
+  // Load config when supplier changes
+  useEffect(() => {
+    const idForn = form.idFornecedor ? Number(form.idFornecedor) : undefined;
+    getLatestConfig(idForn).then(newConfig => {
+        setConfig(newConfig);
+        if (newConfig && form.cotacaoAtualUSD) {
+            const risk = Number((form.cotacaoAtualUSD - newConfig.valorReducaoDolar).toFixed(2));
+            setForm(prev => ({ ...prev, cotacaoRisco: risk }));
+            // Trigger recalculation with new risk rate
+            recalculateAllItems(risk, form.valorTotalFreteBRL / risk, form.valorTotalFreteBRL, newConfig);
+        }
+    }).catch(console.error);
+  }, [form.idFornecedor]);
 
 
 
@@ -248,11 +262,12 @@ export default function ProformaInvoicePage() {
     recalculateAllItems(newCotacao, newTotalFreteUSD, form.valorTotalFreteBRL);
   }
 
-  function recalculateAllItems(cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number) {
+  function recalculateAllItems(cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number, overrideConfig?: Configuracao) {
      if (itens.length === 0) return;
 
-     const comissao = config?.percentualComissao || 0;
-     const gordura = config?.percentualGordura || 0;
+     const activeConfig = overrideConfig || config;
+     const comissao = activeConfig?.percentualComissao || 0;
+     const gordura = activeConfig?.percentualGordura || 0;
      const totalM3 = itens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
 
      const novosItens = itens.map(item => {

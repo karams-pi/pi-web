@@ -123,10 +123,19 @@ export default function ModulosPage() {
   }
 
   // Load Config and Cotacao
+  const loadConfigData = async (idForn?: number) => {
+    try {
+      const c = await getLatestConfig(idForn);
+      setConfig(c);
+    } catch (e) {
+      console.error("Erro ao carregar config", e);
+    }
+  };
+
   useEffect(() => {
-    getLatestConfig().then(setConfig).catch(console.error);
+    loadConfigData(filterFornecedor ? Number(filterFornecedor) : undefined);
     getCotacaoUSD().then(setCotacao).catch(console.error);
-  }, []);
+  }, [filterFornecedor]);
 
   // Load filters AND all modules whenever filter selection changes
   useEffect(() => {
@@ -1017,9 +1026,9 @@ function CalculationDetailsModal({
     const safeCotacao = cotacaoRisco <= 0 ? 1 : cotacaoRisco;
 
     const valorBase = valorTecido / safeCotacao;
-    const comissao = valorBase * (config.percentualComissao / 100);
+    const comissao = valorBase * ((config?.percentualComissao || 0) / 100);
     // Reverted: Gordura on Base Only
-    const gordura = valorBase * (config.percentualGordura / 100);
+    const gordura = valorBase * ((config?.percentualGordura || 0) / 100);
     const total = valorBase + comissao + gordura;
 
     return (
@@ -1040,7 +1049,7 @@ function CalculationDetailsModal({
                         </div>
                         <div style={rowStyle}>
                             <span>Redução Dólar (Config):</span>
-                            <span style={{ color: '#ef4444' }}>- R$ {fmt(config.valorReducaoDolar, 2)}</span>
+                            <span style={{ color: '#ef4444' }}>- R$ {fmt(config?.valorReducaoDolar, 2)}</span>
                         </div>
                         <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 8, marginTop: 8 }}>
                             <span>Cotação de Risco:</span>
@@ -1062,11 +1071,11 @@ function CalculationDetailsModal({
                         
                         <div style={{ margin: '8px 0', borderLeft: '2px solid #334155', paddingLeft: 12 }}>
                             <div style={rowStyle}>
-                                <span>Comissão ({fmt(config.percentualComissao)}%):</span>
+                                <span>Comissão ({fmt(config?.percentualComissao)}%):</span>
                                 <span>+ $ {fmt(comissao, 2)}</span>
                             </div>
                             <div style={rowStyle}>
-                                <span>Gordura (Sobre Base) ({fmt(config.percentualGordura)}%):</span>
+                                <span>Gordura (Sobre Base) ({fmt(config?.percentualGordura)}%):</span>
                                 <span style={{ color: '#10b981' }}>+ $ {fmt(gordura, 2)}</span>
                             </div>
                         </div>
