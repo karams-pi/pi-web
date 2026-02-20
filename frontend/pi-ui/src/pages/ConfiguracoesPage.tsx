@@ -447,12 +447,23 @@ export default function ConfiguracoesPage() {
   } | null>(null);
 
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [selectedSupplierGeral, setSelectedSupplierGeral] = useState<string>("");
   const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
-    loadConfig();
-    listFornecedores().then(data => setFornecedores(data || []));
+    listFornecedores().then(data => {
+        setFornecedores(data || []);
+        if (data && data.length > 0) {
+            setSelectedSupplierGeral(String(data[0].id));
+        }
+    });
   }, []);
+
+  useEffect(() => {
+    if (selectedSupplierGeral) {
+        loadConfig(Number(selectedSupplierGeral));
+    }
+  }, [selectedSupplierGeral]);
 
   const handleSyncSequences = async () => {
     if (!confirm("Deseja sincronizar as sequências do banco de dados? Isso resolve erros de 'Chave Duplicada' após importações.")) return;
@@ -468,10 +479,10 @@ export default function ConfiguracoesPage() {
     }
   };
 
-  const loadConfig = async () => {
+  const loadConfig = async (idForn?: number) => {
     try {
       setLoading(true);
-      const config = await getLatestConfig();
+      const config = await getLatestConfig(idForn);
       if (config) {
         setCurrentConfig(config);
         setFormData({
@@ -507,7 +518,12 @@ export default function ConfiguracoesPage() {
     setMessage(null);
 
     try {
-      const newConfig = await createConfig(formData);
+      const payload = {
+          ...formData,
+          idFornecedor: selectedSupplierGeral ? Number(selectedSupplierGeral) : null
+      };
+      
+      const newConfig = await createConfig(payload);
       setCurrentConfig(newConfig);
       
       setMessage({
@@ -586,11 +602,21 @@ export default function ConfiguracoesPage() {
         
         {/* Taxas Section */}
         <section className="cfg-section">
-          <div className="cfg-section-header">
-             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#3b82f6">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-             </svg>
-             <h3 className="cfg-section-title">Taxas e Percentuais</h3>
+          <div className="cfg-section-header" style={{ justifyContent: 'space-between' }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#3b82f6">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <h3 className="cfg-section-title">Taxas e Percentuais</h3>
+             </div>
+             <div style={{ width: 300 }}>
+                <SearchableSelect 
+                    value={selectedSupplierGeral}
+                    onChange={setSelectedSupplierGeral}
+                    options={fornecedores.map(f => ({ value: String(f.id), label: f.nome }))}
+                    placeholder="Selecione um fornecedor..."
+                />
+             </div>
           </div>
           <div className="cfg-grid">
             <DecimalInput

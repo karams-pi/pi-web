@@ -26,14 +26,30 @@ public class ConfiguracoesController : ControllerBase
     }
 
     [HttpGet("latest")]
-    public async Task<ActionResult<Configuracao>> GetLatestConfiguracao()
+    public async Task<ActionResult<Configuracao>> GetLatestConfiguracao([FromQuery] long? idFornecedor = null)
     {
-        var config = await _context.Configuracoes
+        var query = _context.Configuracoes.AsQueryable();
+
+        if (idFornecedor.HasValue)
+        {
+            query = query.Where(c => c.IdFornecedor == idFornecedor.Value);
+        }
+        else
+        {
+            query = query.Where(c => c.IdFornecedor == null);
+        }
+
+        var config = await query
             .OrderByDescending(c => c.DataConfig)
             .FirstOrDefaultAsync();
 
         if (config == null)
         {
+            // Fallback to global if supplier specific not found
+            if (idFornecedor.HasValue)
+            {
+                return await GetLatestConfiguracao(null);
+            }
             return NotFound("Nenhuma configuração encontrada.");
         }
 
@@ -129,11 +145,70 @@ public class ConfiguracoesController : ControllerBase
             var sql2 = "SELECT setval(pg_get_serial_sequence('configuracoes_frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM configuracoes_frete_item;";
             await _context.Database.ExecuteSqlRawAsync(sql2);
 
+            var sql3 = "SELECT setval(pg_get_serial_sequence('configuracoes', 'id'), COALESCE(max(id),0) + 1, false) FROM configuracoes;";
+            await _context.Database.ExecuteSqlRawAsync(sql3);
+
             return Ok("Sequences reset successfully");
         }
         catch (Exception ex)
         {
             return StatusCode(500, $"Error resetting sequences: {ex.Message}");
+        }
+    }
+
+    [HttpPost("replicate-to-suppliers")]
+    public async Task<IActionResult> ReplicateToSuppliers()
+    {
+        try
+        {
+            // 1. Get latest global config
+            var latestGlobal = await _context.Configuracoes
+                .Where(c => c.IdFornecedor == null)
+                .OrderByDescending(c => c.DataConfig)
+                .FirstOrDefaultAsync();
+
+            if (latestGlobal == null) return BadRequest("Nenhuma configuração global encontrada para replicar.");
+
+            // 2. Get all suppliers
+            var suppliers = await _context.Fornecedores.ToListAsync();
+
+            // 3. For each supplier, verify if they already have one. If not, create.
+            int count = 0;
+            foreach (var supplier in suppliers)
+            {
+                bool exists = await _context.Configuracoes.AnyAsync(c => c.IdFornecedor == supplier.Id);
+                if (!exists)
+                {
+                    var newConfig = new Configuracao
+                    {
+                        DataConfig = DateTime.UtcNow,
+                        ValorReducaoDolar = latestGlobal.ValorReducaoDolar,
+                        ValorPercImposto = latestGlobal.ValorPercImposto,
+                        PercentualComissao = latestGlobal.PercentualComissao,
+                        PercentualGordura = latestGlobal.PercentualGordura,
+                        ValorFCAFreteRodFronteira = latestGlobal.ValorFCAFreteRodFronteira,
+                        ValorDespesasFCA = latestGlobal.ValorDespesasFCA,
+                        ValorFOBFretePortoParanagua = latestGlobal.ValorFOBFretePortoParanagua,
+                        ValorFOBDespPortRegDoc = latestGlobal.ValorFOBDespPortRegDoc,
+                        ValorFOBDespDespacAduaneiro = latestGlobal.ValorFOBDespDespacAduaneiro,
+                        ValorFOBDespCourier = latestGlobal.ValorFOBDespCourier,
+                        IdFornecedor = supplier.Id
+                    };
+                    _context.Configuracoes.Add(newConfig);
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { message = $"Configurações replicadas para {count} fornecedores." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Erro ao replicar configurações: {ex.Message}" });
         }
     }
 }

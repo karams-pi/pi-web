@@ -13,14 +13,16 @@ export interface Configuracao {
   valorFOBDespPortRegDoc: number;
   valorFOBDespDespacAduaneiro: number;
   valorFOBDespCourier: number;
+  idFornecedor?: number | null;
 }
 
 export const getConfigs = async () => {
   return await apiGet<Configuracao[]>("/api/configuracoes");
 };
 
-export const getLatestConfig = async () => {
-  return await apiGet<Configuracao>("/api/configuracoes/latest");
+export const getLatestConfig = async (idFornecedor?: number | null) => {
+  const url = idFornecedor ? `/api/configuracoes/latest?idFornecedor=${idFornecedor}` : "/api/configuracoes/latest";
+  return await apiGet<Configuracao>(url);
 };
 
 export const getConfigById = async (id: number) => {
@@ -29,6 +31,10 @@ export const getConfigById = async (id: number) => {
 
 export const createConfig = async (config: Omit<Configuracao, "id" | "dataConfig">) => {
   return await apiPost<Configuracao>("/api/configuracoes", config);
+};
+
+export const replicateConfigs = async () => {
+  return await apiPost<any>("/api/configuracoes/replicate-to-suppliers", {});
 };
 
 export const updateConfig = async (id: number, config: Configuracao) => {

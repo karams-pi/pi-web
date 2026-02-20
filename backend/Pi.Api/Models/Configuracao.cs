@@ -54,4 +54,10 @@ public class Configuracao
     [Required]
     [Column("valor_FOB_desp_courier", TypeName = "numeric(18,2)")]
     public decimal ValorFOBDespCourier { get; set; } = 0;
+
+    [Column("id_fornecedor")]
+    public long? IdFornecedor { get; set; }
+
+    [ForeignKey(nameof(IdFornecedor))]
+    public Fornecedor? Fornecedor { get; set; }
 }
