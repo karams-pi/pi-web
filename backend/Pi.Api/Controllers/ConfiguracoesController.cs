@@ -25,6 +25,18 @@ public class ConfiguracoesController : ControllerBase
             .ToListAsync();
     }
 
+    [HttpGet("latest-all")]
+    public async Task<ActionResult<IEnumerable<Configuracao>>> GetLatestConfigs()
+    {
+        // Gets the latest config for EACH supplier (and global)
+        var configs = await _context.Configuracoes
+            .GroupBy(c => c.IdFornecedor)
+            .Select(g => g.OrderByDescending(c => c.DataConfig).First())
+            .ToListAsync();
+        
+        return configs;
+    }
+
     [HttpGet("latest")]
     public async Task<ActionResult<Configuracao>> GetLatestConfiguracao([FromQuery] long? idFornecedor = null)
     {

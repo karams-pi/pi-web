@@ -25,6 +25,10 @@ export const getLatestConfig = async (idFornecedor?: number | null) => {
   return await apiGet<Configuracao>(url);
 };
 
+export const getLatestConfigsAll = async () => {
+  return await apiGet<Configuracao[]>("/api/configuracoes/latest-all");
+};
+
 export const getConfigById = async (id: number) => {
   return await apiGet<Configuracao>(`/api/configuracoes/${id}`);
 };

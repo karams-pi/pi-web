@@ -10,7 +10,7 @@ interface ModuloSelectProps {
   mapMarca: Map<number, string>;
   mapTecido?: Map<number, string>;
   placeholder?: string;
-  calcExw?: (valor: number) => number;
+  calcExw?: (valor: number, idFornecedor: number) => number;
 }
 
 export function ModuloSelect({
@@ -175,7 +175,7 @@ export function ModuloSelect({
                                  <span>
                                     {calcExw && (
                                         <span style={{ color: "#10b981", marginRight: 10, fontWeight: "bold" }}>
-                                            $ {calcExw(mt.valorTecido).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                            $ {calcExw(mt.valorTecido, opt.idFornecedor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                                         </span>
                                     )}
                                     <span style={{ color: "#ccc" }}>

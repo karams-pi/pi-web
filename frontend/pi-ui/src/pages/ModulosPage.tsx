@@ -18,7 +18,7 @@ import {
 import { PrintExportButtons } from "../components/PrintExportButtons";
 import { exportToCSV } from "../utils/printExport";
 import type { ColumnDefinition } from "../utils/printExport";
-import { getLatestConfig } from "../api/configuracoes";
+
 import { getCotacaoUSD } from "../api/pis";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { ModuloSelect } from "../components/ModuloSelect";
@@ -51,6 +51,7 @@ export default function ModulosPage() {
   const [tecidos, setTecidos] = useState<Tecido[]>([]);
 
   const [config, setConfig] = useState<Configuracao | null>(null);
+  const [configsMap, setConfigsMap] = useState<Map<number | null, Configuracao>>(new Map());
   const [cotacao, setCotacao] = useState<number>(0);
 
   const [loading, setLoading] = useState(false);
@@ -74,7 +75,7 @@ export default function ModulosPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"geral" | "tecidos">("geral");
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [calcModalData, setCalcModalData] = useState<{ valorTecido: number } | null>(null);
+  const [calcModalData, setCalcModalData] = useState<{ valorTecido: number; idFornecedor: number } | null>(null);
 
   // Selection state for combo
   const [selectedModuleId, setSelectedModuleId] = useState("");
@@ -123,17 +124,26 @@ export default function ModulosPage() {
   }
 
   // Load Config and Cotacao
-  const loadConfigData = async (idForn?: number) => {
+  const loadConfigData = async () => {
     try {
-      const c = await getLatestConfig(idForn);
-      setConfig(c);
+      const { getLatestConfigsAll } = await import("../api/configuracoes");
+      const allConfigs = await getLatestConfigsAll();
+      const map = new Map<number | null, Configuracao>();
+      allConfigs.forEach(c => {
+        if (c) map.set(c.idFornecedor ?? null, c);
+      });
+      setConfigsMap(map);
+
+      // Current config for legacy/general use (global or filter)
+      const currentId = filterFornecedor ? Number(filterFornecedor) : null;
+      setConfig(map.get(currentId) || map.get(null) || null);
     } catch (e) {
-      console.error("Erro ao carregar config", e);
+      console.error("Erro ao carregar configs", e);
     }
   };
 
   useEffect(() => {
-    loadConfigData(filterFornecedor ? Number(filterFornecedor) : undefined);
+    loadConfigData();
     getCotacaoUSD().then(setCotacao).catch(console.error);
   }, [filterFornecedor]);
 
@@ -260,14 +270,15 @@ export default function ModulosPage() {
     }
   }, [items]);
 
-  function calcEXW(valorTecido: number) {
-    if (!config || !cotacao) return 0;
-    const cotacaoRisco = cotacao - config.valorReducaoDolar;
+  function calcEXW(valorTecido: number, idFornecedor: number) {
+    const c = configsMap.get(idFornecedor) || configsMap.get(null);
+    if (!c || !cotacao) return 0;
+    const cotacaoRisco = cotacao - c.valorReducaoDolar;
     if (cotacaoRisco <= 0) return 0;
     const valorBase = valorTecido / cotacaoRisco;
-    const comissao = valorBase * (config.percentualComissao / 100);
+    const comissao = valorBase * (c.percentualComissao / 100);
     // Reverted: Gordura on Base Only
-    const gordura = valorBase * (config.percentualGordura / 100);
+    const gordura = valorBase * (c.percentualGordura / 100);
     return valorBase + comissao + gordura;
   }
 
@@ -506,11 +517,11 @@ export default function ModulosPage() {
                         {myTecidos.length > 0 ? (
                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
                                  <span style={{ color: '#10b981' }}>
-                                    $ {fmt(calcEXW(myTecidos[0].valorTecido), 2)}
+                                    $ {fmt(calcEXW(myTecidos[0].valorTecido, x.idFornecedor), 2)}
                                  </span>
                                  <button 
                                     className="btn-icon" 
-                                    onClick={() => setCalcModalData({ valorTecido: myTecidos[0].valorTecido })}
+                                    onClick={() => setCalcModalData({ valorTecido: myTecidos[0].valorTecido, idFornecedor: x.idFornecedor })}
                                     title="Ver memória de cálculo"
                                     style={{ padding: 2, display: 'flex' }}
                                  >
@@ -561,11 +572,11 @@ export default function ModulosPage() {
                         <td style={td}>
                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
                                  <span style={{ color: '#10b981' }}>
-                                    $ {fmt(calcEXW(mt.valorTecido), 2)}
+                                    $ {fmt(calcEXW(mt.valorTecido, x.idFornecedor), 2)}
                                  </span>
                                  <button 
                                     className="btn-icon" 
-                                    onClick={() => setCalcModalData({ valorTecido: mt.valorTecido })}
+                                    onClick={() => setCalcModalData({ valorTecido: mt.valorTecido, idFornecedor: x.idFornecedor })}
                                     title="Ver memória de cálculo"
                                     style={{ padding: 2, display: 'flex' }}
                                  >
@@ -774,12 +785,12 @@ export default function ModulosPage() {
         loading={loading}
       />
 
-      {calcModalData && config && (
+      {calcModalData && (
           <CalculationDetailsModal
             isOpen={!!calcModalData}
             onClose={() => setCalcModalData(null)}
-            valorTecido={calcModalData.valorTecido}
-            config={config}
+            valorTecido={(calcModalData as any).valorTecido}
+            config={configsMap.get((calcModalData as any).idFornecedor) || configsMap.get(null) || config}
             cotacao={cotacao}
           />
       )}
@@ -1015,13 +1026,13 @@ function CalculationDetailsModal({
     isOpen: boolean;
     onClose: () => void;
     valorTecido: number;
-    config: Configuracao;
+    config: Configuracao | null;
     cotacao: number;
 }) {
     if (!isOpen) return null;
 
     // Recalculate Logic to display
-    const cotacaoRisco = cotacao - config.valorReducaoDolar;
+    const cotacaoRisco = cotacao - (config?.valorReducaoDolar || 0);
     // Safety check div by zero
     const safeCotacao = cotacaoRisco <= 0 ? 1 : cotacaoRisco;
 
