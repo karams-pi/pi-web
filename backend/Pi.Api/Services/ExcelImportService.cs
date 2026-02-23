@@ -885,7 +885,7 @@ public class ExcelImportService
                     if (!decimal.TryParse(largText, NumberStyles.Any, new CultureInfo("pt-BR"), out var larg))
                         continue;
 
-                    // === Col D (4): Profundidade (extract value after "F:") ===
+                    // === Col D (4): Profundidade (extract ONLY value starting with "F:") ===
                     var profTextRaw = worksheet.Cells[row, 4].Text?.Trim() ?? "";
                     decimal prof = 0;
                     if (!string.IsNullOrEmpty(profTextRaw))
@@ -895,11 +895,6 @@ public class ExcelImportService
                         if (match.Success)
                         {
                             decimal.TryParse(match.Groups[1].Value, NumberStyles.Any, new CultureInfo("pt-BR"), out prof);
-                        }
-                        else
-                        {
-                            // Fallback to direct parse if "F:" is not found
-                            decimal.TryParse(profTextRaw, NumberStyles.Any, new CultureInfo("pt-BR"), out prof);
                         }
                     }
 
