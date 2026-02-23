@@ -541,6 +541,9 @@ export default function ConfiguracoesPage() {
     }
   };
 
+  const selectedSupplierObj = fornecedores.find(f => String(f.id) === selectedSupplierGeral);
+  const isFerguileOrLivintus = selectedSupplierObj && (selectedSupplierObj.nome.toLowerCase().includes("ferguile") || selectedSupplierObj.nome.toLowerCase().includes("livintus"));
+
   if (loading) {
     return (
       <div className="cfg-page">
@@ -620,7 +623,7 @@ export default function ConfiguracoesPage() {
           </div>
           <div className="cfg-grid">
             <DecimalInput
-              label="Redução Dólar"
+              label={isFerguileOrLivintus ? "Valor Cotação Fixo" : "Redução Dólar"}
               name="valorReducaoDolar"
               value={formData.valorReducaoDolar}
               onChange={handleDecimalChange}

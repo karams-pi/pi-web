@@ -150,7 +150,18 @@ export default function ProformaInvoicePage() {
     getLatestConfig(idForn).then(newConfig => {
         setConfig(newConfig);
         if (newConfig && form.cotacaoAtualUSD) {
-            const risk = Number((form.cotacaoAtualUSD - newConfig.valorReducaoDolar).toFixed(2));
+            let risk = Number((form.cotacaoAtualUSD - newConfig.valorReducaoDolar).toFixed(2));
+
+            if (idForn) {
+                const supplier = fornecedores.find(f => f.id === idForn);
+                if (supplier) {
+                    const name = supplier.nome.toLowerCase();
+                    if (name.includes("ferguile") || name.includes("livintus")) {
+                        risk = Number(newConfig.valorReducaoDolar.toFixed(2));
+                    }
+                }
+            }
+
             setForm(prev => ({ ...prev, cotacaoRisco: risk }));
             // Trigger recalculation with new risk rate
             recalculateAllItems(risk, form.valorTotalFreteBRL / risk, form.valorTotalFreteBRL, newConfig);

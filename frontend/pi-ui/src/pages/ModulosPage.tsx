@@ -270,7 +270,12 @@ export default function ModulosPage() {
   function calcEXW(valorTecido: number, idFornecedor: number) {
     const c = configsMap.get(idFornecedor) || configsMap.get(null);
     if (!c || !cotacao) return 0;
-    const cotacaoRisco = cotacao - c.valorReducaoDolar;
+    
+    const supplier = fornecedores.find(f => f.id === idFornecedor);
+    const sName = (supplier?.nome || "").toLowerCase();
+    const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
+
+    const cotacaoRisco = isFerguile ? c.valorReducaoDolar : (cotacao - c.valorReducaoDolar);
     if (cotacaoRisco <= 0) return 0;
     const valorBase = valorTecido / cotacaoRisco;
     const comissao = valorBase * (c.percentualComissao / 100);
@@ -791,6 +796,11 @@ export default function ModulosPage() {
             valorTecido={(calcModalData as any).valorTecido}
             config={configsMap.get((calcModalData as any).idFornecedor) || configsMap.get(null) || config}
             cotacao={cotacao}
+            isFerguile={(() => {
+                const supplier = fornecedores.find(f => f.id === (calcModalData as any).idFornecedor);
+                const sName = (supplier?.nome || "").toLowerCase();
+                return sName.includes("ferguile") || sName.includes("livintus");
+            })()}
           />
       )}
     </div>
@@ -1020,18 +1030,20 @@ function CalculationDetailsModal({
     onClose,
     valorTecido,
     config,
-    cotacao
+    cotacao,
+    isFerguile
 }: {
     isOpen: boolean;
     onClose: () => void;
     valorTecido: number;
     config: Configuracao | null;
     cotacao: number;
+    isFerguile?: boolean;
 }) {
     if (!isOpen) return null;
 
     // Recalculate Logic to display
-    const cotacaoRisco = cotacao - (config?.valorReducaoDolar || 0);
+    const cotacaoRisco = isFerguile ? (config?.valorReducaoDolar || 0) : (cotacao - (config?.valorReducaoDolar || 0));
     // Safety check div by zero
     const safeCotacao = cotacaoRisco <= 0 ? 1 : cotacaoRisco;
 
@@ -1058,8 +1070,10 @@ function CalculationDetailsModal({
                             <strong>R$ {fmt(cotacao, 2)}</strong>
                         </div>
                         <div style={rowStyle}>
-                            <span>Redução Dólar (Config):</span>
-                            <span style={{ color: '#ef4444' }}>- R$ {fmt(config?.valorReducaoDolar, 2)}</span>
+                            <span>{isFerguile ? "Valor Cotação Fixo (Config):" : "Redução Dólar (Config):"}</span>
+                            <span style={{ color: isFerguile ? '#3b82f6' : '#ef4444' }}>
+                                {isFerguile ? "" : "- "}R$ {fmt(config?.valorReducaoDolar, 2)}
+                            </span>
                         </div>
                         <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 8, marginTop: 8 }}>
                             <span>Cotação de Risco:</span>

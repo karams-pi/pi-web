@@ -105,7 +105,7 @@ public class ModuloExportService
                         var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid);
                         if (mt != null)
                         {
-                            decimal val = CalcPrice(mt.ValorTecido, currency, cotacao, config);
+                            decimal val = CalcPrice(mt.ValorTecido, currency, cotacao, config, mod.Fornecedor?.Nome);
                             ws.Cells[currentRow, fabricStartCol + i].Value = val;
                         }
                         else
@@ -167,12 +167,15 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    private decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config)
+    private decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, string? fornecedorName)
     {
         if (currency == "BRL") return valorTecido;
         if (config == null || cotacao <= 0) return 0;
 
-        decimal cotacaoRisco = cotacao - config.ValorReducaoDolar;
+        string sName = (fornecedorName ?? "").ToLower();
+        bool isFerguile = sName.Contains("ferguile") || sName.Contains("livintus");
+
+        decimal cotacaoRisco = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
         if (cotacaoRisco <= 0) return 0;
 
         decimal valorBase = valorTecido / cotacaoRisco;

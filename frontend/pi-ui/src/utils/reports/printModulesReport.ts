@@ -31,12 +31,17 @@ export function printModulesReport({
   const title = `Relatório de Módulos - ${currency === 'BRL' ? 'Valores em Reais (R$)' : 'Valores em Dólar (EXW)'}`;
 
 
-  function calcPrice(valorTecido: number): number {
+  function calcPrice(valorTecido: number, idFornecedor: number): number {
     if (currency === "BRL") {
       return valorTecido;
     } else {
         if (!config || !cotacao) return 0;
-        const cotacaoRisco = cotacao - config.valorReducaoDolar;
+        
+        const fornecedorName = maps.fornecedor.get(idFornecedor) || "";
+        const sName = fornecedorName.toLowerCase();
+        const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
+
+        const cotacaoRisco = isFerguile ? config.valorReducaoDolar : (cotacao - config.valorReducaoDolar);
         if (cotacaoRisco <= 0) return 0;
         const valorBase = valorTecido / cotacaoRisco;
         const comissao = valorBase * (config.percentualComissao / 100);
@@ -207,7 +212,7 @@ export function printModulesReport({
               sortedFabricIds.forEach(fid => {
                   const mt = mod.modulosTecidos?.find(x => x.idTecido === fid);
                   if (mt) {
-                      const val = calcPrice(mt.valorTecido);
+                      const val = calcPrice(mt.valorTecido, mod.idFornecedor);
                       const symbol = currency === "BRL" ? "R$" : "$";
                       if (currency === "EXW") {
                            fabricCols += `<td class="right">${symbol} ${fmt(val)}</td>`;
