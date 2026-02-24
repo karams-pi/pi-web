@@ -1,0 +1,1383 @@
+Sheet: Planilha1
+R300: None | TRIESTE | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1662 | None | None | None | None | None | None
+R301: None | TRIESTE | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1750 | None | None | None | None | None | None
+R302: None | TRIESTE | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1700 | None | None | None | None | None | None
+R303: None | TRIESTE | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1589 | None | None | None | None | None | None
+R304: None | TRIESTE | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1773 | None | None | None | None | None | None
+R305: None | TRIESTE | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1867 | None | None | None | None | None | None
+R306: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1834 | None | None | None | None | None | None
+R307: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1712 | None | None | None | None | None | None
+R308: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1900 | None | None | None | None | None | None
+R309: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2000 | None | None | None | None | None | None
+R310: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1945 | None | None | None | None | None | None
+R311: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1812 | None | None | None | None | None | None
+R312: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2023 | None | None | None | None | None | None
+R313: None | TRIESTE | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2123 | None | None | None | None | None | None
+R314: None | TRIESTE | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2212 | None | None | None | None | None | None
+R315: None | TRIESTE | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2078 | None | None | None | None | None | None
+R316: None | TRIESTE | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2289 | None | None | None | None | None | None
+R317: None | TRIESTE | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2412 | None | None | None | None | None | None
+R318: None | LORIENT | 2.1 | F:1,13
+A:1,60 | 1.06 | 2.12 | 1.15 | 0.75 | 1.8285 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1600 | None | None | None | None | None | None
+R319: None | LORIENT | 2.1 | F:1,13
+A:1,60 | 1.06 | 2.12 | 1.15 | 0.75 | 1.8285 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1500 | None | None | None | None | None | None
+R320: None | LORIENT | 2.1 | F:1,13
+A:1,60 | 1.06 | 2.12 | 1.15 | 0.75 | 1.8285 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1666 | None | None | None | None | None | None
+R321: None | LORIENT | 2.1 | F:1,13
+A:1,60 | 1.06 | 2.12 | 1.15 | 0.75 | 1.8285 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1756 | None | None | None | None | None | None
+R322: None | LORIENT | 2.3 | F:1,13
+A:1,60 | 1.06 | 2.32 | 1.15 | 0.75 | 2.001 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1712 | None | None | None | None | None | None
+R323: None | LORIENT | 2.3 | F:1,13
+A:1,60 | 1.06 | 2.32 | 1.15 | 0.75 | 2.001 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1612 | None | None | None | None | None | None
+R324: None | LORIENT | 2.3 | F:1,13
+A:1,60 | 1.06 | 2.32 | 1.15 | 0.75 | 2.001 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1777 | None | None | None | None | None | None
+R325: None | LORIENT | 2.3 | F:1,13
+A:1,60 | 1.06 | 2.32 | 1.15 | 0.75 | 2.001 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1867 | None | None | None | None | None | None
+R326: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 2.52 | 1.15 | 0.75 | 2.1735 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1856 | None | None | None | None | None | None
+R327: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 2.52 | 1.15 | 0.75 | 2.1735 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1734 | None | None | None | None | None | None
+R328: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 2.52 | 1.15 | 0.75 | 2.1735 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1923 | None | None | None | None | None | None
+R329: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 2.52 | 1.15 | 0.75 | 2.1735 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2023 | None | None | None | None | None | None
+R330: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1989 | None | None | None | None | None | None
+R331: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1867 | None | None | None | None | None | None
+R332: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2067 | None | None | None | None | None | None
+R333: None | LORIENT | 2.5 | F:1,13
+A:1,60 | 1.06 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2167 | None | None | None | None | None | None
+R334: None | LORIENT | 2.8 | F:1,13
+A:1,60 | 1.06 | 1.42 | 1.15 | 0.75 | 1.22475 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2256 | None | None | None | None | None | None
+R335: None | LORIENT | 2.8 | F:1,13
+A:1,60 | 1.06 | 1.42 | 1.15 | 0.75 | 1.22475 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2123 | None | None | None | None | None | None
+R336: None | LORIENT | 2.8 | F:1,13
+A:1,60 | 1.06 | 1.42 | 1.15 | 0.75 | 1.22475 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2345 | None | None | None | None | None | None
+R337: None | LORIENT | 2.8 | F:1,13
+A:1,60 | 1.06 | 1.42 | 1.15 | 0.75 | 1.22475 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2456 | None | None | None | None | None | None
+R338: None | COLMAR | 2.05 | F:1,10
+A:1,60 | 1.1 | 2.07 | 1.12 | 0.75 | 1.7388 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1467 | None | None | None | None | None | None
+R339: None | COLMAR | 2.05 | F:1,10
+A:1,60 | 1.1 | 2.07 | 1.12 | 0.75 | 1.7388 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1367 | None | None | None | None | None | None
+R340: None | COLMAR | 2.05 | F:1,10
+A:1,60 | 1.1 | 2.07 | 1.12 | 0.75 | 1.7388 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1523 | None | None | None | None | None | None
+R341: None | COLMAR | 2.05 | F:1,10
+A:1,60 | 1.1 | 2.07 | 1.12 | 0.75 | 1.7388 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R342: None | COLMAR | 2.25 | F:1,10
+A:1,60 | 1.1 | 2.27 | 1.12 | 0.75 | 1.9068 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1567 | None | None | None | None | None | None
+R343: None | COLMAR | 2.25 | F:1,10
+A:1,60 | 1.1 | 2.27 | 1.12 | 0.75 | 1.9068 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1456 | None | None | None | None | None | None
+R344: None | COLMAR | 2.25 | F:1,10
+A:1,60 | 1.1 | 2.27 | 1.12 | 0.75 | 1.9068 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1634 | None | None | None | None | None | None
+R345: None | COLMAR | 2.25 | F:1,10
+A:1,60 | 1.1 | 2.27 | 1.12 | 0.75 | 1.9068 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1723 | None | None | None | None | None | None
+R346: None | COLMAR | 2.45 | F:1,10
+A:1,60 | 1.1 | 2.47 | 1.12 | 0.75 | 2.0748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1678 | None | None | None | None | None | None
+R347: None | COLMAR | 2.45 | F:1,10
+A:1,60 | 1.1 | 2.47 | 1.12 | 0.75 | 2.0748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1556 | None | None | None | None | None | None
+R348: None | COLMAR | 2.45 | F:1,10
+A:1,60 | 1.1 | 2.47 | 1.12 | 0.75 | 2.0748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1745 | None | None | None | None | None | None
+R349: None | COLMAR | 2.45 | F:1,10
+A:1,60 | 1.1 | 2.47 | 1.12 | 0.75 | 2.0748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1834 | None | None | None | None | None | None
+R350: None | CARTAXO | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1656 | None | None | None | None | None | None
+R351: None | CARTAXO | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1545 | None | None | None | None | None | None
+R352: None | CARTAXO | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1745 | None | None | None | None | None | None
+R353: None | CARTAXO | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1823 | None | None | None | None | None | None
+R354: None | CARTAXO | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1834 | None | None | None | None | None | None
+R355: None | CARTAXO | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1689 | None | None | None | None | None | None
+R356: None | CARTAXO | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1923 | None | None | None | None | None | None
+R357: None | CARTAXO | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2034 | None | None | None | None | None | None
+R358: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1912 | None | None | None | None | None | None
+R359: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1784 | None | None | None | None | None | None
+R360: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1989 | None | None | None | None | None | None
+R361: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2100 | None | None | None | None | None | None
+R362: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2045 | None | None | None | None | None | None
+R363: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1912 | None | None | None | None | None | None
+R364: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2134 | None | None | None | None | None | None
+R365: None | CARTAXO | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2234 | None | None | None | None | None | None
+R366: None | CARTAXO | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2312 | None | None | None | None | None | None
+R367: None | CARTAXO | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2167 | None | None | None | None | None | None
+R368: None | CARTAXO | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2400 | None | None | None | None | None | None
+R369: None | CARTAXO | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2512 | None | None | None | None | None | None
+R370: None | BARILOCHE  | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1645 | None | None | None | None | None | None
+R371: None | BARILOCHE  | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1534 | None | None | None | None | None | None
+R372: None | BARILOCHE  | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1723 | None | None | None | None | None | None
+R373: None | BARILOCHE  | 2.1 | F:1,10
+A:1,60 | 1.15 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1800 | None | None | None | None | None | None
+R374: None | BARILOCHE  | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1767 | None | None | None | None | None | None
+R375: None | BARILOCHE  | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1645 | None | None | None | None | None | None
+R376: None | BARILOCHE  | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1862 | None | None | None | None | None | None
+R377: None | BARILOCHE  | 2.3 | F:1,10
+A:1,60 | 1.15 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1945 | None | None | None | None | None | None
+R378: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1900 | None | None | None | None | None | None
+R379: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1777 | None | None | None | None | None | None
+R380: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1989 | None | None | None | None | None | None
+R381: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2078 | None | None | None | None | None | None
+R382: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2034 | None | None | None | None | None | None
+R383: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1900 | None | None | None | None | None | None
+R384: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2134 | None | None | None | None | None | None
+R385: None | BARILOCHE  | 2.5 | F:1,10
+A:1,60 | 1.15 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2220 | None | None | None | None | None | None
+R386: None | BARILOCHE  | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2300 | None | None | None | None | None | None
+R387: None | BARILOCHE  | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2156 | None | None | None | None | None | None
+R388: None | BARILOCHE  | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2412 | None | None | None | None | None | None
+R389: None | BARILOCHE  | 2.8 | F:1,10
+A:1,60 | 1.15 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2512 | None | None | None | None | None | None
+R390: None | BATAM | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1600 | None | None | None | None | None | None
+R391: None | BATAM | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1500 | None | None | None | None | None | None
+R392: None | BATAM | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1678 | None | None | None | None | None | None
+R393: None | BATAM | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1745 | None | None | None | None | None | None
+R394: None | BATAM | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1723 | None | None | None | None | None | None
+R395: None | BATAM | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1612 | None | None | None | None | None | None
+R396: None | BATAM | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1795 | None | None | None | None | None | None
+R397: None | BATAM | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1867 | None | None | None | None | None | None
+R398: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1867 | None | None | None | None | None | None
+R399: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1756 | None | None | None | None | None | None
+R400: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1945 | None | None | None | None | None | None
+R401: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2023 | None | None | None | None | None | None
+R402: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1978 | None | None | None | None | None | None
+R403: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1856 | None | None | None | None | None | None
+R404: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2073 | None | None | None | None | None | None
+R405: None | BATAM | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2156 | None | None | None | None | None | None
+R406: None | BATAM | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2200 | None | None | None | None | None | None
+R407: None | BATAM | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2067 | None | None | None | None | None | None
+R408: None | BATAM | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2312 | None | None | None | None | None | None
+R409: None | BATAM | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2400 | None | None | None | None | None | None
+R410: None | RAVENA | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1589 | None | None | None | None | None | None
+R411: None | RAVENA | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1489 | None | None | None | None | None | None
+R412: None | RAVENA | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1673 | None | None | None | None | None | None
+R413: None | RAVENA | 2.1 | F:1,10
+A:1,60 | 1.1 | 2.12 | 1.12 | 0.75 | 1.7808 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1745 | None | None | None | None | None | None
+R414: None | RAVENA | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1712 | None | None | None | None | None | None
+R415: None | RAVENA | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1612 | None | None | None | None | None | None
+R416: None | RAVENA | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1800 | None | None | None | None | None | None
+R417: None | RAVENA | 2.3 | F:1,10
+A:1,60 | 1.1 | 2.32 | 1.12 | 0.75 | 1.9488 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1878 | None | None | None | None | None | None
+R418: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1845 | None | None | None | None | None | None
+R419: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1734 | None | None | None | None | None | None
+R420: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1934 | None | None | None | None | None | None
+R421: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 2.52 | 1.12 | 0.75 | 2.1168 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 2012 | None | None | None | None | None | None
+R422: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1978 | None | None | None | None | None | None
+R423: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1856 | None | None | None | None | None | None
+R424: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2084 | None | None | None | None | None | None
+R425: None | RAVENA | 2.5 | F:1,10
+A:1,60 | 1.1 | 1.27 | 1.12 | 0.75 | 1.0668 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2167 | None | None | None | None | None | None
+R426: None | RAVENA | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2212 | None | None | None | None | None | None
+R427: None | RAVENA | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2089 | None | None | None | None | None | None
+R428: None | RAVENA | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2289 | None | None | None | None | None | None
+R429: None | RAVENA | 2.8 | F:1,10
+A:1,60 | 1.1 | 1.42 | 1.12 | 0.75 | 1.1928 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2400 | None | None | None | None | None | None
+R430: COIMBRA | COIMBRA | 1.9 | F: 1,13
+A: 1,58 | 0.88 | 0.97 | 1.15 | 0.75 | 0.836625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1920 | None | None | None | None | None | None
+R431: COIMBRA | COIMBRA | 1.9 | F: 1,13
+A: 1,58 | 0.88 | 0.97 | 1.15 | 0.75 | 0.836625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1840 | None | None | None | None | None | None
+R432: COIMBRA | COIMBRA | 1.9 | F: 1,13
+A: 1,58 | 0.88 | 0.97 | 1.15 | 0.75 | 0.836625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1980 | None | None | None | None | None | None
+R433: COIMBRA | COIMBRA | 1.9 | F: 1,13
+A: 1,58 | 0.88 | 0.97 | 1.15 | 0.75 | 0.836625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2050 | None | None | None | None | None | None
+R434: COIMBRA | COIMBRA | 2.1 | F: 1,13
+A: 1,58 | 0.88 | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2030 | None | None | None | None | None | None
+R435: COIMBRA | COIMBRA | 2.1 | F: 1,13
+A: 1,58 | 0.88 | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1940 | None | None | None | None | None | None
+R436: COIMBRA | COIMBRA | 2.1 | F: 1,13
+A: 1,58 | 0.88 | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2090 | None | None | None | None | None | None
+R437: COIMBRA | COIMBRA | 2.1 | F: 1,13
+A: 1,58 | 0.88 | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2160 | None | None | None | None | None | None
+R438: COIMBRA | COIMBRA | 2.3 | F: 1,13
+A: 1,58 | 0.88 | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2160 | None | None | None | None | None | None
+R439: COIMBRA | COIMBRA | 2.3 | F: 1,13
+A: 1,58 | 0.88 | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2070 | None | None | None | None | None | None
+R440: COIMBRA | COIMBRA | 2.3 | F: 1,13
+A: 1,58 | 0.88 | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2220 | None | None | None | None | None | None
+R441: COIMBRA | COIMBRA | 2.3 | F: 1,13
+A: 1,58 | 0.88 | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2300 | None | None | None | None | None | None
+R442: COIMBRA | COIMBRA | 2.5 | F: 1,13
+A: 1,58 | 0.88 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2290 | None | None | None | None | None | None
+R443: COIMBRA | COIMBRA | 2.5 | F: 1,13
+A: 1,58 | 0.88 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2190 | None | None | None | None | None | None
+R444: COIMBRA | COIMBRA | 2.5 | F: 1,13
+A: 1,58 | 0.88 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2350 | None | None | None | None | None | None
+R445: COIMBRA | COIMBRA | 2.5 | F: 1,13
+A: 1,58 | 0.88 | 1.27 | 1.15 | 0.75 | 1.095375 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2440 | None | None | None | None | None | None
+R446: COIMBRA | COIMBRA | 2.7 | F: 1,13
+A: 1,58 | 0.88 | 1.37 | 1.15 | 0.75 | 1.181625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2410 | None | None | None | None | None | None
+R447: COIMBRA | COIMBRA | 2.7 | F: 1,13
+A: 1,58 | 0.88 | 1.37 | 1.15 | 0.75 | 1.181625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2310 | None | None | None | None | None | None
+R448: COIMBRA | COIMBRA | 2.7 | F: 1,13
+A: 1,58 | 0.88 | 1.37 | 1.15 | 0.75 | 1.181625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2480 | None | None | None | None | None | None
+R449: COIMBRA | COIMBRA | 2.7 | F: 1,13
+A: 1,58 | 0.88 | 1.37 | 1.15 | 0.75 | 1.181625 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2570 | None | None | None | None | None | None
+R450: CAYMAN | CAYMAN | 1.9 | F: 1,09
+A: 1,50 | 0.93 | 0.97 | 1.11 | 0.75 | 0.807525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1890 | None | None | None | None | None | None
+R451: CAYMAN | CAYMAN | 1.9 | F: 1,09
+A: 1,50 | 0.93 | 0.97 | 1.11 | 0.75 | 0.807525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1810 | None | None | None | None | None | None
+R452: CAYMAN | CAYMAN | 1.9 | F: 1,09
+A: 1,50 | 0.93 | 0.97 | 1.11 | 0.75 | 0.807525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1950 | None | None | None | None | None | None
+R453: CAYMAN | CAYMAN | 1.9 | F: 1,09
+A: 1,50 | 0.93 | 0.97 | 1.11 | 0.75 | 0.807525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2010 | None | None | None | None | None | None
+R454: CAYMAN | CAYMAN | 2.1 | F: 1,09
+A: 1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2000 | None | None | None | None | None | None
+R455: CAYMAN | CAYMAN | 2.1 | F: 1,09
+A: 1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1920 | None | None | None | None | None | None
+R456: CAYMAN | CAYMAN | 2.1 | F: 1,09
+A: 1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2060 | None | None | None | None | None | None
+R457: CAYMAN | CAYMAN | 2.1 | F: 1,09
+A: 1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2140 | None | None | None | None | None | None
+R458: CAYMAN | CAYMAN | 2.3 | F: 1,09
+A: 1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2120 | None | None | None | None | None | None
+R459: CAYMAN | CAYMAN | 2.3 | F: 1,09
+A: 1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2020 | None | None | None | None | None | None
+R460: CAYMAN | CAYMAN | 2.3 | F: 1,09
+A: 1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2170 | None | None | None | None | None | None
+R461: CAYMAN | CAYMAN | 2.3 | F: 1,09
+A: 1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2250 | None | None | None | None | None | None
+R462: CAYMAN | CAYMAN | 2.5 | F: 1,09
+A: 1,50 | 0.93 | 1.27 | 1.11 | 0.75 | 1.057275 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2240 | None | None | None | None | None | None
+R463: CAYMAN | CAYMAN | 2.5 | F: 1,09
+A: 1,50 | 0.93 | 1.27 | 1.11 | 0.75 | 1.057275 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2150 | None | None | None | None | None | None
+R464: CAYMAN | CAYMAN | 2.5 | F: 1,09
+A: 1,50 | 0.93 | 1.27 | 1.11 | 0.75 | 1.057275 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2310 | None | None | None | None | None | None
+R465: CAYMAN | CAYMAN | 2.5 | F: 1,09
+A: 1,50 | 0.93 | 1.27 | 1.11 | 0.75 | 1.057275 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2390 | None | None | None | None | None | None
+R466: CAYMAN | CAYMAN | 2.7 | F: 1,09
+A: 1,50 | 0.93 | 1.37 | 1.11 | 0.75 | 1.140525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2360 | None | None | None | None | None | None
+R467: CAYMAN | CAYMAN | 2.7 | F: 1,09
+A: 1,50 | 0.93 | 1.37 | 1.11 | 0.75 | 1.140525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2260 | None | None | None | None | None | None
+R468: CAYMAN | CAYMAN | 2.7 | F: 1,09
+A: 1,50 | 0.93 | 1.37 | 1.11 | 0.75 | 1.140525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2430 | None | None | None | None | None | None
+R469: CAYMAN | CAYMAN | 2.7 | F: 1,09
+A: 1,50 | 0.93 | 1.37 | 1.11 | 0.75 | 1.140525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2510 | None | None | None | None | None | None
+R470: None | NATURE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2167 | None | None | None | None | None | None
+R471: None | NATURE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2078 | None | None | None | None | None | None
+R472: None | NATURE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2220 | None | None | None | None | None | None
+R473: None | NATURE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2300 | None | None | None | None | None | None
+R474: None | NATURE | 2.3 | F:1,09
+A:1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2289 | None | None | None | None | None | None
+R475: None | NATURE | 2.3 | F:1,09
+A:1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2189 | None | None | None | None | None | None
+R476: None | NATURE | 2.3 | F:1,09
+A:1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2356 | None | None | None | None | None | None
+R477: None | NATURE | 2.3 | F:1,09
+A:1,50 | 0.93 | 1.17 | 1.11 | 0.75 | 0.974025 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2434 | None | None | None | None | None | None
+R478: None | NATURE | 2.6 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2467 | None | None | None | None | None | None
+R479: None | NATURE | 2.6 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2378 | None | None | None | None | None | None
+R480: None | NATURE | 2.6 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2534 | None | None | None | None | None | None
+R481: None | NATURE | 2.6 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2623 | None | None | None | None | None | None
+R482: None | NATURE | 2.9 | F:1,09
+A:1,50 | 0.93 | 1.47 | 1.11 | 0.75 | 1.223775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2645 | None | None | None | None | None | None
+R483: None | NATURE | 2.9 | F:1,09
+A:1,50 | 0.93 | 1.47 | 1.11 | 0.75 | 1.223775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2523 | None | None | None | None | None | None
+R484: None | NATURE | 2.9 | F:1,09
+A:1,50 | 0.93 | 1.47 | 1.11 | 0.75 | 1.223775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2712 | None | None | None | None | None | None
+R485: None | NATURE | 2.9 | F:1,09
+A:1,50 | 0.93 | 1.47 | 1.11 | 0.75 | 1.223775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2800 | None | None | None | None | None | None
+R486: None | INOVARE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2090 | None | None | None | None | None | None
+R487: None | INOVARE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1998 | None | None | None | None | None | None
+R488: None | INOVARE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2150 | None | None | None | None | None | None
+R489: None | INOVARE | 2.1 | F:1,09
+A:1,50 | 0.93 | 1.07 | 1.11 | 0.75 | 0.890775 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2230 | None | None | None | None | None | None
+R490: None | INOVARE | 2.4 | F:1,09
+A:1,50 | 0.93 | 1.22 | 1.11 | 0.75 | 1.01565 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2260 | None | None | None | None | None | None
+R491: None | INOVARE | 2.4 | F:1,09
+A:1,50 | 0.93 | 1.22 | 1.11 | 0.75 | 1.01565 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2160 | None | None | None | None | None | None
+R492: None | INOVARE | 2.4 | F:1,09
+A:1,50 | 0.93 | 1.22 | 1.11 | 0.75 | 1.01565 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2330 | None | None | None | None | None | None
+R493: None | INOVARE | 2.4 | F:1,09
+A:1,50 | 0.93 | 1.22 | 1.11 | 0.75 | 1.01565 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2410 | None | None | None | None | None | None
+R494: None | INOVARE | 2.7 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2420 | None | None | None | None | None | None
+R495: None | INOVARE | 2.7 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2310 | None | None | None | None | None | None
+R496: None | INOVARE | 2.7 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2490 | None | None | None | None | None | None
+R497: None | INOVARE | 2.7 | F:1,09
+A:1,50 | 0.93 | 1.32 | 1.11 | 0.75 | 1.0989 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2590 | None | None | None | None | None | None
+R498: None | VILLAGE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1412 | None | None | None | None | None | None
+R499: None | VILLAGE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1323 | None | None | None | None | None | None
+R500: None | VILLAGE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1478 | None | None | None | None | None | None
+R501: None | VILLAGE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1545 | None | None | None | None | None | None
+R502: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1512 | None | None | None | None | None | None
+R503: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1412 | None | None | None | None | None | None
+R504: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1578 | None | None | None | None | None | None
+R505: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1656 | None | None | None | None | None | None
+R506: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1578 | None | None | None | None | None | None
+R507: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1489 | None | None | None | None | None | None
+R508: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1645 | None | None | None | None | None | None
+R509: None | VILLAGE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1734 | None | None | None | None | None | None
+R510: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1623 | None | None | None | None | None | None
+R511: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1523 | None | None | None | None | None | None
+R512: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1689 | None | None | None | None | None | None
+R513: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1767 | None | None | None | None | None | None
+R514: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1689 | None | None | None | None | None | None
+R515: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1600 | None | None | None | None | None | None
+R516: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1756 | None | None | None | None | None | None
+R517: None | VILLAGE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1845 | None | None | None | None | None | None
+R518: None | VILLAGE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1912 | None | None | None | None | None | None
+R519: None | VILLAGE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1800 | None | None | None | None | None | None
+R520: None | VILLAGE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1978 | None | None | None | None | None | None
+R521: None | VILLAGE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2089 | None | None | None | None | None | None
+R522: None | ATUALLE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1423 | None | None | None | None | None | None
+R523: None | ATUALLE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1345 | None | None | None | None | None | None
+R524: None | ATUALLE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1478 | None | None | None | None | None | None
+R525: None | ATUALLE | 2.1 | F:1,04
+A:1,40 | 1.05 | 2.12 | 1.06 | 0.75 | 1.6854 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1545 | None | None | None | None | None | None
+R526: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1523 | None | None | None | None | None | None
+R527: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1434 | None | None | None | None | None | None
+R528: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1589 | None | None | None | None | None | None
+R529: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 2.32 | 1.06 | 0.75 | 1.8444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1656 | None | None | None | None | None | None
+R530: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1612 | None | None | None | None | None | None
+R531: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1523 | None | None | None | None | None | None
+R532: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1689 | None | None | None | None | None | None
+R533: None | ATUALLE | 2.3 | F:1,04
+A:1,40 | 1.05 | 1.17 | 1.06 | 0.75 | 0.93015 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1756 | None | None | None | None | None | None
+R534: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1634 | None | None | None | None | None | None
+R535: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1545 | None | None | None | None | None | None
+R536: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1700 | None | None | None | None | None | None
+R537: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 2.52 | 1.06 | 0.75 | 2.0034 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1777 | None | None | None | None | None | None
+R538: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1734 | None | None | None | None | None | None
+R539: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1623 | None | None | None | None | None | None
+R540: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1800 | None | None | None | None | None | None
+R541: None | ATUALLE | 2.5 | F:1,04
+A:1,40 | 1.05 | 1.27 | 1.06 | 0.75 | 1.00965 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1889 | None | None | None | None | None | None
+R542: None | ATUALLE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1978 | None | None | None | None | None | None
+R543: None | ATUALLE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1867 | None | None | None | None | None | None
+R544: None | ATUALLE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2045 | None | None | None | None | None | None
+R545: None | ATUALLE | 2.8 | F:1,04
+A:1,40 | 1.05 | 1.42 | 1.06 | 0.75 | 1.1289 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2156 | None | None | None | None | None | None
+R546: None | NOBILE | 2.1 | F:1,05
+A:1,40 | 0.93 | 2.12 | 1.07 | 0.75 | 1.7013 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1434 | None | None | None | None | None | None
+R547: None | NOBILE | 2.1 | F:1,05
+A:1,40 | 0.93 | 2.12 | 1.07 | 0.75 | 1.7013 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1334 | None | None | None | None | None | None
+R548: None | NOBILE | 2.1 | F:1,05
+A:1,40 | 0.93 | 2.12 | 1.07 | 0.75 | 1.7013 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1489 | None | None | None | None | None | None
+R549: None | NOBILE | 2.1 | F:1,05
+A:1,40 | 0.93 | 2.12 | 1.07 | 0.75 | 1.7013 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1567 | None | None | None | None | None | None
+R550: None | NOBILE | 2.3 | F:1,05
+A:1,40 | 0.93 | 2.32 | 1.07 | 0.75 | 1.8618 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1534 | None | None | None | None | None | None
+R551: None | NOBILE | 2.3 | F:1,05
+A:1,40 | 0.93 | 2.32 | 1.07 | 0.75 | 1.8618 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1434 | None | None | None | None | None | None
+R552: None | NOBILE | 2.3 | F:1,05
+A:1,40 | 0.93 | 2.32 | 1.07 | 0.75 | 1.8618 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1600 | None | None | None | None | None | None
+R553: None | NOBILE | 2.3 | F:1,05
+A:1,40 | 0.93 | 2.32 | 1.07 | 0.75 | 1.8618 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1678 | None | None | None | None | None | None
+R554: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 2.52 | 1.07 | 0.75 | 2.0223 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1634 | None | None | None | None | None | None
+R555: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 2.52 | 1.07 | 0.75 | 2.0223 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1534 | None | None | None | None | None | None
+R556: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 2.52 | 1.07 | 0.75 | 2.0223 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1700 | None | None | None | None | None | None
+R557: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 2.52 | 1.07 | 0.75 | 2.0223 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1800 | None | None | None | None | None | None
+R558: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1776 | None | None | None | None | None | None
+R559: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1645 | None | None | None | None | None | None
+R560: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1845 | None | None | None | None | None | None
+R561: None | NOBILE | 2.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1945 | None | None | None | None | None | None
+R562: None | NOBILE | 2.8 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1998 | None | None | None | None | None | None
+R563: None | NOBILE | 2.8 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1856 | None | None | None | None | None | None
+R564: None | NOBILE | 2.8 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2067 | None | None | None | None | None | None
+R565: None | NOBILE | 2.8 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2178 | None | None | None | None | None | None
+R566: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2523 | None | None | None | None | None | None
+R567: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 0.92 | 1.07 | 0.75 | 0.7383 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2523 | None | None | None | None | None | None
+R568: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2523 | None | None | None | None | None | None
+R569: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2350 | None | None | None | None | None | None
+R570: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 0.92 | 1.07 | 0.75 | 0.7383 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2350 | None | None | None | None | None | None
+R571: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2350 | None | None | None | None | None | None
+R572: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 2623 | None | None | None | None | None | None
+R573: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 0.92 | 1.07 | 0.75 | 0.7383 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 2623 | None | None | None | None | None | None
+R574: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 2623 | None | None | None | None | None | None
+R575: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 2767 | None | None | None | None | None | None
+R576: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 0.92 | 1.07 | 0.75 | 0.7383 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 2767 | None | None | None | None | None | None
+R577: None | NOBILE | 3.2 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 2767 | None | None | None | None | None | None
+R578: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2650 | None | None | None | None | None | None
+R579: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.02 | 1.07 | 0.75 | 0.81855 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2650 | None | None | None | None | None | None
+R580: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2650 | None | None | None | None | None | None
+R581: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2467 | None | None | None | None | None | None
+R582: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.02 | 1.07 | 0.75 | 0.81855 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2467 | None | None | None | None | None | None
+R583: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2467 | None | None | None | None | None | None
+R584: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 2767 | None | None | None | None | None | None
+R585: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.02 | 1.07 | 0.75 | 0.81855 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 2767 | None | None | None | None | None | None
+R586: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 2767 | None | None | None | None | None | None
+R587: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 2917 | None | None | None | None | None | None
+R588: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.02 | 1.07 | 0.75 | 0.81855 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 2917 | None | None | None | None | None | None
+R589: None | NOBILE | 3.5 | F:1,05
+A:1,40 | 0.93 | 1.27 | 1.07 | 0.75 | 1.019175 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 2917 | None | None | None | None | None | None
+R590: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2984 | None | None | None | None | None | None
+R591: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2984 | None | None | None | None | None | None
+R592: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-10 | 2984 | None | None | None | None | None | None
+R593: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2784 | None | None | None | None | None | None
+R594: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2784 | None | None | None | None | None | None
+R595: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-12 | 2784 | None | None | None | None | None | None
+R596: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 3100 | None | None | None | None | None | None
+R597: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 3100 | None | None | None | None | None | None
+R598: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-13 | 3100 | None | None | None | None | None | None
+R599: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 3267 | None | None | None | None | None | None
+R600: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.17 | 1.07 | 0.75 | 0.938925 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 3267 | None | None | None | None | None | None
+R601: None | NOBILE | 3.95 | F:1,05
+A:1,40 | 0.93 | 1.42 | 1.07 | 0.75 | 1.13955 | #REF! | #REF! | 3 MÓDULOS | TC-14 | 3267 | None | None | None | None | None | None
+R602: None | NORUEGA | 2,10m | F:1,13
+A:1,60 | 1,15m | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1778 | None | None | None | None | None | None
+R603: None | NORUEGA | 2,10m | F:1,13
+A:1,60 | 1,15m | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1665 | None | None | None | None | None | None
+R604: None | NORUEGA | 2,10m | F:1,13
+A:1,60 | 1,15m | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1862 | None | None | None | None | None | None
+R605: None | NORUEGA | 2,10m | F:1,13
+A:1,60 | 1,15m | 1.07 | 1.15 | 0.75 | 0.922875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1945 | None | None | None | None | None | None
+R606: None | NORUEGA | 2,30m | F:1,13
+A:1,60 | 1,15m | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2289 | None | None | None | None | None | None
+R607: None | NORUEGA | 2,30m | F:1,13
+A:1,60 | 1,15m | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2156 | None | None | None | None | None | None
+R608: None | NORUEGA | 2,30m | F:1,13
+A:1,60 | 1,15m | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2367 | None | None | None | None | None | None
+R609: None | NORUEGA | 2,30m | F:1,13
+A:1,60 | 1,15m | 1.17 | 1.15 | 0.75 | 1.009125 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2489 | None | None | None | None | None | None
+R610: None | NORUEGA | 2,90m | F:1,13
+A:1,60 | 1,15m | 1.47 | 1.15 | 0.75 | 1.267875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2500 | None | None | None | None | None | None
+R611: None | NORUEGA | 2,90m | F:1,13
+A:1,60 | 1,15m | 1.47 | 1.15 | 0.75 | 1.267875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2345 | None | None | None | None | None | None
+R612: None | NORUEGA | 2,90m | F:1,13
+A:1,60 | 1,15m | 1.47 | 1.15 | 0.75 | 1.267875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2623 | None | None | None | None | None | None
+R613: None | NORUEGA | 2,90m | F:1,13
+A:1,60 | 1,15m | 1.47 | 1.15 | 0.75 | 1.267875 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2744 | None | None | None | None | None | None
+R614: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.5 | 1.15 | 0.75 | 1.29375 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2934 | None | None | None | None | None | None
+R615: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2934 | None | None | None | None | None | None
+R616: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.5 | 1.15 | 0.75 | 1.29375 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2777 | None | None | None | None | None | None
+R617: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2777 | None | None | None | None | None | None
+R618: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.5 | 1.15 | 0.75 | 1.29375 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 3089 | None | None | None | None | None | None
+R619: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 3089 | None | None | None | None | None | None
+R620: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.5 | 1.15 | 0.75 | 1.29375 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 3222 | None | None | None | None | None | None
+R621: None | NORUEGA | 2,58mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 3222 | None | None | None | None | None | None
+R622: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.9 | 1.15 | 0.75 | 1.63875 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 3045 | None | None | None | None | None | None
+R623: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 3045 | None | None | None | None | None | None
+R624: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.9 | 1.15 | 0.75 | 1.63875 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2878 | None | None | None | None | None | None
+R625: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2878 | None | None | None | None | None | None
+R626: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.9 | 1.15 | 0.75 | 1.63875 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 3212 | None | None | None | None | None | None
+R627: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 3212 | None | None | None | None | None | None
+R628: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 1.9 | 1.15 | 0.75 | 1.63875 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 3356 | None | None | None | None | None | None
+R629: None | NORUEGA | 2,98mx2,15m | F:1,13
+A:1,60 | 1,15m | 2.17 | 1.12 | 0.75 | 1.8228 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 3356 | None | None | None | None | None | None
+R630: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.41 | 1.06 | 0.75 | 1.12095 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2512 | None | None | None | None | None | None
+R631: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2512 | None | None | None | None | None | None
+R632: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.41 | 1.06 | 0.75 | 1.12095 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2389 | None | None | None | None | None | None
+R633: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2389 | None | None | None | None | None | None
+R634: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.41 | 1.06 | 0.75 | 1.12095 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2623 | None | None | None | None | None | None
+R635: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2623 | None | None | None | None | None | None
+R636: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.41 | 1.06 | 0.75 | 1.12095 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 2712 | None | None | None | None | None | None
+R637: None | AREZZO | 2,43mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 2712 | None | None | None | None | None | None
+R638: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.86 | 1.06 | 0.75 | 1.4787 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2856 | None | None | None | None | None | None
+R639: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2856 | None | None | None | None | None | None
+R640: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.86 | 1.06 | 0.75 | 1.4787 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2712 | None | None | None | None | None | None
+R641: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2712 | None | None | None | None | None | None
+R642: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.86 | 1.06 | 0.75 | 1.4787 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2978 | None | None | None | None | None | None
+R643: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2978 | None | None | None | None | None | None
+R644: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 1.86 | 1.06 | 0.75 | 1.4787 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 3089 | None | None | None | None | None | None
+R645: None | AREZZO | 2,88mx2,05m | F:1,04
+A:1,43 | 1,00m | 2.07 | 1.02 | 0.75 | 1.58355 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 3089 | None | None | None | None | None | None
+R646: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2578 | None | None | None | None | None | None
+R647: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2578 | None | None | None | None | None | None
+R648: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2434 | None | None | None | None | None | None
+R649: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2434 | None | None | None | None | None | None
+R650: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2667 | None | None | None | None | None | None
+R651: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2667 | None | None | None | None | None | None
+R652: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 2789 | None | None | None | None | None | None
+R653: None | ALLEGRA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 2789 | None | None | None | None | None | None
+R654: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2600 | None | None | None | None | None | None
+R655: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-10 | 2600 | None | None | None | None | None | None
+R656: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2456 | None | None | None | None | None | None
+R657: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-12 | 2456 | None | None | None | None | None | None
+R658: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2689 | None | None | None | None | None | None
+R659: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-13 | 2689 | None | None | None | None | None | None
+R660: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.66 | 1.02 | 0.75 | 1.2699 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 2812 | None | None | None | None | None | None
+R661: None | TUNISIA | 2,65mx1,92m | F:1,00
+A:1,33 | 1,10m | 1.94 | 1.03 | 0.75 | 1.49865 | #REF! | #REF! | 2 MÓDULOS | TC-14 | 2812 | None | None | None | None | None | None
+R662: None | KYOTO | 2.1 | F:0,98
+A:1,37 | 1,08 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1434 | None | None | None | None | None | None
+R663: None | KYOTO | 2.1 | F:0,98
+A:1,37 | 1,08 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1345 | None | None | None | None | None | None
+R664: None | KYOTO | 2.1 | F:0,98
+A:1,37 | 1,08 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1489 | None | None | None | None | None | None
+R665: None | KYOTO | 2.1 | F:0,98
+A:1,37 | 1,08 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1567 | None | None | None | None | None | None
+R666: None | KYOTO | 2.3 | F:0,98
+A:1,37 | 1,08 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1534 | None | None | None | None | None | None
+R667: None | KYOTO | 2.3 | F:0,98
+A:1,37 | 1,08 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1444 | None | None | None | None | None | None
+R668: None | KYOTO | 2.3 | F:0,98
+A:1,37 | 1,08 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1600 | None | None | None | None | None | None
+R669: None | KYOTO | 2.3 | F:0,98
+A:1,37 | 1,08 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1678 | None | None | None | None | None | None
+R670: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1656 | None | None | None | None | None | None
+R671: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1555 | None | None | None | None | None | None
+R672: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1723 | None | None | None | None | None | None
+R673: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1812 | None | None | None | None | None | None
+R674: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1734 | None | None | None | None | None | None
+R675: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1623 | None | None | None | None | None | None
+R676: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1800 | None | None | None | None | None | None
+R677: None | KYOTO | 2.5 | F:0,98
+A:1,37 | 1,08 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1889 | None | None | None | None | None | None
+R678: None | ZUHAI | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1367 | None | None | None | None | None | None
+R679: None | ZUHAI | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1278 | None | None | None | None | None | None
+R680: None | ZUHAI | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1423 | None | None | None | None | None | None
+R681: None | ZUHAI | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1500 | None | None | None | None | None | None
+R682: None | ZUHAI | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1467 | None | None | None | None | None | None
+R683: None | ZUHAI | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R684: None | ZUHAI | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1523 | None | None | None | None | None | None
+R685: None | ZUHAI | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R686: None | ZUHAI | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1567 | None | None | None | None | None | None
+R687: None | ZUHAI | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1478 | None | None | None | None | None | None
+R688: None | ZUHAI | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1634 | None | None | None | None | None | None
+R689: None | ZUHAI | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1712 | None | None | None | None | None | None
+R690: None | AVALON | 2.15 | F:0,98
+A:1,37 | 1,1 | 2.17 | 1 | 0.75 | 1.6275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1444 | None | None | None | None | None | None
+R691: None | AVALON | 2.15 | F:0,98
+A:1,37 | 1,1 | 2.17 | 1 | 0.75 | 1.6275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1345 | None | None | None | None | None | None
+R692: None | AVALON | 2.15 | F:0,98
+A:1,37 | 1,1 | 2.17 | 1 | 0.75 | 1.6275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1500 | None | None | None | None | None | None
+R693: None | AVALON | 2.15 | F:0,98
+A:1,37 | 1,1 | 2.17 | 1 | 0.75 | 1.6275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1589 | None | None | None | None | None | None
+R694: None | AVALON | 2.35 | F:0,98
+A:1,37 | 1,1 | 2.37 | 1 | 0.75 | 1.7775 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1545 | None | None | None | None | None | None
+R695: None | AVALON | 2.35 | F:0,98
+A:1,37 | 1,1 | 2.37 | 1 | 0.75 | 1.7775 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1444 | None | None | None | None | None | None
+R696: None | AVALON | 2.35 | F:0,98
+A:1,37 | 1,1 | 2.37 | 1 | 0.75 | 1.7775 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1612 | None | None | None | None | None | None
+R697: None | AVALON | 2.35 | F:0,98
+A:1,37 | 1,1 | 2.37 | 1 | 0.75 | 1.7775 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1689 | None | None | None | None | None | None
+R698: None | AVALON | 2.55 | F:0,98
+A:1,37 | 1,1 | 2.57 | 1 | 0.75 | 1.9275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1656 | None | None | None | None | None | None
+R699: None | AVALON | 2.55 | F:0,98
+A:1,37 | 1,1 | 2.57 | 1 | 0.75 | 1.9275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1545 | None | None | None | None | None | None
+R700: None | AVALON | 2.55 | F:0,98
+A:1,37 | 1,1 | 2.57 | 1 | 0.75 | 1.9275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1723 | None | None | None | None | None | None
+R701: None | AVALON | 2.55 | F:0,98
+A:1,37 | 1,1 | 2.57 | 1 | 0.75 | 1.9275 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1812 | None | None | None | None | None | None
+R702: None | PAVIA | 2.05 | F:0,98
+A:1,37 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1289 | None | None | None | None | None | None
+R703: None | PAVIA | 2.05 | F:0,98
+A:1,37 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1212 | None | None | None | None | None | None
+R704: None | PAVIA | 2.05 | F:0,98
+A:1,37 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1345 | None | None | None | None | None | None
+R705: None | PAVIA | 2.05 | F:0,98
+A:1,37 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1412 | None | None | None | None | None | None
+R706: None | PAVIA | 2.25 | F:0,98
+A:1,37 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1389 | None | None | None | None | None | None
+R707: None | PAVIA | 2.25 | F:0,98
+A:1,37 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1300 | None | None | None | None | None | None
+R708: None | PAVIA | 2.25 | F:0,98
+A:1,37 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1444 | None | None | None | None | None | None
+R709: None | PAVIA | 2.25 | F:0,98
+A:1,37 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1523 | None | None | None | None | None | None
+R710: None | PAVIA | 2.45 | F:0,98
+A:1,37 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1478 | None | None | None | None | None | None
+R711: None | PAVIA | 2.45 | F:0,98
+A:1,37 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R712: None | PAVIA | 2.45 | F:0,98
+A:1,37 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1534 | None | None | None | None | None | None
+R713: None | PAVIA | 2.45 | F:0,98
+A:1,37 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R714: None | FRANÇA | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1389 | None | None | None | None | None | None
+R715: None | FRANÇA | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1289 | None | None | None | None | None | None
+R716: None | FRANÇA | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1444 | None | None | None | None | None | None
+R717: None | FRANÇA | 2.1 | F:0,98
+A:1,37 | 1,1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1523 | None | None | None | None | None | None
+R718: None | FRANÇA | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1500 | None | None | None | None | None | None
+R719: None | FRANÇA | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1389 | None | None | None | None | None | None
+R720: None | FRANÇA | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1556 | None | None | None | None | None | None
+R721: None | FRANÇA | 2.3 | F:0,98
+A:1,37 | 1,1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1645 | None | None | None | None | None | None
+R722: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1578 | None | None | None | None | None | None
+R723: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1478 | None | None | None | None | None | None
+R724: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1645 | None | None | None | None | None | None
+R725: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1723 | None | None | None | None | None | None
+R726: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1645 | None | None | None | None | None | None
+R727: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1545 | None | None | None | None | None | None
+R728: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1712 | None | None | None | None | None | None
+R729: None | FRANÇA | 2.5 | F:0,98
+A:1,37 | 1,1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1800 | None | None | None | None | None | None
+R730: None | PENICHE | 2.05 | 0.98 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1367 | None | None | None | None | None | None
+R731: None | PENICHE | 2.05 | 0.98 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1278 | None | None | None | None | None | None
+R732: None | PENICHE | 2.05 | 0.98 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1423 | None | None | None | None | None | None
+R733: None | PENICHE | 2.05 | 0.98 | 1.1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1500 | None | None | None | None | None | None
+R734: None | PENICHE | 2.25 | 0.98 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1478 | None | None | None | None | None | None
+R735: None | PENICHE | 2.25 | 0.98 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R736: None | PENICHE | 2.25 | 0.98 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1534 | None | None | None | None | None | None
+R737: None | PENICHE | 2.25 | 0.98 | 1.1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R738: None | PENICHE | 2.45 | 0.98 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1578 | None | None | None | None | None | None
+R739: None | PENICHE | 2.45 | 0.98 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1478 | None | None | None | None | None | None
+R740: None | PENICHE | 2.45 | 0.98 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1645 | None | None | None | None | None | None
+R741: None | PENICHE | 2.45 | 0.98 | 1.1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1734 | None | None | None | None | None | None
+R742: None | SAROV | 2.1 | F:1,00
+A:1,40 | 1.1 | 2.12 | 1.02 | 0.75 | 1.6218 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1489 | None | None | None | None | None | None
+R743: None | SAROV | 2.1 | F:1,00
+A:1,40 | 1.1 | 2.12 | 1.02 | 0.75 | 1.6218 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R744: None | SAROV | 2.1 | F:1,00
+A:1,40 | 1.1 | 2.12 | 1.02 | 0.75 | 1.6218 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1562 | None | None | None | None | None | None
+R745: None | SAROV | 2.1 | F:1,00
+A:1,40 | 1.1 | 2.12 | 1.02 | 0.75 | 1.6218 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1634 | None | None | None | None | None | None
+R746: None | SAROV | 2.3 | F:1,00
+A:1,40 | 1.1 | 2.32 | 1.02 | 0.75 | 1.7748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1589 | None | None | None | None | None | None
+R747: None | SAROV | 2.3 | F:1,00
+A:1,40 | 1.1 | 2.32 | 1.02 | 0.75 | 1.7748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1489 | None | None | None | None | None | None
+R748: None | SAROV | 2.3 | F:1,00
+A:1,40 | 1.1 | 2.32 | 1.02 | 0.75 | 1.7748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1678 | None | None | None | None | None | None
+R749: None | SAROV | 2.3 | F:1,00
+A:1,40 | 1.1 | 2.32 | 1.02 | 0.75 | 1.7748 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1756 | None | None | None | None | None | None
+R750: None | SAROV | 2.5 | F:1,00
+A:1,40 | 1.1 | 2.52 | 1.02 | 0.75 | 1.9278 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1712 | None | None | None | None | None | None
+R751: None | SAROV | 2.5 | F:1,00
+A:1,40 | 1.1 | 2.52 | 1.02 | 0.75 | 1.9278 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1600 | None | None | None | None | None | None
+R752: None | SAROV | 2.5 | F:1,00
+A:1,40 | 1.1 | 2.52 | 1.02 | 0.75 | 1.9278 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1806 | None | None | None | None | None | None
+R753: None | SAROV | 2.5 | F:1,00
+A:1,40 | 1.1 | 2.52 | 1.02 | 0.75 | 1.9278 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1888 | None | None | None | None | None | None
+R754: None | SINTRA | 2 | F:1,20
+A:1,50 | 0,95 | 2.02 | 1.22 | 0.97 | 2.390468 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2112 | None | None | None | None | None | None
+R755: None | SINTRA | 2 | F:1,20
+A:1,50 | 0,95 | 2.02 | 1.22 | 0.97 | 2.390468 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1989 | None | None | None | None | None | None
+R756: None | SINTRA | 2 | F:1,20
+A:1,50 | 0,95 | 2.02 | 1.22 | 0.97 | 2.390468 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2189 | None | None | None | None | None | None
+R757: None | SINTRA | 2 | F:1,20
+A:1,50 | 0,95 | 2.02 | 1.22 | 0.97 | 2.390468 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2289 | None | None | None | None | None | None
+R758: None | SINTRA | 2,2 | F:1,20
+A:1,50 | 0,95 | 2.22 | 1.22 | 0.97 | 2.627148 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2245 | None | None | None | None | None | None
+R759: None | SINTRA | 2,2 | F:1,20
+A:1,50 | 0,95 | 2.22 | 1.22 | 0.97 | 2.627148 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2100 | None | None | None | None | None | None
+R760: None | SINTRA | 2,2 | F:1,20
+A:1,50 | 0,95 | 2.22 | 1.22 | 0.97 | 2.627148 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2312 | None | None | None | None | None | None
+R761: None | SINTRA | 2,2 | F:1,20
+A:1,50 | 0,95 | 2.22 | 1.22 | 0.97 | 2.627148 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2423 | None | None | None | None | None | None
+R762: None | SINTRA | 2,4 | F:1,20
+A:1,50 | 0,95 | 2.42 | 1.22 | 0.97 | 2.863828 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2356 | None | None | None | None | None | None
+R763: None | SINTRA | 2,4 | F:1,20
+A:1,50 | 0,95 | 2.42 | 1.22 | 0.97 | 2.863828 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2220 | None | None | None | None | None | None
+R764: None | SINTRA | 2,4 | F:1,20
+A:1,50 | 0,95 | 2.42 | 1.22 | 0.97 | 2.863828 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2443 | None | None | None | None | None | None
+R765: None | SINTRA | 2,4 | F:1,20
+A:1,50 | 0,95 | 2.42 | 1.22 | 0.97 | 2.863828 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2578 | None | None | None | None | None | None
+R766: None | CAPRI | 2.08 | F:1,20
+A:1,50 | 0,95 | 2.08 | 1.22 | 0.97 | 2.461472 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2089 | None | None | None | None | None | None
+R767: None | CAPRI | 2.08 | F:1,20
+A:1,50 | 0,95 | 2.08 | 1.22 | 0.97 | 2.461472 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1978 | None | None | None | None | None | None
+R768: None | CAPRI | 2.08 | F:1,20
+A:1,50 | 0,95 | 2.08 | 1.22 | 0.97 | 2.461472 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2178 | None | None | None | None | None | None
+R769: None | CAPRI | 2.08 | F:1,20
+A:1,50 | 0,95 | 2.08 | 1.22 | 0.97 | 2.461472 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2267 | None | None | None | None | None | None
+R770: None | AUSTIN | 2.1 | F:0,98
+A:1,37 | 1.08 | 1.82 | 1 | 0.97 | 1.7654 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1367 | None | None | None | None | None | None
+R771: None | AUSTIN | 2.1 | F:0,98
+A:1,37 | 1.08 | 1.82 | 1 | 0.97 | 1.7654 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1278 | None | None | None | None | None | None
+R772: None | AUSTIN | 2.1 | F:0,98
+A:1,37 | 1.08 | 1.82 | 1 | 0.97 | 1.7654 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1423 | None | None | None | None | None | None
+R773: None | AUSTIN | 2.1 | F:0,98
+A:1,37 | 1.08 | 1.82 | 1 | 0.97 | 1.7654 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1500 | None | None | None | None | None | None
+R774: None | AUSTIN | 2.3 | F:0,98
+A:1,37 | 1.08 | 2.12 | 1 | 0.97 | 2.0564 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1478 | None | None | None | None | None | None
+R775: None | AUSTIN | 2.3 | F:0,98
+A:1,37 | 1.08 | 2.12 | 1 | 0.97 | 2.0564 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R776: None | AUSTIN | 2.3 | F:0,98
+A:1,37 | 1.08 | 2.12 | 1 | 0.97 | 2.0564 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1534 | None | None | None | None | None | None
+R777: None | AUSTIN | 2.3 | F:0,98
+A:1,37 | 1.08 | 2.12 | 1 | 0.97 | 2.0564 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R778: None | AUSTIN | 2.5 | F:0,98
+A:1,37 | 1.08 | 2.52 | 1 | 0.97 | 2.4444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1578 | None | None | None | None | None | None
+R779: None | AUSTIN | 2.5 | F:0,98
+A:1,37 | 1.08 | 2.52 | 1 | 0.97 | 2.4444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1478 | None | None | None | None | None | None
+R780: None | AUSTIN | 2.5 | F:0,98
+A:1,37 | 1.08 | 2.52 | 1 | 0.97 | 2.4444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1634 | None | None | None | None | None | None
+R781: None | AUSTIN | 2.5 | F:0,98
+A:1,37 | 1.08 | 2.52 | 1 | 0.97 | 2.4444 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1723 | None | None | None | None | None | None
+R782: None | BULGÁRIA | 2.1 | F:0,98
+A:1,37 | 1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1500 | None | None | None | None | None | None
+R783: None | BULGÁRIA | 2.1 | F:0,98
+A:1,37 | 1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1400 | None | None | None | None | None | None
+R784: None | BULGÁRIA | 2.1 | F:0,98
+A:1,37 | 1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1567 | None | None | None | None | None | None
+R785: None | BULGÁRIA | 2.1 | F:0,98
+A:1,37 | 1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1656 | None | None | None | None | None | None
+R786: None | BULGÁRIA | 2.3 | F:0,98
+A:1,37 | 1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1623 | None | None | None | None | None | None
+R787: None | BULGÁRIA | 2.3 | F:0,98
+A:1,37 | 1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1512 | None | None | None | None | None | None
+R788: None | BULGÁRIA | 2.3 | F:0,98
+A:1,37 | 1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1689 | None | None | None | None | None | None
+R789: None | BULGÁRIA | 2.3 | F:0,98
+A:1,37 | 1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1777 | None | None | None | None | None | None
+R790: None | BULGÁRIA | 2.5 | F:0,98
+A:1,37 | 1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1745 | None | None | None | None | None | None
+R791: None | BULGÁRIA | 2.5 | F:0,98
+A:1,37 | 1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1634 | None | None | None | None | None | None
+R792: None | BULGÁRIA | 2.5 | F:0,98
+A:1,37 | 1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1823 | None | None | None | None | None | None
+R793: None | BULGÁRIA | 2.5 | F:0,98
+A:1,37 | 1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1912 | None | None | None | None | None | None
+R794: None | GENEBRA / MUNIQUE | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1489 | None | None | None | None | None | None
+R795: None | GENEBRA / MUNIQUE | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1567 | None | None | None | None | None | None
+R796: None | GENEBRA / MUNIQUE | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1389 | None | None | None | None | None | None
+R797: None | GENEBRA / MUNIQUE | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1634 | None | None | None | None | None | None
+R798: None | GENEBRA / MUNIQUE | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1612 | None | None | None | None | None | None
+R799: None | GENEBRA / MUNIQUE | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1489 | None | None | None | None | None | None
+R800: None | GENEBRA / MUNIQUE | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1689 | None | None | None | None | None | None
+R801: None | GENEBRA / MUNIQUE | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1756 | None | None | None | None | None | None
+R802: None | GENEBRA / MUNIQUE | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1723 | None | None | None | None | None | None
+R803: None | GENEBRA / MUNIQUE | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1612 | None | None | None | None | None | None
+R804: None | GENEBRA / MUNIQUE | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1806 | None | None | None | None | None | None
+R805: None | GENEBRA / MUNIQUE | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1888 | None | None | None | None | None | None
+R806: None | BREST | 1.8 | F:0,98
+A:1,37 | 1.02 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1212 | None | None | None | None | None | None
+R807: None | BREST | 1.8 | F:0,98
+A:1,37 | 1.02 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1123 | None | None | None | None | None | None
+R808: None | BREST | 1.8 | F:0,98
+A:1,37 | 1.02 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1245 | None | None | None | None | None | None
+R809: None | BREST | 1.8 | F:0,98
+A:1,37 | 1.02 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1323 | None | None | None | None | None | None
+R810: None | BREST | 2.1 | F:0,98
+A:1,37 | 1.02 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1300 | None | None | None | None | None | None
+R811: None | BREST | 2.1 | F:0,98
+A:1,37 | 1.02 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1212 | None | None | None | None | None | None
+R812: None | BREST | 2.1 | F:0,98
+A:1,37 | 1.02 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1367 | None | None | None | None | None | None
+R813: None | BREST | 2.1 | F:0,98
+A:1,37 | 1.02 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1444 | None | None | None | None | None | None
+R814: None | BREST | 2.3 | F:0,98
+A:1,37 | 1.02 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1400 | None | None | None | None | None | None
+R815: None | BREST | 2.3 | F:0,98
+A:1,37 | 1.02 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1300 | None | None | None | None | None | None
+R816: None | BREST | 2.3 | F:0,98
+A:1,37 | 1.02 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1456 | None | None | None | None | None | None
+R817: None | BREST | 2.3 | F:0,98
+A:1,37 | 1.02 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1545 | None | None | None | None | None | None
+R818: None | BREST | 2.5 | F:0,98
+A:1,37 | 1.02 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1512 | None | None | None | None | None | None
+R819: None | BREST | 2.5 | F:0,98
+A:1,37 | 1.02 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1412 | None | None | None | None | None | None
+R820: None | BREST | 2.5 | F:0,98
+A:1,37 | 1.02 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1589 | None | None | None | None | None | None
+R821: None | BREST | 2.5 | F:0,98
+A:1,37 | 1.02 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1666 | None | None | None | None | None | None
+R822: None | PALERMO | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 0 | None | None | None | None | None | None
+R823: None | PALERMO | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 0 | None | None | None | None | None | None
+R824: None | PALERMO | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 0 | None | None | None | None | None | None
+R825: None | PALERMO | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 0 | None | None | None | None | None | None
+R826: None | PALERMO | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 0 | None | None | None | None | None | None
+R827: None | PALERMO | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 0 | None | None | None | None | None | None
+R828: None | PALERMO | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 0 | None | None | None | None | None | None
+R829: None | PALERMO | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 0 | None | None | None | None | None | None
+R830: None | PALERMO | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 0 | None | None | None | None | None | None
+R831: None | PALERMO | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 0 | None | None | None | None | None | None
+R832: None | PALERMO | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 0 | None | None | None | None | None | None
+R833: None | PALERMO | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 0 | None | None | None | None | None | None
+R834: None | PARMA | 1.8 | F:0,98
+A:1,37 | 1.1 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1323 | None | None | None | None | None | None
+R835: None | PARMA | 1.8 | F:0,98
+A:1,37 | 1.1 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1234 | None | None | None | None | None | None
+R836: None | PARMA | 1.8 | F:0,98
+A:1,37 | 1.1 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1378 | None | None | None | None | None | None
+R837: None | PARMA | 1.8 | F:0,98
+A:1,37 | 1.1 | 1.82 | 1 | 0.75 | 1.365 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1456 | None | None | None | None | None | None
+R838: None | PARMA | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1478 | None | None | None | None | None | None
+R839: None | PARMA | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R840: None | PARMA | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1534 | None | None | None | None | None | None
+R841: None | PARMA | 2.1 | F:0,98
+A:1,37 | 1.1 | 2.12 | 1 | 0.75 | 1.59 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1623 | None | None | None | None | None | None
+R842: None | PARMA | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1589 | None | None | None | None | None | None
+R843: None | PARMA | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1489 | None | None | None | None | None | None
+R844: None | PARMA | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1656 | None | None | None | None | None | None
+R845: None | PARMA | 2.3 | F:0,98
+A:1,37 | 1.1 | 2.32 | 1 | 0.75 | 1.74 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1745 | None | None | None | None | None | None
+R846: None | PARMA | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1712 | None | None | None | None | None | None
+R847: None | PARMA | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1600 | None | None | None | None | None | None
+R848: None | PARMA | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1789 | None | None | None | None | None | None
+R849: None | PARMA | 2.5 | F:0,98
+A:1,37 | 1.1 | 2.52 | 1 | 0.75 | 1.89 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1878 | None | None | None | None | None | None
+R850: None | PARMA | 2.7 | F:0,98
+A:1,37 | 1.1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1934 | None | None | None | None | None | None
+R851: None | PARMA | 2.7 | F:0,98
+A:1,37 | 1.1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1812 | None | None | None | None | None | None
+R852: None | PARMA | 2.7 | F:0,98
+A:1,37 | 1.1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2012 | None | None | None | None | None | None
+R853: None | PARMA | 2.7 | F:0,98
+A:1,37 | 1.1 | 1.27 | 1 | 0.75 | 0.9525 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2112 | None | None | None | None | None | None
+R854: None | OLIMPO | 2 | F:0,98
+A:1,30 | 0.98 | 2.02 | 1 | 0.75 | 1.515 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1095 | None | None | None | None | None | None
+R855: None | OLIMPO | 2 | F:0,98
+A:1,30 | 0.98 | 2.02 | 1 | 0.75 | 1.515 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1025 | None | None | None | None | None | None
+R856: None | OLIMPO | 2 | F:0,98
+A:1,30 | 0.98 | 2.02 | 1 | 0.75 | 1.515 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1145 | None | None | None | None | None | None
+R857: None | OLIMPO | 2 | F:0,98
+A:1,30 | 0.98 | 2.02 | 1 | 0.75 | 1.515 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1205 | None | None | None | None | None | None
+R858: None | OLIMPO | 2.2 | F:0,98
+A:1,30 | 0.98 | 2.22 | 1 | 0.75 | 1.665 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1180 | None | None | None | None | None | None
+R859: None | OLIMPO | 2.2 | F:0,98
+A:1,30 | 0.98 | 2.22 | 1 | 0.75 | 1.665 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1105 | None | None | None | None | None | None
+R860: None | OLIMPO | 2.2 | F:0,98
+A:1,30 | 0.98 | 2.22 | 1 | 0.75 | 1.665 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1230 | None | None | None | None | None | None
+R861: None | OLIMPO | 2.2 | F:0,98
+A:1,30 | 0.98 | 2.22 | 1 | 0.75 | 1.665 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1295 | None | None | None | None | None | None
+R862: None | BÉRGAMO | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1378 | None | None | None | None | None | None
+R863: None | BÉRGAMO | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1289 | None | None | None | None | None | None
+R864: None | BÉRGAMO | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1434 | None | None | None | None | None | None
+R865: None | BÉRGAMO | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1512 | None | None | None | None | None | None
+R866: None | BÉRGAMO | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1467 | None | None | None | None | None | None
+R867: None | BÉRGAMO | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1367 | None | None | None | None | None | None
+R868: None | BÉRGAMO | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1534 | None | None | None | None | None | None
+R869: None | BÉRGAMO | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R870: None | BÉRGAMO | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1567 | None | None | None | None | None | None
+R871: None | BÉRGAMO | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1467 | None | None | None | None | None | None
+R872: None | BÉRGAMO | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1634 | None | None | None | None | None | None
+R873: None | BÉRGAMO | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1723 | None | None | None | None | None | None
+R874: None | PRISMA / LÓTUS | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1400 | None | None | None | None | None | None
+R875: None | PRISMA / LÓTUS | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1312 | None | None | None | None | None | None
+R876: None | PRISMA / LÓTUS | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1456 | None | None | None | None | None | None
+R877: None | PRISMA / LÓTUS | 2.1 | F:0,95
+A:1,30 | 1.1 | 2.12 | 0.97 | 0.75 | 1.5423 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1534 | None | None | None | None | None | None
+R878: None | PRISMA / LÓTUS | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1500 | None | None | None | None | None | None
+R879: None | PRISMA / LÓTUS | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1400 | None | None | None | None | None | None
+R880: None | PRISMA / LÓTUS | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1555 | None | None | None | None | None | None
+R881: None | PRISMA / LÓTUS | 2.3 | F:0,95
+A:1,30 | 1.1 | 2.32 | 0.97 | 0.75 | 1.6878 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1645 | None | None | None | None | None | None
+R882: None | PRISMA / LÓTUS | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1600 | None | None | None | None | None | None
+R883: None | PRISMA / LÓTUS | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1500 | None | None | None | None | None | None
+R884: None | PRISMA / LÓTUS | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1666 | None | None | None | None | None | None
+R885: None | PRISMA / LÓTUS | 2.5 | F:0,95
+A:1,30 | 1.1 | 2.52 | 0.97 | 0.75 | 1.8333 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1756 | None | None | None | None | None | None
+R886: None | BALLARAT | 2.05 | F:0,98
+A:1,30 | 1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1289 | None | None | None | None | None | None
+R887: None | BALLARAT | 2.05 | F:0,98
+A:1,30 | 1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1212 | None | None | None | None | None | None
+R888: None | BALLARAT | 2.05 | F:0,98
+A:1,30 | 1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1362 | None | None | None | None | None | None
+R889: None | BALLARAT | 2.05 | F:0,98
+A:1,30 | 1 | 2.07 | 1 | 0.75 | 1.5525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1423 | None | None | None | None | None | None
+R890: None | BALLARAT | 2.25 | F:0,98
+A:1,30 | 1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1378 | None | None | None | None | None | None
+R891: None | BALLARAT | 2.25 | F:0,98
+A:1,30 | 1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1289 | None | None | None | None | None | None
+R892: None | BALLARAT | 2.25 | F:0,98
+A:1,30 | 1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1439 | None | None | None | None | None | None
+R893: None | BALLARAT | 2.25 | F:0,98
+A:1,30 | 1 | 2.27 | 1 | 0.75 | 1.7025 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1489 | None | None | None | None | None | None
+R894: None | BALLARAT | 2.45 | F:0,98
+A:1,30 | 1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1467 | None | None | None | None | None | None
+R895: None | BALLARAT | 2.45 | F:0,98
+A:1,30 | 1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1378 | None | None | None | None | None | None
+R896: None | BALLARAT | 2.45 | F:0,98
+A:1,30 | 1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1545 | None | None | None | None | None | None
+R897: None | BALLARAT | 2.45 | F:0,98
+A:1,30 | 1 | 2.47 | 1 | 0.75 | 1.8525 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1612 | None | None | None | None | None | None
+R898: None | VICENZA | 1.95 | F: 1,05
+A: 1,30 | 0.97 | 1.97 | 1.07 | 0.73 | 1.538767 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1289 | None | None | None | None | None | None
+R899: None | VICENZA | 1.95 | F: 1,05
+A: 1,30 | 0.97 | 1.97 | 1.07 | 0.73 | 1.538767 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1200 | None | None | None | None | None | None
+R900: None | VICENZA | 1.95 | F: 1,05
+A: 1,30 | 0.97 | 1.97 | 1.07 | 0.73 | 1.538767 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1356 | None | None | None | None | None | None
+R901: None | VICENZA | 1.95 | F: 1,05
+A: 1,30 | 0.97 | 1.97 | 1.07 | 0.73 | 1.538767 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1434 | None | None | None | None | None | None
+R902: None | VICENZA | 2.15 | F: 1,05
+A: 1,30 | 0.97 | 2.17 | 1.07 | 0.73 | 1.694987 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1389 | None | None | None | None | None | None
+R903: None | VICENZA | 2.15 | F: 1,05
+A: 1,30 | 0.97 | 2.17 | 1.07 | 0.73 | 1.694987 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1300 | None | None | None | None | None | None
+R904: None | VICENZA | 2.15 | F: 1,05
+A: 1,30 | 0.97 | 2.17 | 1.07 | 0.73 | 1.694987 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1456 | None | None | None | None | None | None
+R905: None | VICENZA | 2.15 | F: 1,05
+A: 1,30 | 0.97 | 2.17 | 1.07 | 0.73 | 1.694987 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1545 | None | None | None | None | None | None
+R906: None | VICENZA | 2.35 | F: 1,05
+A: 1,30 | 0.97 | 2.37 | 1.07 | 0.73 | 1.851207 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1512 | None | None | None | None | None | None
+R907: None | VICENZA | 2.35 | F: 1,05
+A: 1,30 | 0.97 | 2.37 | 1.07 | 0.73 | 1.851207 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1412 | None | None | None | None | None | None
+R908: None | VICENZA | 2.35 | F: 1,05
+A: 1,30 | 0.97 | 2.37 | 1.07 | 0.73 | 1.851207 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1567 | None | None | None | None | None | None
+R909: None | VICENZA | 2.35 | F: 1,05
+A: 1,30 | 0.97 | 2.37 | 1.07 | 0.73 | 1.851207 | #REF! | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 | 1656 | None | None | None | None | None | None
+R910: None | FERRARA | 2,10m | F: 1,07
+A: 1,52 | 0.93 | 1.07 | 1.09 | 0.85 | 0.991355 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1810 | None | None | None | None | None | None
+R911: None | FERRARA | 2,10m | F: 1,07
+A: 1,52 | 0.93 | 1.07 | 1.09 | 0.85 | 0.991355 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1720 | None | None | None | None | None | None
+R912: None | FERRARA | 2,10m | F: 1,07
+A: 1,52 | 0.93 | 1.07 | 1.09 | 0.85 | #REF! | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1860 | None | None | None | None | None | None
+R913: None | FERRARA | 2,10m | F: 1,07
+A: 1,52 | 0.93 | 1.07 | 1.09 | 0.85 | 0.991355 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1940 | None | None | None | None | None | None
+R914: None | FERRARA | 2,30m | F: 1,07
+A: 1,52 | 0.93 | 1.17 | 1.09 | 0.85 | 1.084005 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1960 | None | None | None | None | None | None
+R915: None | FERRARA | 2,30m | F: 1,07
+A: 1,52 | 0.93 | 1.17 | 1.09 | 0.85 | 1.084005 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1870 | None | None | None | None | None | None
+R916: None | FERRARA | 2,30m | F: 1,07
+A: 1,52 | 0.93 | 1.17 | 1.09 | 0.85 | 1.084005 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2020 | None | None | None | None | None | None
+R917: None | FERRARA | 2,30m | F: 1,07
+A: 1,52 | 0.93 | 1.17 | 1.09 | 0.85 | 1.084005 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2095 | None | None | None | None | None | None
+R918: None | FERRARA | 2,50m | F: 1,07
+A: 1,52 | 0.93 | 1.27 | 1.09 | 0.85 | 1.176655 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2150 | None | None | None | None | None | None
+R919: None | FERRARA | 2,50m | F: 1,07
+A: 1,52 | 0.93 | 1.27 | 1.09 | 0.85 | 1.176655 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2050 | None | None | None | None | None | None
+R920: None | FERRARA | 2,50m | F: 1,07
+A: 1,52 | 0.93 | 1.27 | 1.09 | 0.85 | 1.176655 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2215 | None | None | None | None | None | None
+R921: None | FERRARA | 2,50m | F: 1,07
+A: 1,52 | 0.93 | 1.27 | 1.09 | 0.85 | 1.176655 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2295 | None | None | None | None | None | None
+R922: None | BLEND | 1,82m | F: 1,07
+A: 1,47 | 0.93 | 0.93 | 1.09 | 0.85 | 0.861645 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2112 | None | None | None | None | None | None
+R923: None | BLEND | 1,82m | F: 1,07
+A: 1,47 | 0.93 | 0.93 | 1.09 | 0.85 | 0.861645 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2023 | None | None | None | None | None | None
+R924: None | BLEND | 1,82m | F: 1,07
+A: 1,47 | 0.93 | 0.93 | 1.09 | 0.85 | 0.861645 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2167 | None | None | None | None | None | None
+R925: None | BLEND | 1,82m | F: 1,07
+A: 1,47 | 0.93 | 0.93 | 1.09 | 0.85 | 0.861645 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2245 | None | None | None | None | None | None
+R926: None | BLEND | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2278 | None | None | None | None | None | None
+R927: None | BLEND | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2200 | None | None | None | None | None | None
+R928: None | BLEND | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2356 | None | None | None | None | None | None
+R929: None | BLEND | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2445 | None | None | None | None | None | None
+R930: None | BLEND | 2,62m | F: 1,07
+A: 1,47 | 0.93 | 1.33 | 1.09 | 0.85 | 1.232245 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2443 | None | None | None | None | None | None
+R931: None | BLEND | 2,62m | F: 1,07
+A: 1,47 | 0.93 | 1.33 | 1.09 | 0.85 | 1.232245 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2334 | None | None | None | None | None | None
+R932: None | BLEND | 2,62m | F: 1,07
+A: 1,47 | 0.93 | 1.33 | 1.09 | 0.85 | 1.232245 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2512 | None | None | None | None | None | None
+R933: None | BLEND | 2,62m | F: 1,07
+A: 1,47 | 0.93 | 1.33 | 1.09 | 0.85 | 1.232245 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2600 | None | None | None | None | None | None
+R934: None | VALENCE | 2,02m | F: 1,07
+A: 1,47 | 0.93 | 1.03 | 1.09 | 0.85 | 0.954295 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2056 | None | None | None | None | None | None
+R935: None | VALENCE | 2,02m | F: 1,07
+A: 1,47 | 0.93 | 1.03 | 1.09 | 0.85 | 0.954295 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1956 | None | None | None | None | None | None
+R936: None | VALENCE | 2,02m | F: 1,07
+A: 1,47 | 0.93 | 1.03 | 1.09 | 0.85 | 0.954295 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2112 | None | None | None | None | None | None
+R937: None | VALENCE | 2,02m | F: 1,07
+A: 1,47 | 0.93 | 1.03 | 1.09 | 0.85 | 0.954295 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2189 | None | None | None | None | None | None
+R938: None | VALENCE | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2167 | None | None | None | None | None | None
+R939: None | VALENCE | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2067 | None | None | None | None | None | None
+R940: None | VALENCE | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2223 | None | None | None | None | None | None
+R941: None | VALENCE | 2,22m | F: 1,07
+A: 1,47 | 0.93 | 1.13 | 1.09 | 0.85 | 1.046945 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2312 | None | None | None | None | None | None
+R942: None | VALENCE | 2,42m | F: 1,07
+A: 1,47 | 0.93 | 1.23 | 1.09 | 0.85 | 1.139595 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2289 | None | None | None | None | None | None
+R943: None | VALENCE | 2,42m | F: 1,07
+A: 1,47 | 0.93 | 1.23 | 1.09 | 0.85 | 1.139595 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2178 | None | None | None | None | None | None
+R944: None | VALENCE | 2,42m | F: 1,07
+A: 1,47 | 0.93 | 1.23 | 1.09 | 0.85 | 1.139595 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2356 | None | None | None | None | None | None
+R945: None | VALENCE | 2,42m | F: 1,07
+A: 1,47 | 0.93 | 1.23 | 1.09 | 0.85 | 1.139595 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2444 | None | None | None | None | None | None
+R946: None | PALAZIO | 1.53 | 0.9 | 0.9 | 1.56 | 0.92 | 0.6 | 0.86112 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 878 | None | None | None | None | None | None
+R947: None | PALAZIO | 1.53 | 0.9 | 0.9 | 1.56 | 0.92 | 0.6 | 0.86112 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 823 | None | None | None | None | None | None
+R948: None | PALAZIO | 1.53 | 0.9 | 0.9 | 1.56 | 0.92 | 0.6 | 0.86112 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 912 | None | None | None | None | None | None
+R949: None | PALAZIO | 1.53 | 0.9 | 0.9 | 1.56 | 0.92 | 0.6 | 0.86112 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 956 | None | None | None | None | None | None
+R950: None | PALAZIO | 2.08 | 0.9 | 0.9 | 2.11 | 0.92 | 0.6 | 1.16472 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1034 | None | None | None | None | None | None
+R951: None | PALAZIO | 2.08 | 0.9 | 0.9 | 2.11 | 0.92 | 0.6 | 1.16472 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 978 | None | None | None | None | None | None
+R952: None | PALAZIO | 2.08 | 0.9 | 0.9 | 2.11 | 0.92 | 0.6 | 1.16472 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1078 | None | None | None | None | None | None
+R953: None | PALAZIO | 2.08 | 0.9 | 0.9 | 2.11 | 0.92 | 0.6 | 1.16472 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1134 | None | None | None | None | None | None
+R954: None | VENETTO | 2.1 | 0,86
+ | 0.87 | 1.07 | 0.89 | 0.85 | 0.809455 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1589 | None | None | None | None | None | None
+R955: None | VENETTO | 2.1 | 0,86
+ | 0.87 | 1.07 | 0.89 | 0.85 | 0.809455 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1512 | None | None | None | None | None | None
+R956: None | VENETTO | 2.1 | 0,86
+ | 0.87 | 1.07 | 0.89 | 0.85 | 0.809455 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1645 | None | None | None | None | None | None
+R957: None | VENETTO | 2.1 | 0,86
+ | 0.87 | 1.07 | 0.89 | 0.85 | 0.809455 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1689 | None | None | None | None | None | None
+R958: None | VENETTO | 2.4 | 0,86
+ | 0.87 | 1.22 | 0.89 | 0.85 | 0.92293 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1667 | None | None | None | None | None | None
+R959: None | VENETTO | 2.4 | 0,86
+ | 0.87 | 1.22 | 0.89 | 0.85 | 0.92293 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1589 | None | None | None | None | None | None
+R960: None | VENETTO | 2.4 | 0,86
+ | 0.87 | 1.22 | 0.89 | 0.85 | 0.92293 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1712 | None | None | None | None | None | None
+R961: None | VENETTO | 2.4 | 0,86
+ | 0.87 | 1.22 | 0.89 | 0.85 | 0.92293 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1778 | None | None | None | None | None | None
+R962: None | VENETTO | 2.7 | 0,86
+ | 0.87 | 1.37 | 0.89 | 0.85 | 1.036405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1776 | None | None | None | None | None | None
+R963: None | VENETTO | 2.7 | 0,86
+ | 0.87 | 1.37 | 0.89 | 0.85 | 1.036405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1689 | None | None | None | None | None | None
+R964: None | VENETTO | 2.7 | 0,86
+ | 0.87 | 1.37 | 0.89 | 0.85 | 1.036405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1834 | None | None | None | None | None | None
+R965: None | VENETTO | 2.7 | 0,86
+ | 0.87 | 1.37 | 0.89 | 0.85 | 1.036405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1912 | None | None | None | None | None | None
+R966: None | BRAVINO | 0,84m | 0.87 | 
+0,90m
+ | 0.86 | 0.89 | 0.56 | 0.428624 | #REF! | #REF! | POLTRONA | TC-10 | 867 | None | None | None | None | None | None
+R967: None | BRAVINO | 0,84m | 0.87 | 
+0,90m
+ | 0.86 | 0.89 | 0.56 | 0.428624 | #REF! | #REF! | POLTRONA | TC-12 | 834 | None | None | None | None | None | None
+R968: None | BRAVINO | 0,84m | 0.87 | 
+0,90m
+ | 0.86 | 0.89 | 0.56 | 0.428624 | #REF! | #REF! | POLTRONA | TC-13 | 878 | None | None | None | None | None | None
+R969: None | BRAVINO | 0,84m | 0.87 | 
+0,90m
+ | 0.86 | 0.89 | 0.56 | 0.428624 | #REF! | #REF! | POLTRONA | TC-14 / ST | 900 | None | None | None | None | None | None
+R970: None | BRAVINO | 2,04m | 0.87 | 
+0,90m
+ | 1.04 | 0.89 | 0.56 | 0.518336 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1623 | None | None | None | None | None | None
+R971: None | BRAVINO | 2,04m | 0.87 | 
+0,90m
+ | 1.04 | 0.89 | 0.56 | 0.518336 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1578 | None | None | None | None | None | None
+R972: None | BRAVINO | 2,04m | 0.87 | 
+0,90m
+ | 1.04 | 0.89 | 0.56 | 0.518336 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1656 | None | None | None | None | None | None
+R973: None | BRAVINO | 2,04m | 0.87 | 
+0,90m
+ | 1.04 | 0.89 | 0.56 | 0.518336 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 1712 | None | None | None | None | None | None
+R974: None | BRAVINO | 2,34m | 0.87 | 
+0,90m
+ | 1.19 | 0.89 | 0.56 | 0.593096 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1734 | None | None | None | None | None | None
+R975: None | BRAVINO | 2,34m | 0.87 | 
+0,90m
+ | 1.19 | 0.89 | 0.56 | 0.593096 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1666 | None | None | None | None | None | None
+R976: None | BRAVINO | 2,34m | 0.87 | 
+0,90m
+ | 1.19 | 0.89 | 0.56 | 0.593096 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1756 | None | None | None | None | None | None
+R977: None | BRAVINO | 2,34m | 0.87 | 
+0,90m
+ | 1.19 | 0.89 | 0.56 | 0.593096 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 1800 | None | None | None | None | None | None
+R978: None | BRAVINO | 2,64m | 0.87 | 
+0,90m
+ | 1.34 | 0.89 | 0.56 | 0.667856 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1834 | None | None | None | None | None | None
+R979: None | BRAVINO | 2,64m | 0.87 | 
+0,90m
+ | 1.34 | 0.89 | 0.56 | 0.667856 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1767 | None | None | None | None | None | None
+R980: None | BRAVINO | 2,64m | 0.87 | 
+0,90m
+ | 1.34 | 0.89 | 0.56 | 0.667856 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1889 | None | None | None | None | None | None
+R981: None | BRAVINO | 2,64m | 0.87 | 
+0,90m
+ | 1.34 | 0.89 | 0.56 | 0.667856 | 0.34950240192 | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 1934 | None | None | None | None | None | None
+R982: None | CHABLIS | 0.8 | 0.92 | 0.86 | 0.82 | 0.94 | 0.56 | 0.431648 | #REF! | #REF! | POLTRONA | TC-10 | 1012 | None | None | None | None | None | None
+R983: None | CHABLIS | 0.8 | 0.92 | 0.86 | 0.82 | 0.94 | 0.56 | 0.431648 | #REF! | #REF! | POLTRONA | TC-12 | 978 | None | None | None | None | None | None
+R984: None | CHABLIS | 0.8 | 0.92 | 0.86 | 0.82 | 0.94 | 0.56 | 0.431648 | #REF! | #REF! | POLTRONA | TC-13 | 1034 | None | None | None | None | None | None
+R985: None | CHABLIS | 0.8 | 0.92 | 0.86 | 0.82 | 0.94 | 0.56 | 0.431648 | #REF! | #REF! | POLTRONA | TC-14 / ST | 1067 | None | None | None | None | None | None
+R986: None | CHABLIS | 2.1 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1989 | None | None | None | None | None | None
+R987: None | CHABLIS | 2.1 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1923 | None | None | None | None | None | None
+R988: None | CHABLIS | 2.1 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2023 | None | None | None | None | None | None
+R989: None | CHABLIS | 2.1 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2078 | None | None | None | None | None | None
+R990: None | CHABLIS | 2.4 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2100 | None | None | None | None | None | None
+R991: None | CHABLIS | 2.4 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2045 | None | None | None | None | None | None
+R992: None | CHABLIS | 2.4 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2156 | None | None | None | None | None | None
+R993: None | CHABLIS | 2.4 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2212 | None | None | None | None | None | None
+R994: None | CHABLIS | 2.7 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2245 | None | None | None | None | None | None
+R995: None | CHABLIS | 2.7 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2167 | None | None | None | None | None | None
+R996: None | CHABLIS | 2.7 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2289 | None | None | None | None | None | None
+R997: None | CHABLIS | 2.7 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | 0.39860397696 | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2356 | None | None | None | None | None | None
+R998: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-10 | 2367 | None | None | None | None | None | None
+R999: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-10 | 2367 | None | None | None | None | None | None
+R1000: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-12 | 2300 | None | None | None | None | None | None

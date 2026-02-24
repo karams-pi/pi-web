@@ -1,0 +1,4 @@
+E:\teste\pi-web\backend\Pi.Api\Services\ExcelImportService.cs(915,54): error CS0165: Uso de vari├ível local n├úo atribu├¡da "marca" [E:\teste\pi-web\backend\Pi.Api\Pi.Api.csproj]
+E:\teste\pi-web\backend\Pi.Api\Services\ExcelImportService.cs(1235,36): error CS1503: Argumento 2: n├úo ├® poss├¡vel converter de "System.StringComparison" para "int" [E:\teste\pi-web\backend\Pi.Api\Pi.Api.csproj]
+E:\teste\pi-web\backend\Pi.Api\Services\ExcelImportService.cs(915,54): error CS0165: Uso de vari├ível local n├úo atribu├¡da "marca" [E:\teste\pi-web\backend\Pi.Api\Pi.Api.csproj]
+E:\teste\pi-web\backend\Pi.Api\Services\ExcelImportService.cs(1235,36): error CS1503: Argumento 2: n├úo ├® poss├¡vel converter de "System.StringComparison" para "int" [E:\teste\pi-web\backend\Pi.Api\Pi.Api.csproj]

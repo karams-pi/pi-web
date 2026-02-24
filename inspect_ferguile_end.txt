@@ -1,0 +1,311 @@
+Sheet: Planilha1
+R1000: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-12 | 2300 | None | None | None | None | None | None
+R1001: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-12 | 2300 | None | None | None | None | None | None
+R1002: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-13 | 2412 | None | None | None | None | None | None
+R1003: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-13 | 2412 | None | None | None | None | None | None
+R1004: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-14 / ST | 2478 | None | None | None | None | None | None
+R1005: None | CHABLIS
+CHESS | 2.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 1 ASSENTO + CHAISE | TC-14 / ST | 2478 | None | None | None | None | None | None
+R1006: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3234 | None | None | None | None | None | None
+R1007: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.02 | 0.94 | 0.56 | 0.536928 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3234 | None | None | None | None | None | None
+R1008: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3234 | None | None | None | None | None | None
+R1009: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3134 | None | None | None | None | None | None
+R1010: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.02 | 0.94 | 0.56 | 0.536928 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3134 | None | None | None | None | None | None
+R1011: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3134 | None | None | None | None | None | None
+R1012: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3289 | None | None | None | None | None | None
+R1013: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.02 | 0.94 | 0.56 | 0.536928 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3289 | None | None | None | None | None | None
+R1014: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3289 | None | None | None | None | None | None
+R1015: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.07 | 0.94 | 0.56 | 0.563248 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3389 | None | None | None | None | None | None
+R1016: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 1.02 | 0.94 | 0.56 | 0.536928 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3389 | None | None | None | None | None | None
+R1017: None | CHABLIS
+CHESS | 3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3389 | None | None | None | None | None | None
+R1018: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3345 | None | None | None | None | None | None
+R1019: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.17 | 0.94 | 0.56 | 0.615888 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3345 | None | None | None | None | None | None
+R1020: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3345 | None | None | None | None | None | None
+R1021: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3245 | None | None | None | None | None | None
+R1022: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.17 | 0.94 | 0.56 | 0.615888 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3245 | None | None | None | None | None | None
+R1023: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3245 | None | None | None | None | None | None
+R1024: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3423 | None | None | None | None | None | None
+R1025: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.17 | 0.94 | 0.56 | 0.615888 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3423 | None | None | None | None | None | None
+R1026: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3423 | None | None | None | None | None | None
+R1027: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.22 | 0.94 | 0.56 | 0.642208 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3500 | None | None | None | None | None | None
+R1028: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 1.17 | 0.94 | 0.56 | 0.615888 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3500 | None | None | None | None | None | None
+R1029: None | CHABLIS
+CHESS | 3.3 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3500 | None | None | None | None | None | None
+R1030: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3489 | None | None | None | None | None | None
+R1031: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.32 | 0.94 | 0.56 | 0.694848 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3489 | None | None | None | None | None | None
+R1032: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-10 | 3489 | None | None | None | None | None | None
+R1033: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3378 | None | None | None | None | None | None
+R1034: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.32 | 0.94 | 0.56 | 0.694848 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3378 | None | None | None | None | None | None
+R1035: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-12 | 3378 | None | None | None | None | None | None
+R1036: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3556 | None | None | None | None | None | None
+R1037: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.32 | 0.94 | 0.56 | 0.694848 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3556 | None | None | None | None | None | None
+R1038: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-13 | 3556 | None | None | None | None | None | None
+R1039: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.37 | 0.94 | 0.56 | 0.721168 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3656 | None | None | None | None | None | None
+R1040: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 1.32 | 0.94 | 0.56 | 0.694848 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3656 | None | None | None | None | None | None
+R1041: None | CHABLIS
+CHESS | 3.6 | 0.92 | 0.86 | 0.97 | 1.5 | 0.56 | 0.8148 | #REF! | #REF! | BIPARTIDO - 3 ASSENTOS + CHAISE | TC-14 / ST | 3656 | None | None | None | None | None | None
+R1042: None | CORBELLI | 0,84m | 0.92 | 0.88 | 0.84 | 0.94 | 0.57 | 0.450072 | 0.25320600648 | #REF! | POLTRONA | TC-10 | 867 | None | None | None | None | None | None
+R1043: None | CORBELLI | 0,84m | 0.92 | 0.88 | 0.84 | 0.94 | 0.57 | 0.450072 | 0.25320600648 | #REF! | POLTRONA | TC-12 | 834 | None | None | None | None | None | None
+R1044: None | CORBELLI | 0,84m | 0.92 | 0.88 | 0.84 | 0.94 | 0.57 | 0.450072 | 0.25320600648 | #REF! | POLTRONA | TC-13 | 888 | None | None | None | None | None | None
+R1045: None | CORBELLI | 0,84m | 0.92 | 0.88 | 0.84 | 0.94 | 0.57 | 0.450072 | 0.25320600648 | #REF! | POLTRONA | TC-14 / ST | 912 | None | None | None | None | None | None
+R1046: None | CORBELLI | 1,60m | 0.92 | 0.88 | 1.6 | 0.94 | 0.57 | 0.85728 | 0.4822971552 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1200 | None | None | None | None | None | None
+R1047: None | CORBELLI | 1,60m | 0.92 | 0.88 | 1.6 | 0.94 | 0.57 | 0.85728 | 0.4822971552 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1156 | None | None | None | None | None | None
+R1048: None | CORBELLI | 1,60m | 0.92 | 0.88 | 1.6 | 0.94 | 0.57 | 0.85728 | 0.4822971552 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1245 | None | None | None | None | None | None
+R1049: None | CORBELLI | 1,60m | 0.92 | 0.88 | 1.6 | 0.94 | 0.57 | 0.85728 | 0.4822971552 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 / ST | 1278 | None | None | None | None | None | None
+R1050: None | CORBELLI | 2,10m | 0.92 | 0.88 | 2.1 | 0.94 | 0.57 | 1.12518 | 0.6330150162 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1323 | None | None | None | None | None | None
+R1051: None | CORBELLI | 2,10m | 0.92 | 0.88 | 2.1 | 0.94 | 0.57 | 1.12518 | 0.6330150162 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1267 | None | None | None | None | None | None
+R1052: None | CORBELLI | 2,10m | 0.92 | 0.88 | 2.1 | 0.94 | 0.57 | 1.12518 | 0.6330150162 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1356 | None | None | None | None | None | None
+R1053: None | CORBELLI | 2,10m | 0.92 | 0.88 | 2.1 | 0.94 | 0.57 | 1.12518 | 0.6330150162 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 / ST | 1400 | None | None | None | None | None | None
+R1054: None | CORBELLI | 2,40m | 0.92 | 0.88 | 2.4 | 0.94 | 0.57 | 1.28592 | 0.7234457328 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1423 | None | None | None | None | None | None
+R1055: None | CORBELLI | 2,40m | 0.92 | 0.88 | 2.4 | 0.94 | 0.57 | 1.28592 | 0.7234457328 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1367 | None | None | None | None | None | None
+R1056: None | CORBELLI | 2,40m | 0.92 | 0.88 | 2.4 | 0.94 | 0.57 | 1.28592 | 0.7234457328 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1456 | None | None | None | None | None | None
+R1057: None | CORBELLI | 2,40m | 0.92 | 0.88 | 2.4 | 0.94 | 0.57 | 1.28592 | 0.7234457328 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14/ST | 1512 | None | None | None | None | None | None
+R1058: None | MALBEC | 1,50m | 0.92 | 0.88 | 1.52 | 0.9 | 0.7 | 0.9576 | 0.6334524 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1034 | None | None | None | None | None | None
+R1059: None | MALBEC | 1,50m | 0.92 | 0.88 | 1.52 | 0.9 | 0.7 | 0.9576 | 0.6334524 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 989 | None | None | None | None | None | None
+R1060: None | MALBEC | 1,50m | 0.92 | 0.88 | 1.52 | 0.9 | 0.7 | 0.9576 | 0.6334524 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1067 | None | None | None | None | None | None
+R1061: None | MALBEC | 1,50m | 0.92 | 0.88 | 1.52 | 0.9 | 0.7 | 0.9576 | 0.6334524 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 / ST | 1106 | None | None | None | None | None | None
+R1062: None | MALBEC | 2,05m | 0.92 | 0.88 | 2.07 | 0.9 | 0.7 | 1.3041 | 0.86266215 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1178 | None | None | None | None | None | None
+R1063: None | MALBEC | 2,05m | 0.92 | 0.88 | 2.07 | 0.9 | 0.7 | 1.3041 | 0.86266215 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1134 | None | None | None | None | None | None
+R1064: None | MALBEC | 2,05m | 0.92 | 0.88 | 2.07 | 0.9 | 0.7 | 1.3041 | 0.86266215 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1212 | None | None | None | None | None | None
+R1065: None | MALBEC | 2,05m | 0.92 | 0.88 | 2.07 | 0.9 | 0.7 | 1.3041 | 0.86266215 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 / ST | 1267 | None | None | None | None | None | None
+R1066: None | MALBEC | 2,35m | 0.92 | 0.88 | 2.37 | 0.9 | 0.7 | 1.4931 | 0.98768565 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-10 | 1289 | None | None | None | None | None | None
+R1067: None | MALBEC | 2,35m | 0.92 | 0.88 | 2.37 | 0.9 | 0.7 | 1.4931 | 0.98768565 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-12 | 1234 | None | None | None | None | None | None
+R1068: None | MALBEC | 2,35m | 0.92 | 0.88 | 2.37 | 0.9 | 0.7 | 1.4931 | 0.98768565 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-13 | 1333 | None | None | None | None | None | None
+R1069: None | MALBEC | 2,35m | 0.92 | 0.88 | 2.37 | 0.9 | 0.7 | 1.4931 | 0.98768565 | #REF! | PEÇA ÚNICA - 2 ASSENTOS | TC-14 / ST | 1378 | None | None | None | None | None | None
+R1070: None | POTENZA | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1612 | None | None | None | None | None | None
+R1071: None | POTENZA | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1534 | None | None | None | None | None | None
+R1072: None | POTENZA | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1667 | None | None | None | None | None | None
+R1073: None | POTENZA | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1756 | None | None | None | None | None | None
+R1074: None | POTENZA | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1689 | None | None | None | None | None | None
+R1075: None | POTENZA | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1600 | None | None | None | None | None | None
+R1076: None | POTENZA | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1756 | None | None | None | None | None | None
+R1077: None | POTENZA | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1823 | None | None | None | None | None | None
+R1078: None | POTENZA | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1767 | None | None | None | None | None | None
+R1079: None | POTENZA | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1689 | None | None | None | None | None | None
+R1080: None | POTENZA | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1834 | None | None | None | None | None | None
+R1081: None | POTENZA | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1912 | None | None | None | None | None | None
+R1082: None | POTENZA | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1856 | None | None | None | None | None | None
+R1083: None | POTENZA | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1756 | None | None | None | None | None | None
+R1084: None | POTENZA | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1912 | None | None | None | None | None | None
+R1085: None | POTENZA | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1999 | None | None | None | None | None | None
+R1086: None | POTENZA | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1967 | None | None | None | None | None | None
+R1087: None | POTENZA | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1856 | None | None | None | None | None | None
+R1088: None | POTENZA | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2045 | None | None | None | None | None | None
+R1089: None | POTENZA | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2134 | None | None | None | None | None | None
+R1090: None | SALTON | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1689 | None | None | None | None | None | None
+R1091: None | SALTON | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1589 | None | None | None | None | None | None
+R1092: None | SALTON | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1734 | None | None | None | None | None | None
+R1093: None | SALTON | 2 | 0.93 | 0.95 | 1.02 | 0.95 | 0.75 | 0.72675 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1812 | None | None | None | None | None | None
+R1094: None | SALTON | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1776 | None | None | None | None | None | None
+R1095: None | SALTON | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1667 | None | None | None | None | None | None
+R1096: None | SALTON | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1834 | None | None | None | None | None | None
+R1097: None | SALTON | 2.2 | 0.93 | 0.95 | 1.12 | 0.95 | 0.75 | 0.798 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1934 | None | None | None | None | None | None
+R1098: None | SALTON | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1834 | None | None | None | None | None | None
+R1099: None | SALTON | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1734 | None | None | None | None | None | None
+R1100: None | SALTON | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 1912 | None | None | None | None | None | None
+R1101: None | SALTON | 2.4 | 0.93 | 0.95 | 1.22 | 0.95 | 0.75 | 0.86925 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 1989 | None | None | None | None | None | None
+R1102: None | SALTON | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1934 | None | None | None | None | None | None
+R1103: None | SALTON | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1834 | None | None | None | None | None | None
+R1104: None | SALTON | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2000 | None | None | None | None | None | None
+R1105: None | SALTON | 2.6 | 0.93 | 0.95 | 1.32 | 0.95 | 0.75 | 0.9405 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2089 | None | None | None | None | None | None
+R1106: None | SALTON | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2045 | None | None | None | None | None | None
+R1107: None | SALTON | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1934 | None | None | None | None | None | None
+R1108: None | SALTON | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2112 | None | None | None | None | None | None
+R1109: None | SALTON | 2.8 | 0.93 | 0.95 | 1.42 | 0.95 | 0.75 | 1.01175 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 | 2212 | None | None | None | None | None | None
+R1110: None | TOULON | 0.94 | 0,9 | 0.87 | 0.96 | 0.92 | 0.76 | 0.671232 | #REF! | #REF! | POLTRONA | TC-10 | 1100 | None | None | None | None | None | None
+R1111: None | TOULON | 0.94 | 0,9 | 0.87 | 0.96 | 0.92 | 0.76 | 0.671232 | #REF! | #REF! | POLTRONA | TC-12 | 1067 | None | None | None | None | None | None
+R1112: None | TOULON | 0.94 | 0,9 | 0.87 | 0.96 | 0.92 | 0.76 | 0.671232 | #REF! | #REF! | POLTRONA | TC-13 | 1123 | None | None | None | None | None | None
+R1113: None | TOULON | 0.94 | 0,9 | 0.87 | 0.96 | 0.92 | 0.76 | 0.671232 | #REF! | #REF! | POLTRONA | TC-14 / ST | 1145 | None | None | None | None | None | None
+R1114: None | TOULON | 2.16 | 0,9 | 0,87 | 1.1 | 0.92 | 0.76 | 0.76912 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 1956 | None | None | None | None | None | None
+R1115: None | TOULON | 2.16 | 0,9 | 0,87 | 1.1 | 0.92 | 0.76 | 0.76912 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1867 | None | None | None | None | None | None
+R1116: None | TOULON | 2.16 | 0,9 | 0,87 | 1.1 | 0.92 | 0.76 | 0.76912 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2023 | None | None | None | None | None | None
+R1117: None | TOULON | 2.16 | 0,9 | 0,87 | 1.1 | 0.92 | 0.76 | 0.76912 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2078 | None | None | None | None | None | None
+R1118: None | TOULON | 2.36 | 0,9 | 0,87 | 1.2 | 0.92 | 0.76 | 0.83904 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2067 | None | None | None | None | None | None
+R1119: None | TOULON | 2.36 | 0,9 | 0,87 | 1.2 | 0.92 | 0.76 | 0.83904 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 1978 | None | None | None | None | None | None
+R1120: None | TOULON | 2.36 | 0,9 | 0,87 | 1.2 | 0.92 | 0.76 | 0.83904 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2123 | None | None | None | None | None | None
+R1121: None | TOULON | 2.36 | 0,9 | 0,87 | 1.2 | 0.92 | 0.76 | 0.83904 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2189 | None | None | None | None | None | None
+R1122: None | TOULON | 2.56 | 0,9 | 0,87 | 1.3 | 0.92 | 0.76 | 0.90896 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2189 | None | None | None | None | None | None
+R1123: None | TOULON | 2.56 | 0,9 | 0,87 | 1.3 | 0.92 | 0.76 | 0.90896 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2112 | None | None | None | None | None | None
+R1124: None | TOULON | 2.56 | 0,9 | 0,87 | 1.3 | 0.92 | 0.76 | 0.90896 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2245 | None | None | None | None | None | None
+R1125: None | TOULON | 2.56 | 0,9 | 0,87 | 1.3 | 0.92 | 0.76 | 0.90896 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2334 | None | None | None | None | None | None
+R1126: None | TOULON | 2.76 | 0,9 | 0,87 | 1.4 | 0.92 | 0.76 | 0.97888 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-10 | 2334 | None | None | None | None | None | None
+R1127: None | TOULON | 2.76 | 0,9 | 0,87 | 1.4 | 0.92 | 0.76 | 0.97888 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-12 | 2245 | None | None | None | None | None | None
+R1128: None | TOULON | 2.76 | 0,9 | 0,87 | 1.4 | 0.92 | 0.76 | 0.97888 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-13 | 2400 | None | None | None | None | None | None
+R1129: None | TOULON | 2.76 | 0,9 | 0,87 | 1.4 | 0.92 | 0.76 | 0.97888 | #REF! | #REF! | BIPARTIDO - 2 ASSENTOS | TC-14 / ST | 2478 | None | None | None | None | None | None
+R1130: None | PERINI | 1.1 | 0.95 | 0.95 | 1.12 | 0.97 | 0.75 | 0.8148 | #REF! | #REF! | POLTRONA | TC-10 | 1100 | None | None | None | None | None | None
+R1131: None | PERINI | 1.1 | 0.95 | 0.95 | 1.12 | 0.97 | 0.76 | 0.825664 | #REF! | #REF! | POLTRONA | TC-12 | 1056 | None | None | None | None | None | None
+R1132: None | PERINI | 1.1 | 0.95 | 0.95 | 1.12 | 0.97 | 0.76 | 0.825664 | #REF! | #REF! | POLTRONA | TC-13 | 1134 | None | None | None | None | None | None
+R1133: None | PERINI | 1.1 | 0.95 | 0.95 | 1.12 | 0.97 | 0.76 | 0.825664 | #REF! | #REF! | POLTRONA | TC-14 / ST | 1167 | None | None | None | None | None | None
+R1134: None | PERINI | 1.7 | 0.95 | 0.95 | 1.72 | 0.97 | 0.76 | 1.267984 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1389 | None | None | None | None | None | None
+R1135: None | PERINI | 1.7 | 0.95 | 0.95 | 1.72 | 0.97 | 0.76 | 1.267984 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1333 | None | None | None | None | None | None
+R1136: None | PERINI | 1.7 | 0.95 | 0.95 | 1.72 | 0.97 | 0.76 | 1.267984 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1434 | None | None | None | None | None | None
+R1137: None | PERINI | 1.7 | 0.95 | 0.95 | 1.72 | 0.97 | 0.76 | 1.267984 | #REF! | #REF! | PEÇA ÚNICA | TC-14 / ST | 1478 | None | None | None | None | None | None
+R1138: None | PERINI | 2.3 | 0.95 | 0.95 | 2.32 | 0.97 | 0.76 | 1.710304 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1767 | None | None | None | None | None | None
+R1139: None | PERINI | 2.3 | 0.95 | 0.95 | 2.32 | 0.97 | 0.76 | 1.710304 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1689 | None | None | None | None | None | None
+R1140: None | PERINI | 2.3 | 0.95 | 0.95 | 2.32 | 0.97 | 0.76 | 1.710304 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1812 | None | None | None | None | None | None
+R1141: None | PERINI | 2.3 | 0.95 | 0.95 | 2.32 | 0.97 | 0.76 | 1.710304 | #REF! | #REF! | PEÇA ÚNICA | TC-14 / ST | 1878 | None | None | None | None | None | None
+R1142: None | POLTRONA PANTIN | 0.75 | 0.83 | 0.87 | 0.84 | 0.75 | 0.47 | 0.2961 | #REF! | #REF! | POLTRONA | TC-10 | 917 | None | None | None | None | None | None
+R1143: None | POLTRONA PANTIN | 0.75 | 0.83 | 0.87 | 0.84 | 0.75 | 0.47 | 0.2961 | #REF! | #REF! | POLTRONA | TC-12 | 888 | None | None | None | None | None | None
+R1144: None | POLTRONA PANTIN | 0.75 | 0.83 | 0.87 | 0.84 | 0.75 | 0.47 | 0.2961 | #REF! | #REF! | POLTRONA | TC-13 | 945 | None | None | None | None | None | None
+R1145: None | POLTRONA PANTIN | 0.75 | 0.83 | 0.87 | 0.84 | 0.75 | 0.47 | 0.2961 | #REF! | #REF! | POLTRONA | TC-14 | 967 | None | None | None | None | None | None
+R1146: None | PANTIN SEM BRAÇO | 0.9 | 0.83 | 0.87 | 0.97 | 0.87 | 0.47 | 0.396633 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 789 | None | None | None | None | None | None
+R1147: None | PANTIN SEM BRAÇO | 0.9 | 0.83 | 0.87 | 0.97 | 0.87 | 0.47 | 0.396633 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 767 | None | None | None | None | None | None
+R1148: None | PANTIN SEM BRAÇO | 0.9 | 0.83 | 0.87 | 0.97 | 0.87 | 0.47 | 0.396633 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 800 | None | None | None | None | None | None
+R1149: None | PANTIN SEM BRAÇO | 0.9 | 0.83 | 0.87 | 0.97 | 0.87 | 0.47 | 0.396633 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 823 | None | None | None | None | None | None
+R1150: None | PANTIN COM BRAÇO | 0.95 | 0.83 | 0.87 | 0.97 | 0.84 | 0.47 | 0.382956 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 884 | None | None | None | None | None | None
+R1151: None | PANTIN COM BRAÇO | 0.95 | 0.83 | 0.87 | 0.97 | 0.84 | 0.47 | 0.382956 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 856 | None | None | None | None | None | None
+R1152: None | PANTIN COM BRAÇO | 0.95 | 0.83 | 0.87 | 0.97 | 0.84 | 0.47 | 0.382956 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 912 | None | None | None | None | None | None
+R1153: None | PANTIN COM BRAÇO | 0.95 | 0.83 | 0.87 | 0.97 | 0.84 | 0.47 | 0.382956 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 934 | None | None | None | None | None | None
+R1154: None | PUFF | 0.81 | 0.81 | 0.46 | 0.84 | 0.83 | 0.32 | 0.223104 | #REF! | #REF! | PUFF | TC-10 | 634 | None | None | None | None | None | None
+R1155: None | PUFF | 0.81 | 0.81 | 0.46 | 0.84 | 0.83 | 0.32 | 0.223104 | #REF! | #REF! | PUFF | TC-12 | 623 | None | None | None | None | None | None
+R1156: None | PUFF | 0.81 | 0.81 | 0.46 | 0.84 | 0.83 | 0.32 | 0.223104 | #REF! | #REF! | PUFF | TC-13 | 645 | None | None | None | None | None | None
+R1157: None | PUFF | 0.81 | 0.81 | 0.46 | 0.84 | 0.83 | 0.32 | 0.223104 | #REF! | #REF! | PUFF | TC-14 | 662 | None | None | None | None | None | None
+R1158: None | SAINT | 0.77 | 0.87 | 0.87 | 0.79 | 0.89 | 0.78 | 0.548418 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,77m | TC-10 | 789 | None | None | None | None | None | None
+R1159: None | SAINT | 0.77 | 0.87 | 0.87 | 0.79 | 0.89 | 0.78 | 0.548418 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,77m | TC-12 | 767 | None | None | None | None | None | None
+R1160: None | SAINT | 0.77 | 0.87 | 0.87 | 0.79 | 0.89 | 0.78 | 0.548418 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,77m | TC-13 | 812 | None | None | None | None | None | None
+R1161: None | SAINT | 0.77 | 0.87 | 0.87 | 0.79 | 0.89 | 0.78 | 0.548418 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,77m | TC-14 / ST | 834 | None | None | None | None | None | None
+R1162: None | SAINT | 0.8 | 0.87 | 0.87 | 0.82 | 0.89 | 0.78 | 0.569244 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+0,80m | TC-10 | 777 | None | None | None | None | None | None
+R1163: None | SAINT | 0.8 | 0.87 | 0.87 | 0.82 | 0.89 | 0.78 | 0.569244 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+0,80m | TC-12 | 745 | None | None | None | None | None | None
+R1164: None | SAINT | 0.8 | 0.87 | 0.87 | 0.82 | 0.89 | 0.78 | 0.569244 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+0,80m | TC-13 | 795 | None | None | None | None | None | None
+R1165: None | SAINT | 0.8 | 0.87 | 0.87 | 0.82 | 0.89 | 0.78 | 0.569244 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+0,80m | TC-14 / ST | 823 | None | None | None | None | None | None
+R1166: None | SAINT | 0.97 | 0.87 | 0.87 | 0.99 | 0.89 | 0.78 | 0.687258 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,97m | TC-10 | 867 | None | None | None | None | None | None
+R1167: None | SAINT | 0.97 | 0.87 | 0.87 | 0.99 | 0.89 | 0.78 | 0.687258 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,97m | TC-12 | 828 | None | None | None | None | None | None
+R1168: None | SAINT | 0.97 | 0.87 | 0.87 | 0.99 | 0.89 | 0.78 | 0.687258 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,97m | TC-13 | 878 | None | None | None | None | None | None
+R1169: None | SAINT | 0.97 | 0.87 | 0.87 | 0.99 | 0.89 | 0.78 | 0.687258 | #REF! | #REF! | 1 LUGAR COM BRAÇO
+0,97m | TC-14 / ST | 906 | None | None | None | None | None | None
+R1170: None | SAINT | 1 | 0.87 | 0.87 | 1.02 | 0.89 | 0.78 | 0.708084 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+1,00m | TC-10 | 850 | None | None | None | None | None | None
+R1171: None | SAINT | 1 | 0.87 | 0.87 | 1.02 | 0.89 | 0.78 | 0.708084 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+1,00m | TC-12 | 812 | None | None | None | None | None | None
+R1172: None | SAINT | 1 | 0.87 | 0.87 | 1.02 | 0.89 | 0.78 | 0.708084 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+1,00m | TC-13 | 867 | None | None | None | None | None | None
+R1173: None | SAINT | 1 | 0.87 | 0.87 | 1.02 | 0.89 | 0.78 | 0.708084 | #REF! | #REF! | 1 LUGAR SEM BRAÇO
+1,00m | TC-14 / ST | 900 | None | None | None | None | None | None
+R1174: None | SAINT | 0.97 | 1.35 | 0.87 | 0.99 | 1.37 | 0.78 | 1.057914 | #REF! | #REF! | CHAISE
+0,97 m | TC-10 | 984 | None | None | None | None | None | None
+R1175: None | SAINT | 0.97 | 1.35 | 0.87 | 0.99 | 1.37 | 0.78 | 1.057914 | #REF! | #REF! | CHAISE
+0,97 m | TC-12 | 945 | None | None | None | None | None | None
+R1176: None | SAINT | 0.97 | 1.35 | 0.87 | 0.99 | 1.37 | 0.78 | 1.057914 | #REF! | #REF! | CHAISE
+0,97 m | TC-13 | 1006 | None | None | None | None | None | None
+R1177: None | SAINT | 0.97 | 1.35 | 0.87 | 0.99 | 1.37 | 0.78 | 1.057914 | #REF! | #REF! | CHAISE
+0,97 m | TC-14 / ST | 1039 | None | None | None | None | None | None
+R1178: None | LECCE | 1.7 | 0,72 | 0,75 | 1.72 | 0.74 | 0.73 | 0.929144 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1145 | None | None | None | None | None | None
+R1179: None | LECCE | 1.7 | 0,72 | 0,75 | 1.72 | 0.74 | 0.73 | 0.929144 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1110 | None | None | None | None | None | None
+R1180: None | LECCE | 1.7 | 0,72 | 0,75 | 1.72 | 0.74 | 0.73 | 0.929144 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1167 | None | None | None | None | None | None
+R1181: None | LECCE | 1.7 | 0,72 | 0,75 | 1.72 | 0.74 | 0.73 | 0.929144 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1200 | None | None | None | None | None | None
+R1182: None | LECCE | 2.05 | 0.72 | 0.75 | 2.07 | 0.74 | 0.75 | 1.14885 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1256 | None | None | None | None | None | None
+R1183: None | LECCE | 2.05 | 0.72 | 0.75 | 2.07 | 0.74 | 0.75 | 1.14885 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1212 | None | None | None | None | None | None
+R1184: None | LECCE | 2.05 | 0.72 | 0.75 | 2.07 | 0.74 | 0.75 | 1.14885 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1289 | None | None | None | None | None | None
+R1185: None | LECCE | 2.05 | 0.72 | 0.75 | 2.07 | 0.74 | 0.75 | 1.14885 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1323 | None | None | None | None | None | None
+R1186: None | LECCE GIRATÓRIA | 0.75 | 0.72 | 0.75 | 0.77 | 0.74 | 0.74 | 0.421652 | #REF! | #REF! | POLTRONA | TC-10 | 767 | None | None | None | None | None | None
+R1187: None | LECCE GIRATÓRIA | 0.75 | 0.72 | 0.75 | 0.77 | 0.74 | 0.74 | 0.421652 | #REF! | #REF! | POLTRONA | TC-12 | 745 | None | None | None | None | None | None
+R1188: None | LECCE GIRATÓRIA | 0.75 | 0.72 | 0.75 | 0.77 | 0.74 | 0.74 | 0.421652 | #REF! | #REF! | POLTRONA | TC-13 | 789 | None | None | None | None | None | None
+R1189: None | LECCE GIRATÓRIA | 0.75 | 0.72 | 0.75 | 0.77 | 0.74 | 0.74 | 0.421652 | #REF! | #REF! | POLTRONA | TC-14 | 812 | None | None | None | None | None | None
+R1190: None | ZOE | 1,30m | 0,80m | 0,84m | 1.32 | 0.82 | 0.8 | 0.86592 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1025 | None | None | None | None | None | None
+R1191: None | ZOE | 1,30m | 0,80m | 0,84m | 1.32 | 0.82 | 0.8 | 0.86592 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 980 | None | None | None | None | None | None
+R1192: None | ZOE | 1,30m | 0,80m | 0,84m | 1.32 | 0.82 | 0.8 | 0.86592 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1050 | None | None | None | None | None | None
+R1193: None | ZOE | 1,30m | 0,80m | 0,84m | 1.32 | 0.82 | 0.8 | 0.86592 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1090 | None | None | None | None | None | None
+R1194: None | ZOE | 1,60m | 0,80m | 0,84m | 1.62 | 0.82 | 0.8 | 1.06272 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1120 | None | None | None | None | None | None
+R1195: None | ZOE | 1,60m | 0,80m | 0,84m | 1.62 | 0.82 | 0.8 | 1.06272 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1080 | None | None | None | None | None | None
+R1196: None | ZOE | 1,60m | 0,80m | 0,84m | 1.62 | 0.82 | 0.8 | 1.06272 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1150 | None | None | None | None | None | None
+R1197: None | ZOE | 1,60m | 0,80m | 0,84m | 1.62 | 0.82 | 0.8 | 1.06272 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1140 | None | None | None | None | None | None
+R1198: None | ZOE | 1,90m | 0,80m | 0,84m | 1.92 | 0.82 | 0.8 | 1.25952 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1245 | None | None | None | None | None | None
+R1199: None | ZOE | 1,90m | 0,80m | 0,84m | 1.92 | 0.82 | 0.8 | 1.25952 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1190 | None | None | None | None | None | None
+R1200: None | ZOE | 1,90m | 0,80m | 0,84m | 1.92 | 0.82 | 0.8 | 1.25952 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1285 | None | None | None | None | None | None
+R1201: None | ZOE | 1,90m | 0,80m | 0,84m | 1.92 | 0.82 | 0.8 | 1.25952 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1330 | None | None | None | None | None | None
+R1202: None | ZOE GIRATÓRIA | 0,75m | 0,80m | 0,84m | 0.77 | 0.82 | 0.8 | 0.50512 | #REF! | #REF! | POLTRONA | TC-10 | 745 | None | None | None | None | None | None
+R1203: None | ZOE GIRATÓRIA | 0,75m | 0,80m | 0,84m | 0.77 | 0.82 | 0.8 | 0.50512 | #REF! | #REF! | POLTRONA | TC-12 | 720 | None | None | None | None | None | None
+R1204: None | ZOE GIRATÓRIA | 0,75m | 0,80m | 0,84m | 0.77 | 0.82 | 0.8 | 0.50512 | #REF! | #REF! | POLTRONA | TC-13 | 765 | None | None | None | None | None | None
+R1205: None | ZOE GIRATÓRIA | 0,75m | 0,80m | 0,84m | 0.77 | 0.82 | 0.8 | 0.50512 | #REF! | #REF! | POLTRONA | TC-14 | 785 | None | None | None | None | None | None
+R1206: None | CAMIN | 1.4 | 0.75 | 0.83 | 1.42 | 0.77 | 0.77 | 0.841918 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1078 | None | None | None | None | None | None
+R1207: None | CAMIN | 1.4 | 0.75 | 0.83 | 1.42 | 0.77 | 0.77 | 0.841918 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1034 | None | None | None | None | None | None
+R1208: None | CAMIN | 1.4 | 0.75 | 0.83 | 1.42 | 0.77 | 0.77 | 0.841918 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1100 | None | None | None | None | None | None
+R1209: None | CAMIN | 1.4 | 0.75 | 0.83 | 1.42 | 0.77 | 0.77 | 0.841918 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1134 | None | None | None | None | None | None
+R1210: None | CAMIN | 1.7 | 0.75 | 0.83 | 1.72 | 0.77 | 0.77 | 1.019788 | #REF! | #REF! | PEÇA ÚNICA | TC-10 | 1167 | None | None | None | None | None | None
+R1211: None | CAMIN | 1.7 | 0.75 | 0.83 | 1.72 | 0.77 | 0.77 | 1.019788 | #REF! | #REF! | PEÇA ÚNICA | TC-12 | 1134 | None | None | None | None | None | None
+R1212: None | CAMIN | 1.7 | 0.75 | 0.83 | 1.72 | 0.77 | 0.77 | 1.019788 | #REF! | #REF! | PEÇA ÚNICA | TC-13 | 1200 | None | None | None | None | None | None
+R1213: None | CAMIN | 1.7 | 0.75 | 0.83 | 1.72 | 0.77 | 0.77 | 1.019788 | #REF! | #REF! | PEÇA ÚNICA | TC-14 | 1234 | None | None | None | None | None | None
+R1214: None | CAMIN | 2.05 | 0.75 | 0.83 | 2.07 | 0.77 | 0.77 | 1.227303 | #REF! | #REF! | PEÇA ÚNICA  | TC-10 | 1300 | None | None | None | None | None | None
+R1215: None | CAMIN | 2.05 | 0.75 | 0.83 | 2.07 | 0.77 | 0.77 | 1.227303 | #REF! | #REF! | PEÇA ÚNICA  | TC-12 | 1256 | None | None | None | None | None | None
+R1216: None | CAMIN | 2.05 | 0.75 | 0.83 | 2.07 | 0.77 | 0.77 | 1.227303 | #REF! | #REF! | PEÇA ÚNICA  | TC-13 | 1333 | None | None | None | None | None | None
+R1217: None | CAMIN | 2.05 | 0.75 | 0.83 | 2.07 | 0.77 | 0.77 | 1.227303 | #REF! | #REF! | PEÇA ÚNICA  | TC-14 | 1378 | None | None | None | None | None | None
+R1218: None | CARMIN POLTRONA | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.77 | 0.456533 | #REF! | #REF! | POLTRONA | TC-10 | 789 | None | None | None | None | None | None
+R1219: None | CARMIN POLTRONA | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.77 | 0.456533 | #REF! | #REF! | POLTRONA | TC-12 | 756 | None | None | None | None | None | None
+R1220: None | CARMIN POLTRONA | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.77 | 0.456533 | #REF! | #REF! | POLTRONA | TC-13 | 800 | None | None | None | None | None | None
+R1221: None | CARMIN POLTRONA | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.77 | 0.456533 | #REF! | #REF! | POLTRONA | TC-14 | 812 | None | None | None | None | None | None
+R1222: None | POLTRONA LUCY | 0,77m | 0,72m | 0,73m | 0.79 | 0.75 | 0.74 | 0.43845 | #REF! | #REF! | POLTRONA | TC-10 | 812 | None | None | None | None | None | None
+R1223: None | POLTRONA LUCY | 0,77m | 0,72m | 0,73m | 0.79 | 0.75 | 0.74 | 0.43845 | #REF! | #REF! | POLTRONA | TC-12 | 789 | None | None | None | None | None | None
+R1224: None | POLTRONA LUCY | 0,77m | 0,72m | 0,73m | 0.79 | 0.75 | 0.74 | 0.43845 | #REF! | #REF! | POLTRONA | TC-13 | 823 | None | None | None | None | None | None
+R1225: None | POLTRONA LUCY | 0,77m | 0,72m | 0,73m | 0.79 | 0.75 | 0.74 | 0.43845 | #REF! | #REF! | POLTRONA | TC-14 / ST | 845 | None | None | None | None | None | None
+R1226: None | POLTRONA CELICA | 0,89m | F: 1,04
+A: 1,68 | 1.05 | 0.91 | 1.06 | 0.85 | 0.81991 | #REF! | #REF! | POLTRONA | TC-10 | 1412 | None | None | None | None | None | None
+R1227: None | POLTRONA CELICA | 0,89m | F: 1,04
+A: 1,68 | 1.05 | 0.91 | 1.06 | 0.85 | 0.81991 | #REF! | #REF! | POLTRONA | TC-12 | 1367 | None | None | None | None | None | None
+R1228: None | POLTRONA CELICA | 0,89m | F: 1,04
+A: 1,68 | 1.05 | 0.91 | 1.06 | 0.85 | 0.81991 | #REF! | #REF! | POLTRONA | TC-13 | 1434 | None | None | None | None | None | None
+R1229: None | POLTRONA CELICA | 0,89m | F: 1,04
+A: 1,68 | 1.05 | 0.91 | 1.06 | 0.85 | 0.81991 | #REF! | #REF! | POLTRONA | TC-14 / ST | 1478 | None | None | None | None | None | None
+R1230: None | POLTRONA CONDOR | 0,82m | F: 0,97
+A: 1,68 | 1.02 | 0.84 | 0.99 | 0.76 | 0.632016 | #REF! | #REF! | POLTRONA | TC / ST / NOBUCK | 2389 | None | None | None | None | None | None
+R1231: None | GARDEN | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.85 | 0.503965 | #REF! | #REF! | POLTRONA | TC-10 | 789 | None | None | None | None | None | None
+R1232: None | GARDEN | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.85 | 0.503965 | #REF! | #REF! | POLTRONA | TC-12 | 777 | None | None | None | None | None | None
+R1233: None | GARDEN | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.85 | 0.503965 | #REF! | #REF! | POLTRONA | TC-13 | 806 | None | None | None | None | None | None
+R1234: None | GARDEN | 0.75 | 0.75 | 0.83 | 0.77 | 0.77 | 0.85 | 0.503965 | #REF! | #REF! | POLTRONA | TC-14 / ST | 823 | None | None | None | None | None | None
+R1235: None | BELGA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.92 | 0.580888 | #REF! | #REF! | POLTRONA | TC-10 | 0 | None | None | None | None | None | None
+R1236: None | BELGA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.92 | 0.580888 | #REF! | #REF! | POLTRONA | TC-12 | 0 | None | None | None | None | None | None
+R1237: None | BELGA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.92 | 0.580888 | #REF! | #REF! | POLTRONA | TC-13 | 0 | None | None | None | None | None | None
+R1238: None | BELGA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.92 | 0.580888 | #REF! | #REF! | POLTRONA | TC-14 | 0 | None | None | None | None | None | None
+R1239: None | TRÓIA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.67 | 0.423038 | #REF! | #REF! | POLTRONA | TC-10 | 484 | None | None | None | None | None | None
+R1240: None | TRÓIA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.67 | 0.423038 | #REF! | #REF! | POLTRONA | TC-12 | 462 | None | None | None | None | None | None
+R1241: None | TRÓIA | 0.8 | 0.75 | 0.9 | 0.82 | 0.77 | 0.67 | 0.423038 | #REF! | #REF! | POLTRONA | TC-13 | 506 | None | None | None | None | None | None
+R1242: None | TRÓIA | 0.8 | 0.75 | 0.9 | 0.8 | 0.77 | 0.67 | 0.41272 | #REF! | #REF! | POLTRONA | TC-14 | 523 | None | None | None | None | None | None

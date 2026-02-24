@@ -1,0 +1,215 @@
+Sheet: LIVINTUS COURO
+R1: None | MODELO | COMP. | ALTURA | PROF. | COMPOSIÇÃO | LINHA | VALOR EM REAIS (UNITÁRIO) | None | None | None | None | None | None | None
+R2: BALDUZZI | BALDUZZI | 1.08 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,08m | CO-5 | 2160 | None | None | None | None | None | None | None
+R3: None | BALDUZZI | 1.08 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,08m | CO-6 | 2260 | None | None | None | None | None | None | None
+R4: None | BALDUZZI | 1.08 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,08m | CO-7 | 2340 | None | None | None | None | None | None | None
+R5: None | BALDUZZI | 1.18 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,18m | CO-5 | 2250 | None | None | None | None | None | None | None
+R6: None | BALDUZZI | 1.18 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,18m | CO-6 | 2360 | None | None | None | None | None | None | None
+R7: None | BALDUZZI | 1.18 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,18m | CO-7 | 2245 | None | None | None | None | None | None | None
+R8: None | BALDUZZI | 1.28 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,28m | CO-5 | 2350 | None | None | None | None | None | None | None
+R9: None | BALDUZZI | 1.28 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,28m | CO-6 | 2460 | None | None | None | None | None | None | None
+R10: None | BALDUZZI | 1.28 | 0.9 | 1.14 | 1 LUGAR COM
+BRAÇO
+1,28m | CO-7 | 2560 | None | None | None | None | None | None | None
+R11: None | BALDUZZI | 0.75 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,75m | CO-5 | 1860 | None | None | None | None | None | None | None
+R12: None | BALDUZZI | 0.75 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,75m | CO-6 | 1930 | None | None | None | None | None | None | None
+R13: None | BALDUZZI | 0.75 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,75m | CO-7 | 1995 | None | None | None | None | None | None | None
+R14: None | BALDUZZI | 0.85 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,85m | CO-5 | 1945 | None | None | None | None | None | None | None
+R15: None | BALDUZZI | 0.85 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,85m | CO-6 | 2025 | None | None | None | None | None | None | None
+R16: None | BALDUZZI | 0.85 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,85m | CO-7 | 2090 | None | None | None | None | None | None | None
+R17: None | BALDUZZI | 0.95 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,95m | CO-5 | 2040 | None | None | None | None | None | None | None
+R18: None | BALDUZZI | 0.95 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,95m | CO-6 | 2120 | None | None | None | None | None | None | None
+R19: None | BALDUZZI | 0.95 | 0.9 | 1.14 | 1 LUGAR SEM
+BRAÇO
+0,95m | CO-7 | 2190 | None | None | None | None | None | None | None
+R20: None | BALDUZZI | 1.08 | 0.9 | 1.59 | CHAISE
+1,08m | CO-5 | 2480 | None | None | None | None | None | None | None
+R21: None | BALDUZZI | 1.08 | 0.9 | 1.59 | CHAISE
+1,08m | CO-6 | 2610 | None | None | None | None | None | None | None
+R22: None | BALDUZZI | 1.08 | 0.9 | 1.59 | CHAISE
+1,08m | CO-7 | 2715 | None | None | None | None | None | None | None
+R23: None | BALDUZZI | 1.18 | 0.9 | 1.59 | CHAISE
+1,18m | CO-5 | 2580 | None | None | None | None | None | None | None
+R24: None | BALDUZZI | 1.18 | 0.9 | 1.59 | CHAISE
+1,18m | CO-6 | 2715 | None | None | None | None | None | None | None
+R25: None | BALDUZZI | 1.18 | 0.9 | 1.59 | CHAISE
+1,18m | CO-7 | 2825 | None | None | None | None | None | None | None
+R26: None | BALDUZZI | 1.28 | 0.9 | 1.59 | CHAISE
+1,28m | CO-5 | 2690 | None | None | None | None | None | None | None
+R27: None | BALDUZZI | 1.28 | 0.9 | 1.59 | CHAISE
+1,28m | CO-6 | 2825 | None | None | None | None | None | None | None
+R28: None | BALDUZZI | 1.28 | 0.9 | 1.59 | CHAISE
+1,28m | CO-7 | 2935 | None | None | None | None | None | None | None
+R29: None | BALDUZZI | 1.14 | 0.45 | 1.14 | PUFF 
+1,14m | CO-5 | 1555 | None | None | None | None | None | None | None
+R30: None | BALDUZZI | 1.14 | 0.45 | 1.14 | PUFF 
+1,14m | CO-6 | 1615 | None | None | None | None | None | None | None
+R31: None | BALDUZZI | 1.14 | 0.45 | 1.14 | PUFF 
+1,14m | CO-7 | 1670 | None | None | None | None | None | None | None
+R32: None | INSIEME | 2.24 | 0.98 | 1 | 2 MÓDULOS
+Assento s/bç:  | CO-5 | 6840 | None | None | None | None | None | None | None
+R33: None | INSIEME | 2.24 | 0.98 | 1 | 2 MÓDULOS
+Assento s/bç:  | CO-6 | 7060 | None | None | None | None | None | None | None
+R34: None | INSIEME | 2.24 | 0.98 | 1.6 | 2 MÓDULOS
+Assento s/bç:  | CO-7 | 7230 | None | None | None | None | None | None | None
+R35: None | INSIEME | 2.54 | 0.98 | 1 | 2 MÓDULOS
+Assento s/bç:  | CO-5 | 7290 | None | None | None | None | None | None | None
+R36: None | INSIEME | 2.54 | 0.98 | 1 | 2 MÓDULOS
+Assento s/bç:  | CO-6 | 7510 | None | None | None | None | None | None | None
+R37: None | INSIEME | 2.54 | 0.98 | 1.6 | 2 MÓDULOS
+Assento s/bç:  | CO-7 | 7700 | None | None | None | None | None | None | None
+R38: None | INSIEME | 2.84 | 0.98 | 1 | 2 MÓDULOS
+Assento s/bç:  | CO-5 | 7840 | None | None | None | None | None | None | None
+R39: None | INSIEME | 2.84 | 0.98 | 1 | 2 MÓDULOS
+Assento s/bç:  | CO-6 | 8090 | None | None | None | None | None | None | None
+R40: None | INSIEME | 2.84 | 0.98 | 1.6 | 2 MÓDULOS
+Assento s/bç:  | CO-7 | 8290 | None | None | None | None | None | None | None
+R41: None | INSIEME | 3.14 | 0.98 | 1 | 3 MÓDULOS
+Assento s/bç :  | CO-5 | 10065 | None | None | None | None | None | None | None
+R42: None | INSIEME | 3.14 | 0.98 | 1 | 3 MÓDULOS
+Assento s/bç :  | CO-6 | 10375 | None | None | None | None | None | None | None
+R43: None | INSIEME | 3.14 | 0.98 | 1.6 | 3 MÓDULOS
+Assento s/bç :  | CO-7 | 10620 | None | None | None | None | None | None | None
+R44: None | INSIEME | 3.59 | 0.98 | 1 | 3 MÓDULOS
+Assento s/bç :  | CO-5 | 10705 | None | None | None | None | None | None | None
+R45: None | INSIEME | 3.59 | 0.98 | 1 | 3 MÓDULOS
+Assento s/bç :  | CO-6 | 11020 | None | None | None | None | None | None | None
+R46: None | INSIEME | 3.59 | 0.98 | 1.6 | 3 MÓDULOS
+Assento s/bç :  | CO-7 | 11290 | None | None | None | None | None | None | None
+R47: None | INSIEME | 4.04 | 0.98 | 1 | 3 MÓDULOS
+Assento s/bç :  | CO-5 | 11485 | None | None | None | None | None | None | None
+R48: None | INSIEME | 4.04 | 0.98 | 1 | 3 MÓDULOS
+Assento s/bç :  | CO-6 | 11840 | None | None | None | None | None | None | None
+R49: None | INSIEME | 4.04 | 0.98 | 1.6 | 3 MÓDULOS
+Assento s/bç :  | CO-7 | 12125 | None | None | None | None | None | None | None
+R50: FRASCATI | FRASCATTI | 2.2 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-5 | 3938 | None | None | None | None | None | None | None
+R51: None | FRASCATTI | 2.2 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-6 | 4170 | None | None | None | None | None | None | None
+R52: None | FRASCATTI | 2.2 | 0.93 | 1.55 | 2 MÓDULOS
+Assento s/bç | CO-7 | 4360 | None | None | None | None | None | None | None
+R53: None | FRASCATTI | 2.4 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-5 | 4250 | None | None | None | None | None | None | None
+R54: None | FRASCATTI | 2.4 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-6 | 4510 | None | None | None | None | None | None | None
+R55: None | FRASCATTI | 2.4 | 0.93 | 1.55 | 2 MÓDULOS
+Assento s/bç | CO-7 | 4720 | None | None | None | None | None | None | None
+R56: None | FRASCATTI | 2.6 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-5 | 4660 | None | None | None | None | None | None | None
+R57: None | FRASCATTI | 2.6 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-6 | 4940 | None | None | None | None | None | None | None
+R58: None | FRASCATTI | 2.6 | 0.93 | 1.55 | 2 MÓDULOS
+Assento s/bç | CO-7 | 5170 | None | None | None | None | None | None | None
+R59: None | FRASCATTI | 2.8 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-5 | 5100 | None | None | None | None | None | None | None
+R60: None | FRASCATTI | 2.8 | 0.93 | 1.12 | 2 MÓDULOS
+Assento s/bç | CO-6 | 5410 | None | None | None | None | None | None | None
+R61: None | FRASCATTI | 2.8 | 0.93 | 1.55 | 2 MÓDULOS
+Assento s/bç | CO-7 | 5670 | None | None | None | None | None | None | None
+R62: None | BRUNELLO | 2.44 | 1.02 | 1.08 | 2 MÓDULOS
+Assento s/bç:  | CO-5 | 7430 | None | None | None | None | None | None | None
+R63: None | BRUNELLO | 2.44 | 1.02 | 1.08 | 2 MÓDULOS
+Assento s/bç:  | CO-6 | 7650 | None | None | None | None | None | None | None
+R64: None | BRUNELLO | 2.44 | 1.02 | 1.65 | 2 MÓDULOS
+Assento s/bç:  | CO-7 | 7840 | None | None | None | None | None | None | None
+R65: None | BRUNELLO | 2.64 | 1.02 | 1.08 | 2 MÓDULOS
+Assento s/bç:  | CO-5 | 7980 | None | None | None | None | None | None | None
+R66: None | BRUNELLO | 2.64 | 1.02 | 1.08 | 2 MÓDULOS
+Assento s/bç:  | CO-6 | 8220 | None | None | None | None | None | None | None
+R67: None | BRUNELLO | 2.64 | 1.02 | 1.65 | 2 MÓDULOS
+Assento s/bç:  | CO-7 | 8430 | None | None | None | None | None | None | None
+R68: None | BRUNELLO | 2.84 | 1.02 | 1.08 | 2 MÓDULOS
+Assento s/bç:  | CO-5 | 8660 | None | None | None | None | None | None | None
+R69: None | BRUNELLO | 2.84 | 1.02 | 1.08 | 2 MÓDULOS
+Assento s/bç:  | CO-6 | 8940 | None | None | None | None | None | None | None
+R70: None | BRUNELLO | 2.84 | 1.02 | 1.65 | 2 MÓDULOS
+Assento s/bç:  | CO-7 | 9170 | None | None | None | None | None | None | None
+R71: None | BRUNELLO | 3.44 | 1.02 | 1.08 | 3 MÓDULOS
+Assento s/bç :  | CO-5 | 10825 | None | None | None | None | None | None | None
+R72: None | BRUNELLO | 3.44 | 1.02 | 1.08 | 3 MÓDULOS
+Assento s/bç :  | CO-6 | 11130 | None | None | None | None | None | None | None
+R73: None | BRUNELLO | 3.44 | 1.02 | 1.65 | 3 MÓDULOS
+Assento s/bç :  | CO-7 | 11390 | None | None | None | None | None | None | None
+R74: None | BRUNELLO | 3.74 | 1.02 | 1.08 | 3 MÓDULOS
+Assento s/bç :  | CO-5 | 11595 | None | None | None | None | None | None | None
+R75: None | BRUNELLO | 3.74 | 1.02 | 1.08 | 3 MÓDULOS
+Assento s/bç :  | CO-6 | 11930 | None | None | None | None | None | None | None
+R76: None | BRUNELLO | 3.74 | 1.02 | 1.65 | 3 MÓDULOS
+Assento s/bç :  | CO-7 | 12220 | None | None | None | None | None | None | None
+R77: None | BRUNELLO | 4.04 | 1.02 | 1.08 | 3 MÓDULOS
+Assento s/bç :  | CO-5 | 12570 | None | None | None | None | None | None | None
+R78: None | BRUNELLO | 4.04 | 1.02 | 1.08 | 3 MÓDULOS
+Assento s/bç :  | CO-6 | 12960 | None | None | None | None | None | None | None
+R79: None | BRUNELLO | 4.04 | 1.02 | 1.65 | 3 MÓDULOS
+Assento s/bç :  | CO-7 | 13285 | None | None | None | None | None | None | None
+R80: None | LAURENT | 2.2 | 0.93 | 1.15 | 2 MÓDULOS
+Assento s/bç: 0,90m | CO-5 | 4470 | None | None | None | None | None | None | None
+R81: None | LAURENT | 2.2 | 0.93 | 1.15 | 2 MÓDULOS
+Assento s/bç: 0,90m | CO-6 | 4720 | None | None | None | None | None | None | None
+R82: None | LAURENT | 2.2 | 0.93 | 1.6 | 2 MÓDULOS
+Assento s/bç: 0,90m | CO-7 | 4930 | None | None | None | None | None | None | None
+R83: None | LAURENT | 2.4 | 0.93 | 1.15 | 2 MÓDULOS
+Assento s/bç : 1,00m | CO-5 | 4930 | None | None | None | None | None | None | None
+R84: None | LAURENT | 2.4 | 0.93 | 1.15 | 2 MÓDULOS
+Assento s/bç : 1,00m | CO-6 | 5200 | None | None | None | None | None | None | None
+R85: None | LAURENT | 2.4 | 0.93 | 1.6 | 2 MÓDULOS
+Assento s/bç : 1,00m | CO-7 | 5430 | None | None | None | None | None | None | None
+R86: None | LAURENT | 2.8 | 0.93 | 1.15 | 2 MÓDULOS
+Assento s/bç: 1,20m | CO-5 | 5550 | None | None | None | None | None | None | None
+R87: None | LAURENT | 2.8 | 0.93 | 1.15 | 2 MÓDULOS
+Assento s/bç: 1,20m | CO-6 | 5850 | None | None | None | None | None | None | None
+R88: None | LAURENT | 2.8 | 0.93 | 1.6 | 2 MÓDULOS
+Assento s/bç: 1,20m | CO-7 | 6102 | None | None | None | None | None | None | None
+R89: None | VÊNETO | 2.1 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 0,95m | CO-5 | 2640 | None | None | None | None | None | None | None
+R90: None | VÊNETO | 2.1 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 0,95m | CO-6 | 2790 | None | None | None | None | None | None | None
+R91: None | VÊNETO | 2.1 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 0,95m | CO-7 | 2920 | None | None | None | None | None | None | None
+R92: None | VÊNETO | 2.4 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 1,10m | CO-5 | 2870 | None | None | None | None | None | None | None
+R93: None | VÊNETO | 2.4 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 1,10m | CO-6 | 3050 | None | None | None | None | None | None | None
+R94: None | VÊNETO | 2.4 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 1,10m | CO-7 | 3190 | None | None | None | None | None | None | None
+R95: None | VÊNETO | 2.7 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 1,25m | CO-5 | 3150 | None | None | None | None | None | None | None
+R96: None | VÊNETO | 2.7 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 1,25m | CO-6 | 3350 | None | None | None | None | None | None | None
+R97: None | VÊNETO | 2.7 | 0.87 | 0.86 | 2 MÓDULOS
+Assento s/bç: 1,25m | CO-7 | 3510 | None | None | None | None | None | None | None
+R98: None | BRAVINO | 0.8 | 0.87 | 0.9 | POLTRONA | CO-5 | 1435 | None | None | None | None | None | None | None
+R99: None | BRAVINO | 0.8 | 0.87 | 0.9 | POLTRONA | CO-6 | 1500 | None | None | None | None | None | None | None
+R100: None | BRAVINO | 0.8 | 0.87 | 0.9 | POLTRONA | CO-7 | 1560 | None | None | None | None | None | None | None
