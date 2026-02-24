@@ -485,7 +485,9 @@ export default function ModulosPage() {
                 <th style={th}>Categoria</th>
                 <th style={th}>Modelo</th>
                 <th style={th}>Módulo</th>
-                <th style={th}>Dimensões (LxPxA)</th>
+                <th style={th}>Larg</th>
+                <th style={th}>Prof</th>
+                <th style={th}>Alt</th>
                 <th style={th}>M³</th>
                 <th style={th}>EXW (Parcial)</th>
                 <th style={th}>Tecidos / Valores</th>
@@ -510,9 +512,9 @@ export default function ModulosPage() {
                     <td style={td} rowSpan={rowSpan}>{catMap.get(x.idCategoria) || x.idCategoria}</td>
                     <td style={td} rowSpan={rowSpan}>{marcaMap.get(x.idMarca) || x.idMarca}</td>
                     <td style={td} rowSpan={rowSpan}>{x.descricao}</td>
-                    <td style={td} rowSpan={rowSpan}>
-                      {fmt(x.largura)} x {fmt(x.profundidade)} x {fmt(x.altura)}
-                    </td>
+                    <td style={td} rowSpan={rowSpan}>{fmt(x.largura)}</td>
+                    <td style={td} rowSpan={rowSpan}>{fmt(x.profundidade)}</td>
+                    <td style={td} rowSpan={rowSpan}>{fmt(x.altura)}</td>
                     <td style={td} rowSpan={rowSpan}>{fmt(x.m3)}</td>
                     
                     {/* EXW */}
