@@ -1,4 +1,4 @@
-import { apiDelete, apiGet, apiPost, apiPut } from "./api";
+import { API_BASE, apiDelete, apiGet, apiPost, apiPut } from "./api";
 import type { Modulo, ModuloTecido } from "./types";
 
 // --- MODULOS ---
@@ -95,7 +95,7 @@ export async function exportModulosExcel(params: {
   idTecido?: number;
   status?: string;
 }) {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/modulos/excel`, {
+  const res = await fetch(`${API_BASE}/api/modulos/excel`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),

@@ -2,6 +2,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Pi.Api.Models;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Pi.Api.Services;
 
@@ -12,61 +13,46 @@ public class ModuloExportService
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Relatório de Módulos");
 
+        // Global Setup
+        ws.Cells.Style.Font.Name = "Segoe UI";
+        ws.Cells.Style.Font.Size = 9;
+
         string title = $"Relatório de Módulos - {(currency == "BRL" ? "Valores em Reais (R$)" : "Valores em Dólar (EXW)")}";
         
         // ═══════════════ HEADER ═══════════════
-        ws.Cells["A1:Z1"].Merge = true;
         ws.Cells["A1"].Value = title;
         ws.Cells["A1"].Style.Font.Bold = true;
         ws.Cells["A1"].Style.Font.Size = 14;
 
         ws.Cells["A2"].Value = "Fecha de Emisión:";
+        ws.Cells["A2"].Style.Font.Bold = true;
         ws.Cells["B2"].Value = DateTime.Now.ToString("dd/MM/yyyy");
-        ws.Cells["A3"].Value = "* Esta lista de precios es válida por 30 días a partir de la fecha de emisión.";
-        ws.Cells["A3"].Style.Font.Color.SetColor(Color.Red);
-        ws.Cells["A3"].Style.Font.Bold = true;
+        
+        ws.Cells["F1:J1"].Merge = true;
+        ws.Cells["F1"].Value = "* Esta lista de precios es válida por 30 días a partir de la fecha de emisión.";
+        ws.Cells["F1"].Style.Font.Color.SetColor(Color.FromArgb(217, 83, 79)); // #d9534f
+        ws.Cells["F1"].Style.Font.Bold = true;
+        ws.Cells["F1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
         // ═══════════════ DATA PROCESSING ═══════════════
-        // Get all unique fabrics
         var uniqueFabrics = modules
             .SelectMany(m => m.ModulosTecidos)
             .Select(mt => mt.Tecido)
             .Where(t => t != null)
             .GroupBy(t => t!.Id)
             .Select(g => g.First())
-            .OrderBy(t => t!.Nome)
             .ToList();
 
-        // ═══════════════ TABLE HEADERS ═══════════════
-        int startRow = 5;
-        ws.Cells[startRow, 1, startRow + 1, 1].Merge = true; ws.Cells[startRow, 1].Value = "FOTO";
-        ws.Cells[startRow, 2, startRow + 1, 2].Merge = true; ws.Cells[startRow, 2].Value = "MODELO";
-        ws.Cells[startRow, 3, startRow + 1, 3].Merge = true; ws.Cells[startRow, 3].Value = "MÓDULO";
-        ws.Cells[startRow, 4, startRow + 1, 4].Merge = true; ws.Cells[startRow, 4].Value = "LARG";
-        ws.Cells[startRow, 5, startRow + 1, 5].Merge = true; ws.Cells[startRow, 5].Value = "PROF";
-        ws.Cells[startRow, 6, startRow + 1, 6].Merge = true; ws.Cells[startRow, 6].Value = "ALT";
-        ws.Cells[startRow, 7, startRow + 1, 7].Merge = true; ws.Cells[startRow, 7].Value = "M³";
+        // Natural sort for fabrics (G0, G1, G2...)
+        uniqueFabrics = uniqueFabrics
+            .OrderBy(t => Regex.Replace(t!.Nome, @"\d+", m => m.Value.PadLeft(5, '0')))
+            .ToList();
 
-        int fabricStartCol = 8;
-        ws.Cells[startRow, fabricStartCol, startRow, fabricStartCol + uniqueFabrics.Count - 1].Merge = true;
-        ws.Cells[startRow, fabricStartCol].Value = $"VALOR ({(currency == "BRL" ? "Reais" : "EXW")})";
-        ws.Cells[startRow, fabricStartCol].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
-        for (int i = 0; i < uniqueFabrics.Count; i++)
-        {
-            ws.Cells[startRow + 1, fabricStartCol + i].Value = uniqueFabrics[i]!.Nome;
-        }
-
-        var headerRange = ws.Cells[startRow, 1, startRow + 1, fabricStartCol + uniqueFabrics.Count - 1];
-        headerRange.Style.Font.Bold = true;
-        headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-        headerRange.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(224, 224, 224));
-        headerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+        int fabricStartCol = 7;
+        int maxCols = fabricStartCol + uniqueFabrics.Count - 1;
 
         // ═══════════════ CONTENT ═══════════════
-        int currentRow = startRow + 2;
+        int currentRow = 5;
         var groups = modules
             .GroupBy(m => new { 
                 Forn = m.Fornecedor?.Nome ?? "N/A", 
@@ -76,29 +62,62 @@ public class ModuloExportService
 
         foreach (var group in groups)
         {
-            // Group Title Row
-            ws.Cells[currentRow, 1, currentRow, fabricStartCol + uniqueFabrics.Count - 1].Merge = true;
-            ws.Cells[currentRow, 1].Value = $"{group.Key.Forn} - {group.Key.Cat}";
+            // Supplier - Category Header Row
+            ws.Cells[currentRow, 1, currentRow, maxCols].Merge = true;
+            ws.Cells[currentRow, 1].Value = $"{group.Key.Forn.ToUpper()} - {group.Key.Cat.ToUpper()}";
             ws.Cells[currentRow, 1].Style.Font.Bold = true;
+            ws.Cells[currentRow, 1].Style.Font.Size = 12;
             ws.Cells[currentRow, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            ws.Cells[currentRow, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(209, 213, 222));
+            ws.Cells[currentRow, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(209, 213, 219)); // #d1d5db
             ws.Cells[currentRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            ws.Row(currentRow).Height = 25;
             currentRow++;
 
             var brandGroups = group.GroupBy(m => m.Marca).OrderBy(b => b.Key?.Nome);
             foreach (var brandGroup in brandGroups)
             {
-                int brandStartRow = currentRow;
                 var brand = brandGroup.Key;
+                var brandItems = brandGroup.OrderBy(m => m.Descricao).ToList();
 
-                foreach (var mod in brandGroup.OrderBy(m => m.Descricao))
+                // Table Headers (Modelo, Módulo, ... , Valor)
+                // Row 1
+                ws.Cells[currentRow, 1, currentRow + 1, 1].Merge = true; ws.Cells[currentRow, 1].Value = "Modelo";
+                ws.Cells[currentRow, 2, currentRow + 1, 2].Merge = true; ws.Cells[currentRow, 2].Value = "Módulo";
+                ws.Cells[currentRow, 3, currentRow + 1, 3].Merge = true; ws.Cells[currentRow, 3].Value = "Larg";
+                ws.Cells[currentRow, 4, currentRow + 1, 4].Merge = true; ws.Cells[currentRow, 4].Value = "Prof";
+                ws.Cells[currentRow, 5, currentRow + 1, 5].Merge = true; ws.Cells[currentRow, 5].Value = "Alt";
+                ws.Cells[currentRow, 6, currentRow + 1, 6].Merge = true; ws.Cells[currentRow, 6].Value = "M³";
+
+                ws.Cells[currentRow, fabricStartCol, currentRow, maxCols].Merge = true;
+                ws.Cells[currentRow, fabricStartCol].Value = $"Valor ({(currency == "BRL" ? "Reais" : "EXW")})";
+
+                // Row 2 (Fabrics list)
+                for (int i = 0; i < uniqueFabrics.Count; i++)
                 {
-                    ws.Cells[currentRow, 3].Value = mod.Descricao;
-                    ws.Cells[currentRow, 4].Value = mod.Largura;
-                    ws.Cells[currentRow, 5].Value = mod.Profundidade;
-                    ws.Cells[currentRow, 6].Value = mod.Altura;
-                    ws.Cells[currentRow, 7].Value = mod.M3;
+                    ws.Cells[currentRow + 1, fabricStartCol + i].Value = uniqueFabrics[i]!.Nome;
+                }
 
+                // Styling Table Headers
+                var hRange = ws.Cells[currentRow, 1, currentRow + 1, maxCols];
+                hRange.Style.Font.Bold = true;
+                hRange.Style.Font.Size = 8;
+                hRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                hRange.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(224, 224, 224)); // #e0e0e0
+                hRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                hRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                foreach (var cell in hRange) { cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); }
+
+                currentRow += 2;
+
+                // Data Rows
+                int brandStartRow = currentRow;
+                foreach (var mod in brandItems)
+                {
+                    ws.Cells[currentRow, 2].Value = mod.Descricao;
+                    ws.Cells[currentRow, 3].Value = mod.Largura;
+                    ws.Cells[currentRow, 4].Value = mod.Profundidade;
+                    ws.Cells[currentRow, 5].Value = mod.Altura;
+                    ws.Cells[currentRow, 6].Value = mod.M3;
                     for (int i = 0; i < uniqueFabrics.Count; i++)
                     {
                         var fid = uniqueFabrics[i]!.Id;
@@ -111,58 +130,56 @@ public class ModuloExportService
                         else
                         {
                             ws.Cells[currentRow, fabricStartCol + i].Value = "-";
+                            ws.Cells[currentRow, fabricStartCol + i].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         }
                     }
 
-                    ws.Row(currentRow).Height = 20;
+                    ws.Row(currentRow).Height = 25;
                     currentRow++;
                 }
 
-                // Merge Brand Name & Photo
-                ws.Cells[brandStartRow, 2, currentRow - 1, 2].Merge = true;
-                ws.Cells[brandStartRow, 2].Value = brand?.Nome ?? "Outros";
-                ws.Cells[brandStartRow, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                ws.Cells[brandStartRow, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                ws.Cells[brandStartRow, 2].Style.Font.Bold = true;
+                // Brand Identification (Merged Column 1)
+                int brandEndRow = currentRow - 1;
+                ws.Cells[brandStartRow, 1, brandEndRow, 1].Merge = true;
+                ws.Cells[brandStartRow, 1].Value = brand?.Nome ?? "Outros";
+                ws.Cells[brandStartRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                ws.Cells[brandStartRow, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
+                ws.Cells[brandStartRow, 1].Style.Font.Bold = true;
 
-                ws.Cells[brandStartRow, 1, currentRow - 1, 1].Merge = true;
                 if (brand?.Imagem != null)
                 {
                     using var ms = new MemoryStream(brand.Imagem);
-                    var pic = ws.Drawings.AddPicture($"PicM_{brand.Id}", ms);
-                    pic.SetPosition(brandStartRow - 1, 5, 0, 5);
-                    pic.SetSize(60, 60);
+                    var pic = ws.Drawings.AddPicture($"PicB_{brand.Id}_{brandStartRow}", ms);
+                    pic.SetPosition(brandStartRow - 1, 5, 0, 5); 
+                    pic.SetSize(70, 70); 
+                    
+                    if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 85;
                 }
-                if (currentRow - brandStartRow == 1) ws.Row(brandStartRow).Height = 65;
 
-                // Borders for the whole brand block
-                var brandBlock = ws.Cells[brandStartRow, 1, currentRow - 1, fabricStartCol + uniqueFabrics.Count - 1];
-                brandBlock.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                brandBlock.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                brandBlock.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                brandBlock.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                
-                // Internal borders
-                for (int r = brandStartRow; r < currentRow; r++)
-                {
-                    for (int c = 3; c < fabricStartCol + uniqueFabrics.Count; c++)
-                    {
-                        ws.Cells[r, c].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-                    }
-                }
+                // Final Borders and formatting for the brand table
+                var tableRange = ws.Cells[brandStartRow, 1, brandEndRow, maxCols];
+                foreach (var cell in tableRange) { cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); }
+                ws.Cells[brandStartRow, 2, brandEndRow, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                ws.Cells[brandStartRow, 3, brandEndRow, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                ws.Cells[brandStartRow, fabricStartCol, brandEndRow, maxCols].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+
+                currentRow++; // Gap
             }
         }
 
-        ws.Cells[startRow + 2, fabricStartCol, currentRow - 1, fabricStartCol + uniqueFabrics.Count - 1].Style.Numberformat.Format = "_-$* #,##0.00_-";
-        ws.Cells[startRow + 2, 4, currentRow - 1, 7].Style.Numberformat.Format = "#,##0.00";
+        // Apply global number formats
+        string curSymbol = currency == "BRL" ? "R$ " : "$ ";
+        ws.Cells[5, fabricStartCol, currentRow, maxCols].Style.Numberformat.Format = $"\"{curSymbol}\"#,##0.00";
+        ws.Cells[5, 3, currentRow, 6].Style.Numberformat.Format = "#,##0.00";
 
-        ws.Column(1).Width = 10;
-        ws.Column(2).Width = 15;
-        ws.Column(3).Width = 30;
-        for (int i = 0; i < uniqueFabrics.Count; i++)
-        {
-            ws.Column(fabricStartCol + i).Width = 14;
-        }
+        // Column widths
+        ws.Column(1).Width = 22; // Modelo
+        ws.Column(2).Width = 35; // Módulo
+        ws.Column(3).Width = 7;
+        ws.Column(4).Width = 7;
+        ws.Column(5).Width = 7;
+        ws.Column(6).Width = 7;
+        for (int i = 0; i < uniqueFabrics.Count; i++) ws.Column(fabricStartCol + i).Width = 12;
 
         return package.GetAsByteArray();
     }
@@ -170,10 +187,10 @@ public class ModuloExportService
     private decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, string? fornecedorName)
     {
         if (currency == "BRL") return valorTecido;
-        if (config == null || cotacao <= 0) return 0;
+        if (config == null || cotacao == 0) return 0;
 
-        string sName = (fornecedorName ?? "").ToLower();
-        bool isFerguile = sName.Contains("ferguile") || sName.Contains("livintus");
+        bool isFerguile = !string.IsNullOrEmpty(fornecedorName) && 
+            (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus"));
 
         decimal cotacaoRisco = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
         if (cotacaoRisco <= 0) return 0;

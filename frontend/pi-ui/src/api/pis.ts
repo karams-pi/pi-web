@@ -1,4 +1,4 @@
-import { apiDelete, apiGet, apiPost, apiPut } from "./api";
+import { API_BASE, apiDelete, apiGet, apiPost, apiPut } from "./api";
 import type { ProformaInvoice } from "./types";
 
 export async function listPis() {
@@ -32,7 +32,7 @@ export async function deletePi(id: number) {
 }
 
 export async function exportPiExcel(id: number) {
-  const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/pis/${id}/excel`, {
+  const res = await fetch(`${API_BASE}/api/pis/${id}/excel`, {
     headers: {
         // Add auth if needed, but current api.ts seems to use simple fetch wrappers
     }
