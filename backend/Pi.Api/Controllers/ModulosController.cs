@@ -59,12 +59,12 @@ public class ModulosController : ControllerBase
 
         var modules = await query.ToListAsync();
         
-        // Load latest config if needed
-        var config = await _db.Configuracoes
+        // Load all configs to handle supplier-specific logic
+        var configs = await _db.Configuracoes
             .OrderByDescending(c => c.DataConfig)
-            .FirstOrDefaultAsync();
+            .ToListAsync();
 
-        var fileBytes = _exportService.ExportToExcel(modules, request.Currency, request.Cotacao, config);
+        var fileBytes = _exportService.ExportToExcel(modules, request.Currency, request.Cotacao, configs);
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RelatorioModulos.xlsx");
     }
 

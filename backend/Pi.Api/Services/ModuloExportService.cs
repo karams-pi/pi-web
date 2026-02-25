@@ -8,7 +8,7 @@ namespace Pi.Api.Services;
 
 public class ModuloExportService
 {
-    public byte[] ExportToExcel(List<Modulo> modules, string currency, decimal cotacao, Configuracao? config)
+    public byte[] ExportToExcel(List<Modulo> modules, string currency, decimal cotacao, List<Configuracao> configs)
     {
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Relatório de Módulos");
@@ -124,7 +124,11 @@ public class ModuloExportService
                         var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid);
                         if (mt != null)
                         {
-                            decimal val = CalcPrice(mt.ValorTecido, currency, cotacao, config, mod.Fornecedor?.Nome);
+                            // Find best config (Supplier-specific or Global)
+                            var modConfig = configs.FirstOrDefault(c => c.IdFornecedor == mod.IdFornecedor) 
+                                            ?? configs.FirstOrDefault(c => c.IdFornecedor == null);
+
+                            decimal val = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.Fornecedor?.Nome);
                             ws.Cells[currentRow, fabricStartCol + i].Value = val;
                         }
                         else
