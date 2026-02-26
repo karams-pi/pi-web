@@ -299,7 +299,7 @@ export default function ModulosPage() {
       setIsPrintModalOpen(true);
   }
 
-  async function onConfirmPrint(scope: 'screen' | 'all', currency: 'BRL' | 'EXW') {
+  async function onConfirmPrint(scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) {
       let list = items;
       if (scope === 'all') {
           try {
@@ -333,7 +333,8 @@ export default function ModulosPage() {
               marca: marcaMap,
               tecido: tecidoMap
           },
-          marcasFull: new Map(marcas.map(m => [m.id, m]))
+          marcasFull: new Map(marcas.map(m => [m.id, m])),
+          validityDays
       });
       setIsPrintModalOpen(false);
   }

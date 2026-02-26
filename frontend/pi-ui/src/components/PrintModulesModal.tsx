@@ -3,7 +3,7 @@ import { useState } from 'react';
 interface PrintModulesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW') => void;
+  onConfirm: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) => void;
   onExcelConfirm?: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW') => void;
   loading?: boolean;
 }
@@ -11,6 +11,7 @@ interface PrintModulesModalProps {
 export function PrintModulesModal({ isOpen, onClose, onConfirm, onExcelConfirm, loading }: PrintModulesModalProps) {
   const [scope, setScope] = useState<'screen' | 'all'>('screen');
   const [currency, setCurrency] = useState<'BRL' | 'EXW'>('BRL');
+  const [validityDays, setValidityDays] = useState<number>(30);
 
   if (!isOpen) return null;
 
@@ -70,8 +71,22 @@ export function PrintModulesModal({ isOpen, onClose, onConfirm, onExcelConfirm, 
                 />
                 Dólar (EXW)
               </label>
+
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: '#94a3b8' }}>Validade:</span>
+                <input 
+                  type="number" 
+                  className="cl-input" 
+                  style={{ width: '60px', padding: '4px 8px', height: '32px' }}
+                  value={validityDays}
+                  onChange={(e) => setValidityDays(Number(e.target.value))}
+                  min={1}
+                />
+                <span style={{ fontSize: 12, color: '#94a3b8' }}>dias</span>
+              </div>
             </div>
           </div>
+
 
           <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
             <button className="btn btn-secondary" onClick={onClose} disabled={loading}>
@@ -79,7 +94,7 @@ export function PrintModulesModal({ isOpen, onClose, onConfirm, onExcelConfirm, 
             </button>
             <button 
               className="btn btn-primary" 
-              onClick={() => onConfirm(scope, currency)}
+              onClick={() => onConfirm(scope, currency, validityDays)}
               disabled={loading}
               style={{ background: '#333' }}
             >

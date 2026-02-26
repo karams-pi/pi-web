@@ -13,6 +13,7 @@ interface PrintModulesReportOptions {
     tecido: Map<number, string>;
   };
   marcasFull?: Map<number, Marca>;
+  validityDays?: number;
 }
 
 export function printModulesReport({
@@ -22,6 +23,7 @@ export function printModulesReport({
   config,
   maps,
   marcasFull,
+  validityDays = 30,
 }: PrintModulesReportOptions) {
   if (!modules || modules.length === 0) {
     alert("Sem dados para imprimir");
@@ -306,11 +308,14 @@ export function printModulesReport({
       </head>
       <body>
         <div class="header">
-            <h1 style="float: left; margin-right: 20px;">${title}</h1>
+            <h1 style="float: left; margin-right: 20px;">
+              ${title}
+              <span style="color: #fff; font-size: 10px; font-weight: normal; margin-left: 10px;">Cotação na impressão: ${fmt(cotacao)}</span>
+            </h1>
             <div style="float: right; text-align: right;">
                 <div class="meta" style="margin-bottom: 2px;"><strong>Fecha de Emisión:</strong> ${new Date().toLocaleDateString("pt-BR")}</div>
                 <div style="font-size: 11px; color: #d9534f; font-weight: bold;">
-                    * Esta lista de precios es válida por 30 días a partir de la fecha de emisión.
+                    * Esta lista de precios es válida por ${validityDays} días a partir de la fecha de emisión.
                 </div>
             </div>
             <div style="clear: both;"></div>
