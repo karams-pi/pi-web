@@ -8,7 +8,13 @@ export default function HomeMenu() {
         <div className="home-logos">
           <img src="/logo-karams.png" alt="Karams" style={{ height: 60 }} />
           <div className="logo-divider" />
-          <img src="/logo-seawise.png" alt="SEAWISE" style={{ height: 50 }} />
+          <img src="/logo-koyo.jpeg" alt="Koyo" style={{ height: 55 }} />
+          <div className="logo-divider" />
+          <img src="/logo-seawise.png" alt="SEAWISE" className="seawise-logo" style={{ height: 50 }} />
+          <div className="logo-divider" />
+          <img src="/logo-ferguile_.png" alt="Ferguile" style={{ height: 45 }} />
+          <div className="logo-divider" />
+          <img src="/logo-livintus.png" alt="Livintus" style={{ height: 45 }} />
         </div>
       </section>
 

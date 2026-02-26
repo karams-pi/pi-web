@@ -65,6 +65,34 @@ export default function MarcasPage() {
     }
     return res;
   }, [items, search, filterStatus]);
+  
+  // Clipboard paste handler for images
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const blob = items[i].getAsFile();
+          if (blob) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const result = reader.result as string;
+              const base64 = result.split(",")[1];
+              setForm(prev => ({ ...prev, imagem: base64 }));
+            };
+            reader.readAsDataURL(blob);
+          }
+        }
+      }
+    };
+
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+  }, [isOpen]);
 
   function openCreate() {
     setEditing(null);
@@ -281,7 +309,7 @@ export default function MarcasPage() {
                     </div>
                   </div>
                   <div className="field fieldFull">
-                    <div className="label">Imagem</div>
+                    <div className="label">Imagem (Dica: Você pode colar um print aqui com Ctrl+V)</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <input 
                             type="file" 

@@ -345,10 +345,14 @@ a {
 
 .home-logos {
   display: flex;
-  gap: 40px;
+  gap: 32px; /* Slightly reduced gap to fit more logos */
   align-items: center;
   justify-content: center;
-  padding: 32px;
+  padding: 20px 48px;
+  background: rgba(255, 255, 255, 0.85); 
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .logo-divider {
@@ -361,13 +365,17 @@ a {
   height: 48px;
   width: auto;
   object-fit: contain;
-  filter: grayscale(0.2) brightness(1.1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   transition: all 0.4s ease;
 }
 
 .home-logos img:hover {
-  filter: grayscale(0) brightness(1.2);
+  filter: brightness(1.5) drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
   transform: scale(1.1);
+}
+
+.home-logos img:hover.seawise-logo {
+  filter: brightness(1.1);
 }
 
 .home-menu-section {
