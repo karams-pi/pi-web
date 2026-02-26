@@ -103,6 +103,7 @@ export type Configuracao = {
   valorFOBDespCourier: number;
   portoEmbarque?: string;
   condicoesPagamento?: string;
+  idFornecedor?: number | null;
 };
 
 export type Frete = {

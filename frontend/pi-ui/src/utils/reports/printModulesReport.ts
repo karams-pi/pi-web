@@ -250,6 +250,20 @@ export function printModulesReport({
       `;
   });
 
+  // 5. Calculate hidden quotation display value
+  let hiddenCotacaoText = "";
+  if (currency === "EXW" && config && cotacao) {
+    const fornecedorName = config.idFornecedor ? (maps.fornecedor.get(config.idFornecedor) || "").toLowerCase() : "";
+    const isFerguile = fornecedorName.includes("ferguile") || fornecedorName.includes("livintus");
+    
+    // Logic based on supplier type:
+    // - Karams/Koyo: Risk Quotation (cotacao - config.valorReducaoDolar)
+    // - Ferguile/Livintus: Fixed Quotation (config.valorReducaoDolar)
+    const valor = isFerguile ? config.valorReducaoDolar : (cotacao - config.valorReducaoDolar);
+    
+    hiddenCotacaoText = `Cotação na impressão: ${fmt(valor)}`;
+  }
+
   const html = `
     <html>
       <head>
@@ -310,7 +324,7 @@ export function printModulesReport({
         <div class="header">
             <h1 style="float: left; margin-right: 20px;">
               ${title}
-              <span style="color: #fff; font-size: 10px; font-weight: normal; margin-left: 10px;">Cotação na impressão: ${fmt(cotacao)}</span>
+              <span style="color: #fff; font-size: 10px; font-weight: normal; margin-left: 10px;">${hiddenCotacaoText}</span>
             </h1>
             <div style="float: right; text-align: right;">
                 <div class="meta" style="margin-bottom: 2px;"><strong>Fecha de Emisión:</strong> ${new Date().toLocaleDateString("pt-BR")}</div>
