@@ -16,9 +16,8 @@
 }
 
 .cl-page {
-  padding: 16px;
+  /* Removed local background to use global app background */
   color: var(--text);
-  background: linear-gradient(180deg, #070b14, #0b1220);
   min-height: calc(100vh - 64px);
 }
 
@@ -77,11 +76,11 @@
 }
 
 .cl-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  /* overflow: hidden; Removed to allow dropdowns to show */
 }
 
 .cl-tableWrap {

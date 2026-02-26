@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Download } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import { importKarams, importKoyo, importFerguile, importLivintus } from '../api/importacao';
 import { listFornecedores } from '../api/fornecedores';
 import type { Fornecedor } from '../api/types';
@@ -73,7 +75,7 @@ export default function ImportacaoPage() {
 
   return (
     <div className="cl-page">
-      <h1 className="cl-title">Importação de Tabela de Preços</h1>
+      <PageHeader title="Importação de Tabela de Preços" icon={<Download size={24} />} />
       
       <div className="cl-card" style={{ maxWidth: '800px', margin: '0 auto', padding: '24px' }}>
         {message && (

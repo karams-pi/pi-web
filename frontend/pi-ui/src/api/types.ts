@@ -84,8 +84,8 @@ export type Cliente = {
   cargoFuncao?: string | null;
   observacoes?: string | null;
   portoDestino?: string | null;
-  criadoEm: string;
-  atualizadoEm: string;
+  criadoEm?: string;
+  atualizadoEm?: string;
 };
 
 export type Configuracao = {

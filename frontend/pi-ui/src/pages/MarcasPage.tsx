@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import "./ClientesPage.css";
 
 import type { Marca } from "../api/types";
+import { Tag } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import {
   createMarca,
   deleteMarca,
@@ -136,10 +138,9 @@ export default function MarcasPage() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Modelos</h1>
-
-      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+    <div className="cl-page">
+      <PageHeader title="Modelos" icon={<Tag size={24} />} />
+      <div className="cl-toolbar">
         <input
           placeholder="Buscar modelo..."
           value={search}

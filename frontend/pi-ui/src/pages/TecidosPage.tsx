@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./ClientesPage.css";
 import type { Tecido } from "../api/types";
+import { Scissors } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import {
   createTecido,
   deleteTecido,
@@ -107,17 +109,9 @@ export default function TecidosPage() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Tecidos</h1>
-
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          marginBottom: 12,
-        }}
-      >
+    <div className="cl-page">
+      <PageHeader title="Tecidos" icon={<Scissors size={24} />} />
+      <div className="cl-toolbar">
         <input
           placeholder="Buscar..."
           value={search}

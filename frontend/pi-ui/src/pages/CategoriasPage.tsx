@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./ClientesPage.css"; // Reuse modal styles from here
 import type { Categoria } from "../api/types";
+import { Layers } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import {
   createCategoria,
   deleteCategoria,
@@ -109,17 +111,9 @@ export default function CategoriasPage() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Categorias</h1>
-
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          marginBottom: 12,
-        }}
-      >
+    <div className="cl-page">
+      <PageHeader title="Categorias" icon={<Layers size={24} />} />
+      <div className="cl-toolbar">
         <input
           placeholder="Buscar..."
           value={search}

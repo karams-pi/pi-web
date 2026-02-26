@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Info } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import { getVersion, type VersionInfo } from '../api/version';
 import './ClientesPage.css';
 
@@ -28,9 +30,7 @@ export default function SobrePage() {
 
   return (
     <div className="cl-page">
-      <h1 className="cl-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <span style={{ fontSize: '28px' }}>ℹ️</span> Sobre
-      </h1>
+      <PageHeader title="Sobre" icon={<Info size={24} />} />
 
       {loading && (
         <div className="cl-card" style={{ textAlign: 'center', padding: '40px' }}>

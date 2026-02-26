@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { HelpCircle, Calculator } from "lucide-react"; // Import icons
+import { HelpCircle, Calculator, Grid } from "lucide-react"; // Import icons
 import "./ClientesPage.css";
 
-import type { Categoria, Fornecedor, Marca, Modulo, ModuloTecido, Tecido, Configuracao } from "../api/types";
+import PageHeader from "../components/PageHeader";
+import type { Modulo, ModuloTecido, Configuracao, Categoria, Marca, Fornecedor, Tecido } from "../api/types";
 
 import {
   createModulo,
@@ -379,11 +380,12 @@ export default function ModulosPage() {
 
   return (
     <div className="list-container">
+      <PageHeader title="Módulos" icon={<Grid size={24} />} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1>Módulos</h1>
+        {/* Header content moved to PageHeader if it was just the H1 */}
       </div>
 
-      <div style={{ background: '#1a1a2e', padding: 16, borderRadius: 8, marginBottom: 16, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div style={{ background: 'rgba(255, 255, 255, 0.04)', backdropFilter: 'blur(8px)', border: '1px solid var(--line)', padding: 16, borderRadius: 8, marginBottom: 16, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ width: 220 }}>
           <SearchableSelect
             value={filterFornecedor}

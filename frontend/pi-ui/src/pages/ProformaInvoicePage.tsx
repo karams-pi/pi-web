@@ -11,6 +11,8 @@ import { listClientes } from "../api/clientes";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
+import { FileText } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
 
 type FormState = {
@@ -708,10 +710,11 @@ export default function ProformaInvoicePage() {
   if (loading) return <div style={{ padding: 16 }}>Carregando...</div>;
 
   return (
-    <div style={{ padding: 16, maxWidth: "100%", overflowX: "hidden" }}>
+    <div>
+      <PageHeader title="Proforma Invoice" icon={<FileText size={24} />} />
       
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Proforma Invoice</h1>
+        {/* H1 was here */}
         <div style={{ display: "flex", gap: 10 }}>
             {form.id && (
                 <button

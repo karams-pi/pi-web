@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import './ClientesPage.css';
 
 // importe TIPOS como type-only
-import type { Cliente, PagedResult } from '../api/clientes';
+import type { PagedResult } from '../api/clientes';
+import { Users } from "lucide-react";
+import PageHeader from "../components/PageHeader";
+import type { Cliente } from "../api/types";
 
 // importe as FUNÇÕES normalmente
 import {
@@ -169,144 +172,145 @@ export default function ClientesPage() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Clientes</h1>
-
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          alignItems: 'center',
-          marginBottom: 12,
-        }}>
-        <input
-          placeholder='Buscar por nome, empresa, e-mail...'
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          style={{ flex: 1, padding: 8 }}
-        />
-        <button className="btn btn-primary" onClick={openCreate}>Novo</button>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-          <PrintExportButtons
-            onPrint={handlePrint}
-            onExcel={handleExcel}
-            disabled={loading}
-          />
-      </div>
-
-      <div
-        style={{
-          marginBottom: 8,
-          display: 'flex',
-          gap: 8,
-          alignItems: 'center',
-        }}>
-        <span>Total: {data?.total ?? 0}</span>
-        <label>
-          Page size:
-          <select
-            value={pageSize}
+    <div className="cl-page">
+      <PageHeader title="Clientes" icon={<Users size={24} />} />
+      <div className="cl-toolbar">
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+            marginBottom: 12,
+          }}>
+          <input
+            placeholder='Buscar por nome, empresa, e-mail...'
+            value={search}
             onChange={(e) => {
-              setPageSize(Number(e.target.value));
+              setSearch(e.target.value);
               setPage(1);
-            }}>
-            {[10, 20, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+            }}
+            style={{ flex: 1, padding: 8 }}
+          />
+          <button className="btn btn-primary" onClick={openCreate}>Novo</button>
+        </div>
 
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      {loading ? (
-        <div>Carregando...</div>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={th}>Nome</th>
-              <th style={th}>Empresa</th>
-              <th style={th}>NIT</th>
-              <th style={th}>E-mail</th>
-              <th style={th}>Telefone</th>
-              <th style={th}>País</th>
-              <th style={th}>Cidade</th>
-              <th style={th}>Endereço</th>
-              <th style={th}>CEP</th>
-              <th style={th}>Contato</th>
-              <th style={th}>Cargo</th>
-              <th style={th}>Obs.</th>
-              <th style={th}>Ativo</th>
-              <th style={th}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.items.map((c) => (
-              <tr key={c.id}>
-                <td style={td}>{c.nome}</td>
-                <td style={td}>{c.empresa || '-'}</td>
-                <td style={td}>{c.nit || '-'}</td>
-                <td style={td}>{c.email || '-'}</td>
-                <td style={td}>{c.telefone || '-'}</td>
-                <td style={td}>{c.pais || "-"}</td>
-                <td style={td}>{c.cidade || "-"}</td>
-                <td style={td}>{c.endereco || "-"}</td>
-                <td style={td}>{c.cep || "-"}</td>
-                <td style={td}>{c.pessoaContato || "-"}</td>
-                <td style={td}>{c.cargoFuncao || "-"}</td>
-                <td style={td} title={c.observacoes || ""}>
-                  {(c.observacoes || "-").slice(0, 24)}
-                  {(c.observacoes?.length ?? 0) > 24 ? "…" : ""}
-                </td>
-                <td style={td}>{c.ativo ? 'Sim' : 'Não'}</td>
-                <td style={td}>
-                  <button className="btn btn-sm" onClick={() => openEdit(c)}>Editar</button>{' '}
-                  <button className="btn btn-danger btn-sm" onClick={() => onDelete(c)}>
-                    Remover
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {data && data.items.length === 0 && (
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+            <PrintExportButtons
+              onPrint={handlePrint}
+              onExcel={handleExcel}
+              disabled={loading}
+            />
+        </div>
+
+        <div
+          style={{
+            marginBottom: 8,
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+          }}>
+          <span>Total: {data?.total ?? 0}</span>
+          <label>
+            Page size:
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}>
+              {[10, 20, 50, 100].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {loading ? (
+          <div>Carregando...</div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
               <tr>
-                <td colSpan={6} style={{ padding: 12, textAlign: 'center' }}>
-                  Nenhum cliente encontrado
-                </td>
+                <th style={th}>Nome</th>
+                <th style={th}>Empresa</th>
+                <th style={th}>NIT</th>
+                <th style={th}>E-mail</th>
+                <th style={th}>Telefone</th>
+                <th style={th}>País</th>
+                <th style={th}>Cidade</th>
+                <th style={th}>Endereço</th>
+                <th style={th}>CEP</th>
+                <th style={th}>Contato</th>
+                <th style={th}>Cargo</th>
+                <th style={th}>Obs.</th>
+                <th style={th}>Ativo</th>
+                <th style={th}>Ações</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {data?.items.map((c) => (
+                <tr key={c.id}>
+                  <td style={td}>{c.nome}</td>
+                  <td style={td}>{c.empresa || '-'}</td>
+                  <td style={td}>{c.nit || '-'}</td>
+                  <td style={td}>{c.email || '-'}</td>
+                  <td style={td}>{c.telefone || '-'}</td>
+                  <td style={td}>{c.pais || "-"}</td>
+                  <td style={td}>{c.cidade || "-"}</td>
+                  <td style={td}>{c.endereco || "-"}</td>
+                  <td style={td}>{c.cep || "-"}</td>
+                  <td style={td}>{c.pessoaContato || "-"}</td>
+                  <td style={td}>{c.cargoFuncao || "-"}</td>
+                  <td style={td} title={c.observacoes || ""}>
+                    {(c.observacoes || "-").slice(0, 24)}
+                    {(c.observacoes?.length ?? 0) > 24 ? "…" : ""}
+                  </td>
+                  <td style={td}>{c.ativo ? 'Sim' : 'Não'}</td>
+                  <td style={td}>
+                    <button className="btn btn-sm" onClick={() => openEdit(c)}>Editar</button>{' '}
+                    <button className="btn btn-danger btn-sm" onClick={() => onDelete(c)}>
+                      Remover
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {data && data.items.length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ padding: 12, textAlign: 'center' }}>
+                    Nenhum cliente encontrado
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
 
-      <div
-        style={{
-          marginTop: 12,
-          display: 'flex',
-          gap: 8,
-          alignItems: 'center',
-        }}>
-        <button
-          className="btn"
-          disabled={page <= 1}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}>
-          Anterior
-        </button>
-        <span>
-          Página {page} de {totalPages}
-        </span>
-        <button
-          className="btn"
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
-          Próxima
-        </button>
+        <div
+          style={{
+            marginTop: 12,
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+          }}>
+          <button
+            className="btn"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}>
+            Anterior
+          </button>
+          <span>
+            Página {page} de {totalPages}
+          </span>
+          <button
+            className="btn"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+            Próxima
+          </button>
+        </div>
       </div>
 
       {isOpen && (

@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, NavLink, Link } from "react-router-dom";
+import { Routes, Route, NavLink, Link } from "react-router-dom";
 import HomeMenu from "./pages/HomeMenu";
 import ClientesPage from "./pages/ClientesPage";
 import FornecedoresPage from "./pages/FornecedoresPage";
@@ -47,37 +47,41 @@ function NotFound() {
 }
 
 export default function App() {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
   return (
-    <HashRouter>
-      <div className="app">
-        <Header />
+    <div className="app">
+      <Sidebar 
+        isCollapsed={isSidebarCollapsed} 
+        setIsCollapsed={setIsSidebarCollapsed} 
+      />
+      <Header />
 
-        <main className="main">
-          <div className="container">
-            <Routes>
-              <Route path="/" element={<HomeMenu />} />
-              <Route path="/clientes" element={<ClientesPage />} />
-              <Route path="/fornecedores" element={<FornecedoresPage />} />
-              <Route path="/categorias" element={<CategoriasPage />} />
-              <Route path="/marcas" element={<MarcasPage />} />
-              <Route path="/tecidos" element={<TecidosPage />} />
-              <Route path="/modulos" element={<ModulosPage />} />
-              <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
-              <Route path="/print-pi/:id" element={<PrintPiPage />} />
-              <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
+      <main className="main">
+        <div className="container">
+          <Routes>
+            <Route path="/" element={<HomeMenu />} />
+            <Route path="/clientes" element={<ClientesPage />} />
+            <Route path="/fornecedores" element={<FornecedoresPage />} />
+            <Route path="/categorias" element={<CategoriasPage />} />
+            <Route path="/marcas" element={<MarcasPage />} />
+            <Route path="/tecidos" element={<TecidosPage />} />
+            <Route path="/modulos" element={<ModulosPage />} />
+            <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
+            <Route path="/print-pi/:id" element={<PrintPiPage />} />
+            <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
 
-              <Route path="/importacao" element={<ImportacaoPage />} />
-              <Route path="/config" element={<ConfiguracoesPage />} />
-              <Route path="/sobre" element={<SobrePage />} />
-              {/* <Route path="/precos" element={<PrecosPage />} /> */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </main>
+            <Route path="/importacao" element={<ImportacaoPage />} />
+            <Route path="/config" element={<ConfiguracoesPage />} />
+            <Route path="/sobre" element={<SobrePage />} />
+            {/* <Route path="/precos" element={<PrecosPage />} /> */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </main>
 
-        <Footer />
-      </div>
-    </HashRouter>
+      <Footer />
+    </div>
   );
 }
 
@@ -98,8 +102,91 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { 
   Menu, X, Home, Users, Truck, Layers, Tag, Scissors, 
-  Grid, FileText, Download, Settings, Info 
+  Grid, FileText, Download, Settings, Info, ChevronLeft, ChevronRight
 } from "lucide-react";
+
+function NavLinks() {
+  return (
+    <>
+      <NavLink to="/" end className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Home size={18} />
+        <span>Menu</span>
+      </NavLink>
+
+      <NavLink to="/clientes" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Users size={18} />
+        <span>Clientes</span>
+      </NavLink>
+
+      <NavLink to="/fornecedores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Truck size={18} />
+        <span>Fornecedores</span>
+      </NavLink>
+
+      <NavLink to="/categorias" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Layers size={18} />
+        <span>Categorias</span>
+      </NavLink>
+
+      <NavLink to="/marcas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Tag size={18} />
+        <span>Modelos</span>
+      </NavLink>
+
+      <NavLink to="/tecidos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Scissors size={18} />
+        <span>Tecidos</span>
+      </NavLink>
+
+      <NavLink to="/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Grid size={18} />
+        <span>Modulos</span>
+      </NavLink>
+
+      <NavLink to="/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <FileText size={18} />
+        <span>Proforma</span>
+      </NavLink>
+
+      <NavLink to="/importacao" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Download size={18} />
+        <span>Importar</span>
+      </NavLink>
+
+      <NavLink to="/config" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Settings size={18} />
+        <span>Config</span>
+      </NavLink>
+
+      <NavLink to="/sobre" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Info size={18} />
+        <span>Sobre</span>
+      </NavLink>
+    </>
+  );
+}
+
+function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean, setIsCollapsed: (v: boolean) => void }) {
+  return (
+    <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
+      <button 
+        className="sidebar-toggle" 
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+      </button>
+
+      <Link to="/" className="brand">
+        PI Web
+      </Link>
+
+      <nav className="nav">
+        <NavLinks />
+      </nav>
+    </aside>
+  );
+}
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -127,60 +214,7 @@ function Header() {
           </button>
 
           <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
-            <NavLink to="/" end className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Home size={18} />
-              <span>Menu</span>
-            </NavLink>
-
-            <NavLink to="/clientes" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Users size={18} />
-              <span>Clientes</span>
-            </NavLink>
-
-            <NavLink to="/fornecedores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Truck size={18} />
-              <span>Fornecedores</span>
-            </NavLink>
-
-            <NavLink to="/categorias" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Layers size={18} />
-              <span>Categorias</span>
-            </NavLink>
-
-            <NavLink to="/marcas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Tag size={18} />
-              <span>Modelos</span>
-            </NavLink>
-
-            <NavLink to="/tecidos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Scissors size={18} />
-              <span>Tecidos</span>
-            </NavLink>
-
-            <NavLink to="/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Grid size={18} />
-              <span>Modulos</span>
-            </NavLink>
-
-            <NavLink to="/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <FileText size={18} />
-              <span>Proforma</span>
-            </NavLink>
-
-            <NavLink to="/importacao" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Download size={18} />
-              <span>Importar</span>
-            </NavLink>
-
-            <NavLink to="/config" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Settings size={18} />
-              <span>Config</span>
-            </NavLink>
-
-            <NavLink to="/sobre" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-              <Info size={18} />
-              <span>Sobre</span>
-            </NavLink>
+            <NavLinks />
           </nav>
         </div>
       </div>

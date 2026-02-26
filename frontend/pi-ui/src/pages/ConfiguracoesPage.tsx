@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Settings } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 import {
   type Configuracao,
   createConfig,
@@ -556,10 +558,12 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="cfg-page">
+      <PageHeader title="Configurações do Sistema" icon={<Settings size={24} />} />
+      
       <div className="cfg-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-                <h2 className="cfg-title">Configurações do Sistema</h2>
+                {/* H2 title was here */}
                 <p className="cfg-subtitle">
                 Defina os valores padrão utilizados nos cálculos do sistema. As alterações geram um novo registro histórico para auditoria.
                 </p>

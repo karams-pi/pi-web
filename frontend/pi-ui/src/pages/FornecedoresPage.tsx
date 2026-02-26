@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ClientesPage.css'; // Reuse existing styles or create new ones if needed
+import { Truck } from "lucide-react";
+import PageHeader from "../components/PageHeader";
 
 import type { Fornecedor } from '../api/types';
 import {
@@ -125,10 +127,9 @@ export default function FornecedoresPage() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Fornecedores</h1>
-
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+    <div className="cl-page">
+      <PageHeader title="Fornecedores" icon={<Truck size={24} />} />
+      <div className="cl-toolbar">
         <input
           placeholder="Buscar por nome, CNPJ..."
           value={search}
