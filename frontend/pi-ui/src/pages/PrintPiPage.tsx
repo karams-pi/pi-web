@@ -72,15 +72,16 @@ export default function PrintPiPage() {
   const dateObj = safeDate(pi?.dataPi);
 
   const displayClient = cliente || (pi as any)?.cliente;
-  const incoterm = pi?.frete?.nome || "EXW";
+  const incoterm = pi?.frete?.nome || (pi as any)?.Frete?.Nome || "EXW";
   const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
   
   const processedData = useMemo(() => {
     if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0 };
 
     const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
-    pi.piItens.forEach(item => {
-        const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+    pi.piItens.forEach(i => {
+        const item = i as any;
+        const mt = modulosTecidos.find(m => m.id === (item.idModuloTecido ?? item.IdModuloTecido));
         const marca = mt?.modulo?.marca?.nome || "Outros";
         if (!itemsByMarca[marca]) itemsByMarca[marca] = [];
         itemsByMarca[marca].push({ item, mt });
@@ -190,14 +191,18 @@ export default function PrintPiPage() {
     let totalM3 = 0;
     let totalQty = 0;
 
-    pi.piItens.forEach(item => {
-        const qty = Number(item.quantidade) || 0;
+    pi.piItens.forEach(i => {
+        const item = i as any;
+        const qty = Number(item.quantidade ?? item.Quantidade) || 0;
         totalQty += qty;
-        totalM3 += (Number(item.m3) || 0) * qty;
+        totalM3 += (Number(item.m3 ?? item.M3) || 0) * qty;
+        
         if (currency === "BRL") {
-            totalValue += (Number(item.valorFinalItemBRL) || 0);
+            totalValue += (Number(item.valorFinalItemBRL ?? item.ValorFinalItemBRL) || 0);
         } else {
-            totalValue += ((Number(item.valorEXW) || 0) * qty);
+            const exw = (Number(item.valorEXW ?? item.ValorEXW) || 0) * qty;
+            const freight = (Number(item.valorFreteRateadoUSD ?? item.ValorFreteRateadoUSD) || 0) * qty;
+            totalValue += exw + (showFreight ? freight : 0);
         }
     });
 
@@ -528,15 +533,17 @@ export default function PrintPiPage() {
                                     {/* Freight: Only for non-EXW */}
                                     {showFreight && (
                                         <td style={{ border: "1px solid #000", textAlign: "right", background: "#fefce8" }}>
-                                            {currency === "BRL" ? `R$ ${fmt(item.valorFreteRateadoBRL)}` : `$ ${fmt(item.valorFreteRateadoUSD)}`}
+                                            {currency === "BRL" ? 
+                                                `R$ ${fmt(item.valorFreteRateadoBRL ?? (item as any).ValorFreteRateadoBRL)}` : 
+                                                `$ ${fmt(item.valorFreteRateadoUSD ?? (item as any).ValorFreteRateadoUSD)}`}
                                         </td>
                                     )}
 
                                     {/* Unit EXW: Per Item */}
                                     {currency === "BRL" ? (
-                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#f0f9ff" }}>R$ {fmt(item.valorFinalItemBRL / (item.quantidade || 1))}</td>
+                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#f0f9ff" }}>R$ {fmt((item.valorFinalItemBRL ?? (item as any).ValorFinalItemBRL) / ((item.quantidade ?? (item as any).Quantidade) || 1))}</td>
                                     ) : (
-                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW)}</td>
+                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW ?? (item as any).ValorEXW)}</td>
                                     )}
                                     
                                     {/* Total Group EXW: Broken down by Fabric */}
@@ -591,7 +598,7 @@ export default function PrintPiPage() {
               <p><strong>Marca:</strong> Karams</p>
               <p><strong>NCM:</strong> 94016100</p>
               <p><strong>Producto:</strong> {fmt(processedData.totalSofaQty, 0)}</p>
-              <p><strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? `R$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + (Number(i.valorFinalItemBRL) || 0), 0))}` : `$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.valorEXW) || 0) * (Number(i.quantidade) || 0)), 0))}`}</p>
+              <p><strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? `R$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + (Number(i.valorFinalItemBRL ?? i.ValorFinalItemBRL) || 0), 0))}` : `$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.valorEXW ?? i.ValorEXW) || 0) * (Number(i.quantidade ?? i.Quantidade) || 0) + (Number(i.valorFreteRateadoUSD ?? i.ValorFreteRateadoUSD) || 0) * (Number(i.quantidade ?? i.Quantidade) || 0)), 0))}`}</p>
               <p><strong>CBM M³:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
               <p><strong>P.N. TOTAL:</strong></p>
               <p><strong>P.B. TOTAL:</strong></p>

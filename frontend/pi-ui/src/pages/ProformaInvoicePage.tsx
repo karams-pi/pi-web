@@ -147,7 +147,7 @@ export default function ProformaInvoicePage() {
   useEffect(() => {
     // Recalcular rateio quando itens mudarem ou totais de frete mudarem
     recalcularRateio();
-  }, [itens.length, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config]); 
+  }, [itens, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config]); 
 
   // Load config when supplier changes
   useEffect(() => {
@@ -516,6 +516,8 @@ export default function ProformaInvoicePage() {
   };
 
   async function salvar() {
+    // Garantir que o rateio está atualizado antes de salvar
+    recalcularRateio();
     try {
       if (!form.idCliente) {
         alert("Selecione um cliente");
@@ -607,30 +609,31 @@ export default function ProformaInvoicePage() {
         if (itensApi && Array.isArray(itensApi)) {
            const novosItens: ItemGrid[] = itensApi.map((item: any) => {
 
-               const mt = modulosTecidos.find(m => m.id === item.idModuloTecido || m.id === item.IdModuloTecido);
+               const idModuloTecido = item.idModuloTecido || item.IdModuloTecido;
+               const mt = modulosTecidos.find(m => m.id === idModuloTecido);
                
-               const largura = item.largura || item.Largura || (mt as any)?.modulo?.largura || 0;
-               const profundidade = item.profundidade || item.Profundidade || (mt as any)?.modulo?.profundidade || 0;
-               const altura = item.altura || item.Altura || (mt as any)?.modulo?.altura || 0;
-               const pa = item.pa || item.Pa || (mt as any)?.modulo?.pa || 0;
-               const m3 = item.m3 || item.M3 || (mt as any)?.modulo?.m3 || (largura * profundidade * altura);
+               const largura = item.largura ?? item.Largura ?? (mt as any)?.modulo?.largura ?? 0;
+               const profundidade = item.profundidade ?? item.Profundidade ?? (mt as any)?.modulo?.profundidade ?? 0;
+               const altura = item.altura ?? item.Altura ?? (mt as any)?.modulo?.altura ?? 0;
+               const pa = item.pa ?? item.Pa ?? (mt as any)?.modulo?.pa ?? 0;
+               const m3 = item.m3 ?? item.M3 ?? (mt as any)?.modulo?.m3 ?? (largura * profundidade * altura);
 
                return {
                    id: item.id || item.Id,
                    tempId: Date.now() + Math.random(),
-                   idModuloTecido: item.idModuloTecido || item.IdModuloTecido,
+                   idModuloTecido,
                    moduloTecido: mt,
-                   quantidade: item.quantidade || item.Quantidade,
+                   quantidade: item.quantidade ?? item.Quantidade,
                    largura,
                    profundidade,
                    altura,
                    pa,
                    m3,
-                   valorEXW: item.valorEXW || item.ValorEXW,
-                   valorFreteRateadoBRL: item.valorFreteRateadoBRL || item.ValorFreteRateadoBRL,
-                   valorFreteRateadoUSD: item.valorFreteRateadoUSD || item.ValorFreteRateadoUSD,
-                   valorFinalItemBRL: item.valorFinalItemBRL || item.ValorFinalItemBRL,
-                   valorFinalItemUSDRisco: item.valorFinalItemUSDRisco || item.ValorFinalItemUSDRisco,
+                   valorEXW: item.valorEXW ?? item.ValorEXW ?? 0,
+                   valorFreteRateadoBRL: item.valorFreteRateadoBRL ?? item.ValorFreteRateadoBRL ?? 0,
+                   valorFreteRateadoUSD: item.valorFreteRateadoUSD ?? item.ValorFreteRateadoUSD ?? 0,
+                   valorFinalItemBRL: item.valorFinalItemBRL ?? item.ValorFinalItemBRL ?? 0,
+                   valorFinalItemUSDRisco: item.valorFinalItemUSDRisco ?? item.ValorFinalItemUSDRisco ?? 0,
                    exwTooltip: "Cálculo importado",
                    freteBrlTooltip: "Cálculo importado",
                    freteUsdTooltip: "Cálculo importado",

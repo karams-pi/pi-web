@@ -70,7 +70,7 @@ export default function PrintPiFerguilePage() {
 
   const dateObj = safeDate(pi?.dataPi);
   const displayClient = cliente || (pi as any)?.cliente;
-  const incoterm = pi?.frete?.nome || "FCA";
+  const incoterm = pi?.frete?.nome || (pi as any)?.Frete?.Nome || "EXW";
   const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
 
 
@@ -167,8 +167,11 @@ export default function PrintPiFerguilePage() {
     }
 
     const totalValue = rows.reduce((s, r) => {
-        if (currency === "BRL") return s + (Number(r.item.valorFinalItemBRL) || 0);
-        return s + r.totalPrice;
+        const item = r.item as any;
+        if (currency === "BRL") return s + (Number(item.valorFinalItemBRL ?? item.ValorFinalItemBRL) || 0);
+        const exw = (Number(item.valorEXW ?? item.ValorEXW) || 0) * (Number(item.quantidade ?? item.Quantidade) || 0);
+        const freight = (Number(item.valorFreteRateadoUSD ?? item.ValorFreteRateadoUSD) || 0) * (Number(item.quantidade ?? item.Quantidade) || 0);
+        return s + exw + (showFreight ? freight : 0);
     }, 0);
     const totalM3 = rows.reduce((s, r) => s + r.volM3, 0);
     const totalQty = rows.reduce((s, r) => s + r.quantidade, 0);
@@ -429,7 +432,9 @@ export default function PrintPiFerguilePage() {
                 {/* Freight: Only for non-EXW */}
                 {showFreight && (
                   <td style={{ ...cellStyle, textAlign: "right", background: "#fefce8" }}>
-                    {currency === "BRL" ? `R$ ${fmtBR(row.item.valorFreteRateadoBRL)}` : `$ ${fmtBR(row.item.valorFreteRateadoUSD)}`}
+                    {currency === "BRL" ? 
+                      `R$ ${fmtBR((row.item as any).valorFreteRateadoBRL ?? (row.item as any).ValorFreteRateadoBRL)}` : 
+                      `$ ${fmtBR((row.item as any).valorFreteRateadoUSD ?? (row.item as any).ValorFreteRateadoUSD)}`}
                   </td>
                 )}
 

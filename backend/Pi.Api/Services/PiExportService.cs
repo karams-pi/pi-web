@@ -193,8 +193,8 @@ public class PiExportService
                 ws.Cells[currentRow, 12].Value = item.Finishing;
                 ws.Cells[currentRow, 13].Value = item.Observacao;
 
-                decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : item.ValorEXW;
-                decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : (item.ValorEXW * item.Quantidade);
+                decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : (item.ValorEXW + (showFreight ? item.ValorFreteRateadoUSD : 0));
+                decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0));
 
                 if (showFreight)
                 {
@@ -209,7 +209,7 @@ public class PiExportService
                 
                 totalQty += item.Quantidade;
                 totalM3 += (item.M3 * item.Quantidade);
-                totalValue += (currency == "BRL" ? item.ValorFinalItemBRL : (item.ValorEXW * item.Quantidade));
+                totalValue += (currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0)));
                 currentRow++;
             }
 
@@ -366,8 +366,8 @@ public class PiExportService
                 ws.Cells[currentRow, 11].Value = item.ModuloTecido?.CodigoModuloTecido;
                 ws.Cells[currentRow, 12].Value = item.Observacao;
 
-                decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : item.ValorEXW;
-                decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : (item.ValorEXW * item.Quantidade);
+                decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : (item.ValorEXW + (showFreight ? item.ValorFreteRateadoUSD : 0));
+                decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0));
 
                 if (showFreight)
                 {
