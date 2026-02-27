@@ -13,6 +13,13 @@ export default function PrintPiPage() {
   const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const urlParams = useMemo(() => {
+    const hash = window.location.hash;
+    const searchPart = hash.includes('?') ? hash.split('?')[1] : '';
+    return new URLSearchParams(searchPart || window.location.search);
+  }, []);
+  const currency = (urlParams.get("currency") as "BRL" | "EXW") || "EXW";
+
   useEffect(() => {
     async function load() {
       if (!id) return;
@@ -20,6 +27,7 @@ export default function PrintPiPage() {
         // 1. Fetch PI first
         const piData = await getPi(Number(id));
         setPi(piData);
+        // ...
 
         // 2. Fetch others in parallel
         const promises: Promise<any>[] = [listModulosTecidos()];
@@ -53,7 +61,7 @@ export default function PrintPiPage() {
   }, [id]);
 
   const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-  const fmt3 = (n: number) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+  const fmt3 = (n: number | undefined) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   
   // Safe Date Handling
   const safeDate = (dateStr: string | undefined) => {
@@ -63,10 +71,10 @@ export default function PrintPiPage() {
   };
   const dateObj = safeDate(pi?.dataPi);
 
-  // Fallback if explicit fetch fails but PI has nested client (legacy check)
   const displayClient = cliente || (pi as any)?.cliente;
-  console.log("PI Date:", dateObj); 
-
+  const incoterm = pi?.frete?.nome || "EXW";
+  const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
+  
   const processedData = useMemo(() => {
     if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0 };
 
@@ -178,8 +186,23 @@ export default function PrintPiPage() {
          };
     });
 
-    return { brandGroups, totalSofaQty };
-  }, [pi, modulosTecidos]);
+    let totalValue = 0;
+    let totalM3 = 0;
+    let totalQty = 0;
+
+    pi.piItens.forEach(item => {
+        const qty = Number(item.quantidade) || 0;
+        totalQty += qty;
+        totalM3 += (Number(item.m3) || 0) * qty;
+        if (currency === "BRL") {
+            totalValue += (Number(item.valorFinalItemBRL) || 0);
+        } else {
+            totalValue += ((Number(item.valorEXW) || 0) * qty);
+        }
+    });
+
+    return { brandGroups, totalSofaQty, totalQty, totalM3, totalValue };
+  }, [pi, modulosTecidos, currency]);
 
   const formattedPiNumber = useMemo(() => {
     if (!pi) return "";
@@ -200,8 +223,8 @@ export default function PrintPiPage() {
     return base;
   }, [pi, modulosTecidos, dateObj]);
 
-  if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
-  if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
+  if (loading) return <div style={{ padding: 20 }}>Cargando documento...</div>;
+  if (!pi) return <div style={{ padding: 20 }}>Documento no encontrado.</div>;
 
   return (
     <div className="print-container" style={{ padding: 40, fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", maxWidth: "1100px", margin: "0 auto" }}>
@@ -290,19 +313,19 @@ export default function PrintPiPage() {
       <div className="print-header-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "20px" }}>
           {/* Left: Importer */}
           <div style={{ paddingRight: "10px", fontSize: "11px", lineHeight: "1.4em" }}>
-              <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>IMPORTER:</div>
+              <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>IMPORTADOR:</div>
               <div style={{ textTransform: "uppercase" }}>{displayClient?.nome || (pi as any).cliente?.nome}</div>
               
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>ADDRESS:</span>
+                  <span style={{ width: "70px" }}>DIRECCIÓN:</span>
                   <span>{displayClient?.endereco || (pi as any).cliente?.endereco}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>CITY:</span>
+                  <span style={{ width: "70px" }}>CIUDAD:</span>
                   <span>{displayClient?.cidade || (pi as any).cliente?.cidade}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>COUNTRY:</span>
+                  <span style={{ width: "70px" }}>PAÍS:</span>
                   <span>{displayClient?.pais || (pi as any).cliente?.pais}</span>
               </div>
               <div style={{ display: "flex" }}>
@@ -310,15 +333,15 @@ export default function PrintPiPage() {
                   <span>{displayClient?.nit || (pi as any).cliente?.nit || ""}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>FONE:</span>
+                  <span style={{ width: "70px" }}>TELÉFONO:</span>
                   <span>{displayClient?.telefone || (pi as any).cliente?.telefone}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>RES. PERSON:</span>
+                  <span style={{ width: "70px" }}>RESPONSABLE:</span>
                   <span>{displayClient?.pessoaContato || (pi as any).cliente?.pessoaContato || ".."}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>E-MAIL:</span>
+                  <span style={{ width: "70px" }}>EMAIL:</span>
                   <span>{displayClient?.email || (pi as any).cliente?.email}</span>
               </div>
           </div>
@@ -328,7 +351,7 @@ export default function PrintPiPage() {
                <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>PROFORMA INVOICE: {formattedPiNumber}</div>
                
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>DATE:</span>
+                   <span>FECHA:</span>
                    <span>{dateObj.toLocaleDateString("pt-BR")}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -336,27 +359,27 @@ export default function PrintPiPage() {
                    <span>{formattedPiNumber}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>ORDER DATE:</span>
+                   <span>PEDIDO FECHA:</span>
                    <span>{new Date(pi.dataPi).toLocaleDateString("pt-BR")}</span> 
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>PLACE OF LOADING:</span>
+                   <span style={{ width: "130px" }}>PUNTO DE EMBARQUE:</span>
                    <span>{pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || "PARANAGUA"}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>PLACE OF DISCHARGE:</span>
+                   <span style={{ width: "130px" }}>PUNTO DE DESTINO:</span>
                    <span>{displayClient?.portoDestino || pi.cliente?.portoDestino || ""}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>DELIVERY TIME:</span>
-                   <span>50 days after first payment</span>
+                   <span style={{ width: "130px" }}>TIEMPO DE ENTREGA:</span>
+                   <span>50 dias despues del primer pago</span>
                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ width: "130px" }}>INCOTERM:</span>
+                    <span>{incoterm} {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || ""}</span>
+                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>INCOTERM:</span>
-                   <span>FOB {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || ""}</span>
-               </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>PAYMENT TERM:</span>
+                   <span style={{ width: "130px" }}>PAGO CONDICIONES:</span>
                    <span>{pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
                </div>
           </div>
@@ -372,24 +395,25 @@ export default function PrintPiPage() {
         <table className="print-table" style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", fontSize: "10px" }}>
           <thead style={{ background: "#1a2e44", color: "white", textTransform: "uppercase" }}>
             <tr>
-              <th rowSpan={2} style={{ width: "10%" }}>Photo</th>
-              <th rowSpan={2} style={{ width: "10%" }}>Name</th>
-              <th rowSpan={2} style={{ width: "25%" }}>Description</th>
-              <th colSpan={3}>DIMENSIONS (m)</th>
-              <th rowSpan={2} style={{ width: "5%" }}>Qty Module</th>
-              <th rowSpan={2} style={{ width: "5%" }}>Qty Sofa</th>
-              <th rowSpan={2} style={{ width: "5%" }}>Total Vol M³</th>
-              <th rowSpan={2} style={{ width: "10%" }}>Fabric</th>
-              <th rowSpan={2} style={{ width: "10%" }}>Feet</th>
-              <th rowSpan={2} style={{ width: "10%" }}>Finishing</th>
-              <th rowSpan={2} style={{ width: "10%" }}>Observation</th>
-              <th rowSpan={2} style={{ width: "10%" }}>EXW DOLAR {fmt(pi.cotacaoAtualUSD)}</th>
-              <th rowSpan={2} style={{ width: "10%" }}>TOTAL EXW</th>
+              <th rowSpan={2} style={{ width: "10%" }}>FOTO</th>
+              <th rowSpan={2} style={{ width: "10%" }}>NOMBRE</th>
+              <th rowSpan={2} style={{ width: "25%" }}>DESCRIPCIÓN</th>
+              <th colSpan={3}>DIMENSIONES (m)</th>
+              <th rowSpan={2} style={{ width: "5%" }}>CANT UNID</th>
+              <th rowSpan={2} style={{ width: "5%" }}>CANT SOFA</th>
+              <th rowSpan={2} style={{ width: "5%" }}>TOTAL VOLUME M³</th>
+              <th rowSpan={2} style={{ width: "10%" }}>TELA</th>
+              <th rowSpan={2} style={{ width: "10%" }}>PIES</th>
+               <th rowSpan={2} style={{ width: "10%" }}>ACABADO</th>
+               <th rowSpan={2} style={{ width: "10%" }}>OBSERVACIÓN</th>
+               {showFreight && <th rowSpan={2} style={{ width: "10%" }}>FRETE</th>}
+               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "UNIT R$" : `UNIT DOLAR ${fmt(pi.cotacaoAtualUSD)}`}</th>
+              <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
             </tr>
             <tr>
-               <th style={{ width: "5%" }}>Width</th>
-               <th style={{ width: "5%" }}>Depth</th>
-               <th style={{ width: "5%" }}>Height</th>
+               <th style={{ width: "5%" }}>LARGO</th>
+               <th style={{ width: "5%" }}>PROF.</th>
+               <th style={{ width: "5%" }}>ALTO</th>
             </tr>
           </thead>
           <tbody>
@@ -443,7 +467,12 @@ export default function PrintPiPage() {
                             if (spans['totalExw'][index] > 0) {
                                 const span = spans['totalExw'][index];
                                 const groupRange = sortedItems.slice(index, index + span);
-                                fabricGroupTotal = groupRange.reduce((sum, g) => sum + ((Number(g.item.valorEXW) || 0) * (Number(g.item.quantidade) || 0)), 0);
+                                fabricGroupTotal = groupRange.reduce((sum, g) => {
+                                    if (currency === "BRL") {
+                                        return sum + (Number(g.item.valorFinalItemBRL) || 0);
+                                    }
+                                    return sum + ((Number(g.item.valorEXW) || 0) * (Number(g.item.quantidade) || 0));
+                                }, 0);
                             }
 
                             const renderMergedCellForCurrentRow = (field: string, content: React.ReactNode, extraStyle: React.CSSProperties = {}) => {
@@ -496,14 +525,25 @@ export default function PrintPiPage() {
                                     {/* Observation */}
                                     {renderMergedCellForCurrentRow('observation', item.observacao || "", { })}
                                     
+                                    {/* Freight: Only for non-EXW */}
+                                    {showFreight && (
+                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fefce8" }}>
+                                            {currency === "BRL" ? `R$ ${fmt(item.valorFreteRateadoBRL)}` : `$ ${fmt(item.valorFreteRateadoUSD)}`}
+                                        </td>
+                                    )}
+
                                     {/* Unit EXW: Per Item */}
-                                    <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW)}</td>
+                                    {currency === "BRL" ? (
+                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#f0f9ff" }}>R$ {fmt(item.valorFinalItemBRL / (item.quantidade || 1))}</td>
+                                    ) : (
+                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW)}</td>
+                                    )}
                                     
                                     {/* Total Group EXW: Broken down by Fabric */}
-                                    {renderMergedCellForCurrentRow('totalExw', `$ ${fmt(fabricGroupTotal)}`, { 
+                                    {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupTotal)}` : `$ ${fmt(fabricGroupTotal)}`, { 
                                         textAlign: "right", 
                                         fontWeight: "bold", 
-                                        background: "#fff1f2" 
+                                        background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" 
                                     })}
                                 </tr>
                             );
@@ -512,6 +552,18 @@ export default function PrintPiPage() {
                 );
             })}
           </tbody>
+          <tfoot>
+            <tr style={{ fontWeight: "bold", background: "#f8fafc" }}>
+              <td colSpan={6} style={{ border: "1px solid #000", textAlign: "right", padding: "4px 8px" }}>TOTAL</td>
+              <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalQty}</td>
+              <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalSofaQty}</td>
+              <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3(processedData.totalM3)}</td>
+              <td colSpan={showFreight ? 6 : 5} style={{ border: "1px solid #000" }}></td>
+              <td style={{ border: "1px solid #000", textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2", fontWeight: "bold" }}>
+                {currency === "BRL" ? "R$" : "$"} {fmt(processedData.totalValue)}
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
@@ -521,30 +573,34 @@ export default function PrintPiPage() {
 
       <div className="footer-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid #000", marginTop: 20 }}>
           <div className="footer-col bank-details" style={{ padding: 10, borderRight: "1px solid #000" }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>ACCOUNTING DETAILS:INTERMEDIARY BANK</h3>
+              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DETALLES BANCARIOS: BANCO INTERMEDIARIO</h3>
               <p>BANK OF AMERICA, N.A.</p>
-              <p>ADDRESS: NEW YORK - US</p>
+              <p>DIRECCIÓN: NEW YORK - US</p>
               <p>SWIFT CODE: BOFAUS3N</p>
-              <p>ACCOUNT: 6550925836</p>
-              <p style={{ marginTop: 10 }}><strong>BENEFICIARY BANK:</strong></p>
+              <p>CUENTA: 6550925836</p>
+              <p style={{ marginTop: 10 }}><strong>BANCO BENEFICIARIO:</strong></p>
               <p>BANCO RENDIMENTO S/A</p>
-              <p>ADDRESS: SÃO PAULO - BR</p>
+              <p>DIRECCIÓN: SÃO PAULO - BR</p>
               <p>SWIFT CODE: RENDBRSP</p>
               <p>IBAN: BR4468900810000010025069901i1</p>
-              <p>ACCOUNT: 00250699000148</p>
-              <p>NAME: KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA</p>
+              <p>CUENTA: 00250699000148</p>
+              <p>NOMBRE: KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA</p>
           </div>
           <div className="footer-col" style={{ padding: 10 }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>GENERAL PRODUCT DATA</h3>
-              <p><strong>Brand:</strong> Karams</p>
+              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DATOS GENERALES DEL PRODUCTO</h3>
+              <p><strong>Marca:</strong> Karams</p>
               <p><strong>NCM:</strong> 94016100</p>
-              <p><strong>Product:</strong> {fmt(processedData.totalSofaQty, 0)}</p>
+              <p><strong>Producto:</strong> {fmt(processedData.totalSofaQty, 0)}</p>
+              <p><strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? `R$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + (Number(i.valorFinalItemBRL) || 0), 0))}` : `$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.valorEXW) || 0) * (Number(i.quantidade) || 0)), 0))}`}</p>
               <p><strong>CBM M³:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
               <p><strong>P.N. TOTAL:</strong></p>
               <p><strong>P.B. TOTAL:</strong></p>
               <p><strong>VOLUMEN TOTAL:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
               <p><strong>Productos originales de fabrica</strong></p>
-              <p><strong>Made in Brasil</strong></p>
+              <p><strong>Hecho en Brasil</strong></p>
+              <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>
+                * Esta proforma es válida por {urlParams.get("validity") || 30} días a partir de la fecha de emisión.
+              </p>
           </div>
       </div>
     

@@ -22,11 +22,11 @@ public class PisController : ControllerBase
     }
 
     [HttpGet("{id}/excel")]
-    public async Task<IActionResult> ExportExcel(long id)
+    public async Task<IActionResult> ExportExcel(long id, [FromQuery] string currency = "EXW", [FromQuery] int validity = 30)
     {
         try
         {
-            var bytes = await _exportService.ExportToExcelAsync(id);
+            var bytes = await _exportService.ExportToExcelAsync(id, currency, validity);
             var pi = await _db.Pis.FindAsync(id);
             string fileName = $"PI_{pi?.Prefixo}-{pi?.PiSequencia}.xlsx";
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);

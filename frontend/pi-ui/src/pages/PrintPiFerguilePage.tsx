@@ -13,6 +13,13 @@ export default function PrintPiFerguilePage() {
   const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const urlParams = useMemo(() => {
+    const hash = window.location.hash;
+    const searchPart = hash.includes('?') ? hash.split('?')[1] : '';
+    return new URLSearchParams(searchPart || window.location.search);
+  }, []);
+  const currency = (urlParams.get("currency") as "BRL" | "EXW") || "EXW";
+
   useEffect(() => {
     async function load() {
       if (!id) return;
@@ -64,26 +71,9 @@ export default function PrintPiFerguilePage() {
   const dateObj = safeDate(pi?.dataPi);
   const displayClient = cliente || (pi as any)?.cliente;
   const incoterm = pi?.frete?.nome || "FCA";
+  const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
 
 
-  // Month names in English for the PDF format
-  const monthNames = [
-    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
-  ];
-
-  const formatDateEN = (d: Date) => {
-    const day = d.getDate();
-    const suffix =
-      day === 1 || day === 21 || day === 31
-        ? "st"
-        : day === 2 || day === 22
-        ? "nd"
-        : day === 3 || day === 23
-        ? "rd"
-        : "th";
-    return `${monthNames[d.getMonth()]}, ${String(day).padStart(2, "0")}${suffix}, ${d.getFullYear()}`;
-  };
 
   // ─── Process data: group by REFERENCIA (marca) ───
   const processedData = useMemo(() => {
@@ -176,7 +166,10 @@ export default function PrintPiFerguilePage() {
       descSpans[i] = span;
     }
 
-    const totalValue = rows.reduce((s, r) => s + r.totalPrice, 0);
+    const totalValue = rows.reduce((s, r) => {
+        if (currency === "BRL") return s + (Number(r.item.valorFinalItemBRL) || 0);
+        return s + r.totalPrice;
+    }, 0);
     const totalM3 = rows.reduce((s, r) => s + r.volM3, 0);
     const totalQty = rows.reduce((s, r) => s + r.quantidade, 0);
 
@@ -280,20 +273,20 @@ export default function PrintPiFerguilePage() {
             FERGUILE ESTOFADOS LTDA
           </div>
           <div>CNPJ: 27.499.537/0001-02</div>
-          <div>ADDRESS: RUA CANÁRIO DO BREJO, 630</div>
+          <div>DIRECCIÓN: RUA CANÁRIO DO BREJO, 630</div>
           <div>RIBEIRÃO BANDEIRANTE DO NORTE</div>
-          <div>ZIP CODE: 86703-797</div>
+          <div>CÓDIGO POSTAL: 86703-797</div>
           <div>ARAPONGAS - PARANÁ</div>
-          <div>COUNTRY: BRASIL</div>
+          <div>PAÍS: BRASIL</div>
           <div style={{ marginTop: 6 }}>
-            <strong>DELIVERY TIME:</strong>{" "}
-            {pi.configuracoes?.condicoesPagamento ? "60 days" : "60 days"}
+            <strong>TIEMPO DE ENTREGA:</strong>{" "}
+            {pi.configuracoes?.condicoesPagamento ? "60 dias" : "60 dias"}
           </div>
           <div>
             <strong>INCOTERM:</strong> {incoterm} - ARAPONGAS PR
           </div>
           <div>
-            <strong>PAYMENT TERM:</strong> {pi.configuracoes?.condicoesPagamento || "AT SIGHT"}
+            <strong>PAGO CONDICIONES:</strong> {pi.configuracoes?.condicoesPagamento || "A VISTA"}
           </div>
         </div>
 
@@ -305,22 +298,22 @@ export default function PrintPiFerguilePage() {
             </span>
           </div>
           <div>
-            DATA: {dateObj.toLocaleDateString("pt-BR")}
+            FECHA: {dateObj.toLocaleDateString("pt-BR")}
           </div>
           <div>
             PROFORMA INVOICE: {formattedPiNumber}
           </div>
           <div>
-            ORDER DATE: {formatDateEN(dateObj)}
+            PEDIDO FECHA: {dateObj.toLocaleDateString("pt-BR")}
           </div>
-          <div style={{ marginTop: 6, fontWeight: "bold" }}>IMPORTER:</div>
+          <div style={{ marginTop: 6, fontWeight: "bold" }}>IMPORTADOR:</div>
           <div style={{ marginLeft: 20 }}>
             <div>{displayClient?.empresa || displayClient?.nome || ""}</div>
-            {displayClient?.nit && <div>CUIT: {displayClient.nit}</div>}
-            {displayClient?.endereco && <div>ADDRESS: {displayClient.endereco}{displayClient?.cidade ? `, ${displayClient.cidade}` : ""}</div>}
-            {displayClient?.cep && <div>CODIGO POSTAL: {displayClient.cep}</div>}
-            {displayClient?.pais && <div>COUNTRY: {displayClient.pais}</div>}
-            {displayClient?.pessoaContato && <div>RESPONSIBLE PERSON: {displayClient.pessoaContato}</div>}
+            {displayClient?.nit && <div>NIT: {displayClient.nit}</div>}
+            {displayClient?.endereco && <div>DIRECCIÓN: {displayClient.endereco}{displayClient?.cidade ? `, ${displayClient.cidade}` : ""}</div>}
+            {displayClient?.cep && <div>CÓDIGO POSTAL: {displayClient.cep}</div>}
+            {displayClient?.pais && <div>PAÍS: {displayClient.pais}</div>}
+            {displayClient?.pessoaContato && <div>RESPONSABLE: {displayClient.pessoaContato}</div>}
             {displayClient?.telefone && <div>TEL.: {displayClient.telefone}</div>}
             {displayClient?.email && <div>E-MAIL: {displayClient.email}</div>}
           </div>
@@ -343,8 +336,9 @@ export default function PrintPiFerguilePage() {
             <th style={{ ...thStyle, width: "7%" }}>FABRIC</th>
             <th style={{ ...thStyle, width: "5%" }}>TELA<br/>N</th>
             <th style={{ ...thStyle, width: "10%" }}>OBSERVACIÓN</th>
-            <th style={{ ...thStyle, width: "7%" }}>{incoterm} UNIT<br/>USD</th>
-            <th style={{ ...thStyle, width: "8%" }}>TOTAL {incoterm}</th>
+            {showFreight && <th style={{ ...thStyle, width: "7%" }}>FRETE</th>}
+            <th style={{ ...thStyle, width: "7%" }}>{incoterm} UNIT<br/>{currency === "BRL" ? "R$" : `DOLAR ${fmtBR(pi.cotacaoAtualUSD)}`}</th>
+            <th style={{ ...thStyle, width: "8%" }}>TOTAL {incoterm}<br/>{currency === "BRL" ? "R$" : "USD"}</th>
           </tr>
         </thead>
         <tbody>
@@ -432,14 +426,21 @@ export default function PrintPiFerguilePage() {
                 {/* OBSERVACIÓN */}
                 <td style={{ ...cellStyle, textAlign: "left", fontSize: "8px" }}>{row.observacao}</td>
 
+                {/* Freight: Only for non-EXW */}
+                {showFreight && (
+                  <td style={{ ...cellStyle, textAlign: "right", background: "#fefce8" }}>
+                    {currency === "BRL" ? `R$ ${fmtBR(row.item.valorFreteRateadoBRL)}` : `$ ${fmtBR(row.item.valorFreteRateadoUSD)}`}
+                  </td>
+                )}
+
                 {/* UNIT USD */}
-                <td style={{ ...cellStyle, textAlign: "right", background: "#fff1f2" }}>
-                  $ {fmt(row.unitPrice)}
+                <td style={{ ...cellStyle, textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" }}>
+                  {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(row.item.valorFinalItemBRL / (row.item.quantidade || 1)) : fmt(row.unitPrice)}
                 </td>
 
                 {/* TOTAL USD */}
-                <td style={{ ...cellStyle, textAlign: "right", fontWeight: "bold", background: "#fff1f2" }}>
-                  $ {fmt(row.totalPrice)}
+                <td style={{ ...cellStyle, textAlign: "right", fontWeight: "bold", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" }}>
+                  {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(row.item.valorFinalItemBRL) : fmt(row.totalPrice)}
                 </td>
               </tr>
             );
@@ -452,17 +453,15 @@ export default function PrintPiFerguilePage() {
             <td colSpan={7} style={{ ...cellStyle, textAlign: "right", fontSize: "10px" }}>
               TOTAL
             </td>
-            <td style={{ ...cellStyle, fontWeight: "bold" }}>
+            <td style={{ ...cellStyle, fontWeight: "bold", textAlign: "center" }}>
               {processedData.totalQty}
             </td>
-            <td style={{ ...cellStyle, fontWeight: "bold" }}>
+            <td style={{ ...cellStyle, fontWeight: "bold", textAlign: "center" }}>
               {fmtBR(processedData.totalM3)}
             </td>
-            <td colSpan={3} style={cellStyle}></td>
-            <td style={{ ...cellStyle, textAlign: "right", background: "#fef2f2", fontSize: "10px" }}>
-            </td>
+            <td colSpan={showFreight ? 5 : 4} style={cellStyle}></td>
             <td style={{ ...cellStyle, textAlign: "right", background: "#fef2f2", fontWeight: "bold", fontSize: "11px" }}>
-              $ {fmt(processedData.totalValue)}
+              {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(processedData.totalValue) : fmt(processedData.totalValue)}
             </td>
           </tr>
         </tfoot>
@@ -481,27 +480,30 @@ export default function PrintPiFerguilePage() {
       >
         <div style={{ padding: 10, borderRight: "1px solid #000" }}>
           <h3 style={{ margin: "0 0 5px 0", fontSize: "12px", textTransform: "uppercase" }}>
-            ACCOUNTING DETAILS:
+            DETALLES BANCARIOS:
           </h3>
-          <p style={{ margin: "2px 0" }}><strong>Beneficiary:</strong> FERGUILE ESTOFADOS LTDA</p>
+          <p style={{ margin: "2px 0" }}><strong>Beneficiario:</strong> FERGUILE ESTOFADOS LTDA</p>
           <p style={{ margin: "2px 0" }}><strong>CNPJ:</strong> 27.499.537/0001-02</p>
-          <p style={{ margin: "2px 0" }}><strong>BANK:</strong> SICREDI 748</p>
-          <p style={{ margin: "2px 0" }}><strong>BENEFICIARY ACCOUNT:</strong> 0723/032524</p>
-          <p style={{ margin: "2px 0" }}><strong>IBAN CODE:</strong> BR7001181521007230000003252C1</p>
-          <p style={{ margin: "2px 0" }}><strong>SWIFT CODE:</strong> BCSIBRRS748</p>
+          <p style={{ margin: "2px 0" }}><strong>BANCO:</strong> SICREDI 748</p>
+          <p style={{ margin: "2px 0" }}><strong>CUENTA BENEFICIARIA:</strong> 0723/032524</p>
+          <p style={{ margin: "2px 0" }}><strong>CÓDIGO IBAN:</strong> BR7001181521007230000003252C1</p>
+          <p style={{ margin: "2px 0" }}><strong>CÓDIGO SWIFT:</strong> BCSIBRRS748</p>
         </div>
         <div style={{ padding: 10 }}>
           <p style={{ margin: "2px 0" }}>
-            <strong>Volume:</strong> {processedData.totalQty}
+            <strong>Volumen:</strong> {processedData.totalQty}
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>NCM:</strong> 94016100
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Brand:</strong> Ferguile / Livintus
+            <strong>Marca:</strong> Ferguile / Livintus
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Factory original products</strong>
+            <strong>Productos originales de fábrica</strong>
+          </p>
+          <p style={{ margin: "2px 0" }}>
+            <strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(processedData.totalValue, 2) : fmt(processedData.totalValue, 2)}
           </p>
           <p style={{ margin: "10px 0 2px 0" }}>
             <strong>CBM M³:</strong> {fmtBR(processedData.totalM3, 3)}
@@ -513,7 +515,10 @@ export default function PrintPiFerguilePage() {
             <strong>P.B. TOTAL (KG):</strong> {fmtBR(processedData.totalM3 * 165, 2)}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Made in Brasil</strong>
+            <strong>Hecho en Brasil</strong>
+          </p>
+          <p style={{ marginTop: 15, fontSize: "10px", fontStyle: "italic" }}>
+            * Esta proforma es válida por {urlParams.get("validity") || 30} días a partir de la fecha de emisión.
           </p>
         </div>
       </div>

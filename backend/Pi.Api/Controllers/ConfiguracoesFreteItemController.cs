@@ -28,63 +28,78 @@ public class ConfiguracoesFreteItemController : ControllerBase
     [HttpGet("by-frete/{idFrete}")]
     public async Task<ActionResult<object>> GetByFrete(long idFrete, [FromQuery] long? fornecedorId = null)
     {
-        var query = _db.ConfiguracoesFreteItens
-            .Include(x => x.FreteItem)
-            .Where(x => x.FreteItem!.IdFrete == idFrete);
-
-        if (fornecedorId.HasValue)
-        {
-            query = query.Where(x => x.IdFornecedor == fornecedorId.Value);
-        }
-        else
-        {
-            query = query.Where(x => x.IdFornecedor == null);
-        }
-
-        var items = await query
-            .Select(x => new
-            {
-                x.Id,
-                x.IdFreteItem,
-                x.Valor,
-                x.FlDesconsidera,
-                x.IdFornecedor,
-                FreteItem = new
-                {
-                    x.FreteItem!.Id,
-                    x.FreteItem.Nome
-                }
-            })
+        var itemIds = await _db.FreteItens
+            .Where(x => x.IdFrete == idFrete)
+            .Select(x => x.Id)
             .ToListAsync();
+
+        var configs = await _db.ConfiguracoesFreteItens
+            .Include(x => x.FreteItem)
+            .Where(x => itemIds.Contains(x.IdFreteItem) &&
+                        (x.IdFornecedor == null || (fornecedorId.HasValue && x.IdFornecedor == fornecedorId.Value)))
+            .ToListAsync();
+
+        var result = new List<object>();
+
+        foreach (var itemId in itemIds)
+        {
+            var config = configs
+                .Where(x => x.IdFreteItem == itemId)
+                .OrderByDescending(x => x.IdFornecedor.HasValue)
+                .FirstOrDefault();
+
+            if (config != null)
+            {
+                result.Add(new
+                {
+                    config.Id,
+                    config.IdFreteItem,
+                    config.Valor,
+                    config.FlDesconsidera,
+                    config.IdFornecedor,
+                    FreteItem = new
+                    {
+                        config.FreteItem!.Id,
+                        config.FreteItem.Nome
+                    }
+                });
+            }
+        }
         
-        return Ok(items);
+        return Ok(result);
     }
 
     [HttpGet("total-frete/{idFrete}")]
     public async Task<ActionResult<decimal>> GetTotalFrete(long idFrete, [FromQuery] long? fornecedorId = null)
     {
-        var baseQuery = _db.ConfiguracoesFreteItens
-            .Include(x => x.FreteItem)
-            .Where(x => x.FreteItem!.IdFrete == idFrete && !x.FlDesconsidera);
+        var itemIds = await _db.FreteItens
+            .Where(x => x.IdFrete == idFrete)
+            .Select(x => x.Id)
+            .ToListAsync();
 
-        if (fornecedorId.HasValue)
+        if (!itemIds.Any()) return Ok(0m);
+
+        var configs = await _db.ConfiguracoesFreteItens
+            .Where(x => itemIds.Contains(x.IdFreteItem) && !x.FlDesconsidera &&
+                        (x.IdFornecedor == null || (fornecedorId.HasValue && x.IdFornecedor == fornecedorId.Value)))
+            .ToListAsync();
+
+        decimal total = 0;
+
+        foreach (var itemId in itemIds)
         {
-            // Check if there are specific configurations for this supplier
-            var hasSpecificConfig = await baseQuery.AnyAsync(x => x.IdFornecedor == fornecedorId.Value);
+            var config = configs
+                .Where(x => x.IdFreteItem == itemId)
+                .OrderByDescending(x => x.IdFornecedor.HasValue)
+                .FirstOrDefault();
 
-            if (hasSpecificConfig)
+            if (config != null)
             {
-                // Use specific supplier costs
-                return await baseQuery
-                    .Where(x => x.IdFornecedor == fornecedorId.Value)
-                    .SumAsync(x => x.Valor);
+                total += config.Valor;
             }
         }
 
-        // Fallback or Default: Use Global (IdFornecedor == null)
-        return await baseQuery
-            .Where(x => x.IdFornecedor == null)
-            .SumAsync(x => x.Valor);
+        return Ok(total);
     }
 
     [HttpGet("{id}")]

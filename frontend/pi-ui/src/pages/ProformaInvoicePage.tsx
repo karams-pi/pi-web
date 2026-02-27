@@ -12,6 +12,7 @@ import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
 import { FileText } from "lucide-react";
+import { PiCurrencyModal } from "../components/PiCurrencyModal";
 import PageHeader from "../components/PageHeader";
 import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
 
@@ -96,6 +97,8 @@ export default function ProformaInvoicePage() {
 
   // Modal State
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
+  const [currencyModalType, setCurrencyModalType] = useState<"print" | "excel">("print");
 
   // Help Modal State
   const [helpModalOpen, setHelpModalOpen] = useState(false);
@@ -676,28 +679,6 @@ export default function ProformaInvoicePage() {
 
 
 
-  async function handleExportExcel() {
-    if (!form.id) return alert("Salve a PI primeiro para exportar com o layout correto.");
-    if (itens.length === 0) return alert("Não há itens para exportar.");
-    
-    try {
-      setLoading(true);
-      const blob = await exportPiExcel(form.id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `PI_${form.prefixo}-${form.piSequencia}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error("Erro ao exportar Excel:", error);
-      alert("Erro ao exportar Excel.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const totalGeralBRL = useMemo(() => {
     return itens.reduce((sum, item) => sum + item.valorFinalItemBRL, 0);
@@ -713,33 +694,42 @@ export default function ProformaInvoicePage() {
     <div>
       <PageHeader title="Proforma Invoice" icon={<FileText size={24} />} />
       
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 15 }}>
         {/* H1 was here */}
         <div style={{ display: "flex", gap: 10 }}>
             {form.id && (
-                <button
-                    className="btn btn-secondary"
-                    onClick={() => {
-                        const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
-                        const sName = (supplier?.nome || "").toLowerCase();
-                        const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
-                        const route = isFerguile ? "print-pi-ferguile" : "print-pi";
-                        window.open(`#/${route}/${form.id}`, "_blank");
-                    }}
-                    style={{ height: 40, background: "#10b981", borderColor: "#10b981", color: "white" }}
-                >
-                    🖨️ Imprimir
-                </button>
-            )}
-            {form.id && (
-                <button
-                    className="btn btn-secondary"
-                    onClick={handleExportExcel}
-                    style={{ height: 40, background: "#2563eb", borderColor: "#2563eb", color: "white" }}
-                    disabled={itens.length === 0}
-                >
-                    📊 Excel
-                </button>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => {
+                            setCurrencyModalType("print");
+                            setCurrencyModalOpen(true);
+                        }}
+                        style={{ height: 40, background: "#10b981", borderColor: "#10b981", color: "white" }}
+                    >
+                        🖨️ Imprimir
+                    </button>
+
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => setShowSearchModal(true)}
+                        style={{ height: 40 }}
+                    >
+                        🔍 Consultar
+                    </button>
+
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => {
+                            setCurrencyModalType("excel");
+                            setCurrencyModalOpen(true);
+                        }}
+                        style={{ height: 40, background: "#2563eb", borderColor: "#2563eb", color: "white" }}
+                        disabled={itens.length === 0}
+                    >
+                        📊 Excel
+                    </button>
+                </div>
             )}
             <button 
                 className="btn btn-secondary" 
@@ -772,7 +762,7 @@ export default function ProformaInvoicePage() {
         </div>
       )}
 
-      <div className="cl-card" style={{ marginBottom: 20, padding: 16 }}>
+      <div className="cl-card" style={{ marginBottom: 20, padding: 16, position: "relative", zIndex: 10 }}>
         <h3 style={{ marginTop: 0 }}>Dados da PI</h3>
         <div className="formGrid">
           <div className="field">
@@ -961,6 +951,12 @@ export default function ProformaInvoicePage() {
         </div>
 
         <div style={{ overflowX: "auto" }}>
+          {/* EXW logic check */}
+          {(() => {
+              const selectedFrete = fretes.find(f => f.id === form.idFrete);
+              const isEXW = selectedFrete?.nome === "EXW";
+
+              return (
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900, fontSize: "12px" }}>
             <thead>
               <tr style={{ background: "#f8f9fa", borderBottom: "2px solid #dee2e6" }}>
@@ -977,8 +973,12 @@ export default function ProformaInvoicePage() {
                 <th style={{...th, width: "50px"}}>PA</th>
                 <th style={{...th, width: "70px"}}>m³</th>
                 <th style={{...th, textAlign:"right", minWidth: "100px"}}>Valor EXW</th>
-                <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete ({fretes.find(f => f.id === form.idFrete)?.nome || "FOB"}) R$</th>
-                <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete ({fretes.find(f => f.id === form.idFrete)?.nome || "FOB"}) $</th>
+                {!isEXW && (
+                    <>
+                    <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete ({selectedFrete?.nome || "FOB"}) R$</th>
+                    <th style={{...th, textAlign:"right", minWidth: "100px"}}>Frete ({selectedFrete?.nome || "FOB"}) $</th>
+                    </>
+                )}
                 <th style={{...th, textAlign:"right", minWidth: "100px"}}>Total R$</th>
                 <th style={{...th, textAlign:"right", minWidth: "100px"}}>Total $</th>
               </tr>
@@ -1057,38 +1057,44 @@ export default function ProformaInvoicePage() {
                           <span className="mobile-help-icon" onClick={() => openHelp("Cálculo EXW", item.exwTooltip)}>?</span>
                       </div>
                   </td>
-                  <td style={{...td, textAlign:"right"}} title={item.freteBrlTooltip}>
-                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                          R$ {fmt(item.valorFreteRateadoBRL)}
-                          <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete R$", item.freteBrlTooltip)}>?</span>
-                      </div>
-                  </td>
-                  <td style={{...td, textAlign:"right"}} title={item.freteUsdTooltip}>
-                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                          $ {fmt(item.valorFreteRateadoUSD)}
-                          <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete USD", item.freteUsdTooltip)}>?</span>
-                      </div>
-                  </td>
+                  {!isEXW && (
+                      <>
+                        <td style={{...td, textAlign:"right"}} title={item.freteBrlTooltip}>
+                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+                                R$ {fmt(item.valorFreteRateadoBRL)}
+                                <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete R$", item.freteBrlTooltip)}>?</span>
+                            </div>
+                        </td>
+                        <td style={{...td, textAlign:"right"}} title={item.freteUsdTooltip}>
+                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+                                $ {fmt(item.valorFreteRateadoUSD)}
+                                <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete USD", item.freteUsdTooltip)}>?</span>
+                            </div>
+                        </td>
+                      </>
+                   )}
                   <td style={{...td, textAlign:"right"}}>R$ {fmt(item.valorFinalItemBRL)}</td>
                   <td style={{...td, textAlign:"right"}}>$ {fmt(item.valorFinalItemUSDRisco)}</td>
                 </tr>
               ))}
               {itens.length === 0 && (
                 <tr>
-                  <td colSpan={14} style={{ ...td, textAlign: "center", color: "#888", padding: 20 }}>
+                  <td colSpan={isEXW ? 12 : 14} style={{ ...td, textAlign: "center", color: "#888", padding: 20 }}>
                     Nenhum item adicionado
                   </td>
                 </tr>
               )}
               {itens.length > 0 && (
                 <tr style={{ fontWeight: "bold", background: "rgba(37, 99, 235, 0.1)" }}>
-                  <td colSpan={12} style={{ ...td, textAlign: "right" }}>TOTAL:</td>
+                  <td colSpan={isEXW ? 10 : 12} style={{ ...td, textAlign: "right" }}>TOTAL:</td>
                   <td style={td}>R$ {fmt(totalGeralBRL)}</td>
                   <td style={td}>$ {fmt(totalGeralUSD)}</td>
                 </tr>
               )}
             </tbody>
           </table>
+              );
+          })()}
         </div>
       </div>
 
@@ -1097,6 +1103,52 @@ export default function ProformaInvoicePage() {
           {saving ? "Salvando..." : "Salvar PI"}
         </button>
       </div>
+      <PiCurrencyModal
+        isOpen={currencyModalOpen}
+        onClose={() => setCurrencyModalOpen(false)}
+        onConfirm={(currency, validity) => {
+            setCurrencyModalOpen(false);
+            if (currencyModalType === "print") {
+                const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
+                const sName = (supplier?.nome || "").toLowerCase();
+                const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
+                const route = isFerguile ? "print-pi-ferguile" : "print-pi";
+                window.open(`#/${route}/${form.id}?currency=${currency}&validity=${validity}`, "_blank");
+            } else {
+                (async () => {
+                    if (!form.id) return;
+                    try {
+                        setLoading(true);
+                        const blob = await exportPiExcel(form.id, currency, validity);
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `PI_${form.prefixo}-${form.piSequencia}_${currency}.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    } catch (error) {
+                        console.error("Erro ao exportar Excel:", error);
+                        alert("Erro ao exportar Excel.");
+                    } finally {
+                        setLoading(false);
+                    }
+                })();
+            }
+        }}
+        title={currencyModalType === "print" ? "Moneda para Impresión" : "Moneda para Excel"}
+      />
+      
+      {showSearchModal && (
+        <PiSearchModal 
+          onClose={() => setShowSearchModal(false)} 
+          onSelect={(pi) => {
+              setShowSearchModal(false);
+              handleSelectPi(pi);
+          }}
+        />
+      )}
     </div>
   );
 }

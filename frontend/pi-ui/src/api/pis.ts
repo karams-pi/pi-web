@@ -31,8 +31,8 @@ export async function deletePi(id: number) {
   return apiDelete(`/api/pis/${id}`);
 }
 
-export async function exportPiExcel(id: number) {
-  const res = await fetch(`${API_BASE}/api/pis/${id}/excel`, {
+export async function exportPiExcel(id: number, currency = "EXW", validity = 30) {
+  const res = await fetch(`${API_BASE}/api/pis/${id}/excel?currency=${currency}&validity=${validity}`, {
     headers: {
         // Add auth if needed, but current api.ts seems to use simple fetch wrappers
     }
