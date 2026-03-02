@@ -369,7 +369,7 @@ export default function PrintPiPage() {
                     <span>{incoterm} {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || ""}</span>
                 </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>PAGO CONDICIONES:</span>
+                   <span style={{ width: "130px" }}>CONDICIÓN DE PAGO:</span>
                    <span>{pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
                </div>
           </div>
@@ -401,9 +401,9 @@ export default function PrintPiPage() {
               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
             </tr>
             <tr>
-               <th style={{ width: "5%" }}>LARGO</th>
+               <th style={{ width: "5%" }}>LARG.</th>
                <th style={{ width: "5%" }}>PROF.</th>
-               <th style={{ width: "5%" }}>ALTO</th>
+               <th style={{ width: "5%" }}>ALT.</th>
             </tr>
           </thead>
           <tbody>

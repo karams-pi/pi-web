@@ -118,7 +118,7 @@ public class PiExportService
         ws.Cells[gridRow + 3, rightCol + 1].Value = (pi.Configuracoes?.ValorFOBFretePortoParanagua > 0) ? "PARANAGUA" : "ARAPONGAS";
         ws.Cells[gridRow + 4, rightCol].Value = "INCOTERM:";
         ws.Cells[gridRow + 4, rightCol + 1].Value = pi.Frete?.Nome;
-        ws.Cells[gridRow + 5, rightCol].Value = "PAGO CONDICIONES:";
+        ws.Cells[gridRow + 5, rightCol].Value = "CONDICIÓN DE PAGO:";
         ws.Cells[gridRow + 5, rightCol + 1].Value = "T/T";
         ws.Cells[gridRow, 1, gridRow + 7, 15].Style.Font.Size = 9;
 
@@ -128,9 +128,9 @@ public class PiExportService
         ws.Cells[startRow, 2, startRow + 1, 2].Merge = true; ws.Cells[startRow, 2].Value = "NOMBRE";
         ws.Cells[startRow, 3, startRow + 1, 3].Merge = true; ws.Cells[startRow, 3].Value = "DESCRIPCIÓN";
         ws.Cells[startRow, 4, startRow, 6].Merge = true; ws.Cells[startRow, 4].Value = "DIMENSIONES (m)";
-        ws.Cells[startRow + 1, 4].Value = "Largo";
+        ws.Cells[startRow + 1, 4].Value = "LARG.";
         ws.Cells[startRow + 1, 5].Value = "Prof.";
-        ws.Cells[startRow + 1, 6].Value = "Alto";
+        ws.Cells[startRow + 1, 6].Value = "ALT.";
         ws.Cells[startRow, 7, startRow + 1, 7].Merge = true; ws.Cells[startRow, 7].Value = "CANT UNID";
         ws.Cells[startRow, 8, startRow + 1, 8].Merge = true; ws.Cells[startRow, 8].Value = "CANT SOFA";
         ws.Cells[startRow, 9, startRow + 1, 9].Merge = true; ws.Cells[startRow, 9].Value = "TOTAL VOLUMEN M³";
@@ -302,7 +302,7 @@ public class PiExportService
         ws.Cells["A3"].Value = "DIRECCIÓN: RUA CANÁRIO DO BREJO, 630";
         ws.Cells["A4"].Value = "CÓDIGO POSTAL: 86703-797 - ARAPONGAS - PR";
         ws.Cells["A5"].Value = "INCOTERM: " + pi.Frete?.Nome + " - ARAPONGAS PR";
-        ws.Cells["A6"].Value = "PAGO CONDICIONES: A VISTA";
+        ws.Cells["A6"].Value = "CONDICIÓN DE PAGO: A VISTA";
 
         ws.Cells["H1:N6"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
         ws.Cells["H1"].Value = "PROFORMA INVOICE: " + piNumber;

@@ -289,7 +289,7 @@ export default function PrintPiFerguilePage() {
             <strong>INCOTERM:</strong> {incoterm} - ARAPONGAS PR
           </div>
           <div>
-            <strong>PAGO CONDICIONES:</strong> {pi.configuracoes?.condicoesPagamento || "A VISTA"}
+            <strong>CONDICIÓN DE PAGO:</strong> {pi.configuracoes?.condicoesPagamento || "A VISTA"}
           </div>
         </div>
 
