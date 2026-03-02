@@ -326,7 +326,8 @@ export default function ProformaInvoicePage() {
         const freteUnitarioBRL = custoPorM3BRL * item.m3;
         const freteUnitarioUSD = custoPorM3USD * item.m3;
         
-        const valorFinalBRL = (valorEXW + freteUnitarioBRL) * item.quantidade;
+        const valorBaseBRL = valorEXW * cotacaoRisco;
+        const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
         const valorFinalUSD = (valorEXW + freteUnitarioUSD) * item.quantidade;
 
         const freteBrlTooltip = 
@@ -381,7 +382,8 @@ export default function ProformaInvoicePage() {
        const freteUnitarioBRL = custoPorM3BRL * item.m3;
        const freteUnitarioUSD = custoPorM3USD * item.m3;
       
-      const valorFinalBRL = (item.valorEXW + freteUnitarioBRL) * item.quantidade;
+       const valorBaseBRL = item.valorEXW * (Number(form.cotacaoRisco) || 0);
+      const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
       const valorFinalUSD = (item.valorEXW + freteUnitarioUSD) * item.quantidade;
 
       const freteBrlTooltip = 
