@@ -267,7 +267,7 @@ public class ModulosController : ControllerBase
         qMarca = ApplyFilters(qMarca, "marca");
         var marcas = await qMarca
             .Where(x => x.Marca != null && x.Marca.FlAtivo)
-            .Select(x => new { x.Marca!.Id, x.Marca.Nome })
+            .Select(x => new { x.Marca!.Id, x.Marca.Nome, x.Marca.Imagem })
             .Distinct()
             .OrderBy(x => x!.Nome)
             .ToListAsync();

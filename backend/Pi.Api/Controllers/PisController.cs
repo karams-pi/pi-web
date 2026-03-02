@@ -106,7 +106,27 @@ public class PisController : ControllerBase
 
                     i.Observacao,
                     i.Feet,
-                    i.Finishing
+                    i.Finishing,
+                    
+                    // Include nested data for the item
+                    ModuloTecido = i.ModuloTecido != null ? new {
+                        i.ModuloTecido.Id,
+                        i.ModuloTecido.CodigoModuloTecido,
+                        i.ModuloTecido.ValorTecido,
+                        Modulo = i.ModuloTecido.Modulo != null ? new {
+                            i.ModuloTecido.Modulo.Id,
+                            i.ModuloTecido.Modulo.Descricao,
+                            Marca = i.ModuloTecido.Modulo.Marca != null ? new {
+                                i.ModuloTecido.Modulo.Marca.Id,
+                                i.ModuloTecido.Modulo.Marca.Nome,
+                                i.ModuloTecido.Modulo.Marca.Imagem
+                            } : null
+                        } : null,
+                        Tecido = i.ModuloTecido.Tecido != null ? new {
+                           i.ModuloTecido.Tecido.Id,
+                           i.ModuloTecido.Tecido.Nome
+                        } : null
+                    } : null
                 })
             })
             .FirstOrDefaultAsync();

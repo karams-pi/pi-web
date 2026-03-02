@@ -3,14 +3,12 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
 import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
-import { listModulosTecidos } from "../api/modulos"; 
 import { getCliente, type Cliente } from "../api/clientes";
 
 export default function PrintPiPage() {
   const { id } = useParams();
   const [pi, setPi] = useState<ProformaInvoice | null>(null);
   const [cliente, setCliente] = useState<Cliente | null>(null);
-  const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]);
   const [loading, setLoading] = useState(true);
 
   const urlParams = useMemo(() => {
@@ -27,29 +25,16 @@ export default function PrintPiPage() {
         // 1. Fetch PI first
         const piData = await getPi(Number(id));
         setPi(piData);
-        // ...
 
-        // 2. Fetch others in parallel
-        const promises: Promise<any>[] = [listModulosTecidos()];
-        
+        // 2. Fetch client if exists
         if (piData.idCliente) {
-            // Add catch to prevent Promise.all from rejecting entirety if client fetch fails
-            promises.push(
-                getCliente(String(piData.idCliente))
-                    .catch(err => {
-                        console.warn("Falha ao buscar cliente", err);
-                        return null;
-                    })
-            );
+            try {
+                const clientData = await getCliente(String(piData.idCliente));
+                setCliente(clientData);
+            } catch (err) {
+                console.warn("Falha ao buscar cliente", err);
+            }
         }
-
-        const results = await Promise.all(promises);
-        const mts = results[0];
-        const clientData = results[1] || null;
-
-        setModulosTecidos(mts);
-        setCliente(clientData); // Use explicit client data
-        
       } catch (error) {
         console.error("Erro ao carregar PI para impressão:", error);
         alert("Erro ao carregar documento.");
@@ -81,7 +66,7 @@ export default function PrintPiPage() {
     const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
     pi.piItens.forEach(i => {
         const item = i as any;
-        const mt = modulosTecidos.find(m => m.id === (item.idModuloTecido ?? item.IdModuloTecido));
+        const mt = item.moduloTecido;
         const marca = mt?.modulo?.marca?.nome || "Outros";
         if (!itemsByMarca[marca]) itemsByMarca[marca] = [];
         itemsByMarca[marca].push({ item, mt });
@@ -207,7 +192,7 @@ export default function PrintPiPage() {
     });
 
     return { brandGroups, totalSofaQty, totalQty, totalM3, totalValue };
-  }, [pi, modulosTecidos, currency]);
+  }, [pi, currency]);
 
   const formattedPiNumber = useMemo(() => {
     if (!pi) return "";
@@ -216,7 +201,7 @@ export default function PrintPiPage() {
     // Check if supplier is Karams or Koyo
     const firstItem = pi.piItens?.[0];
     if (firstItem) {
-        const mt = modulosTecidos.find(m => m.id === firstItem.idModuloTecido);
+        const mt = (firstItem as any).moduloTecido;
         const supplierName = (mt?.modulo?.fornecedor?.nome || "").toLowerCase();
         if (supplierName.includes("karams") || supplierName.includes("koyo")) {
             const year = dateObj.getFullYear();
@@ -226,7 +211,7 @@ export default function PrintPiPage() {
     }
     
     return base;
-  }, [pi, modulosTecidos, dateObj]);
+  }, [pi, dateObj]);
 
   if (loading) return <div style={{ padding: 20 }}>Cargando documento...</div>;
   if (!pi) return <div style={{ padding: 20 }}>Documento no encontrado.</div>;

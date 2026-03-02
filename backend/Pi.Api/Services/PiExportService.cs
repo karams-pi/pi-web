@@ -229,7 +229,7 @@ public class PiExportService
             if (brand?.Imagem != null)
             {
                 using var ms = new MemoryStream(brand.Imagem);
-                var pic = ws.Drawings.AddPicture($"Pic_{brand.Id}", ms);
+                var pic = ws.Drawings.AddPicture($"Pic_{brand.Id}_{groupStartRow}", ms);
                 pic.SetPosition(groupStartRow - 1, 5, 0, 5);
                 pic.SetSize(60, 60);
             }
@@ -397,7 +397,7 @@ public class PiExportService
             if (brand?.Imagem != null)
             {
                 using var ms = new MemoryStream(brand.Imagem);
-                var pic = ws.Drawings.AddPicture($"PicF_{brand.Id}", ms);
+                var pic = ws.Drawings.AddPicture($"PicF_{brand.Id}_{groupStartRow}", ms);
                 pic.SetPosition(groupStartRow - 1, 5, 0, 5);
                 pic.SetSize(60, 60);
             }
