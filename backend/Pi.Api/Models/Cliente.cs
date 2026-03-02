@@ -18,6 +18,7 @@ public class Cliente
     [Column("cep")] public string? Cep { get; set; }
     [Column("pessoa_contato")] public string? PessoaContato { get; set; }
     [Column("cargo_funcao")] public string? CargoFuncao { get; set; }
+    [Column("porto_destinatario")] public string? PortoDestino { get; set; }
     [Column("observacoes")] public string? Observacoes { get; set; }
     [Column("criado_em")] public DateTimeOffset CriadoEm { get; set; }
     [Column("atualizado_em")] public DateTimeOffset AtualizadoEm { get; set; }

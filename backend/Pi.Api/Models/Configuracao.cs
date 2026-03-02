@@ -60,4 +60,12 @@ public class Configuracao
 
     [ForeignKey(nameof(IdFornecedor))]
     public Fornecedor? Fornecedor { get; set; }
+
+    [Column("porto_embarque")]
+    [MaxLength(100)]
+    public string? PortoEmbarque { get; set; }
+
+    [Column("condicoes_pagamento")]
+    [MaxLength(200)]
+    public string? CondicoesPagamento { get; set; }
 }
