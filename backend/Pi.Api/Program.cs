@@ -99,9 +99,63 @@ using (var scope = app.Services.CreateScope())
             Console.WriteLine($"Versão {currentVersion} registrada no banco.");
         }
     }
-    catch (Exception ex)
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Aviso: Erro ao registrar versão: {ex.Message}");
+        }
+
+        // SEED-FREIGHT: Garante que os valores de frete globais existam
+        try
+        {
+            SeedFreightData(dbContext);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Aviso: Erro ao semear fretes: {ex.Message}");
+        }
+    }
+}
+
+// Método auxiliar para garantir integridade dos dados de frete
+static void SeedFreightData(AppDbContext db)
+{
+    // 1. Garantir que o EXW existe (mesmo id do AppDbContext)
+    if (!db.Fretes.Any(f => f.Id == 4))
     {
-        Console.WriteLine($"Aviso: Erro ao registrar versão: {ex.Message}");
+        db.Fretes.Add(new Pi.Api.Models.Frete { Id = 4, Nome = "EXW" });
+        db.SaveChanges();
+    }
+
+    // 2. Garantir 17 itens globais (id_fornecedor IS NULL)
+    // Se não houver nenhum, criamos a base
+    var hasGlobalDefaults = db.ConfiguracoesFreteItens.Any(c => c.IdFornecedor == null);
+    if (!hasGlobalDefaults)
+    {
+        for (int i = 1; i <= 17; i++)
+        {
+            db.ConfiguracoesFreteItens.Add(new Pi.Api.Models.ConfiguracoesFreteItem
+            {
+                IdFreteItem = i,
+                IdFornecedor = null,
+                Valor = i == 5 ? 3610.00m : 0.00m,
+                FlDesconsidera = false
+            });
+        }
+        db.SaveChanges();
+        Console.WriteLine("Configurações globais de frete semeadas.");
+    }
+    else
+    {
+        // Se já existem, apenas forçamos o valor correto do frete de fronteira (id 5) se ele for diferente 
+        // ou se estiver zerado (comum em restores antigos)
+        var frontierFreight = db.ConfiguracoesFreteItens.FirstOrDefault(c => c.IdFreteItem == 5 && c.IdFornecedor == null);
+        if (frontierFreight != null && (frontierFreight.Valor == 0 || frontierFreight.Valor == 361.00m))
+        {
+            frontierFreight.Valor = 3610.00m;
+            db.SaveChanges();
+            Console.WriteLine("Valor do frete de fronteira (Global) normalizado para 3610.00.");
+        }
     }
 }
 
