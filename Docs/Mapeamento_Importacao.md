@@ -63,26 +63,12 @@ Assim como na Karams, cada aba representa uma **Categoria**.
 
 ### Mapeamento de Tecidos (Preços)
 
-A Koyo possui um mapeamento de colunas de tecidos diferente:
-
-| Tecido (Código) | Coluna Excel |
-| :--- | :--- |
-| **G0** | **L** (12) |
-| **G1** | **M** (13) |
-| **G2** | **N** (14) |
-| **G3** | **O** (15) |
-| **G4** | **P** (16) |
-| **G5** | **Q** (17) |
-| **G6** | **R** (18) |
-| **G7** | **S** (19) |
-| **G8** | **H** (8) |
-| **G9** | **I** (9) |
-| **G10** | **J** (10) |
+O sistema agora detecta as colunas de tecidos **automaticamente** para a Koyo. Ele procura na **primeira linha** de cada aba por células contendo os códigos **G0, G1, G2, G3, G4, G5, G6, G7, G8, G9** e **G10**. Isso torna a importação flexível caso a fornecedora altere a ordem das colunas no futuro.
 
 ---
 
 ## Notas Técnicas
 
 *   **Identificação Única**: O sistema tenta identificar se um módulo já existe combinando `Fornecedor + Categoria + Marca + Descrição + Largura`. Se encontrar, atualiza os dados; caso contrário, cria um novo.
-*   **Variação de Tamanho**: Para a **Karams**, a `Largura` é usada como critério adicional para diferenciar módulos com a mesma descrição (ex: mesmo sofá com tamanhos diferentes).
+*   **Variação de Tamanho**: Para **Karams** e **Koyo**, a `Largura` é usada como critério adicional para diferenciar módulos com a mesma descrição (ex: mesmo sofá com tamanhos diferentes).
 *   **Formatação de Células**: O sistema possui uma rotina de limpeza automática que corrige referências de células inválidas (ex: `ref="D1260;D214"` ou intervalos invertidos) antes de processar o arquivo.
