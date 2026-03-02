@@ -266,9 +266,8 @@ public class ModulosController : ControllerBase
         IQueryable<Modulo> qMarca = _db.Modulos.AsNoTracking().Include(m => m.Marca); 
         qMarca = ApplyFilters(qMarca, "marca");
         var marcas = await qMarca
-            .Where(x => x.Marca != null && x.Marca.FlAtivo) // Only Show active brands in filter
-            .Select(x => x.Marca)
-            .Where(x => x != null)
+            .Where(x => x.Marca != null && x.Marca.FlAtivo)
+            .Select(x => new { x.Marca!.Id, x.Marca.Nome })
             .Distinct()
             .OrderBy(x => x!.Nome)
             .ToListAsync();
