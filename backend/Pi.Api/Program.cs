@@ -99,21 +99,19 @@ using (var scope = app.Services.CreateScope())
             Console.WriteLine($"Versão {currentVersion} registrada no banco.");
         }
     }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Aviso: Erro ao registrar versão: {ex.Message}");
-        }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Aviso: Erro ao registrar versão: {ex.Message}");
+    }
 
-        // SEED-FREIGHT: Garante que os valores de frete globais existam
-        try
-        {
-            SeedFreightData(dbContext);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Aviso: Erro ao semear fretes: {ex.Message}");
-        }
+    // SEED-FREIGHT: Garante que os valores de frete globais existam
+    try
+    {
+        SeedFreightData(dbContext);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Aviso: Erro ao semear fretes: {ex.Message}");
     }
 }
 
