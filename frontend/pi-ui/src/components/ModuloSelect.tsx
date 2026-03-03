@@ -10,7 +10,7 @@ interface ModuloSelectProps {
   mapMarca: Map<number, string>;
   mapTecido?: Map<number, string>;
   placeholder?: string;
-  calcExw?: (valor: number, idFornecedor: number) => number;
+  calcExw?: (valor: number, idFornecedor: number) => number | undefined;
 }
 
 export function ModuloSelect({
@@ -47,7 +47,7 @@ export function ModuloSelect({
     const cat = mapCategoria.get(opt.idCategoria) || "";
     const marc = mapMarca.get(opt.idMarca) || "";
     const mod = opt.descricao;
-    
+
     // Dimensões
     const l = opt.largura || 0;
     const p = opt.profundidade || 0;
@@ -58,7 +58,7 @@ export function ModuloSelect({
 
   const filteredOptions = options.filter((opt) => {
     const term = search.toLowerCase();
-    const label = getLabel(opt).toLowerCase(); 
+    const label = getLabel(opt).toLowerCase();
     return label.includes(term);
   });
 
@@ -68,10 +68,10 @@ export function ModuloSelect({
     <div className="mt-select-wrapper" ref={wrapperRef} style={{ position: "relative", flex: 1 }}>
       <div
         className="cl-select"
-        style={{ 
-          cursor: "pointer", 
-          display: "flex", 
-          alignItems: "center", 
+        style={{
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
           justifyContent: "space-between",
           minHeight: "38px",
           background: "var(--bg-input, #13131f)",
@@ -136,7 +136,7 @@ export function ModuloSelect({
                 const forn = mapFornecedor.get(opt.idFornecedor) || "?";
                 const cat = mapCategoria.get(opt.idCategoria) || "?";
                 const marc = mapMarca.get(opt.idMarca) || "?";
-                
+
                 return (
                   <div
                     key={opt.id}
@@ -156,37 +156,40 @@ export function ModuloSelect({
                     onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a35")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = String(opt.id) === value ? "#29293d" : "transparent")}
                   >
-                     <div style={{ fontWeight: "bold", marginBottom: 2, color: "#4f9eff" }}>
-                        {forn} &gt; {cat} &gt; {marc}
-                     </div>
-                     <div>
-                        {opt.descricao}
-                        <span style={{ color: "#aaa", marginLeft: 6, fontSize: "0.9em" }}>
-                           ({opt.largura} x {opt.profundidade} x {opt.altura})
-                        </span>
-                     </div>
-                     {opt.modulosTecidos && opt.modulosTecidos.length > 0 && (
-                        <div style={{ marginTop: 4, paddingLeft: 8, fontSize: "0.85em", color: "#888", borderLeft: "2px solid #333" }}>
-                          {opt.modulosTecidos.map((mt) => {
-                             const nomeTecido = mt.tecido?.nome || mapTecido?.get(mt.idTecido) || `#${mt.idTecido}`;
-                             return (
-                               <div key={mt.id} style={{ display: "flex", justifyContent: "space-between" }}>
-                                 <span>{nomeTecido}</span>
-                                 <span>
-                                    {calcExw && (
-                                        <span style={{ color: "#10b981", marginRight: 10, fontWeight: "bold" }}>
-                                            $ {calcExw(mt.valorTecido, opt.idFornecedor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                                        </span>
-                                    )}
-                                    <span style={{ color: "#ccc" }}>
-                                        R$ {mt.valorTecido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                                    </span>
-                                 </span>
-                               </div>
-                             );
-                          })}
-                        </div>
-                     )}
+                    <div style={{ fontWeight: "bold", marginBottom: 2, color: "#4f9eff" }}>
+                      {forn} &gt; {cat} &gt; {marc}
+                    </div>
+                    <div>
+                      {opt.descricao}
+                      <span style={{ color: "#aaa", marginLeft: 6, fontSize: "0.9em" }}>
+                        ({opt.largura} x {opt.profundidade} x {opt.altura})
+                      </span>
+                    </div>
+                    {opt.modulosTecidos && opt.modulosTecidos.length > 0 && (
+                      <div style={{ marginTop: 4, paddingLeft: 8, fontSize: "0.85em", color: "#888", borderLeft: "2px solid #333" }}>
+                        {opt.modulosTecidos.map((mt) => {
+                          const nomeTecido = mt.tecido?.nome || mapTecido?.get(mt.idTecido) || `#${mt.idTecido}`;
+                          return (
+                            <div key={mt.id} style={{ display: "flex", justifyContent: "space-between" }}>
+                              <span>{nomeTecido}</span>
+                              <span>
+                                {calcExw && (
+                                  <span style={{ color: "#10b981", marginRight: 10, fontWeight: "bold" }}>
+                                    {(() => {
+                                      const val = calcExw(mt.valorTecido, opt.idFornecedor);
+                                      return val === undefined ? "..." : `$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                    })()}
+                                  </span>
+                                )}
+                                <span style={{ color: "#ccc" }}>
+                                  R$ {mt.valorTecido.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })

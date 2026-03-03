@@ -17,6 +17,7 @@ import {
   getModuleFilters,
   exportModulosExcel,
 } from "../api/modulos";
+import { getLatestConfigsAll } from "../api/configuracoes";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { ModuloSelect } from "../components/ModuloSelect";
 import { PrintModulesModal } from "../components/PrintModulesModal";
@@ -42,7 +43,7 @@ export default function ModulosPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Modulo[]>([]);
   const [allModules, setAllModules] = useState<Modulo[]>([]); // For the combo box
-  
+
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -54,7 +55,7 @@ export default function ModulosPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Pagination / Search State
   const [search, setSearch] = useState("");
   const [filterFornecedor, setFilterFornecedor] = useState("");
@@ -106,9 +107,9 @@ export default function ModulosPage() {
   async function loadAllModules() {
     try {
       const res = await listModulos(
-        "", 
-        1, 
-        1000, 
+        "",
+        1,
+        1000,
         filterFornecedor ? Number(filterFornecedor) : undefined,
         filterCategoria ? Number(filterCategoria) : undefined,
         filterMarca ? Number(filterMarca) : undefined,
@@ -124,7 +125,6 @@ export default function ModulosPage() {
   // Load Config and Cotacao
   const loadConfigData = async () => {
     try {
-      const { getLatestConfigsAll } = await import("../api/configuracoes");
       const allConfigs = await getLatestConfigsAll();
       const map = new Map<number | null, Configuracao>();
       allConfigs.forEach(c => {
@@ -159,9 +159,9 @@ export default function ModulosPage() {
       setError(null);
       // Calls paged API
       const res = await listModulos(
-        search, 
-        page, 
-        10, 
+        search,
+        page,
+        10,
         filterFornecedor ? Number(filterFornecedor) : undefined,
         filterCategoria ? Number(filterCategoria) : undefined,
         filterMarca ? Number(filterMarca) : undefined,
@@ -230,13 +230,13 @@ export default function ModulosPage() {
         await updateModulo(editing.id, payload);
         alert("Módulo atualizado!");
         await loadItems();
-        setIsOpen(false); 
+        setIsOpen(false);
       } else {
         const created = await createModulo(payload);
         alert("Módulo criado! Agora você pode adicionar tecidos.");
         await loadItems();
         setEditing(created);
-        setActiveTab("tecidos"); 
+        setActiveTab("tecidos");
       }
     } catch (e: unknown) {
       alert(getErrorMessage(e));
@@ -270,109 +270,117 @@ export default function ModulosPage() {
 
   function calcEXW(valorTecido: number, idFornecedor: number) {
     const c = configsMap.get(idFornecedor) || configsMap.get(null);
-    if (!c || !cotacao) return 0;
-    
+    if (!c || !cotacao) {
+      return undefined;
+    }
+
     const supplier = fornecedores.find(f => f.id === idFornecedor);
     const sName = (supplier?.nome || "").toLowerCase();
     const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
 
     const cotacaoRisco = isFerguile ? c.valorReducaoDolar : (cotacao - c.valorReducaoDolar);
-    if (cotacaoRisco <= 0) return 0;
+
+    if (cotacaoRisco <= 0) {
+      console.warn(`calcEXW: cotacaoRisco (${cotacaoRisco}) <= 0 for fournisseur ${idFornecedor}`, { isFerguile, cotacao, valorReducaoDolar: c.valorReducaoDolar });
+      return 0;
+    }
+
     const valorBase = valorTecido / cotacaoRisco;
     const comissao = valorBase * (c.percentualComissao / 100);
-    // Reverted: Gordura on Base Only
     const gordura = valorBase * (c.percentualGordura / 100);
-    return valorBase + comissao + gordura;
+
+    const res = valorBase + comissao + gordura;
+    return res;
   }
 
   // Helper to handle combo selection
   const handleModuleSelect = (idStr: string) => {
     const mod = allModules.find(m => String(m.id) === idStr);
     if (mod) {
-        setSearch(mod.descricao);
-        setPage(1);
+      setSearch(mod.descricao);
+      setPage(1);
     }
   };
 
 
   function handlePrint() {
-      setIsPrintModalOpen(true);
+    setIsPrintModalOpen(true);
   }
 
   async function onConfirmPrint(scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) {
-      let list = items;
-      if (scope === 'all') {
-          try {
-              setLoading(true);
-              const res = await listModulos(
-                 search,
-                 1, 100000,
-                 filterFornecedor ? Number(filterFornecedor) : undefined,
-                 filterCategoria ? Number(filterCategoria) : undefined,
-                 filterMarca ? Number(filterMarca) : undefined,
-                 filterTecido ? Number(filterTecido) : undefined,
-                 filterStatus
-              );
-              list = res.items;
-          } catch(e) {
-              alert("Erro ao carregar tudo");
-              return;
-          } finally {
-              setLoading(false);
-          }
+    let list = items;
+    if (scope === 'all') {
+      try {
+        setLoading(true);
+        const res = await listModulos(
+          search,
+          1, 100000,
+          filterFornecedor ? Number(filterFornecedor) : undefined,
+          filterCategoria ? Number(filterCategoria) : undefined,
+          filterMarca ? Number(filterMarca) : undefined,
+          filterTecido ? Number(filterTecido) : undefined,
+          filterStatus
+        );
+        list = res.items;
+      } catch (e) {
+        alert("Erro ao carregar tudo");
+        return;
+      } finally {
+        setLoading(false);
       }
+    }
 
-      printModulesReport({
-          modules: list,
-          currency,
-          cotacao,
-          config,
-          maps: {
-              fornecedor: fornMap,
-              categoria: catMap,
-              marca: marcaMap,
-              tecido: tecidoMap
-          },
-          marcasFull: new Map(marcas.map(m => [m.id, m])),
-          validityDays
-      });
-      setIsPrintModalOpen(false);
+    printModulesReport({
+      modules: list,
+      currency,
+      cotacao,
+      config,
+      maps: {
+        fornecedor: fornMap,
+        categoria: catMap,
+        marca: marcaMap,
+        tecido: tecidoMap
+      },
+      marcasFull: new Map(marcas.map(m => [m.id, m])),
+      validityDays
+    });
+    setIsPrintModalOpen(false);
   }
 
   async function onConfirmExcel(scope: 'screen' | 'all', currency: 'BRL' | 'EXW') {
     try {
-        setLoading(true);
-        const params: any = {
-            currency,
-            cotacao,
-            search,
-            idFornecedor: filterFornecedor ? Number(filterFornecedor) : undefined,
-            idCategoria: filterCategoria ? Number(filterCategoria) : undefined,
-            idMarca: filterMarca ? Number(filterMarca) : undefined,
-            idTecido: filterTecido ? Number(filterTecido) : undefined,
-            status: filterStatus
-        };
+      setLoading(true);
+      const params: any = {
+        currency,
+        cotacao,
+        search,
+        idFornecedor: filterFornecedor ? Number(filterFornecedor) : undefined,
+        idCategoria: filterCategoria ? Number(filterCategoria) : undefined,
+        idMarca: filterMarca ? Number(filterMarca) : undefined,
+        idTecido: filterTecido ? Number(filterTecido) : undefined,
+        status: filterStatus
+      };
 
-        if (scope === 'screen') {
-            params.ids = items.map(m => m.id);
-        }
+      if (scope === 'screen') {
+        params.ids = items.map(m => m.id);
+      }
 
-        const blob = await exportModulosExcel(params);
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `RelatorioModulos_${currency}_${new Date().getTime()}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+      const blob = await exportModulosExcel(params);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `RelatorioModulos_${currency}_${new Date().getTime()}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (e) {
-        alert("Erro ao exportar Excel");
+      alert("Erro ao exportar Excel");
     } finally {
-        setLoading(false);
-        setIsPrintModalOpen(false);
+      setLoading(false);
+      setIsPrintModalOpen(false);
     }
-}
+  }
 
 
   // --- Render ---
@@ -421,56 +429,56 @@ export default function ModulosPage() {
         </div>
 
         <div style={{ width: 140 }}>
-           <select 
-              className="cl-input"
-              value={filterStatus}
-              onChange={(e) => { setFilterStatus(e.target.value as any); setPage(1); }}
-              style={{ height: 38, color: 'var(--text)' }}
-           >
-              <option value="ativos" style={{ color: 'black' }}>Status: Ativos</option>
-              <option value="inativos" style={{ color: 'black' }}>Status: Inativos</option>
-              <option value="todos" style={{ color: 'black' }}>Status: Todos</option>
-           </select>
+          <select
+            className="cl-input"
+            value={filterStatus}
+            onChange={(e) => { setFilterStatus(e.target.value as any); setPage(1); }}
+            style={{ height: 38, color: 'var(--text)' }}
+          >
+            <option value="ativos" style={{ color: 'black' }}>Status: Ativos</option>
+            <option value="inativos" style={{ color: 'black' }}>Status: Inativos</option>
+            <option value="todos" style={{ color: 'black' }}>Status: Todos</option>
+          </select>
         </div>
 
         <div style={{ flex: 1, minWidth: 200 }}>
-             <ModuloSelect
-                value={selectedModuleId}
-                onChange={(val) => {
-                    setSelectedModuleId(val);
-                    handleModuleSelect(val);
-                }}
-                options={allModules}
-                mapFornecedor={fornMap}
-                mapCategoria={catMap}
-                mapMarca={marcaMap}
-                mapTecido={tecidoMap}
-                calcExw={calcEXW}
-             />
+          <ModuloSelect
+            value={selectedModuleId}
+            onChange={(val) => {
+              setSelectedModuleId(val);
+              handleModuleSelect(val);
+            }}
+            options={allModules}
+            mapFornecedor={fornMap}
+            mapCategoria={catMap}
+            mapMarca={marcaMap}
+            mapTecido={tecidoMap}
+            calcExw={calcEXW}
+          />
         </div>
 
         <div style={{ display: 'flex', gap: 8 }}>
-            <button 
-                className="btn btn-secondary" 
-                onClick={() => {
-                    setFilterFornecedor("");
-                    setFilterCategoria("");
-                    setFilterMarca("");
-                    setFilterTecido("");
-                    setFilterStatus("ativos");
-                    setSearch("");
-                    setPage(1);
-                    setSelectedModuleId("");
-                }}
-                style={{ height: '38px', whiteSpace: 'nowrap' }}
-                title="Limpar todos os filtros"
-            >
-                🧹 Limpar
-            </button>
-            <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
-            <button className="btn btn-secondary" onClick={() => handlePrint()} style={{ height: '38px' }} disabled={loading}>
-                🖨️ Relatório
-            </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setFilterFornecedor("");
+              setFilterCategoria("");
+              setFilterMarca("");
+              setFilterTecido("");
+              setFilterStatus("ativos");
+              setSearch("");
+              setPage(1);
+              setSelectedModuleId("");
+            }}
+            style={{ height: '38px', whiteSpace: 'nowrap' }}
+            title="Limpar todos os filtros"
+          >
+            🧹 Limpar
+          </button>
+          <button className="btn btn-primary" onClick={openCreate} style={{ height: '38px' }}>Novo</button>
+          <button className="btn btn-secondary" onClick={() => handlePrint()} style={{ height: '38px' }} disabled={loading}>
+            🖨️ Relatório
+          </button>
         </div>
       </div>
 
@@ -480,9 +488,9 @@ export default function ModulosPage() {
         <div>Carregando...</div>
       ) : (
         <>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-                <tr>
+              <tr>
                 <th style={th}>ID</th>
                 <th style={th}>Fornecedor</th>
                 <th style={th}>Categoria</th>
@@ -496,10 +504,10 @@ export default function ModulosPage() {
                 <th style={th}>Tecidos / Valores</th>
                 <th style={th}>Status</th>
                 <th style={th}>Ações</th>
-                </tr>
+              </tr>
             </thead>
             <tbody>
-                {items.map((x) => {
+              {items.map((x) => {
                 let myTecidos = x.modulosTecidos || [];
                 if (filterTecido) {
                   myTecidos = myTecidos.filter(t => t.idTecido === Number(filterTecido));
@@ -519,50 +527,50 @@ export default function ModulosPage() {
                     <td style={td} rowSpan={rowSpan}>{fmt(x.profundidade)}</td>
                     <td style={td} rowSpan={rowSpan}>{fmt(x.altura)}</td>
                     <td style={td} rowSpan={rowSpan}>{fmt(x.m3)}</td>
-                    
+
                     {/* EXW */}
                     <td style={td}>
-                        {myTecidos.length > 0 ? (
-                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
-                                 <span style={{ color: '#10b981' }}>
-                                    $ {fmt(calcEXW(myTecidos[0].valorTecido, x.idFornecedor), 2)}
-                                 </span>
-                                 <button 
-                                    className="btn-icon" 
-                                    onClick={() => setCalcModalData({ valorTecido: myTecidos[0].valorTecido, idFornecedor: x.idFornecedor })}
-                                    title="Ver memória de cálculo"
-                                    style={{ padding: 2, display: 'flex' }}
-                                 >
-                                    <HelpCircle size={14} color="#94a3b8" />
-                                 </button>
-                             </div>
-                        ) : "-"}
+                      {myTecidos.length > 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+                          <span style={{ color: '#10b981' }}>
+                            {calcEXW(myTecidos[0].valorTecido, x.idFornecedor) === undefined ? "..." : `$ ${fmt(calcEXW(myTecidos[0].valorTecido, x.idFornecedor), 2)}`}
+                          </span>
+                          <button
+                            className="btn-icon"
+                            onClick={() => setCalcModalData({ valorTecido: myTecidos[0].valorTecido, idFornecedor: x.idFornecedor })}
+                            title="Ver memória de cálculo"
+                            style={{ padding: 2, display: 'flex' }}
+                          >
+                            <HelpCircle size={14} color="#94a3b8" />
+                          </button>
+                        </div>
+                      ) : "-"}
                     </td>
 
                     {/* Tecidos/Valores */}
                     <td style={td}>
-                        {myTecidos.length > 0 ? (
-                            <div>
-                                <span style={{ fontWeight: 500, color: '#94a3b8' }}>
-                                    {myTecidos[0].tecido?.nome || myTecidos[0].idTecido}:
-                                </span>{' '}
-                                <span style={{ color: '#e5e7eb' }}>
-                                    R$ {fmt(myTecidos[0].valorTecido, 2)}
-                                </span>
-                            </div>
-                        ) : "-"}
+                      {myTecidos.length > 0 ? (
+                        <div>
+                          <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                            {myTecidos[0].tecido?.nome || myTecidos[0].idTecido}:
+                          </span>{' '}
+                          <span style={{ color: '#e5e7eb' }}>
+                            R$ {fmt(myTecidos[0].valorTecido, 2)}
+                          </span>
+                        </div>
+                      ) : "-"}
                     </td>
 
                     <td style={td}>
-                        {myTecidos.length > 0 ? (
-                             <span style={{ 
-                                 color: myTecidos[0].flAtivo ? '#4ade80' : '#f87171',
-                                 fontWeight: 500,
-                                 fontSize: '0.85rem'
-                             }}>
-                                {myTecidos[0].flAtivo ? 'Ativo' : 'Inativo'}
-                             </span>
-                        ) : "-"}
+                      {myTecidos.length > 0 ? (
+                        <span style={{
+                          color: myTecidos[0].flAtivo ? '#4ade80' : '#f87171',
+                          fontWeight: 500,
+                          fontSize: '0.85rem'
+                        }}>
+                          {myTecidos[0].flAtivo ? 'Ativo' : 'Inativo'}
+                        </span>
+                      ) : "-"}
                     </td>
 
                     <td style={td} rowSpan={rowSpan}>
@@ -576,72 +584,72 @@ export default function ModulosPage() {
 
                 // Additional rows for remaining fabrics
                 const otherRows = myTecidos.slice(1).map((mt, i) => (
-                    <tr key={`${x.id}-row-${i+1}`}>
-                        <td style={td}>
-                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
-                                 <span style={{ color: '#10b981' }}>
-                                    $ {fmt(calcEXW(mt.valorTecido, x.idFornecedor), 2)}
-                                 </span>
-                                 <button 
-                                    className="btn-icon" 
-                                    onClick={() => setCalcModalData({ valorTecido: mt.valorTecido, idFornecedor: x.idFornecedor })}
-                                    title="Ver memória de cálculo"
-                                    style={{ padding: 2, display: 'flex' }}
-                                 >
-                                    <HelpCircle size={14} color="#94a3b8" />
-                                 </button>
-                             </div>
-                        </td>
-                        <td style={td}>
-                            <div>
-                                <span style={{ fontWeight: 500, color: '#94a3b8' }}>
-                                    {mt.tecido?.nome || mt.idTecido}:
-                                </span>{' '}
-                                <span style={{ color: '#e5e7eb' }}>
-                                    R$ {fmt(mt.valorTecido, 2)}
-                                </span>
-                            </div>
-                        </td>
-                        <td style={td}>
-                             <span style={{ 
-                                 color: mt.flAtivo ? '#4ade80' : '#f87171',
-                                 fontWeight: 500,
-                                 fontSize: '0.85rem'
-                             }}>
-                                {mt.flAtivo ? 'Ativo' : 'Inativo'}
-                             </span>
-                        </td>
-                    </tr>
+                  <tr key={`${x.id}-row-${i + 1}`}>
+                    <td style={td}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+                        <span style={{ color: '#10b981' }}>
+                          {calcEXW(mt.valorTecido, x.idFornecedor) === undefined ? "..." : `$ ${fmt(calcEXW(mt.valorTecido, x.idFornecedor), 2)}`}
+                        </span>
+                        <button
+                          className="btn-icon"
+                          onClick={() => setCalcModalData({ valorTecido: mt.valorTecido, idFornecedor: x.idFornecedor })}
+                          title="Ver memória de cálculo"
+                          style={{ padding: 2, display: 'flex' }}
+                        >
+                          <HelpCircle size={14} color="#94a3b8" />
+                        </button>
+                      </div>
+                    </td>
+                    <td style={td}>
+                      <div>
+                        <span style={{ fontWeight: 500, color: '#94a3b8' }}>
+                          {mt.tecido?.nome || mt.idTecido}:
+                        </span>{' '}
+                        <span style={{ color: '#e5e7eb' }}>
+                          R$ {fmt(mt.valorTecido, 2)}
+                        </span>
+                      </div>
+                    </td>
+                    <td style={td}>
+                      <span style={{
+                        color: mt.flAtivo ? '#4ade80' : '#f87171',
+                        fontWeight: 500,
+                        fontSize: '0.85rem'
+                      }}>
+                        {mt.flAtivo ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                  </tr>
                 ));
 
                 return (
-                    <React.Fragment key={x.id}>
-                        {firstRow}
-                        {otherRows}
-                    </React.Fragment>
+                  <React.Fragment key={x.id}>
+                    {firstRow}
+                    {otherRows}
+                  </React.Fragment>
                 );
-                })}
+              })}
             </tbody>
-            </table>
+          </table>
 
-            {/* Pagination Controls */}
-            <div style={{ marginTop: 16, display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center' }}>
-                <button 
-                    className="btn btn-secondary" 
-                    disabled={page <= 1} 
-                    onClick={() => setPage(p => p - 1)}
-                >
-                    Anterior
-                </button>
-                <span>Página {page} de {totalPages || 1} (Total: {totalItems})</span>
-                <button 
-                    className="btn btn-secondary" 
-                    disabled={page >= totalPages} 
-                    onClick={() => setPage(p => p + 1)}
-                >
-                    Próxima
-                </button>
-            </div>
+          {/* Pagination Controls */}
+          <div style={{ marginTop: 16, display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center' }}>
+            <button
+              className="btn btn-secondary"
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+            >
+              Anterior
+            </button>
+            <span>Página {page} de {totalPages || 1} (Total: {totalItems})</span>
+            <button
+              className="btn btn-secondary"
+              disabled={page >= totalPages}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Próxima
+            </button>
+          </div>
         </>
       )}
 
@@ -711,28 +719,28 @@ export default function ModulosPage() {
                         placeholder="Selecione..."
                       />
                     </div>
-                      <div className="field">
-                        <label className="label">Modelo*</label>
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <div style={{ flex: 1 }}>
-                            <SearchableSelect
-                              value={form.idMarca || ""}
-                              onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
-                              options={marcas.map(m => ({ value: m.id, label: m.nome }))}
-                              placeholder="Selecione..."
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            className="btn btn-sm"
-                            onClick={() => navigate("/marcas")}
-                            title="Cadastrar novo modelo"
-                            style={{ minWidth: "40px" }}
-                          >
-                            +
-                          </button>
+                    <div className="field">
+                      <label className="label">Modelo*</label>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <div style={{ flex: 1 }}>
+                          <SearchableSelect
+                            value={form.idMarca || ""}
+                            onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
+                            options={marcas.map(m => ({ value: m.id, label: m.nome }))}
+                            placeholder="Selecione..."
+                          />
                         </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          onClick={() => navigate("/marcas")}
+                          title="Cadastrar novo modelo"
+                          style={{ minWidth: "40px" }}
+                        >
+                          +
+                        </button>
                       </div>
+                    </div>
 
                     <div className="field">
                       <label className="label">Largura</label>
@@ -786,7 +794,7 @@ export default function ModulosPage() {
         </div>
       )}
 
-      <PrintModulesModal 
+      <PrintModulesModal
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
         onConfirm={onConfirmPrint}
@@ -795,18 +803,18 @@ export default function ModulosPage() {
       />
 
       {calcModalData && (
-          <CalculationDetailsModal
-            isOpen={!!calcModalData}
-            onClose={() => setCalcModalData(null)}
-            valorTecido={(calcModalData as any).valorTecido}
-            config={configsMap.get((calcModalData as any).idFornecedor) || configsMap.get(null) || config}
-            cotacao={cotacao}
-            isFerguile={(() => {
-                const supplier = fornecedores.find(f => f.id === (calcModalData as any).idFornecedor);
-                const sName = (supplier?.nome || "").toLowerCase();
-                return sName.includes("ferguile") || sName.includes("livintus");
-            })()}
-          />
+        <CalculationDetailsModal
+          isOpen={!!calcModalData}
+          onClose={() => setCalcModalData(null)}
+          valorTecido={(calcModalData as any).valorTecido}
+          config={configsMap.get((calcModalData as any).idFornecedor) || configsMap.get(null) || config}
+          cotacao={cotacao}
+          isFerguile={(() => {
+            const supplier = fornecedores.find(f => f.id === (calcModalData as any).idFornecedor);
+            const sName = (supplier?.nome || "").toLowerCase();
+            return sName.includes("ferguile") || sName.includes("livintus");
+          })()}
+        />
       )}
     </div>
   );
@@ -826,12 +834,12 @@ function TecidosTab({
   const [selTecido, setSelTecido] = useState("");
   const [valor, setValor] = useState("0,000");
   const [adding, setAdding] = useState(false);
-  
+
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValor, setEditingValor] = useState("");
   const [editingFlAtivo, setEditingFlAtivo] = useState(true);
   const [editingDtRevisao, setEditingDtRevisao] = useState("");
-  
+
   const [filterStatus, setFilterStatus] = useState<'todos' | 'ativos' | 'inativos'>('todos');
 
   async function add() {
@@ -868,7 +876,7 @@ function TecidosTab({
   function startEdit(link: ModuloTecido) {
     setEditingId(link.id);
     setEditingValor(fmt(link.valorTecido, 2));
-    setEditingFlAtivo(link.flAtivo !== false); 
+    setEditingFlAtivo(link.flAtivo !== false);
     setEditingDtRevisao(link.dtUltimaRevisao ? link.dtUltimaRevisao.split('T')[0] : "");
   }
 
@@ -883,7 +891,7 @@ function TecidosTab({
     try {
       const link = currentLinks.find(l => l.id === id);
       if (!link) return;
-      
+
       await updateModuloTecido(id, {
         idModulo: link.idModulo,
         idTecido: link.idTecido,
@@ -901,9 +909,9 @@ function TecidosTab({
 
   // Filter links
   const filteredLinks = (currentLinks || []).filter(l => {
-      if (filterStatus === 'ativos') return l.flAtivo !== false;
-      if (filterStatus === 'inativos') return l.flAtivo === false;
-      return true;
+    if (filterStatus === 'ativos') return l.flAtivo !== false;
+    if (filterStatus === 'inativos') return l.flAtivo === false;
+    return true;
   });
 
   return (
@@ -932,17 +940,17 @@ function TecidosTab({
       </div>
 
       <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-          <label style={{ fontSize: 14, color: '#aaa' }}>Filtro:</label>
-          <select 
-            className="cl-input" 
-            style={{ width: 120, padding: 4, height: 30 }}
-            value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value as any)}
-          >
-              <option value="todos">Todos</option>
-              <option value="ativos">Ativos</option>
-              <option value="inativos">Inativos</option>
-          </select>
+        <label style={{ fontSize: 14, color: '#aaa' }}>Filtro:</label>
+        <select
+          className="cl-input"
+          style={{ width: 120, padding: 4, height: 30 }}
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value as any)}
+        >
+          <option value="todos">Todos</option>
+          <option value="ativos">Ativos</option>
+          <option value="inativos">Inativos</option>
+        </select>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16 }}>
@@ -965,54 +973,54 @@ function TecidosTab({
                 </td>
                 <td style={{ ...td, textAlign: "right" }}>
                   {isEditing ? (
-                     <input 
-                        className="cl-input" 
-                        style={{ width: 80, padding: 4, height: 28 }}
-                        value={editingValor}
-                        onChange={e => setEditingValor(e.target.value)}
-                     /> 
+                    <input
+                      className="cl-input"
+                      style={{ width: 80, padding: 4, height: 28 }}
+                      value={editingValor}
+                      onChange={e => setEditingValor(e.target.value)}
+                    />
                   ) : (
                     fmt(link.valorTecido, 2)
                   )}
                 </td>
                 <td style={{ ...td, textAlign: "center" }}>
-                    {isEditing ? (
-                        <input 
-                            type="checkbox"
-                            checked={editingFlAtivo}
-                            onChange={e => setEditingFlAtivo(e.target.checked)}
-                        />
-                    ) : (
-                        <span>{link.flAtivo !== false ? "✅" : "❌"}</span>
-                    )}
-                </td>
-                 <td style={{ ...td, textAlign: "center" }}>
-                    {isEditing ? (
-                        <input 
-                            type="date"
-                            className="cl-input"
-                            style={{ width: 110, padding: 2, fontSize: 12 }}
-                            value={editingDtRevisao}
-                            onChange={e => setEditingDtRevisao(e.target.value)}
-                        />
-                    ) : (
-                        <span style={{ fontSize: 12 }}>
-                            {link.dtUltimaRevisao ? new Date(link.dtUltimaRevisao).toLocaleDateString() : '-'}
-                        </span>
-                    )}
+                  {isEditing ? (
+                    <input
+                      type="checkbox"
+                      checked={editingFlAtivo}
+                      onChange={e => setEditingFlAtivo(e.target.checked)}
+                    />
+                  ) : (
+                    <span>{link.flAtivo !== false ? "✅" : "❌"}</span>
+                  )}
                 </td>
                 <td style={{ ...td, textAlign: "center" }}>
-                   {isEditing ? (
-                       <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-                           <button className="btn btn-sm btn-primary" onClick={() => saveEdit(link.id)} style={{ padding: '2px 6px' }}>✔️</button>
-                           <button className="btn btn-sm btn-secondary" onClick={cancelEdit} style={{ padding: '2px 6px' }}>❌</button>
-                       </div>
-                   ) : (
-                       <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-                            <button className="btn btn-sm" onClick={() => startEdit(link)} title="Editar valor">✏️</button>
-                            <button className="btn btn-sm btn-danger" onClick={() => remove(link.id)} title="Remover">🗑️</button>
-                       </div>
-                   )}
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      className="cl-input"
+                      style={{ width: 110, padding: 2, fontSize: 12 }}
+                      value={editingDtRevisao}
+                      onChange={e => setEditingDtRevisao(e.target.value)}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 12 }}>
+                      {link.dtUltimaRevisao ? new Date(link.dtUltimaRevisao).toLocaleDateString() : '-'}
+                    </span>
+                  )}
+                </td>
+                <td style={{ ...td, textAlign: "center" }}>
+                  {isEditing ? (
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                      <button className="btn btn-sm btn-primary" onClick={() => saveEdit(link.id)} style={{ padding: '2px 6px' }}>✔️</button>
+                      <button className="btn btn-sm btn-secondary" onClick={cancelEdit} style={{ padding: '2px 6px' }}>❌</button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                      <button className="btn btn-sm" onClick={() => startEdit(link)} title="Editar valor">✏️</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => remove(link.id)} title="Remover">🗑️</button>
+                    </div>
+                  )}
                 </td>
               </tr>
             );
@@ -1031,100 +1039,100 @@ function TecidosTab({
 }
 
 function CalculationDetailsModal({
-    isOpen,
-    onClose,
-    valorTecido,
-    config,
-    cotacao,
-    isFerguile
+  isOpen,
+  onClose,
+  valorTecido,
+  config,
+  cotacao,
+  isFerguile
 }: {
-    isOpen: boolean;
-    onClose: () => void;
-    valorTecido: number;
-    config: Configuracao | null;
-    cotacao: number;
-    isFerguile?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  valorTecido: number;
+  config: Configuracao | null;
+  cotacao: number;
+  isFerguile?: boolean;
 }) {
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    // Recalculate Logic to display
-    const cotacaoRisco = isFerguile ? (config?.valorReducaoDolar || 0) : (cotacao - (config?.valorReducaoDolar || 0));
-    // Safety check div by zero
-    const safeCotacao = cotacaoRisco <= 0 ? 1 : cotacaoRisco;
+  // Recalculate Logic to display
+  const cotacaoRisco = isFerguile ? (config?.valorReducaoDolar || 0) : (cotacao - (config?.valorReducaoDolar || 0));
+  // Safety check div by zero
+  const safeCotacao = cotacaoRisco <= 0 ? 1 : cotacaoRisco;
 
-    const valorBase = valorTecido / safeCotacao;
-    const comissao = valorBase * ((config?.percentualComissao || 0) / 100);
-    // Reverted: Gordura on Base Only
-    const gordura = valorBase * ((config?.percentualGordura || 0) / 100);
-    const total = valorBase + comissao + gordura;
+  const valorBase = valorTecido / safeCotacao;
+  const comissao = valorBase * ((config?.percentualComissao || 0) / 100);
+  // Reverted: Gordura on Base Only
+  const gordura = valorBase * ((config?.percentualGordura || 0) / 100);
+  const total = valorBase + comissao + gordura;
 
-    return (
-        <div className="modalOverlay" onMouseDown={onClose}>
-            <div className="modalCard" style={{ maxWidth: 500 }} onMouseDown={e => e.stopPropagation()}>
-                <div className="modalHeader">
-                    <h3 className="modalTitle" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <Calculator size={20} /> Memória de Cálculo EXW
-                    </h3>
-                    <button className="btn btn-sm" onClick={onClose}>Fechar</button>
-                </div>
-                <div className="modalBody" style={{ padding: 24 }}>
-                    <div style={{ background: '#0f172a', padding: 16, borderRadius: 8, marginBottom: 16 }}>
-                        <h4 style={{ margin: '0 0 12px 0', color: '#94a3b8', fontSize: 14 }}>PARÂMETROS</h4>
-                        <div style={rowStyle}>
-                            <span>Cotação do Dia:</span>
-                            <strong>R$ {fmt(cotacao, 2)}</strong>
-                        </div>
-                        <div style={rowStyle}>
-                            <span>{isFerguile ? "Valor Cotação Fixo (Config):" : "Redução Dólar (Config):"}</span>
-                            <span style={{ color: isFerguile ? '#3b82f6' : '#ef4444' }}>
-                                {isFerguile ? "" : "- "}R$ {fmt(config?.valorReducaoDolar, 2)}
-                            </span>
-                        </div>
-                        <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 8, marginTop: 8 }}>
-                            <span>Cotação de Risco:</span>
-                            <strong style={{ color: '#3b82f6' }}>R$ {fmt(cotacaoRisco, 2)}</strong>
-                        </div>
-                    </div>
-
-                    <div style={{ background: '#0f172a', padding: 16, borderRadius: 8 }}>
-                        <h4 style={{ margin: '0 0 12px 0', color: '#94a3b8', fontSize: 14 }}>CÁLCULO DO PREÇO</h4>
-                        
-                        <div style={rowStyle}>
-                            <span>Valor do Tecido:</span>
-                            <strong>R$ {fmt(valorTecido, 2)}</strong>
-                        </div>
-                        <div style={rowStyle}>
-                            <span>Valor Base (Tecido / Cotação Risco):</span>
-                            <strong>$ {fmt(valorBase, 2)}</strong>
-                        </div>
-                        
-                        <div style={{ margin: '8px 0', borderLeft: '2px solid #334155', paddingLeft: 12 }}>
-                            <div style={rowStyle}>
-                                <span>Comissão ({fmt(config?.percentualComissao)}%):</span>
-                                <span>+ $ {fmt(comissao, 2)}</span>
-                            </div>
-                            <div style={rowStyle}>
-                                <span>Gordura (Sobre Base) ({fmt(config?.percentualGordura)}%):</span>
-                                <span style={{ color: '#10b981' }}>+ $ {fmt(gordura, 2)}</span>
-                            </div>
-                        </div>
-
-                        <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 12, marginTop: 12, fontSize: 18 }}>
-                            <span>Preço EXW Final:</span>
-                            <strong style={{ color: '#10b981' }}>$ {fmt(total, 2)}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="modalOverlay" onMouseDown={onClose}>
+      <div className="modalCard" style={{ maxWidth: 500 }} onMouseDown={e => e.stopPropagation()}>
+        <div className="modalHeader">
+          <h3 className="modalTitle" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <Calculator size={20} /> Memória de Cálculo EXW
+          </h3>
+          <button className="btn btn-sm" onClick={onClose}>Fechar</button>
         </div>
-    );
+        <div className="modalBody" style={{ padding: 24 }}>
+          <div style={{ background: '#0f172a', padding: 16, borderRadius: 8, marginBottom: 16 }}>
+            <h4 style={{ margin: '0 0 12px 0', color: '#94a3b8', fontSize: 14 }}>PARÂMETROS</h4>
+            <div style={rowStyle}>
+              <span>Cotação do Dia:</span>
+              <strong>R$ {fmt(cotacao, 2)}</strong>
+            </div>
+            <div style={rowStyle}>
+              <span>{isFerguile ? "Valor Cotação Fixo (Config):" : "Redução Dólar (Config):"}</span>
+              <span style={{ color: isFerguile ? '#3b82f6' : '#ef4444' }}>
+                {isFerguile ? "" : "- "}R$ {fmt(config?.valorReducaoDolar, 2)}
+              </span>
+            </div>
+            <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 8, marginTop: 8 }}>
+              <span>Cotação de Risco:</span>
+              <strong style={{ color: '#3b82f6' }}>R$ {fmt(cotacaoRisco, 2)}</strong>
+            </div>
+          </div>
+
+          <div style={{ background: '#0f172a', padding: 16, borderRadius: 8 }}>
+            <h4 style={{ margin: '0 0 12px 0', color: '#94a3b8', fontSize: 14 }}>CÁLCULO DO PREÇO</h4>
+
+            <div style={rowStyle}>
+              <span>Valor do Tecido:</span>
+              <strong>R$ {fmt(valorTecido, 2)}</strong>
+            </div>
+            <div style={rowStyle}>
+              <span>Valor Base (Tecido / Cotação Risco):</span>
+              <strong>$ {fmt(valorBase, 2)}</strong>
+            </div>
+
+            <div style={{ margin: '8px 0', borderLeft: '2px solid #334155', paddingLeft: 12 }}>
+              <div style={rowStyle}>
+                <span>Comissão ({fmt(config?.percentualComissao)}%):</span>
+                <span>+ $ {fmt(comissao, 2)}</span>
+              </div>
+              <div style={rowStyle}>
+                <span>Gordura (Sobre Base) ({fmt(config?.percentualGordura)}%):</span>
+                <span style={{ color: '#10b981' }}>+ $ {fmt(gordura, 2)}</span>
+              </div>
+            </div>
+
+            <div style={{ ...rowStyle, borderTop: '1px solid #334155', paddingTop: 12, marginTop: 12, fontSize: 18 }}>
+              <span>Preço EXW Final:</span>
+              <strong style={{ color: '#10b981' }}>$ {fmt(total, 2)}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const rowStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-    fontSize: 14
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginBottom: 6,
+  fontSize: 14
 };
 
 
@@ -1149,7 +1157,8 @@ function tabStyle(active: boolean): React.CSSProperties {
 }
 
 function fmt(n: number | undefined, decimals = 2) {
-  return (n ?? 0).toLocaleString("pt-BR", {
+  if (n === undefined) return "...";
+  return n.toLocaleString("pt-BR", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });

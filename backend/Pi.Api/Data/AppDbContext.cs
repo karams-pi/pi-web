@@ -189,6 +189,15 @@ public class AppDbContext : DbContext
             entity.Property(x => x.ValorFOBDespPortRegDoc).HasColumnName("valor_FOB_desp_port_reg_doc");
             entity.Property(x => x.ValorFOBDespDespacAduaneiro).HasColumnName("valor_FOB_desp_despac_aduaneiro");
             entity.Property(x => x.ValorFOBDespCourier).HasColumnName("valor_FOB_desp_courier");
+            entity.Property(x => x.PortoEmbarque).HasColumnName("porto_embarque").HasMaxLength(100);
+            entity.Property(x => x.CondicoesPagamento).HasColumnName("condicoes_pagamento").HasMaxLength(200);
+        });
+
+        // Cliente
+        modelBuilder.Entity<Cliente>(entity =>
+        {
+            entity.ToTable("clientes");
+            entity.Property(x => x.PortoDestino).HasColumnName("porto_destinatario");
         });
 
         // ===== Proforma Invoice =====
