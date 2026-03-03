@@ -16,6 +16,43 @@ public class ConfiguracoesController : ControllerBase
         _context = context;
     }
 
+    [HttpGet("db-check")]
+    public async Task<ActionResult<object>> DbCheck()
+    {
+        try
+        {
+            var canConnect = await _context.Database.CanConnectAsync();
+            var migrations = await _context.Database.GetAppliedMigrationsAsync();
+            var pending = await _context.Database.GetPendingMigrationsAsync();
+            
+            return Ok(new
+            {
+                canConnect,
+                appliedMigrations = migrations,
+                pendingMigrations = pending,
+                message = "DB check completed"
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error checking DB: {ex.Message}");
+        }
+    }
+
+    [HttpGet("migrate")]
+    public async Task<ActionResult<object>> ManualMigrate()
+    {
+        try
+        {
+            await _context.Database.MigrateAsync();
+            return Ok("Migrations applied successfully via manual endpoint.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error applying migrations manually: {ex}");
+        }
+    }
+
     [HttpGet]
     public async Task<ActionResult<List<Configuracao>>> GetConfiguracoes()
     {

@@ -137,6 +137,7 @@ export default function ModulosPage() {
       setConfig(map.get(currentId) || map.get(null) || null);
     } catch (e) {
       console.error("Erro ao carregar configs", e);
+      setError("Erro ao carregar configurações: " + getErrorMessage(e));
     }
   };
 
