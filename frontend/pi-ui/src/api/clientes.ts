@@ -1,3 +1,5 @@
+import { apiGet, apiPost, apiPut, apiDelete } from "./api";
+
 export interface Cliente {
   id: string;
   nome: string;
@@ -12,6 +14,7 @@ export interface Cliente {
   cep?: string | null;
   pessoaContato?: string | null;
   cargoFuncao?: string | null;
+  portoDestino?: string | null;
   observacoes?: string | null;
   criadoEm?: string;
   atualizadoEm?: string;
@@ -24,51 +27,35 @@ export interface PagedResult<T> {
   pageSize: number;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? ''; // deixe vazio se usa proxy do Vite
-
 export async function listClientes(params: {
   search?: string;
   page?: number;
   pageSize?: number;
 } = {}) {
-  const u = new URL(`${API_BASE}/api/clientes`, window.location.origin);
-  if (params.search) u.searchParams.set('search', params.search);
-  if (params.page) u.searchParams.set('page', String(params.page));
-  if (params.pageSize) u.searchParams.set('pageSize', String(params.pageSize));
+  const u = new URLSearchParams();
+  if (params.search) u.set('search', params.search);
+  if (params.page) u.set('page', String(params.page));
+  if (params.pageSize) u.set('pageSize', String(params.pageSize));
 
-  const res = await fetch(u.toString().replace(window.location.origin, ''));
-  if (!res.ok) throw new Error('Erro ao listar clientes');
-  return (await res.json()) as PagedResult<Cliente>;
+  const query = u.toString();
+  const path = query ? `/api/clientes?${query}` : '/api/clientes';
+
+  return apiGet<PagedResult<Cliente>>(path);
 }
 
 export async function getCliente(id: string) {
-  const res = await fetch(`${API_BASE}/api/clientes/${id}`);
-  if (!res.ok) throw new Error('Cliente não encontrado');
-  return (await res.json()) as Cliente;
+  return apiGet<Cliente>(`/api/clientes/${id}`);
 }
 
 export async function createCliente(input: Partial<Cliente>) {
-  const res = await fetch(`${API_BASE}/api/clientes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  if (!res.ok) throw new Error('Erro ao criar cliente');
-  return (await res.json()) as Cliente;
+  return apiPost<Cliente>('/api/clientes', input);
 }
 
 export async function updateCliente(id: string, input: Partial<Cliente>) {
-  const res = await fetch(`${API_BASE}/api/clientes/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  if (!res.ok) throw new Error('Erro ao atualizar cliente');
+  return apiPut<void>(`/api/clientes/${id}`, input);
 }
 
 export async function deleteCliente(id: string) {
-  const res = await fetch(`${API_BASE}/api/clientes/${id}`, {
-    method: 'DELETE',
-  });
-  if (!res.ok) throw new Error('Erro ao remover cliente');
+  return apiDelete(`/api/clientes/${id}`);
 }
+

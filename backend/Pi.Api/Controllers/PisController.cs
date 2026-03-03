@@ -50,6 +50,7 @@ public class PisController : ControllerBase
                 x.DataPi,
                 x.IdCliente,
                 x.IdFrete,
+                x.IdFornecedor,
                 x.ValorTecido,
                 x.ValorTotalFreteBRL,
                 x.ValorTotalFreteUSD,

@@ -70,11 +70,12 @@ using (var scope = app.Services.CreateScope())
     try
     {
         dbContext.Database.Migrate();
+        Console.WriteLine("Migrations applied successfully.");
     }
     catch (Exception ex)
     {
         // Se falhar a migração, logar, mas tentar continuar (ou falhar de vez se preferir)
-        Console.WriteLine($"Erro ao aplicar Migrations: {ex.Message}");
+        Console.WriteLine($"Erro CRÍTICO ao aplicar Migrations: {ex}");
     }
 
     // AUTO-VERSION: Registra a versão atual no banco se ainda não existir
