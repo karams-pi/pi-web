@@ -30,10 +30,7 @@ namespace Pi.Api.Migrations
                 type: "text",
                 nullable: true);
 
-            migrationBuilder.InsertData(
-                table: "frete",
-                columns: new[] { "id", "nome" },
-                values: new object[] { 4L, "EXW" });
+            migrationBuilder.Sql("INSERT INTO frete (id, nome) VALUES (4, 'EXW') ON CONFLICT (id) DO NOTHING;");
         }
 
         /// <inheritdoc />
