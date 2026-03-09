@@ -15,6 +15,7 @@ import { FileText } from "lucide-react";
 import { PiCurrencyModal } from "../components/PiCurrencyModal";
 import PageHeader from "../components/PageHeader";
 import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
+import { calculateCotacaoRisco, calculateEXW, calculateFreteRateio } from "../utils/calculations";
 
 type FormState = {
   id?: number;
@@ -155,17 +156,8 @@ export default function ProformaInvoicePage() {
     getLatestConfig(idForn).then(newConfig => {
         setConfig(newConfig);
         if (newConfig && form.cotacaoAtualUSD) {
-            let risk = Number((form.cotacaoAtualUSD - newConfig.valorReducaoDolar).toFixed(2));
-
-            if (idForn) {
-                const supplier = fornecedores.find(f => f.id === idForn);
-                if (supplier) {
-                    const name = supplier.nome.toLowerCase();
-                    if (name.includes("ferguile") || name.includes("livintus")) {
-                        risk = Number(newConfig.valorReducaoDolar.toFixed(2));
-                    }
-                }
-            }
+            const supplier = idForn ? fornecedores.find(f => f.id === idForn) : undefined;
+            const risk = calculateCotacaoRisco(supplier?.nome, form.cotacaoAtualUSD, newConfig.valorReducaoDolar);
 
             setForm(prev => ({ ...prev, cotacaoRisco: risk }));
             // Trigger recalculation with new risk rate
@@ -306,36 +298,34 @@ export default function ProformaInvoicePage() {
         let exwTooltip = item.exwTooltip;
 
         if (item.moduloTecido) {
-             const valorModuloTecido = item.moduloTecido.valorTecido;
-             const valorBase = cotacaoRisco > 0 ? valorModuloTecido / cotacaoRisco : 0;
-             const vComissao = valorBase * (comissao / 100);
-             const vGordura = valorBase * (gordura / 100);
-             valorEXW = valorBase + vComissao + vGordura;
+             valorEXW = calculateEXW(
+                 item.moduloTecido.valorTecido, 
+                 cotacaoRisco, 
+                 comissao, 
+                 gordura
+             );
 
+             const valorBase = cotacaoRisco > 0 ? item.moduloTecido.valorTecido / cotacaoRisco : 0;
              exwTooltip = 
-               `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
-               `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
-               `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
+               `Base (R$ ${fmt(item.moduloTecido.valorTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
+               `+ Comissão (${fmt(comissao)}%) = $ ${fmt(valorBase * (comissao / 100))}\n` +
+               `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(valorBase * (gordura / 100))}\n` +
                `= $ ${fmt(valorEXW)}`;
         }
 
-        // 2. Recalculate Frete Rateio
-        const custoPorM3BRL = totalM3 > 0 ? totalFreteBRL / totalM3 : 0;
-        const custoPorM3USD = totalM3 > 0 ? totalFreteUSD / totalM3 : 0;
-
-        const freteUnitarioBRL = custoPorM3BRL * item.m3;
-        const freteUnitarioUSD = custoPorM3USD * item.m3;
+        const freteUnitarioBRL = calculateFreteRateio(totalFreteBRL, totalM3, item.m3);
+        const freteUnitarioUSD = calculateFreteRateio(totalFreteUSD, totalM3, item.m3);
         
         const valorBaseBRL = valorEXW * cotacaoRisco;
         const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
         const valorFinalUSD = (valorEXW + freteUnitarioUSD) * item.quantidade;
 
         const freteBrlTooltip = 
-          `Total Frete R$ ${fmt(totalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(custoPorM3BRL)}/m³\n` +
+          `Total Frete R$ ${fmt(totalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(totalM3 > 0 ? totalFreteBRL / totalM3 : 0)}/m³\n` +
           `x Item M³ ${fmt(item.m3)} = R$ ${fmt(freteUnitarioBRL)}`;
         
         const freteUsdTooltip = 
-          `Total Frete $ ${fmt(totalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(custoPorM3USD)}/m³\n` +
+          `Total Frete $ ${fmt(totalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(totalM3 > 0 ? totalFreteUSD / totalM3 : 0)}/m³\n` +
           `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
 
         return {

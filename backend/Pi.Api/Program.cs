@@ -46,6 +46,7 @@ builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>()
     {
         UseProxy = false
     });
+builder.Services.AddScoped<Pi.Api.Services.ICalculoService, Pi.Api.Services.CalculoService>();
 builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 builder.Services.AddScoped<Pi.Api.Services.PiExportService>();
 builder.Services.AddScoped<Pi.Api.Services.ModuloExportService>();
