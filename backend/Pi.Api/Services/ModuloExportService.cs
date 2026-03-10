@@ -190,8 +190,19 @@ public class ModuloExportService
 
     private decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, string? fornecedorName)
     {
-        if (currency == "BRL") return valorTecido;
-        if (config == null || cotacao == 0) return 0;
+        if (config == null) return valorTecido;
+        
+        decimal percentualComissao = config.PercentualComissao;
+        decimal percentualGordura = config.PercentualGordura;
+
+        if (currency == "BRL")
+        {
+            decimal vComissao = valorTecido * (percentualComissao / 100);
+            decimal vGordura = valorTecido * (percentualGordura / 100);
+            return Math.Round(valorTecido + vComissao + vGordura, 2);
+        }
+
+        if (cotacao == 0) return 0;
 
         bool isFerguile = !string.IsNullOrEmpty(fornecedorName) && 
             (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus"));

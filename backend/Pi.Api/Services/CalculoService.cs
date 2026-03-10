@@ -4,6 +4,7 @@ public interface ICalculoService
 {
     decimal CalcularCotacaoRisco(string supplierName, decimal cotacaoAtual, decimal valorReducaoDolar);
     decimal CalcularEXW(decimal valorModuloTecido, decimal cotacaoRisco, decimal percentualComissao, decimal percentualGordura);
+    decimal CalcularBRL(decimal valorModuloTecido, decimal percentualComissao, decimal percentualGordura);
 }
 
 public class CalculoService : ICalculoService
@@ -31,5 +32,13 @@ public class CalculoService : ICalculoService
         decimal vGordura = valorBase * (percentualGordura / 100);
 
         return Math.Round(valorBase + vComissao + vGordura, 2);
+    }
+
+    public decimal CalcularBRL(decimal valorModuloTecido, decimal percentualComissao, decimal percentualGordura)
+    {
+        decimal vComissao = valorModuloTecido * (percentualComissao / 100);
+        decimal vGordura = valorModuloTecido * (percentualGordura / 100);
+
+        return Math.Round(valorModuloTecido + vComissao + vGordura, 2);
     }
 }

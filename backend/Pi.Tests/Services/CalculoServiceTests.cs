@@ -49,4 +49,16 @@ public class CalculoServiceTests
         // Assert
         result.Should().Be(expected);
     }
+
+    [Theory]
+    [InlineData(100, 10, 5, 115.00)] // 100 + 10% + 5% = 100 + 10 + 5 = 115
+    [InlineData(50, 0, 0, 50.00)]    // 50 + 0 + 0 = 50
+    public void CalcularBRL_ShouldReturnCorrectValue(decimal valorModulo, decimal comissao, decimal gordura, decimal expected)
+    {
+        // Act
+        var result = _service.CalcularBRL(valorModulo, comissao, gordura);
+
+        // Assert
+        result.Should().Be(expected);
+    }
 }

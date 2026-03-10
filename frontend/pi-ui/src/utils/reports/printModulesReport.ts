@@ -34,10 +34,17 @@ export function printModulesReport({
 
 
   function calcPrice(valorTecido: number, idFornecedor: number): number {
+    if (!config) return valorTecido;
+    
+    const pctComissao = config.percentualComissao || 0;
+    const pctGordura = config.percentualGordura || 0;
+
     if (currency === "BRL") {
-      return valorTecido;
+      const vComissao = valorTecido * (pctComissao / 100);
+      const vGordura = valorTecido * (pctGordura / 100);
+      return valorTecido + vComissao + vGordura;
     } else {
-        if (!config || !cotacao) return 0;
+        if (!cotacao) return 0;
         
         const fornecedorName = maps.fornecedor.get(idFornecedor) || "";
         const sName = fornecedorName.toLowerCase();
