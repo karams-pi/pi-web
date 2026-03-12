@@ -5,6 +5,8 @@ import { getPi } from "../api/pis";
 import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
 import { listModulosTecidos } from "../api/modulos";
 import { getCliente, type Cliente } from "../api/clientes";
+import { getSupplierMetadata } from "../utils/supplierDefaults";
+
 
 export default function PrintPiFerguilePage() {
   const { id } = useParams();
@@ -73,6 +75,12 @@ export default function PrintPiFerguilePage() {
   const incoterm = pi?.frete?.nome || (pi as any)?.Frete?.Nome || "EXW";
   const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
 
+  const supplierMetadata = useMemo(() => {
+    const sName = (pi?.fornecedor?.nome || (pi as any)?.Fornecedor?.Nome || "ferguile");
+    return getSupplierMetadata(sName);
+  }, [pi]);
+
+
 
 
   // ─── Process data: group by REFERENCIA (marca) ───
@@ -103,13 +111,15 @@ export default function PrintPiFerguilePage() {
     pi.piItens.forEach((item) => {
       const mt = modulosTecidos.find((m) => m.id === item.idModuloTecido);
       const marca = mt?.modulo?.marca?.nome || "Outros";
-      const marcaFornecedor = mt?.modulo?.fornecedor?.nome || mt?.modulo?.categoria?.nome || "Ferguile";
+      const marcaFornecedor = mt?.modulo?.fornecedor?.nome || mt?.modulo?.categoria?.nome || supplierMetadata.details.brand;
       const descricao = mt?.modulo?.descricao || "";
       const fabricName = mt?.tecido?.nome || "";
       const telaCode = item.tempCodigoModuloTecido || mt?.codigoModuloTecido || "";
       const volM3 = (item.m3 || 0) * (item.quantidade || 0);
       const unitPrice = item.valorEXW || 0;
-      const totalPrice = unitPrice * (item.quantidade || 0);
+      const freightUnit = (item.valorFreteRateadoUSD || 0);
+      const displayUnitPrice = currency === "BRL" ? (item.valorFinalItemBRL / (item.quantidade || 1)) : (unitPrice + (showFreight ? freightUnit : 0));
+      const totalPrice = currency === "BRL" ? item.valorFinalItemBRL : (displayUnitPrice * (item.quantidade || 1));
 
       rows.push({
         item,
@@ -126,9 +136,10 @@ export default function PrintPiFerguilePage() {
         fabricName,
         telaCode,
         observacao: item.observacao || "",
-        unitPrice,
+        unitPrice: displayUnitPrice,
         totalPrice,
       });
+
     });
 
     // Sort by referencia (brand), then by description
@@ -272,15 +283,18 @@ export default function PrintPiFerguilePage() {
       >
         {/* LEFT: Exporter */}
         <div style={{ padding: "10px 15px", fontSize: "11px", lineHeight: "1.5em", borderRight: "2px solid #000" }}>
-          <div style={{ fontWeight: "bold", fontSize: "13px", marginBottom: "4px", textTransform: "uppercase" }}>
-            FERGUILE ESTOFADOS LTDA
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+            <div style={{ fontWeight: "bold", fontSize: "13px", textTransform: "uppercase" }}>
+              {supplierMetadata.name}
+            </div>
+            <img src={supplierMetadata.logo} alt={supplierMetadata.details.brand} style={{ maxWidth: "80px", maxHeight: "40px" }} />
           </div>
-          <div>CNPJ: 27.499.537/0001-02</div>
-          <div>DIRECCIÓN: RUA CANÁRIO DO BREJO, 630</div>
+          <div>CNPJ: {supplierMetadata.cnpj}</div>
+          <div>DIRECCIÓN: {supplierMetadata.address}</div>
           <div>RIBEIRÃO BANDEIRANTE DO NORTE</div>
-          <div>CÓDIGO POSTAL: 86703-797</div>
-          <div>ARAPONGAS - PARANÁ</div>
-          <div>PAÍS: BRASIL</div>
+          <div>CÓDIGO POSTAL: {supplierMetadata.zip}</div>
+          <div>{supplierMetadata.city} - {supplierMetadata.state}</div>
+          <div>PAÍS: {supplierMetadata.country}</div>
           <div style={{ marginTop: 6 }}>
             <strong>TIEMPO DE ENTREGA:</strong>{" "}
             {pi.configuracoes?.condicoesPagamento ? "60 dias" : "60 dias"}
@@ -292,6 +306,7 @@ export default function PrintPiFerguilePage() {
             <strong>CONDICIÓN DE PAGO:</strong> {pi.configuracoes?.condicoesPagamento || "A VISTA"}
           </div>
         </div>
+
 
         {/* RIGHT: PI Details + Importer */}
         <div style={{ padding: "10px 15px", fontSize: "11px", lineHeight: "1.5em" }}>
@@ -438,15 +453,16 @@ export default function PrintPiFerguilePage() {
                   </td>
                 )}
 
-                {/* UNIT USD */}
+                {/* UNIT PRICE */}
                 <td style={{ ...cellStyle, textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" }}>
-                  {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(row.item.valorFinalItemBRL / (row.item.quantidade || 1)) : fmt(row.unitPrice)}
+                  {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(row.unitPrice) : fmt(row.unitPrice)}
                 </td>
 
-                {/* TOTAL USD */}
+                {/* TOTAL PRICE */}
                 <td style={{ ...cellStyle, textAlign: "right", fontWeight: "bold", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" }}>
-                  {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(row.item.valorFinalItemBRL) : fmt(row.totalPrice)}
+                  {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(row.totalPrice) : fmt(row.totalPrice)}
                 </td>
+
               </tr>
             );
           })}
@@ -487,23 +503,25 @@ export default function PrintPiFerguilePage() {
           <h3 style={{ margin: "0 0 5px 0", fontSize: "12px", textTransform: "uppercase" }}>
             DETALLES BANCARIOS:
           </h3>
-          <p style={{ margin: "2px 0" }}><strong>Beneficiario:</strong> FERGUILE ESTOFADOS LTDA</p>
-          <p style={{ margin: "2px 0" }}><strong>CNPJ:</strong> 27.499.537/0001-02</p>
-          <p style={{ margin: "2px 0" }}><strong>BANCO:</strong> SICREDI 748</p>
-          <p style={{ margin: "2px 0" }}><strong>CUENTA BENEFICIARIA:</strong> 0723/032524</p>
-          <p style={{ margin: "2px 0" }}><strong>CÓDIGO IBAN:</strong> BR7001181521007230000003252C1</p>
-          <p style={{ margin: "2px 0" }}><strong>CÓDIGO SWIFT:</strong> BCSIBRRS748</p>
+          <p style={{ margin: "2px 0" }}><strong>Beneficiario:</strong> {supplierMetadata.bankDetails.beneficiaryName}</p>
+          <p style={{ margin: "2px 0" }}><strong>CNPJ:</strong> {supplierMetadata.cnpj}</p>
+          <p style={{ margin: "2px 0" }}><strong>BANCO:</strong> {supplierMetadata.bankDetails.beneficiary}</p>
+          <p style={{ margin: "2px 0" }}><strong>CUENTA BENEFICIARIA:</strong> {supplierMetadata.bankDetails.beneficiaryAccount}</p>
+          {supplierMetadata.bankDetails.beneficiaryIban && <p style={{ margin: "2px 0" }}><strong>CÓDIGO IBAN:</strong> {supplierMetadata.bankDetails.beneficiaryIban}</p>}
+          <p style={{ margin: "2px 0" }}><strong>CÓDIGO SWIFT:</strong> {supplierMetadata.bankDetails.beneficiarySwift}</p>
+
         </div>
         <div style={{ padding: 10 }}>
           <p style={{ margin: "2px 0" }}>
             <strong>Volumen:</strong> {processedData.totalQty}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>NCM:</strong> 94016100
+            <strong>NCM:</strong> {supplierMetadata.details.ncm}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Marca:</strong> Ferguile / Livintus
+            <strong>Marca:</strong> {supplierMetadata.details.brand}
           </p>
+
           <p style={{ margin: "2px 0" }}>
             <strong>Productos originales de fábrica</strong>
           </p>

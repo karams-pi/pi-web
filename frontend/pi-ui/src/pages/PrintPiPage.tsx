@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
 import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
 import { getCliente, type Cliente } from "../api/clientes";
+import { getSupplierMetadata } from "../utils/supplierDefaults";
+
 
 export default function PrintPiPage() {
   const { id } = useParams();
@@ -59,6 +61,12 @@ export default function PrintPiPage() {
   const displayClient = cliente || (pi as any)?.cliente;
   const incoterm = pi?.frete?.nome || (pi as any)?.Frete?.Nome || "EXW";
   const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
+
+  const supplierMetadata = useMemo(() => {
+    const sName = (pi?.fornecedor?.nome || (pi as any)?.Fornecedor?.Nome || "karams");
+    return getSupplierMetadata(sName);
+  }, [pi]);
+
   
   const processedData = useMemo(() => {
     if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0 };
@@ -282,23 +290,24 @@ export default function PrintPiPage() {
       <div className="print-header" style={{ display: "flex", alignItems: "center", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "0px" }}>
         {/* Left: Logo */}
         <div style={{ width: "150px" }}>
-             <img src="/logo-karams.png" alt="Karams Logo" style={{ maxWidth: "100%", height: "auto" }} />
+             <img src={supplierMetadata.logo} alt={`${supplierMetadata.details.brand} Logo`} style={{ maxWidth: "100%", height: "auto" }} />
              {/* Date removed from here as per new layout */}
         </div>
 
         {/* Center: Company Info */}
         <div style={{ flex: 1, textAlign: "center" }}>
-           <h1 style={{ margin: "0 0 2px 0", fontSize: 13, fontWeight: "bold", textTransform: "uppercase" }}>KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA</h1>
+           <h1 style={{ margin: "0 0 2px 0", fontSize: 13, fontWeight: "bold", textTransform: "uppercase" }}>{supplierMetadata.name}</h1>
            <div style={{ fontSize: 10, lineHeight: "1.2em", fontWeight: "bold" }}>
-               <div>CNPJ 02.670.170/0001-09</div>
-               <div>ROD PR 180 - KM 04 - LOTE 11 N8 B1 BAIRRO RURAL 87890-000 TERRA RICA - PARANÁ</div>
-               <div>KARAMS@KARAMS.COM.BR - https://karams.com.br/ | (44) 3441-8400 | (44) 3441-1908</div>
+               <div>CNPJ {supplierMetadata.cnpj}</div>
+               <div>{supplierMetadata.address} {supplierMetadata.zip} {supplierMetadata.city} - {supplierMetadata.state}</div>
+               <div>{supplierMetadata.email} - {supplierMetadata.website} | {supplierMetadata.phone}</div>
            </div>
         </div>
         
         {/* Right Spacer to balance Logo for centering */}
         <div style={{ width: "150px" }}></div>
       </div>
+
 
       <div className="print-header-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "20px" }}>
           {/* Left: Importer */}
@@ -565,23 +574,27 @@ export default function PrintPiPage() {
 
       <div className="footer-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid #000", marginTop: 20 }}>
           <div className="footer-col bank-details" style={{ padding: 10, borderRight: "1px solid #000" }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DETALLES BANCARIOS: BANCO INTERMEDIARIO</h3>
-              <p>BANK OF AMERICA, N.A.</p>
-              <p>DIRECCIÓN: NEW YORK - US</p>
-              <p>SWIFT CODE: BOFAUS3N</p>
-              <p>CUENTA: 6550925836</p>
-              <p style={{ marginTop: 10 }}><strong>BANCO BENEFICIARIO:</strong></p>
-              <p>BANCO RENDIMENTO S/A</p>
-              <p>DIRECCIÓN: SÃO PAULO - BR</p>
-              <p>SWIFT CODE: RENDBRSP</p>
-              <p>IBAN: BR4468900810000010025069901i1</p>
-              <p>CUENTA: 00250699000148</p>
-              <p>NOMBRE: KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA</p>
+              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DETALLES BANCARIOS: {supplierMetadata.bankDetails.intermediary ? "BANCO INTERMEDIARIO" : "BANCO BENEFICIARIO"}</h3>
+              {supplierMetadata.bankDetails.intermediary && (
+                <>
+                  <p>{supplierMetadata.bankDetails.intermediary}</p>
+                  <p>DIRECCIÓN: {supplierMetadata.bankDetails.intermediaryAddress}</p>
+                  <p>SWIFT CODE: {supplierMetadata.bankDetails.intermediarySwift}</p>
+                  <p>CUENTA: {supplierMetadata.bankDetails.intermediaryAccount}</p>
+                  <p style={{ marginTop: 10 }}><strong>BANCO BENEFICIARIO:</strong></p>
+                </>
+              )}
+              <p>{supplierMetadata.bankDetails.beneficiary}</p>
+              {supplierMetadata.bankDetails.beneficiaryAddress && <p>DIRECCIÓN: {supplierMetadata.bankDetails.beneficiaryAddress}</p>}
+              <p>SWIFT CODE: {supplierMetadata.bankDetails.beneficiarySwift}</p>
+              {supplierMetadata.bankDetails.beneficiaryIban && <p>IBAN: {supplierMetadata.bankDetails.beneficiaryIban}</p>}
+              <p>CUENTA: {supplierMetadata.bankDetails.beneficiaryAccount}</p>
+              <p>NOMBRE: {supplierMetadata.bankDetails.beneficiaryName}</p>
           </div>
           <div className="footer-col" style={{ padding: 10 }}>
               <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DATOS GENERALES DEL PRODUCTO</h3>
-              <p><strong>Marca:</strong> Karams</p>
-              <p><strong>NCM:</strong> 94016100</p>
+              <p><strong>Marca:</strong> {supplierMetadata.details.brand}</p>
+              <p><strong>NCM:</strong> {supplierMetadata.details.ncm}</p>
               <p><strong>Producto:</strong> {fmt(processedData.totalSofaQty, 0)}</p>
               <p><strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? `R$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + (Number(i.valorFinalItemBRL ?? i.ValorFinalItemBRL) || 0), 0))}` : `$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.valorEXW ?? i.ValorEXW) || 0) * (Number(i.quantidade ?? i.Quantidade) || 0) + (Number(i.valorFreteRateadoUSD ?? i.ValorFreteRateadoUSD) || 0) * (Number(i.quantidade ?? i.Quantidade) || 0)), 0))}`}</p>
               <p><strong>CBM M³:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
@@ -589,12 +602,13 @@ export default function PrintPiPage() {
               <p><strong>P.B. TOTAL:</strong></p>
               <p><strong>VOLUMEN TOTAL:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
               <p><strong>Productos originales de fabrica</strong></p>
-              <p><strong>Hecho en Brasil</strong></p>
+              <p><strong>{supplierMetadata.details.origin}</strong></p>
               <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>
                 * Esta proforma es válida por {urlParams.get("validity") || 30} días a partir de la fecha de emisión.
               </p>
           </div>
       </div>
+
     
       <div style={{ marginTop: 40, borderTop: "1px solid #000", paddingTop: 10, textAlign: "center", fontSize: 10 }} className="no-print">
         Visualização de Impressão - Sistema PI Web

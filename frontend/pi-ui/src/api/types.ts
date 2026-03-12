@@ -143,6 +143,11 @@ export type ProformaInvoice = {
   cliente?: Cliente;
   configuracoes?: Configuracao;
   frete?: Frete;
+  fornecedor?: {
+    id: number;
+    nome: string;
+    cnpj?: string;
+  };
 };
 
 export type PiItem = {

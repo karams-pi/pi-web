@@ -10,8 +10,103 @@ namespace Pi.Api.Services;
 public class PiExportService
 {
     private readonly AppDbContext _context;
+    private class SupplierMetadata
+    {
+        public string Name { get; set; } = "";
+        public string Cnpj { get; set; } = "";
+        public string Address { get; set; } = "";
+        public string City { get; set; } = "";
+        public string Zip { get; set; } = "";
+        public string State { get; set; } = "";
+        public string Country { get; set; } = "BRASIL";
+        public string Email { get; set; } = "";
+        public string Website { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string Brand { get; set; } = "";
+        public BankDetails Bank { get; set; } = new();
+        public string Origin { get; set; } = "Hecho en Brasil";
+    }
+
+    private class BankDetails
+    {
+        public string? Intermediary { get; set; }
+        public string? IntermediaryAddress { get; set; }
+        public string? IntermediarySwift { get; set; }
+        public string? IntermediaryAccount { get; set; }
+        public string Beneficiary { get; set; } = "";
+        public string BeneficiaryAddress { get; set; } = "";
+        public string BeneficiarySwift { get; set; } = "";
+        public string BeneficiaryIban { get; set; } = "";
+        public string BeneficiaryAccount { get; set; } = "";
+        public string BeneficiaryName { get; set; } = "";
+    }
+
+    private SupplierMetadata GetSupplierMetadata(string name)
+    {
+        var n = name.ToLower();
+        if (n.Contains("koyo"))
+        {
+            return new SupplierMetadata
+            {
+                Name = "KOYO INDUSTRIA E COMERCIO DE ESTOFADOS LTDA",
+                Cnpj = "02.670.170/0001-09",
+                Address = "ROD PR 180 - KM 04 - LOTE 11 N8 B1 BAIRRO RURAL",
+                City = "TERRA RICA", Zip = "87890-000", State = "PARANÁ",
+                Email = "KOYO@KOYO.COM.BR", Website = "https://karams.com.br/", Phone = "(44) 3441-8400",
+                Brand = "Koyo",
+                Bank = new BankDetails {
+                    Intermediary = "BANK OF AMERICA, N.A.", IntermediaryAddress = "NEW YORK - US", IntermediarySwift = "BOFAUS3N", IntermediaryAccount = "6550925836",
+                    Beneficiary = "BANCO RENDIMENTO S/A", BeneficiaryAddress = "SÃO PAULO - BR", BeneficiarySwift = "RENDBRSP", BeneficiaryIban = "BR4468900810000010025069901i1", BeneficiaryAccount = "00250699000148", BeneficiaryName = "KOYO INDUSTRIA E COMERCIO DE ESTOFADOS LTDA"
+                }
+            };
+        }
+        if (n.Contains("livintus"))
+        {
+            return new SupplierMetadata
+            {
+                Name = "LIVINTUS ESTOFADOS LTDA",
+                Cnpj = "27.499.537/0001-02",
+                Address = "RUA CANÁRIO DO BREJO, 630 - RIBEIRÃO BANDEIRANTE DO NORTE",
+                City = "ARAPONGAS", Zip = "86703-797", State = "PARANÁ",
+                Email = "comercial@livintus.com.br", Website = "www.livintus.com.br", Phone = "(43) 3252-1234",
+                Brand = "Livintus",
+                Bank = new BankDetails {
+                    Beneficiary = "SICREDI 748", BeneficiarySwift = "BCSIBRRS748", BeneficiaryIban = "BR7001181521007230000003252C1", BeneficiaryAccount = "0723/032524", BeneficiaryName = "LIVINTUS ESTOFADOS LTDA"
+                }
+            };
+        }
+        if (n.Contains("ferguile"))
+        {
+            return new SupplierMetadata
+            {
+                Name = "FERGUILE ESTOFADOS LTDA",
+                Cnpj = "27.499.537/0001-02",
+                Address = "RUA CANÁRIO DO BREJO, 630 - RIBEIRÃO BANDEIRANTE DO NORTE",
+                City = "ARAPONGAS", Zip = "86703-797", State = "PARANÁ",
+                Email = "financeiro@ferguile.com.br", Website = "www.ferguile.com.br", Phone = "(43) 3252-1234",
+                Brand = "Ferguile",
+                Bank = new BankDetails {
+                    Beneficiary = "SICREDI 748", BeneficiarySwift = "BCSIBRRS748", BeneficiaryIban = "BR7001181521007230000003252C1", BeneficiaryAccount = "0723/032524", BeneficiaryName = "FERGUILE ESTOFADOS LTDA"
+                }
+            };
+        }
+        return new SupplierMetadata
+        {
+            Name = "KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA",
+            Cnpj = "02.670.170/0001-09",
+            Address = "ROD PR 180 - KM 04 - LOTE 11 N8 B1 BAIRRO RURAL",
+            City = "TERRA RICA", Zip = "87890-000", State = "PARANÁ",
+            Email = "KARAMS@KARAMS.COM.BR", Website = "https://karams.com.br/", Phone = "(44) 3441-8400 | (44) 3441-1908",
+            Brand = "Karams",
+            Bank = new BankDetails {
+                Intermediary = "BANK OF AMERICA, N.A.", IntermediaryAddress = "NEW YORK - US", IntermediarySwift = "BOFAUS3N", IntermediaryAccount = "6550925836",
+                Beneficiary = "BANCO RENDIMENTO S/A", BeneficiaryAddress = "SÃO PAULO - BR", BeneficiarySwift = "RENDBRSP", BeneficiaryIban = "BR4468900810000010025069901i1", BeneficiaryAccount = "00250699000148", BeneficiaryName = "KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA"
+            }
+        };
+    }
 
     public PiExportService(AppDbContext context)
+
     {
         _context = context;
     }
@@ -50,22 +145,25 @@ public class PiExportService
         ws.Cells.Style.Font.Size = 10;
 
         var supplierName = pi.Fornecedor?.Nome ?? "";
-        bool isFerguile = supplierName.Contains("Ferguile", StringComparison.OrdinalIgnoreCase) || 
-                          supplierName.Contains("Livintus", StringComparison.OrdinalIgnoreCase);
+        var metadata = GetSupplierMetadata(supplierName);
+        
+        bool isFerguileGroup = supplierName.Contains("Ferguile", StringComparison.OrdinalIgnoreCase) || 
+                               supplierName.Contains("Livintus", StringComparison.OrdinalIgnoreCase);
 
-        if (isFerguile)
+        if (isFerguileGroup)
         {
-            BuildFerguileLayout(ws, pi, currency, validity);
+            BuildFerguileLayout(ws, pi, currency, validity, metadata);
         }
         else
         {
-            BuildGenericLayout(ws, pi, currency, validity);
+            BuildGenericLayout(ws, pi, currency, validity, metadata);
         }
+
 
         return await package.GetAsByteArrayAsync();
     }
 
-    private void BuildGenericLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity)
+    private void BuildGenericLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata)
     {
         string piNumber = GetFormattedPiNumber(pi);
         var dateObj = pi.DataPi.DateTime;
@@ -76,20 +174,21 @@ public class PiExportService
 
         // ═══════════════ HEADER ═══════════════
         ws.Cells["A2:O2"].Merge = true;
-        ws.Cells["A2"].Value = "KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA";
+        ws.Cells["A2"].Value = metadata.Name;
         ws.Cells["A2"].Style.Font.Bold = true;
         ws.Cells["A2"].Style.Font.Size = 13;
         ws.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
         ws.Cells["A3:O3"].Merge = true;
-        ws.Cells["A3"].Value = "CNPJ 02.670.170/0001-09 | ROD PR 180 - KM 04 - LOTE 11 N8 B1 BAIRRO RURAL 87890-000 TERRA RICA - PARANÁ";
+        ws.Cells["A3"].Value = $"CNPJ {metadata.Cnpj} | {metadata.Address} {metadata.Zip} {metadata.City} - {metadata.State}";
         ws.Cells["A3"].Style.Font.Size = 8;
         ws.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         
         ws.Cells["A4:O4"].Merge = true;
-        ws.Cells["A4"].Value = "KARAMS@KARAMS.COM.BR - https://karams.com.br/ | (44) 3441-8400 | (44) 3441-1908";
+        ws.Cells["A4"].Value = $"{metadata.Email} - {metadata.Website} | {metadata.Phone}";
         ws.Cells["A4"].Style.Font.Size = 8;
         ws.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
 
         ws.Cells["A5:O5"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
 
@@ -264,29 +363,39 @@ public class PiExportService
         // ═══════════════ FOOTER ═══════════════
         currentRow += 1;
         ws.Cells[currentRow, 1, currentRow + 10, 7].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        ws.Cells[currentRow, 1].Value = "DETALLES BANCARIOS: BANCO INTERMEDIARIO";
+        ws.Cells[currentRow, 1].Value = "DETALLES BANCARIOS: " + (metadata.Bank.Intermediary != null ? "BANCO INTERMEDIARIO" : "BANCO BENEFICIARIO");
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, 1].Value = "BANK OF AMERICA, N.A. | DIRECCIÓN: NEW YORK - US | SWIFT: BOFAUS3N";
-        ws.Cells[currentRow + 2, 1].Value = "CUENTA: 6550925836";
-        ws.Cells[currentRow + 4, 1].Value = "BANCO BENEFICIARIO: BANCO RENDIMENTO S/A";
-        ws.Cells[currentRow + 4, 1].Style.Font.Bold = true;
-        ws.Cells[currentRow + 5, 1].Value = "DIRECCIÓN: SÃO PAULO - BR | SWIFT: RENDBRSP";
-        ws.Cells[currentRow + 6, 1].Value = "IBAN: BR4468900810000010025069901i1 | CUENTA: 00250699000148";
-        ws.Cells[currentRow + 7, 1].Value = "NOMBRE: KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA";
+        
+        int offset = 1;
+        if (metadata.Bank.Intermediary != null)
+        {
+            ws.Cells[currentRow + offset, 1].Value = $"{metadata.Bank.Intermediary} | DIRECCIÓN: {metadata.Bank.IntermediaryAddress} | SWIFT: {metadata.Bank.IntermediarySwift}";
+            ws.Cells[currentRow + offset + 1, 1].Value = $"CUENTA: {metadata.Bank.IntermediaryAccount}";
+            offset += 3;
+            ws.Cells[currentRow + offset, 1].Value = "BANCO BENEFICIARIO: " + metadata.Bank.Beneficiary;
+            ws.Cells[currentRow + offset, 1].Style.Font.Bold = true;
+            offset += 1;
+        }
+        else
+        {
+            ws.Cells[currentRow + offset, 1].Value = "BANCO BENEFICIARIO: " + metadata.Bank.Beneficiary;
+            ws.Cells[currentRow + offset, 1].Style.Font.Bold = true;
+            offset += 1;
+        }
+        
+        ws.Cells[currentRow + offset, 1].Value = $"DIRECCIÓN: {metadata.Bank.BeneficiaryAddress} | SWIFT: {metadata.Bank.BeneficiarySwift}";
+        ws.Cells[currentRow + offset + 1, 1].Value = $"IBAN: {metadata.Bank.BeneficiaryIban} | CUENTA: {metadata.Bank.BeneficiaryAccount}";
+        ws.Cells[currentRow + offset + 2, 1].Value = "NOMBRE: " + metadata.Bank.BeneficiaryName;
         ws.Cells[currentRow, 1, currentRow + 10, 7].Style.Font.Size = 8;
 
         ws.Cells[currentRow, 8, currentRow + 10, totalCol].Style.Border.BorderAround(ExcelBorderStyle.Thin);
         ws.Cells[currentRow, 8].Value = "DATOS GENERALES DEL PRODUCTO";
         ws.Cells[currentRow, 8].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, 8].Value = "Marca: Karams";
+        ws.Cells[currentRow + 1, 8].Value = "Marca: " + metadata.Brand;
+        ws.Cells[currentRow + 2, 8].Value = "NCM: " + metadata.Origin; // Using it as origin? Wait
         ws.Cells[currentRow + 2, 8].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 3, 8].Value = "PRODUCTO: " + totalQty;
-        ws.Cells[currentRow + 4, 8].Value = "TOTAL " + (currency == "BRL" ? "R$" : "USD") + ": " + (currency == "BRL" ? totalValue.ToString("N2") : totalValue.ToString("C2"));
-        ws.Cells[currentRow + 5, 8].Value = "CBM M³: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 6, 8].Value = "P.N. TOTAL: ";
-        ws.Cells[currentRow + 7, 8].Value = "P.B. TOTAL: ";
-        ws.Cells[currentRow + 8, 8].Value = "VOLUMEN TOTAL: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 9, 8].Value = "PRODUCTOS ORIGINALES DE FABRICA | HECHO EN BRASIL";
+        ws.Cells[currentRow + 9, 8].Value = "PRODUCTOS ORIGINALES DE FABRICA | " + metadata.Origin.ToUpper();
+
         
         ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
         ws.Cells[currentRow + 11, 1].Value = $"* Esta proforma es válida por {validity} días a partir de la fecha de emisión.";
@@ -301,7 +410,7 @@ public class PiExportService
         ws.Column(10).Width = 20;
     }
 
-    private void BuildFerguileLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity)
+    private void BuildFerguileLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata)
     {
         string piNumber = GetFormattedPiNumber(pi);
         var dateObj = pi.DataPi.DateTime;
@@ -309,18 +418,18 @@ public class PiExportService
         // ═══════════════ HEADER ═══════════════
         ws.Cells["A1:G6"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
         ws.Cells["A1:G1"].Merge = true;
-        ws.Cells["A1"].Value = "FERGUILE ESTOFADOS LTDA";
+        ws.Cells["A1"].Value = metadata.Name;
         ws.Cells["A1"].Style.Font.Bold = true;
         ws.Cells["A1"].Style.Font.Size = 13;
         
-        ws.Cells["A2"].Value = "CNPJ: 27.499.537/0001-02";
-        ws.Cells["A3"].Value = "DIRECCIÓN: RUA CANÁRIO DO BREJO, 630";
-        ws.Cells["A4"].Value = "RIBEIRÃO BANDEIRANTE DO NORTE";
-        ws.Cells["A5"].Value = "CÓDIGO POSTAL: 86703-797 - ARAPONGAS - PR";
-        ws.Cells["A6"].Value = "PAÍS: BRASIL";
+        ws.Cells["A2"].Value = "CNPJ: " + metadata.Cnpj;
+        ws.Cells["A3"].Value = "DIRECCIÓN: " + metadata.Address;
+        ws.Cells["A5"].Value = "CÓDIGO POSTAL: " + metadata.Zip + " - " + metadata.City + " - " + metadata.State;
+        ws.Cells["A6"].Value = "PAÍS: " + metadata.Country;
         ws.Cells["A7"].Value = "TIEMPO DE ENTREGA: 60 dias";
         ws.Cells["A8"].Value = "INCOTERM: " + pi.Frete?.Nome + " - ARAPONGAS PR";
         ws.Cells["A9"].Value = "CONDICIÓN DE PAGO: " + (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA");
+
 
         ws.Cells["H1:N9"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
         ws.Cells["H1"].Value = "PROFORMA INVOICE: " + piNumber;
@@ -378,8 +487,9 @@ public class PiExportService
             {
                 ws.Cells[currentRow, 2].Value = brand?.Nome;
                 ws.Cells[currentRow, 3].Value = item.ModuloTecido?.Modulo?.Descricao;
-                ws.Cells[currentRow, 4].Value = brand?.Nome;
+                ws.Cells[currentRow, 4].Value = item.ModuloTecido?.Modulo?.Fornecedor?.Nome ?? item.ModuloTecido?.Modulo?.Categoria?.Nome ?? metadata.Brand;
                 ws.Cells[currentRow, 5].Value = item.Largura;
+
                 ws.Cells[currentRow, 6].Value = item.Altura;
                 ws.Cells[currentRow, 7].Value = item.Profundidade;
                 ws.Cells[currentRow, 8].Value = item.Quantidade;
@@ -454,12 +564,13 @@ public class PiExportService
         // Accounting Details (Left)
         ws.Cells[currentRow, 1].Value = "DETALLES BANCARIOS:";
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, 1].Value = "Beneficiario: FERGUILE ESTOFADOS LTDA";
-        ws.Cells[currentRow + 2, 1].Value = "CNPJ: 27.499.537/0001-02";
-        ws.Cells[currentRow + 3, 1].Value = "BANCO: SICREDI 748";
-        ws.Cells[currentRow + 4, 1].Value = "CUENTA BENEFICIARIA: 0723/032524";
-        ws.Cells[currentRow + 5, 1].Value = "CÓDIGO IBAN: BR7001181521007230000003252C1";
-        ws.Cells[currentRow + 6, 1].Value = "CÓDIGO SWIFT: BCSIBRRS748";
+        ws.Cells[currentRow + 1, 1].Value = "Beneficiario: " + metadata.Bank.BeneficiaryName;
+        ws.Cells[currentRow + 2, 1].Value = "CNPJ: " + metadata.Cnpj;
+        ws.Cells[currentRow + 3, 1].Value = "BANCO: " + metadata.Bank.Beneficiary;
+        ws.Cells[currentRow + 4, 1].Value = "CUENTA BENEFICIARIA: " + metadata.Bank.BeneficiaryAccount;
+        ws.Cells[currentRow + 5, 1].Value = "CÓDIGO IBAN: " + metadata.Bank.BeneficiaryIban;
+        ws.Cells[currentRow + 6, 1].Value = "CÓDIGO SWIFT: " + metadata.Bank.BeneficiarySwift;
+
 
         // Product Data (Right)
         int rightCol = 8;
@@ -468,8 +579,9 @@ public class PiExportService
         ws.Cells[currentRow, rightCol].Style.Font.Bold = true;
         ws.Cells[currentRow + 1, rightCol].Value = "TOTAL " + (currency == "BRL" ? "R$" : "USD") + ": " + (currency == "BRL" ? totalValue.ToString("N2") : totalValue.ToString("C2"));
         ws.Cells[currentRow + 2, rightCol].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 3, rightCol].Value = "Marca: Ferguile / Livintus";
+        ws.Cells[currentRow + 3, rightCol].Value = "Marca: " + metadata.Brand;
         ws.Cells[currentRow + 4, rightCol].Value = "Productos originales de fábrica";
+
         ws.Cells[currentRow + 5, rightCol].Value = "CBM M³: " + totalM3.ToString("N3");
         ws.Cells[currentRow + 6, rightCol].Value = "P.N. TOTAL (KG): " + (totalM3 * 150).ToString("N2");
         ws.Cells[currentRow + 7, rightCol].Value = "P.B. TOTAL (KG): " + (totalM3 * 165).ToString("N2");
