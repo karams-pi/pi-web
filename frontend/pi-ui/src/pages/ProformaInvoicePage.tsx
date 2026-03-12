@@ -143,7 +143,7 @@ export default function ProformaInvoicePage() {
     if (form.idFrete) {
       loadFreteTotals();
     }
-  }, [form.idFrete, form.cotacaoRisco, form.idFornecedor]);
+  }, [form.idFrete, form.idFornecedor]);
 
   useEffect(() => {
     // Recalcular rateio quando itens mudarem ou totais de frete mudarem
@@ -282,6 +282,23 @@ export default function ProformaInvoicePage() {
     }));
 
     recalculateAllItems(newCotacao, newTotalFreteUSD, form.valorTotalFreteBRL);
+  }
+
+  function handleTotalFreteBRLChange(val: string) {
+    if (val === "") {
+        setForm(prev => ({ ...prev, valorTotalFreteBRL: 0, valorTotalFreteUSD: 0 }));
+        return;
+    }
+
+    const newTotalBRL = parseFloat(val);
+    const cotacao = Number(form.cotacaoRisco) || 0;
+    const newTotalUSD = cotacao > 0 ? newTotalBRL / cotacao : 0;
+
+    setForm(prev => ({
+      ...prev,
+      valorTotalFreteBRL: newTotalBRL,
+      valorTotalFreteUSD: newTotalUSD
+    }));
   }
 
   function recalculateAllItems(cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number, overrideConfig?: Configuracao) {
@@ -840,9 +857,15 @@ export default function ProformaInvoicePage() {
             <label className="label">Total Frete BRL</label>
             <input
               className="cl-input"
-              value={fmt(form.valorTotalFreteBRL)}
-              readOnly
-              style={{ background: "#1a1a2e" }}
+              type="number"
+              step="0.01"
+              value={form.valorTotalFreteBRL}
+              onChange={(e) => handleTotalFreteBRLChange(e.target.value)}
+              onBlur={() => {
+                  if (form.valorTotalFreteBRL !== undefined && !isNaN(Number(form.valorTotalFreteBRL))) {
+                      handleTotalFreteBRLChange(Number(form.valorTotalFreteBRL).toFixed(2));
+                  }
+              }}
             />
           </div>
           <div className="field">
