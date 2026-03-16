@@ -299,7 +299,7 @@ export default function ImportacaoPage() {
                 )}
              </div>
 
-             {isPreviewMode && importResult.itensImportados.some(i => i.status === 'Divergente') && (
+             {importResult.itensImportados.some(i => i.status === 'Divergente') && (
                 <div style={{ marginTop: '16px' }}>
                     <button 
                       type="button" 

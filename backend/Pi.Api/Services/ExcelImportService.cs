@@ -994,6 +994,18 @@ public class ExcelImportService
             if (fornecedor == null)
                 throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
 
+            // --- DEACTIVATE ALL EXISTING FABRICS FOR THIS SUPPLIER ---
+            // This ensures that only fabrics currently in the excel will remain active.
+            // MUST be done before loading entities into context to ensure change tracker works.
+            if (!dryRun)
+            {
+                var deactivateSql = @"
+                    UPDATE modulo_tecido 
+                    SET fl_ativo = false 
+                    WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+                await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
+            }
+
             // === CACHES ===
             var categoriasCache = await _context.Categorias.ToListAsync();
             var marcasCache = await _context.Marcas.ToListAsync();
@@ -1031,6 +1043,7 @@ public class ExcelImportService
                 _context.Categorias.Add(categoria);
                 categoriasMap[categoriaNome] = categoria;
             }
+
 
             foreach (var worksheet in package.Workbook.Worksheets)
             {
