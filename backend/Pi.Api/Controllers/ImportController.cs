@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Pi.Api.Data;
 using Pi.Api.Services;
+using Pi.Api.Models;
 
 namespace Pi.Api.Controllers;
 
@@ -141,10 +142,10 @@ public class ImportController : ControllerBase
     }
 
     [HttpPost("livintus")]
-    public async Task<IActionResult> ImportarLivintus(IFormFile file, [FromForm] long idFornecedor, [FromForm] DateTime? dtRevisao)
+    public async Task<IActionResult> ImportarLivintus(IFormFile file, [FromQuery] long idFornecedor, [FromQuery] DateTime? dtRevisao, [FromQuery] bool preview = false)
     {
         if (file == null || file.Length == 0)
-            return BadRequest("Arquivo inválido.");
+            return BadRequest("Arquivo não selecionado.");
         if (idFornecedor <= 0)
             return BadRequest("Fornecedor inválido.");
 
@@ -152,14 +153,36 @@ public class ImportController : ControllerBase
         try
         {
             using var stream = file.OpenReadStream();
-            await _importService.ImportarLivintusAsync(stream, idFornecedor, dtRevisao);
+            var result = await _importService.ImportarLivintusAsync(stream, idFornecedor, dtRevisao, preview);
 
-            await transaction.CommitAsync();
-            return Ok(new { message = "Importação Livintus concluída com sucesso!" });
+            if (preview)
+            {
+                // For preview, we NEVER commit. 
+                await transaction.RollbackAsync();
+            }
+            else
+            {
+                await transaction.CommitAsync();
+            }
+            
+            return Ok(new { 
+                message = "Importação Livintus concluída com sucesso!", 
+                totalFilas = result.TotalFilasProcessadas,
+                totalModulos = result.TotalModulosImportados,
+                discrepancias = result.Discrepancias,
+                itensImportados = result.ItensImportados,
+                sucesso = result.Sucesso
+            });
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
+            try
+            {
+                if (transaction != null)
+                    await transaction.RollbackAsync();
+            }
+            catch { /* Ignore rollback failure if transaction or connection is already gone */ }
+
             var sb = new System.Text.StringBuilder();
             var current = ex;
             while (current != null)
@@ -182,6 +205,20 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = $"Erro ao sincronizar sequências: {ex.Message}" });
+        }
+    }
+
+    [HttpPost("sincronizar")]
+    public async Task<IActionResult> Sincronizar([FromBody] SyncRequest request)
+    {
+        try
+        {
+            await _importService.SincronizarItensAsync(request);
+            return Ok(new { message = "Itens sincronizados com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Erro ao sincronizar itens: {ex.Message}" });
         }
     }
 }

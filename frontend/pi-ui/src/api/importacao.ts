@@ -36,15 +36,21 @@ export const importFerguile = async (file: File, idFornecedor: number, dtRevisao
   return apiPostFormData<any>('/api/Import/ferguile', formData);
 };
 
-export const importLivintus = async (file: File, idFornecedor: number, dtRevisao?: string) => {
+export const importLivintus = async (file: File, idFornecedor: number, dtRevisao?: string, preview: boolean = false) => {
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('idFornecedor', String(idFornecedor));
-  if (dtRevisao) formData.append('dtRevisao', dtRevisao);
+  
+  let url = `/api/Import/livintus?idFornecedor=${idFornecedor}&preview=${preview}`;
+  if (dtRevisao) url += `&dtRevisao=${encodeURIComponent(dtRevisao)}`;
 
-  return apiPostFormData<any>('/api/Import/livintus', formData);
+  return apiPostFormData<any>(url, formData);
 };
 
 export const resetSequences = async () => {
   return apiPostFormData<any>('/api/Import/reset-sequences', new FormData());
+};
+
+export const sincronizarItens = async (request: any) => {
+  const { apiPost } = await import('./api');
+  return apiPost<any>('/api/Import/sincronizar', request);
 };

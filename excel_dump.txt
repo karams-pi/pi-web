@@ -1,0 +1,54 @@
+Columns: [0, 1, 2, 3, 4, 5, 6, 7]
+
+First 50 rows:
+           0          1         2           3          4                           5      6                          7
+0        NaN     MODELO  COMP (m)  ALTURA (m)  PROF. (m)                  COMPOSIÇÃO  LINHA  VALOR EM REAIS (UNITÁRIO)
+1   BALDUZZI   BALDUZZI      1.08         0.9       1.14                     MÓDULOS   CO-5                       2160
+2        NaN   BALDUZZI      1.08         0.9       1.14                     MÓDULOS   CO-6                       2260
+3        NaN   BALDUZZI      1.08         0.9       1.14                     MÓDULOS   CO-7                       2340
+4        NaN   BALDUZZI      1.18         0.9       1.14                     MÓDULOS   CO-5                       2250
+5        NaN   BALDUZZI      1.18         0.9       1.14                     MÓDULOS   CO-6                       2360
+6        NaN   BALDUZZI      1.18         0.9       1.14                     MÓDULOS   CO-7                       2245
+7        NaN   BALDUZZI      1.28         0.9       1.14                     MÓDULOS   CO-5                       2350
+8        NaN   BALDUZZI      1.28         0.9       1.14                     MÓDULOS   CO-6                       2460
+9        NaN   BALDUZZI      1.28         0.9       1.14                     MÓDULOS   CO-7                       2560
+10       NaN   BALDUZZI      0.75         0.9       1.14                     MÓDULOS   CO-5                       1860
+11       NaN   BALDUZZI      0.75         0.9       1.14                     MÓDULOS   CO-6                       1930
+12       NaN   BALDUZZI      0.75         0.9       1.14                     MÓDULOS   CO-7                       1995
+13       NaN   BALDUZZI      0.85         0.9       1.14                     MÓDULOS   CO-5                       1945
+14       NaN   BALDUZZI      0.85         0.9       1.14                     MÓDULOS   CO-6                       2025
+15       NaN   BALDUZZI      0.85         0.9       1.14                     MÓDULOS   CO-7                       2090
+16       NaN   BALDUZZI      0.95         0.9       1.14                     MÓDULOS   CO-5                       2040
+17       NaN   BALDUZZI      0.95         0.9       1.14                     MÓDULOS   CO-6                       2120
+18       NaN   BALDUZZI      0.95         0.9       1.14                     MÓDULOS   CO-7                       2190
+19       NaN   BALDUZZI      1.08         0.9       1.59                     MÓDULOS   CO-5                       2480
+20       NaN   BALDUZZI      1.08         0.9       1.59                     MÓDULOS   CO-6                       2610
+21       NaN   BALDUZZI      1.08         0.9       1.59                     MÓDULOS   CO-7                       2715
+22       NaN   BALDUZZI      1.18         0.9       1.59                     MÓDULOS   CO-5                       2580
+23       NaN   BALDUZZI      1.18         0.9       1.59                     MÓDULOS   CO-6                       2715
+24       NaN   BALDUZZI      1.18         0.9       1.59                     MÓDULOS   CO-7                       2825
+25       NaN   BALDUZZI      1.28         0.9       1.59                     MÓDULOS   CO-5                       2690
+26       NaN   BALDUZZI      1.28         0.9       1.59                     MÓDULOS   CO-6                       2825
+27       NaN   BALDUZZI      1.28         0.9       1.59                     MÓDULOS   CO-7                       2935
+28       NaN   BALDUZZI      1.14        0.45       1.14                        PUFF   CO-5                       1555
+29       NaN   BALDUZZI      1.14        0.45       1.14                        PUFF   CO-6                       1615
+30       NaN   BALDUZZI      1.14        0.45       1.14                        PUFF   CO-7                       1670
+31       NaN    INSIEME      2.24        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-5                       6840
+32       NaN    INSIEME      2.24        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-6                       7060
+33       NaN    INSIEME      2.24        0.98        1.6   2 MÓDULOS\nAssento s/bç:    CO-7                       7230
+34       NaN    INSIEME      2.54        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-5                       7290
+35       NaN    INSIEME      2.54        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-6                       7510
+36       NaN    INSIEME      2.54        0.98        1.6   2 MÓDULOS\nAssento s/bç:    CO-7                       7700
+37       NaN    INSIEME      2.84        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-5                       7840
+38       NaN    INSIEME      2.84        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-6                       8090
+39       NaN    INSIEME      2.84        0.98        1.6   2 MÓDULOS\nAssento s/bç:    CO-7                       8290
+40       NaN    INSIEME      3.14        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-5                      10065
+41       NaN    INSIEME      3.14        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-6                      10375
+42       NaN    INSIEME      3.14        0.98        1.6  3 MÓDULOS\nAssento s/bç :    CO-7                      10620
+43       NaN    INSIEME      3.59        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-5                      10705
+44       NaN    INSIEME      3.59        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-6                      11020
+45       NaN    INSIEME      3.59        0.98        1.6  3 MÓDULOS\nAssento s/bç :    CO-7                      11290
+46       NaN    INSIEME      4.04        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-5                      11485
+47       NaN    INSIEME      4.04        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-6                      11840
+48       NaN    INSIEME      4.04        0.98        1.6  3 MÓDULOS\nAssento s/bç :    CO-7                      12125
+49  FRASCATI  FRASCATTI       2.2        0.93       1.12     2 MÓDULOS\nAssento s/bç   CO-5                       3938

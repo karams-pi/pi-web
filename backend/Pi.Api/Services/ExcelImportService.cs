@@ -520,46 +520,32 @@ public class ExcelImportService
 
     public async Task ResetSequencesAsync()
     {
-        // Fornecedores
-        var maxIdFornecedores = await _context.Fornecedores.MaxAsync(f => (long?)f.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('fornecedor', 'id'), {maxIdFornecedores + 1}, false);");
+        try
+        {
+            // Executamos tudo em um único comando para otimizar e reduzir chance de timeout/queda de conexão
+            var sql = @"
+                DO $$
+                DECLARE
+                    r record;
+                BEGIN
+                    FOR r IN 
+                        SELECT table_name, column_name 
+                        FROM information_schema.columns 
+                        WHERE table_name IN ('fornecedor', 'categoria', 'marca', 'tecido', 'modulo', 'modulo_tecido', 'frete_item', 'configuracoes_frete_item', 'pi', 'pi_item')
+                          AND column_name = 'id'
+                    LOOP
+                        EXECUTE format('SELECT setval(pg_get_serial_sequence(%L, %L), COALESCE((SELECT MAX(id) FROM %I), 0) + 1, false)', 
+                            r.table_name, r.column_name, r.table_name);
+                    END LOOP;
+                END $$;";
 
-        // Categorias
-        var maxIdCategorias = await _context.Categorias.MaxAsync(c => (long?)c.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('categoria', 'id'), {maxIdCategorias + 1}, false);");
-
-        // Marcas
-        var maxIdMarcas = await _context.Marcas.MaxAsync(m => (long?)m.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('marca', 'id'), {maxIdMarcas + 1}, false);");
-
-        // Tecidos
-        var maxIdTecidos = await _context.Tecidos.MaxAsync(t => (long?)t.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('tecido', 'id'), {maxIdTecidos + 1}, false);");
-        
-        // Modulos
-        var maxIdModulos = await _context.Modulos.MaxAsync(m => (long?)m.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('modulo', 'id'), {maxIdModulos + 1}, false);");
-        
-            // ModulosTecidos
-        var maxIdModulosTecidos = await _context.ModulosTecidos.MaxAsync(mt => (long?)mt.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('modulo_tecido', 'id'), {maxIdModulosTecidos + 1}, false);");
-
-        // FreteItem
-        var maxIdFreteItem = await _context.FreteItens.MaxAsync(f => (long?)f.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('frete_item', 'id'), {maxIdFreteItem + 1}, false);");
-
-        // ConfiguracoesFreteItem
-        var maxIdCfgFrete = await _context.ConfiguracoesFreteItens.MaxAsync(c => (long?)c.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('configuracoes_frete_item', 'id'), {maxIdCfgFrete + 1}, false);");
-
-        // Pis
-        var maxIdPis = await _context.Pis.MaxAsync(p => (long?)p.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('pi', 'id'), {maxIdPis + 1}, false);");
-
-        // PiItens
-        var maxIdPiItens = await _context.PiItens.MaxAsync(p => (long?)p.Id) ?? 0;
-        await _context.Database.ExecuteSqlInterpolatedAsync($"SELECT setval(pg_get_serial_sequence('pi_item', 'id'), {maxIdPiItens + 1}, false);");
-
+            await _context.Database.ExecuteSqlRawAsync(sql);
+        }
+        catch (Exception ex)
+        {
+            // Não falhar a importação inteira se apenas o reset de sequências falhar
+            Console.WriteLine($"Aviso: Erro ao resetar sequências (pode ser ignorado se não houver conflito de IDs): {ex.Message}");
+        }
     }
 
     public async Task ImportarKaramsAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao = null)
@@ -567,13 +553,13 @@ public class ExcelImportService
         if (dtRevisao.HasValue) 
              dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
 
-        // 0. Reset Sequences to avoid PK violation (manual inserts desync fix)
-        await ResetSequencesAsync();
-
         var originalCulture = CultureInfo.CurrentCulture;
         try
         {
             CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
+
+            // Reset sequences inside try
+            await ResetSequencesAsync();
 
             // Sanitize stream to fix "Invalid Address format" (semicolon in merged cells)
             using var sanitizedStream = SanitizeExcelFile(fileStream);
@@ -988,17 +974,18 @@ public class ExcelImportService
         }
     }
 
-    public async Task ImportarLivintusAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao)
+    public async Task<ImportResult> ImportarLivintusAsync(Stream fileStream, long idFornecedor, DateTime? dtRevisao, bool dryRun = false)
     {
         if (dtRevisao.HasValue)
             dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
-
-        await ResetSequencesAsync();
 
         var originalCulture = CultureInfo.CurrentCulture;
         try
         {
             CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
+
+            // Reset sequences inside try
+            await ResetSequencesAsync();
 
             using var package = new ExcelPackage(fileStream);
 
@@ -1055,34 +1042,43 @@ public class ExcelImportService
                 for (int row = 2; row <= rowCount; row++) // Skip header row
                 {
                     // === Reads ===
-                    var marcaNome = worksheet.Cells[row, 2].Text?.Trim();
-                    var largText = worksheet.Cells[row, 3].Text?.Trim(); // For isNewSpec check if needed, but we'll use .Value later
-                    var altText = worksheet.Cells[row, 4].Text?.Trim();
-                    var profText = worksheet.Cells[row, 5].Text?.Trim();
-                    var descricaoRaw = worksheet.Cells[row, 6].Text?.Trim();
+                    var brandFromA = worksheet.Cells[row, 1].Text?.Trim();
+                    var brandFromB = worksheet.Cells[row, 2].Text?.Trim();
+                    
+                    // Prioritize Column A for Brand, fallback to Column B
+                    var marcaNome = !string.IsNullOrEmpty(brandFromA) && !brandFromA.Equals("LINHA", StringComparison.OrdinalIgnoreCase) 
+                                    ? brandFromA : brandFromB;
+
+                    var largRaw = worksheet.Cells[row, 3].Value;
+                    var profRaw = worksheet.Cells[row, 4].Value; // FIXED: Column 4 is Depth
+                    var altRaw = worksheet.Cells[row, 5].Value;  // FIXED: Column 5 is Height
+                    var compositionRaw = worksheet.Cells[row, 6].Text?.Trim();
                     var tecidoNome = worksheet.Cells[row, 7].Text?.Trim();
                     var cellValor = worksheet.Cells[row, 8].Value;
                     var valorTecido = UniversalParseDecimal(cellValor);
 
-                    bool isNewSpec = !string.IsNullOrEmpty(marcaNome) && !marcaNome.Equals("MODELO", StringComparison.OrdinalIgnoreCase)
-                                     && !string.IsNullOrEmpty(descricaoRaw) 
-                                     && !descricaoRaw.Equals("COMPOSIÇÃO", StringComparison.OrdinalIgnoreCase)
-                                     && !descricaoRaw.Equals("COMPOSICAO", StringComparison.OrdinalIgnoreCase);
+                    // Improved logic for isNewSpec: if we have a brand or a model and composition
+                    bool isNewSpec = (!string.IsNullOrEmpty(marcaNome) && !marcaNome.Equals("MODELO", StringComparison.OrdinalIgnoreCase))
+                                     || (!string.IsNullOrEmpty(brandFromB) && !string.IsNullOrEmpty(compositionRaw));
 
-                    if (isNewSpec && marcaNome != null && descricaoRaw != null)
+                    if (isNewSpec && !string.IsNullOrEmpty(brandFromB) && !string.IsNullOrEmpty(compositionRaw))
                     {
-                        var descricaoNormalized = NormalizeString(descricaoRaw);
-                        var larg = UniversalParseDecimal(worksheet.Cells[row, 3].Value);
-                        var prof = UniversalParseDecimal(worksheet.Cells[row, 5].Value);
-                        var alt = UniversalParseDecimal(worksheet.Cells[row, 4].Value);
+                        // Use Column B (Model) + Column F (Composition) for a better description
+                        var modelName = brandFromB;
+                        var descricaoNormalized = NormalizeString($"{modelName} - {compositionRaw}");
+                        
+                        // Dimensions are in METERS in Livintus file, keep as is
+                        var larg = UniversalParseDecimal(largRaw);
+                        var prof = UniversalParseDecimal(profRaw);
+                        var alt = UniversalParseDecimal(altRaw);
 
                         // Get/Create Marca
-                        if (!marcasMap.TryGetValue(marcaNome, out var marca))
+                        if (!marcasMap.TryGetValue(marcaNome!, out var marca))
                         {
-                            marca = new Marca { Nome = marcaNome };
+                            marca = new Marca { Nome = marcaNome! };
                             _context.Marcas.Add(marca);
-                            _context.SaveChanges(); // Need ID
-                            marcasMap[marcaNome] = marca;
+                            if (!dryRun) _context.SaveChanges(); // Need ID if not dry-run
+                            marcasMap[marcaNome!] = marca;
                         }
 
                         // Get/Create Modulo
@@ -1118,7 +1114,7 @@ public class ExcelImportService
                                 Profundidade = prof,
                                 Altura = alt,
                                 Pa = 0,
-                                M3 = (larg * prof * alt) / 1000000m,
+                                M3 = (larg * prof * alt), // No division by 1M since inputs are in meters
                                 ModulosTecidos = new List<ModuloTecido>()
                             };
                             _context.Modulos.Add(modulo);
@@ -1132,7 +1128,7 @@ public class ExcelImportService
                             modulo.Largura = larg;
                             modulo.Profundidade = prof;
                             modulo.Altura = alt;
-                            modulo.M3 = (larg * prof * alt) / 1000000m;
+                            modulo.M3 = (larg * prof * alt); // No division by 1M
                         }
                         lastModulo = modulo;
                     }
@@ -1177,7 +1173,115 @@ public class ExcelImportService
                 }
             }
 
-            await _context.SaveChangesAsync();
+            if (!dryRun) await _context.SaveChangesAsync();
+
+            // === VERIFICATION ===
+            var result = new ImportResult();
+            fileStream.Position = 0; // Reset stream for re-reading
+            using var packageVerify = new ExcelPackage(fileStream);
+            
+            // Reload modules from DB for comparison
+            var modulosFinal = await _context.Modulos
+                .Where(m => m.IdFornecedor == idFornecedor)
+                .Include(m => m.ModulosTecidos)
+                .ThenInclude(mt => mt.Tecido)
+                .ToListAsync();
+
+            foreach (var worksheet in packageVerify.Workbook.Worksheets)
+            {
+                if (worksheet.Dimension == null) continue;
+                var rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    result.TotalFilasProcessadas++;
+
+                    var brandFromA = worksheet.Cells[row, 1].Text?.Trim();
+                    var brandFromB = worksheet.Cells[row, 2].Text?.Trim();
+                    var marcaNome = !string.IsNullOrEmpty(brandFromA) && !brandFromA.Equals("LINHA", StringComparison.OrdinalIgnoreCase) 
+                                    ? brandFromA : brandFromB;
+                    
+                    var largVal = UniversalParseDecimal(worksheet.Cells[row, 3].Value);
+                    var profVal = UniversalParseDecimal(worksheet.Cells[row, 4].Value);
+                    var altVal = UniversalParseDecimal(worksheet.Cells[row, 5].Value);
+                    var compositionRaw = worksheet.Cells[row, 6].Text?.Trim();
+                    var tecidoNome = worksheet.Cells[row, 7].Text?.Trim();
+                    var valorTecidoExcel = UniversalParseDecimal(worksheet.Cells[row, 8].Value);
+
+                    if (string.IsNullOrEmpty(brandFromB) || string.IsNullOrEmpty(compositionRaw)) continue;
+
+                    var descricaoExpected = NormalizeString($"{brandFromB} - {compositionRaw}");
+
+                    // Find modulo in DB
+                    var dbModulo = modulosFinal.FirstOrDefault(m => 
+                        NormalizeString(m.Descricao) == descricaoExpected && 
+                        Math.Abs(m.Largura - largVal) < 0.001m);
+
+                    if (dbModulo == null)
+                    {
+                        result.Discrepancias.Add($"Linha {row}: Módulo '{descricaoExpected}' (L:{largVal}) não encontrado no banco.");
+                        continue;
+                    }
+
+                    var detail = new ImportedItemDetail
+                    {
+                        Linha = row,
+                        IdModulo = dbModulo.Id,
+                        Descricao = dbModulo.Descricao ?? string.Empty,
+                        
+                        // System values
+                        Largura = dbModulo.Largura,
+                        Altura = dbModulo.Altura,
+                        Profundidade = dbModulo.Profundidade,
+                        M3 = dbModulo.M3,
+                        
+                        // Excel values
+                        LarguraExcel = largVal,
+                        AlturaExcel = altVal,
+                        ProfundidadeExcel = profVal,
+                        ValorExcel = valorTecidoExcel,
+
+                        Tecido = tecidoNome ?? string.Empty,
+                        Status = (dryRun && (dbModulo.Id == 0)) ? "Novo" : "OK"
+                    };
+
+                    // Verify Dimensions
+                    if (Math.Abs(dbModulo.Largura - largVal) > 0.001m || 
+                        Math.Abs(dbModulo.Profundidade - profVal) > 0.001m || 
+                        Math.Abs(dbModulo.Altura - altVal) > 0.001m)
+                    {
+                        detail.Status = "Divergente";
+                        result.Discrepancias.Add($"Linha {row}: Dimensões divergentes.");
+                    }
+
+                    // Verify Price
+                    if (!string.IsNullOrEmpty(tecidoNome) && !tecidoNome.Equals("LINHA", StringComparison.OrdinalIgnoreCase) && valorTecidoExcel > 0)
+                    {
+                        var dbTecido = dbModulo.ModulosTecidos?.FirstOrDefault(mt => 
+                            mt.Tecido?.Nome?.Trim().Equals(tecidoNome, StringComparison.OrdinalIgnoreCase) == true);
+
+                        if (dbTecido == null)
+                        {
+                            result.Discrepancias.Add($"Linha {row}: Tecido '{tecidoNome}' não vinculado ao módulo no banco.");
+                        }
+                        else 
+                        {
+                            detail.IdModuloTecido = dbTecido.Id;
+                            detail.ValorTecido = dbTecido.ValorTecido;
+                            if (Math.Abs(dbTecido.ValorTecido - valorTecidoExcel) > 0.001m)
+                            {
+                                detail.Status = "Divergente";
+                                result.Discrepancias.Add($"Linha {row}: Valor do tecido '{tecidoNome}' divergente. Excel: {valorTecidoExcel}, Banco: {dbTecido.ValorTecido}");
+                            }
+                        }
+                    }
+
+                    result.ItensImportados.Add(detail);
+                }
+            }
+
+            result.TotalModulosImportados = modulosFinal.Count;
+            return result;
         }
         finally
         {
@@ -1271,5 +1375,35 @@ public class ExcelImportService
         }
 
         return 0;
+    }
+
+    public async Task SincronizarItensAsync(SyncRequest request)
+    {
+        if (request?.Itens == null || request.Itens.Count == 0) return;
+
+        foreach (var item in request.Itens)
+        {
+            if (item.IdModulo <= 0) continue;
+
+            var dbModulo = await _context.Modulos.FindAsync(item.IdModulo);
+            if (dbModulo != null)
+            {
+                dbModulo.Largura = item.Largura;
+                dbModulo.Profundidade = item.Profundidade;
+                dbModulo.Altura = item.Altura;
+                dbModulo.M3 = (item.Largura * item.Profundidade * item.Altura);
+            }
+
+            if (item.IdModuloTecido.HasValue && item.IdModuloTecido.Value > 0)
+            {
+                var mt = await _context.ModulosTecidos.FindAsync(item.IdModuloTecido.Value);
+                if (mt != null)
+                {
+                    mt.ValorTecido = item.Valor;
+                }
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 }
