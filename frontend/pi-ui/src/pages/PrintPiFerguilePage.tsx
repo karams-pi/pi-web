@@ -109,7 +109,7 @@ export default function PrintPiFerguilePage() {
     const rows: RowData[] = [];
 
     pi.piItens.forEach((item) => {
-      const mt = modulosTecidos.find((m) => m.id === item.idModuloTecido);
+      const mt = (item as any).moduloTecido || modulosTecidos.find((m) => m.id === item.idModuloTecido);
       const marca = mt?.modulo?.marca?.nome || "Outros";
       const marcaFornecedor = mt?.modulo?.fornecedor?.nome || mt?.modulo?.categoria?.nome || supplierMetadata.details.brand;
       const descricao = mt?.modulo?.descricao || "";
@@ -297,13 +297,13 @@ export default function PrintPiFerguilePage() {
           <div>PAÍS: {supplierMetadata.country}</div>
           <div style={{ marginTop: 6 }}>
             <strong>TIEMPO DE ENTREGA:</strong>{" "}
-            {pi.configuracoes?.condicoesPagamento ? "60 dias" : "60 dias"}
+            {pi.tempoEntrega || "60 dias"}
           </div>
           <div>
             <strong>INCOTERM:</strong> {incoterm} - ARAPONGAS PR
           </div>
           <div>
-            <strong>CONDICIÓN DE PAGO:</strong> {pi.configuracoes?.condicoesPagamento || "A VISTA"}
+            <strong>CONDICIÓN DE PAGO:</strong> {pi.condicaoPagamento || pi.configuracoes?.condicoesPagamento || "A VISTA"}
           </div>
         </div>
 
@@ -354,8 +354,7 @@ export default function PrintPiFerguilePage() {
             <th style={{ ...thStyle, width: "7%" }}>FABRIC</th>
             <th style={{ ...thStyle, width: "5%" }}>TELA<br/>N</th>
             <th style={{ ...thStyle, width: "10%" }}>OBSERVACIÓN</th>
-            {showFreight && <th style={{ ...thStyle, width: "7%" }}>FRETE</th>}
-            <th style={{ ...thStyle, width: "7%" }}>{incoterm} UNIT<br/>{currency === "BRL" ? "R$" : `DOLAR ${fmtBR(pi.cotacaoAtualUSD)}`}</th>
+            <th style={{ ...thStyle, width: "7%" }}>{incoterm} UNIT<br/>{currency === "BRL" ? "R$" : "DOLAR"}</th>
             <th style={{ ...thStyle, width: "8%" }}>TOTAL {incoterm}<br/>{currency === "BRL" ? "R$" : "USD"}</th>
           </tr>
         </thead>
@@ -444,14 +443,7 @@ export default function PrintPiFerguilePage() {
                 {/* OBSERVACIÓN */}
                 <td style={{ ...cellStyle, textAlign: "left", fontSize: "8px" }}>{row.observacao}</td>
 
-                {/* Freight: Only for non-EXW */}
-                {showFreight && (
-                  <td style={{ ...cellStyle, textAlign: "right", background: "#fefce8" }}>
-                    {currency === "BRL" ? 
-                      `R$ ${fmtBR((row.item as any).valorFreteRateadoBRL ?? (row.item as any).ValorFreteRateadoBRL)}` : 
-                      `$ ${fmtBR((row.item as any).valorFreteRateadoUSD ?? (row.item as any).ValorFreteRateadoUSD)}`}
-                  </td>
-                )}
+                {/* Freight: Removido conforme solicitação (mas o valor continua somado no preço unitário) */}
 
                 {/* UNIT PRICE */}
                 <td style={{ ...cellStyle, textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" }}>
@@ -480,7 +472,7 @@ export default function PrintPiFerguilePage() {
             <td style={{ ...cellStyle, fontWeight: "bold", textAlign: "center" }}>
               {fmtBR(processedData.totalM3)}
             </td>
-            <td colSpan={showFreight ? 5 : 4} style={cellStyle}></td>
+            <td colSpan={4} style={cellStyle}></td>
             <td style={{ ...cellStyle, textAlign: "right", background: "#fef2f2", fontWeight: "bold", fontSize: "11px" }}>
               {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(processedData.totalValue) : fmt(processedData.totalValue)}
             </td>
@@ -512,30 +504,30 @@ export default function PrintPiFerguilePage() {
 
         </div>
         <div style={{ padding: 10 }}>
-          <p style={{ margin: "2px 0" }}>
-            <strong>Volumen:</strong> {processedData.totalQty}
-          </p>
-          <p style={{ margin: "2px 0" }}>
-            <strong>NCM:</strong> {supplierMetadata.details.ncm}
-          </p>
+          <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DATOS GENERALES DEL PRODUCTO</h3>
           <p style={{ margin: "2px 0" }}>
             <strong>Marca:</strong> {supplierMetadata.details.brand}
           </p>
-
           <p style={{ margin: "2px 0" }}>
-            <strong>Productos originales de fábrica</strong>
+            <strong>NCM:</strong> {supplierMetadata.details.ncm || "94016100"}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? "R$" : "$"} {currency === "BRL" ? fmtBR(processedData.totalValue, 2) : fmt(processedData.totalValue, 2)}
+            <strong>Producto:</strong> {fmt(processedData.totalQty, 0)}
           </p>
-          <p style={{ margin: "10px 0 2px 0" }}>
+          <p style={{ margin: "2px 0" }}>
             <strong>CBM M³:</strong> {fmtBR(processedData.totalM3, 3)}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>P.N. TOTAL (KG):</strong> {fmtBR(processedData.totalM3 * 150, 2)}
+            <strong>P.N. TOTAL:</strong>
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>P.B. TOTAL (KG):</strong> {fmtBR(processedData.totalM3 * 165, 2)}
+            <strong>P.B. TOTAL:</strong>
+          </p>
+          <p style={{ margin: "2px 0" }}>
+            <strong>VOLUMEN TOTAL:</strong> {fmtBR(processedData.totalM3, 3)}
+          </p>
+          <p style={{ margin: "2px 0" }}>
+            <strong>Productos originales de fabrica</strong>
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>Hecho en Brasil</strong>

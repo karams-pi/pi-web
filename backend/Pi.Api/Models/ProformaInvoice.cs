@@ -56,6 +56,14 @@ public class ProformaInvoice
     [Column("cotacao_risco")]
     public decimal CotacaoRisco { get; set; }
 
+    [Column("tempo_entrega")]
+    [MaxLength(100)]
+    public string? TempoEntrega { get; set; }
+
+    [Column("condicao_pagamento")]
+    [MaxLength(100)]
+    public string? CondicaoPagamento { get; set; }
+
     // Navigation
     [Column("id_fornecedor")]
     public long? IdFornecedor { get; set; }

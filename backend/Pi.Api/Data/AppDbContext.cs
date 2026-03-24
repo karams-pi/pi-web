@@ -271,6 +271,8 @@ public class AppDbContext : DbContext
             entity.Property(x => x.ValorTotalFreteUSD).HasColumnName("valor_total_frete_usd").HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(x => x.CotacaoAtualUSD).HasColumnName("cotacao_atual_usd").HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(x => x.CotacaoRisco).HasColumnName("cotacao_risco").HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(x => x.TempoEntrega).HasColumnName("tempo_entrega").HasMaxLength(100);
+            entity.Property(x => x.CondicaoPagamento).HasColumnName("condicao_pagamento").HasMaxLength(100);
             
             entity.HasIndex(x => x.IdCliente).HasDatabaseName("ix_pi_id_cliente");
             entity.HasIndex(x => x.IdConfiguracoes).HasDatabaseName("ix_pi_id_configuracoes");

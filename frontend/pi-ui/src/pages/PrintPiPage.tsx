@@ -371,7 +371,7 @@ export default function PrintPiPage() {
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
                    <span style={{ width: "130px" }}>TIEMPO DE ENTREGA:</span>
-                   <span>50 dias despues del primer pago</span>
+                   <span>{pi.tempoEntrega || "50 dias despues del primer pago"}</span>
                </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span style={{ width: "130px" }}>INCOTERM:</span>
@@ -379,7 +379,7 @@ export default function PrintPiPage() {
                 </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
                    <span style={{ width: "130px" }}>CONDICIÓN DE PAGO:</span>
-                   <span>{pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
+                   <span>{pi.condicaoPagamento || pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
                </div>
           </div>
       </div>
@@ -406,7 +406,7 @@ export default function PrintPiPage() {
                <th rowSpan={2} style={{ width: "10%" }}>ACABADO</th>
                <th rowSpan={2} style={{ width: "10%" }}>OBSERVACIÓN</th>
                {showFreight && <th rowSpan={2} style={{ width: "10%" }}>FRETE</th>}
-               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "UNIT R$" : `UNIT DOLAR ${fmt(pi.cotacaoAtualUSD)}`}</th>
+               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "UNIT R$" : "UNIT DOLAR"}</th>
               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
             </tr>
             <tr>
@@ -594,15 +594,14 @@ export default function PrintPiPage() {
           <div className="footer-col" style={{ padding: 10 }}>
               <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DATOS GENERALES DEL PRODUCTO</h3>
               <p><strong>Marca:</strong> {supplierMetadata.details.brand}</p>
-              <p><strong>NCM:</strong> {supplierMetadata.details.ncm}</p>
-              <p><strong>Producto:</strong> {fmt(processedData.totalSofaQty, 0)}</p>
-              <p><strong>TOTAL {currency === "BRL" ? "R$" : "USD"}:</strong> {currency === "BRL" ? `R$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + (Number(i.valorFinalItemBRL ?? i.ValorFinalItemBRL) || 0), 0))}` : `$ ${fmt((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.valorEXW ?? i.ValorEXW) || 0) * (Number(i.quantidade ?? i.Quantidade) || 0) + (Number(i.valorFreteRateadoUSD ?? i.ValorFreteRateadoUSD) || 0) * (Number(i.quantidade ?? i.Quantidade) || 0)), 0))}`}</p>
-              <p><strong>CBM M³:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
+              <p><strong>NCM:</strong> {supplierMetadata.details.ncm || "94016100"}</p>
+              <p><strong>Producto:</strong> {fmt(processedData.totalQty, 0)}</p>
+              <p><strong>CBM M³:</strong> {fmt3(processedData.totalM3)}</p>
               <p><strong>P.N. TOTAL:</strong></p>
               <p><strong>P.B. TOTAL:</strong></p>
-              <p><strong>VOLUMEN TOTAL:</strong> {fmt3((pi.piItens || []).reduce((acc: number, i: any) => acc + ((Number(i.m3) || 0) * (Number(i.quantidade) || 0)), 0))}</p>
+              <p><strong>VOLUMEN TOTAL:</strong> {fmt3(processedData.totalM3)}</p>
               <p><strong>Productos originales de fabrica</strong></p>
-              <p><strong>{supplierMetadata.details.origin}</strong></p>
+              <p><strong>Hecho en Brasil</strong></p>
               <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>
                 * Esta proforma es válida por {urlParams.get("validity") || 30} días a partir de la fecha de emisión.
               </p>

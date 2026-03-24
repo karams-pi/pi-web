@@ -13,6 +13,7 @@ import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
 import { FileText } from "lucide-react";
 import { PiCurrencyModal } from "../components/PiCurrencyModal";
+import { NewClientModal } from "../components/NewClientModal";
 import PageHeader from "../components/PageHeader";
 import type { Frete, ModuloTecido, Configuracao, Fornecedor, Categoria, Marca, Tecido } from "../api/types";
 import { calculateCotacaoRisco, calculateEXW, calculateFreteRateio } from "../utils/calculations";
@@ -29,6 +30,8 @@ type FormState = {
   cotacaoRisco: number | string;
   valorTotalFreteBRL: number;
   valorTotalFreteUSD: number;
+  tempoEntrega?: string;
+  condicaoPagamento?: string;
 };
 
 
@@ -70,6 +73,8 @@ export default function ProformaInvoicePage() {
     cotacaoRisco: 0,
     valorTotalFreteBRL: 0,
     valorTotalFreteUSD: 0,
+    tempoEntrega: "",
+    condicaoPagamento: "",
   });
 
   const [fretes, setFretes] = useState<Frete[]>([]);
@@ -98,6 +103,7 @@ export default function ProformaInvoicePage() {
 
   // Modal State
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
   const [currencyModalType, setCurrencyModalType] = useState<"print" | "excel">("print");
 
@@ -556,6 +562,8 @@ export default function ProformaInvoicePage() {
         valorTotalFreteUSD: form.valorTotalFreteUSD,
         cotacaoAtualUSD: form.cotacaoAtualUSD,
         cotacaoRisco: Number(form.cotacaoRisco),
+        tempoEntrega: form.tempoEntrega,
+        condicaoPagamento: form.condicaoPagamento,
         piItens: itens.map(item => ({
           id: item.id || 0, // Include ID for items (0 if new)
           idModuloTecido: item.idModuloTecido,
@@ -610,7 +618,9 @@ export default function ProformaInvoicePage() {
             cotacaoAtualUSD: pi.cotacaoAtualUSD,
             cotacaoRisco: Number((pi.cotacaoRisco || 0).toFixed(2)),
             valorTotalFreteBRL: pi.valorTotalFreteBRL,
-            valorTotalFreteUSD: pi.valorTotalFreteUSD
+            valorTotalFreteUSD: pi.valorTotalFreteUSD,
+            tempoEntrega: pi.tempoEntrega || "",
+            condicaoPagamento: pi.condicaoPagamento || ""
         });
 
         const itensApi = pi.piItens || (pi as any).PiItens;
@@ -760,6 +770,18 @@ export default function ProformaInvoicePage() {
         />
       )}
 
+      {showNewClientModal && (
+        <NewClientModal
+          isOpen={showNewClientModal}
+          onClose={() => setShowNewClientModal(false)}
+          onClientCreated={async (newClient) => {
+            const clientesData = await listClientes({ pageSize: 1000 });
+            setClientes(clientesData.items || []);
+            setForm(prev => ({ ...prev, idCliente: String(newClient.id) }));
+          }}
+        />
+      )}
+
       {helpModalOpen && (
         <div className="modalOverlay" onMouseDown={() => setHelpModalOpen(false)}>
           <div className="modalCard" style={{ width: 400, height: 'auto', maxHeight: '80vh' }} onMouseDown={(e) => e.stopPropagation()}>
@@ -813,12 +835,25 @@ export default function ProformaInvoicePage() {
           </div>
           <div className="field">
             <label className="label">Cliente*</label>
-            <SearchableSelect
-              value={form.idCliente}
-              onChange={(val) => setForm({ ...form, idCliente: String(val) })}
-              options={clientes.map((c) => ({ value: c.id, label: c.nome }))}
-              placeholder="Selecione..."
-            />
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <div style={{ flex: 1 }}>
+                <SearchableSelect
+                  value={form.idCliente}
+                  onChange={(val) => setForm({ ...form, idCliente: String(val) })}
+                  options={clientes.map((c) => ({ value: c.id, label: c.empresa ? `${c.nome} - ${c.empresa}` : c.nome }))}
+                  placeholder="Selecione..."
+                />
+              </div>
+              <button 
+                type="button"
+                className="btn btn-secondary" 
+                onClick={() => setShowNewClientModal(true)}
+                title="Novo Cliente"
+                style={{ padding: "0 12px", height: "38px" }}
+              >
+                +
+              </button>
+            </div>
           </div>
           <div className="field">
             <label className="label">Frete*</label>
@@ -827,6 +862,29 @@ export default function ProformaInvoicePage() {
               onChange={(val) => setForm({ ...form, idFrete: Number(val) })}
               options={fretes.map((f) => ({ value: f.id, label: f.nome }))}
               placeholder="Selecione..."
+            />
+          </div>
+          <div className="field">
+            <label className="label">Condição de Pagamento</label>
+            <SearchableSelect
+              value={form.condicaoPagamento || ""}
+              onChange={(val) => setForm({ ...form, condicaoPagamento: String(val) })}
+              options={[
+                { value: "", label: "Selecione (Padrão Config)" },
+                { value: "A VISTA", label: "A VISTA" },
+                { value: "ANTECIPADO", label: "ANTECIPADO" },
+                { value: "30% PARA FABRICAÇÃO E 70% ANTES DA COLETA", label: "30% PARA FABRICAÇÃO E 70% ANTES DA COLETA" }
+              ]}
+              placeholder="Selecione..."
+            />
+          </div>
+          <div className="field">
+            <label className="label">Tempo de Entrega</label>
+            <input
+              className="cl-input"
+              placeholder="Ex: 60 dias"
+              value={form.tempoEntrega || ""}
+              onChange={(e) => setForm({ ...form, tempoEntrega: e.target.value })}
             />
           </div>
           <div className="field">

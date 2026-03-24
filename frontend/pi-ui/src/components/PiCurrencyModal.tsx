@@ -76,7 +76,7 @@ export function PiCurrencyModal({ isOpen, onClose, onConfirm, title = "Seleccion
                   style={{ width: "18px", height: "18px", cursor: "pointer" }}
                 />
                 <div>
-                  <div style={{ fontWeight: "600", color: "#fff" }}>Reales (R$)</div>
+                  <div style={{ fontWeight: "600", color: "#fff" }}>Reais (R$)</div>
                   <div style={{ fontSize: "12px", color: "#64748b" }}>Muestra los valores finales en moneda brasileña.</div>
                 </div>
               </label>

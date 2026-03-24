@@ -219,11 +219,11 @@ public class PiExportService
         ws.Cells[gridRow + 4, rightCol].Value = "PUNTO DE DESTINO:";
         ws.Cells[gridRow + 4, rightCol + 1].Value = pi.Cliente?.PortoDestino;
         ws.Cells[gridRow + 5, rightCol].Value = "TIEMPO DE ENTREGA:";
-        ws.Cells[gridRow + 5, rightCol + 1].Value = "50 dias despues del primer pago";
+        ws.Cells[gridRow + 5, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "50 dias despues del primer pago";
         ws.Cells[gridRow + 6, rightCol].Value = "INCOTERM:";
         ws.Cells[gridRow + 6, rightCol + 1].Value = $"{pi.Frete?.Nome} {pi.Configuracoes?.PortoEmbarque ?? ""}";
         ws.Cells[gridRow + 7, rightCol].Value = "CONDICIÓN DE PAGO:";
-        ws.Cells[gridRow + 7, rightCol + 1].Value = pi.Configuracoes?.CondicoesPagamento ?? "T/T";
+        ws.Cells[gridRow + 7, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "T/T");
         ws.Cells[gridRow, 1, gridRow + 8, 15].Style.Font.Size = 8;
 
         // ═══════════════ TABLE HEADER ═══════════════
@@ -255,7 +255,7 @@ public class PiExportService
         }
 
         string currentCurrency = currency?.Trim().ToUpper() ?? "EXW";
-        string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : $"UNIT DOLAR {pi.CotacaoAtualUSD:N2}";
+        string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
         string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
 
         ws.Cells[startRow, unitCol, startRow + 1, unitCol].Merge = true; ws.Cells[startRow, unitCol].Value = unitLabel;
@@ -392,10 +392,14 @@ public class PiExportService
         ws.Cells[currentRow, 8].Value = "DATOS GENERALES DEL PRODUCTO";
         ws.Cells[currentRow, 8].Style.Font.Bold = true;
         ws.Cells[currentRow + 1, 8].Value = "Marca: " + metadata.Brand;
-        ws.Cells[currentRow + 2, 8].Value = "NCM: " + metadata.Origin; // Using it as origin? Wait
         ws.Cells[currentRow + 2, 8].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 9, 8].Value = "PRODUCTOS ORIGINALES DE FABRICA | " + metadata.Origin.ToUpper();
-
+        ws.Cells[currentRow + 3, 8].Value = "Producto: " + totalQty;
+        ws.Cells[currentRow + 4, 8].Value = "CBM M³: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 5, 8].Value = "P.N. TOTAL:";
+        ws.Cells[currentRow + 6, 8].Value = "P.B. TOTAL:";
+        ws.Cells[currentRow + 7, 8].Value = "VOLUMEN TOTAL: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 8, 8].Value = "Productos originales de fabrica";
+        ws.Cells[currentRow + 9, 8].Value = "Hecho en Brasil";
         
         ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
         ws.Cells[currentRow + 11, 1].Value = $"* Esta proforma es válida por {validity} días a partir de la fecha de emisión.";
@@ -426,9 +430,9 @@ public class PiExportService
         ws.Cells["A3"].Value = "DIRECCIÓN: " + metadata.Address;
         ws.Cells["A5"].Value = "CÓDIGO POSTAL: " + metadata.Zip + " - " + metadata.City + " - " + metadata.State;
         ws.Cells["A6"].Value = "PAÍS: " + metadata.Country;
-        ws.Cells["A7"].Value = "TIEMPO DE ENTREGA: 60 dias";
+        ws.Cells["A7"].Value = "TIEMPO DE ENTREGA: " + (!string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "60 dias");
         ws.Cells["A8"].Value = "INCOTERM: " + pi.Frete?.Nome + " - ARAPONGAS PR";
-        ws.Cells["A9"].Value = "CONDICIÓN DE PAGO: " + (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA");
+        ws.Cells["A9"].Value = "CONDICIÓN DE PAGO: " + (!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA"));
 
 
         ws.Cells["H1:N9"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
@@ -448,15 +452,14 @@ public class PiExportService
         // ═══════════════ TABLE ═══════════════
         int startRow = 8;
         string currentCurrency = currency?.Trim().ToUpper() ?? "EXW";
-        string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : $"UNIT DOLAR {pi.CotacaoAtualUSD:N2}";
+        string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
         string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
         
         bool showFreight = new[] { "FOB", "FCA", "CIF" }.Contains(pi.Frete?.Nome?.ToUpper());
-        int unitCol = showFreight ? 14 : 13;
-        int totalCol = showFreight ? 15 : 14;
+        int unitCol = 13;
+        int totalCol = 14;
 
         List<string> headerList = new List<string> { "FOTO", "REFERENCIA", "DESCRIPCIÓN", "MARCA", "LARG.", "ALT.", "PROF.", "CANT.", "TOTAL M3", "FABRIC", "TELA N", "OBSERVACIÓN" };
-        if (showFreight) headerList.Add("FRETE");
         headerList.Add(unitLabel);
         headerList.Add(totalLabel);
 
@@ -500,11 +503,6 @@ public class PiExportService
 
                 decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : (item.ValorEXW + (showFreight ? item.ValorFreteRateadoUSD : 0));
                 decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0));
-
-                if (showFreight)
-                {
-                    ws.Cells[currentRow, 13].Value = currency == "BRL" ? item.ValorFreteRateadoBRL : item.ValorFreteRateadoUSD;
-                }
 
                 ws.Cells[currentRow, unitCol].Value = unitPrice;
                 ws.Cells[currentRow, totalCol].Value = totalPrice;
@@ -558,7 +556,7 @@ public class PiExportService
 
         // ═══════════════ FOOTER ═══════════════
         currentRow += 1;
-        var footerRange = ws.Cells[currentRow, 1, currentRow + 6, 14];
+        var footerRange = ws.Cells[currentRow, 1, currentRow + 10, totalCol];
         footerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
         
         // Accounting Details (Left)
@@ -575,24 +573,24 @@ public class PiExportService
         // Product Data (Right)
         int rightCol = 8;
 
-        ws.Cells[currentRow, rightCol].Value = "Volumen: " + totalQty;
+        ws.Cells[currentRow, rightCol].Value = "DATOS GENERALES DEL PRODUCTO";
         ws.Cells[currentRow, rightCol].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, rightCol].Value = "TOTAL " + (currency == "BRL" ? "R$" : "USD") + ": " + (currency == "BRL" ? totalValue.ToString("N2") : totalValue.ToString("C2"));
+        ws.Cells[currentRow + 1, rightCol].Value = "Marca: " + metadata.Brand;
         ws.Cells[currentRow + 2, rightCol].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 3, rightCol].Value = "Marca: " + metadata.Brand;
-        ws.Cells[currentRow + 4, rightCol].Value = "Productos originales de fábrica";
+        ws.Cells[currentRow + 3, rightCol].Value = "Producto: " + totalQty;
+        ws.Cells[currentRow + 4, rightCol].Value = "CBM M³: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 5, rightCol].Value = "P.N. TOTAL:";
+        ws.Cells[currentRow + 6, rightCol].Value = "P.B. TOTAL:";
+        ws.Cells[currentRow + 7, rightCol].Value = "VOLUMEN TOTAL: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 8, rightCol].Value = "Productos originales de fabrica";
+        ws.Cells[currentRow + 9, rightCol].Value = "Hecho en Brasil";
 
-        ws.Cells[currentRow + 5, rightCol].Value = "CBM M³: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 6, rightCol].Value = "P.N. TOTAL (KG): " + (totalM3 * 150).ToString("N2");
-        ws.Cells[currentRow + 7, rightCol].Value = "P.B. TOTAL (KG): " + (totalM3 * 165).ToString("N2");
-        ws.Cells[currentRow + 8, rightCol].Value = "Hecho en Brasil";
-
-        ws.Cells[currentRow + 8, 1, currentRow + 8, totalCol].Merge = true;
-        ws.Cells[currentRow + 8, 1].Value = $"* Esta proforma es válida por {validity} días a partir de la fecha de emisión.";
-        ws.Cells[currentRow + 8, 1].Style.Font.Italic = true;
-        ws.Cells[currentRow + 8, 1].Style.Font.Size = 8;
+        ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
+        ws.Cells[currentRow + 11, 1].Value = $"* Esta proforma es válida por {validity} días a partir de la fecha de emisión.";
+        ws.Cells[currentRow + 11, 1].Style.Font.Italic = true;
+        ws.Cells[currentRow + 11, 1].Style.Font.Size = 8;
         
-        ws.Cells[currentRow, 1, currentRow + 8, totalCol].Style.Font.Size = 9;
+        ws.Cells[currentRow, 1, currentRow + 10, totalCol].Style.Font.Size = 9;
     }
 
     private string GetFormattedPiNumber(ProformaInvoice pi)
