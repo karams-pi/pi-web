@@ -283,38 +283,170 @@ public class PiExportService
         {
             var brand = group.Key;
             int groupStartRow = currentRow;
-            foreach (var item in group)
+            
+            var sortedItems = group.OrderBy(i => i.ModuloTecido?.Tecido?.Nome ?? "ZZBase")
+                                   .ThenBy(i => i.ModuloTecido?.Modulo?.Descricao ?? "")
+                                   .ToList();
+
+            int[] spanFabric = new int[sortedItems.Count];
+            int[] spanFeet = new int[sortedItems.Count];
+            int[] spanFinishing = new int[sortedItems.Count];
+            int[] spanObservation = new int[sortedItems.Count];
+
+            string GetMergeVal(int idx, string type) {
+                var entry = sortedItems[idx];
+                if (type == "fabric") return entry.ModuloTecido?.Tecido?.Nome ?? "Sem Tecido";
+                if (type == "feet") return entry.Feet ?? "";
+                if (type == "finishing") return entry.Finishing ?? "";
+                if (type == "observation") return entry.Observacao ?? "";
+                return "";
+            }
+
+            foreach (var field in new[] { "fabric", "feet", "finishing", "observation" }) {
+                var arr = field == "fabric" ? spanFabric : field == "feet" ? spanFeet : field == "finishing" ? spanFinishing : spanObservation;
+                
+                for (int i = 0; i < sortedItems.Count; i++) {
+                    if (arr[i] == -1) continue;
+                    int span = 1;
+                    string val = GetMergeVal(i, field);
+                    for (int j = i + 1; j < sortedItems.Count; j++) {
+                        if (GetMergeVal(j, field) == val) {
+                            span++;
+                            arr[j] = -1;
+                        } else { break; }
+                    }
+                    arr[i] = span;
+                }
+            }
+
+            for (int i = 0; i < sortedItems.Count; i++)
             {
-                var mt = item.ModuloTecido;
-                ws.Cells[currentRow, 3].Value = mt?.Modulo?.Descricao;
-                ws.Cells[currentRow, 4].Value = item.Largura;
-                ws.Cells[currentRow, 5].Value = item.Profundidade;
-                ws.Cells[currentRow, 6].Value = item.Altura;
-                ws.Cells[currentRow, 7].Value = item.Quantidade;
-                ws.Cells[currentRow, 8].Value = item.Quantidade;
-                ws.Cells[currentRow, 9].Value = item.M3 * item.Quantidade;
-                ws.Cells[currentRow, 10].Value = mt?.Tecido?.Nome;
-                ws.Cells[currentRow, 11].Value = item.Feet;
-                ws.Cells[currentRow, 12].Value = item.Finishing;
-                ws.Cells[currentRow, 13].Value = item.Observacao;
+                var item = sortedItems[i];
 
-                decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : (item.ValorEXW + (showFreight ? item.ValorFreteRateadoUSD : 0));
-                decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0));
+                if (spanFabric[i] > 0) {
+                    int toRow = currentRow + spanFabric[i] - 1;
+                    
+                    // Description
+                    var groupItems = sortedItems.Skip(i).Take(spanFabric[i]).ToList();
+                    var descLines = groupItems.Select(g => (g.Quantidade > 1 ? $"{g.Quantidade} " : "") + (g.ModuloTecido?.Modulo?.Descricao ?? $"Modulo #{g.IdModuloTecido}")).ToList();
+                    var rangeDesc = ws.Cells[currentRow, 3, toRow, 3];
+                    rangeDesc.Merge = true;
+                    rangeDesc.Value = string.Join("\r\n", descLines);
+                    rangeDesc.Style.WrapText = true;
+                    rangeDesc.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeDesc.Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-                if (showFreight)
-                {
-                    ws.Cells[currentRow, 14].Value = currency == "BRL" ? item.ValorFreteRateadoBRL : item.ValorFreteRateadoUSD;
+                    // Qty Sofa
+                    var rangeQtySofa = ws.Cells[currentRow, 8, toRow, 8];
+                    rangeQtySofa.Merge = true;
+                    rangeQtySofa.Value = item.Quantidade;
+                    rangeQtySofa.Style.Font.Bold = true;
+                    rangeQtySofa.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    rangeQtySofa.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeQtySofa.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    // Fabric
+                    string fName = item.ModuloTecido?.Tecido?.Nome ?? "Sem Tecido";
+                    string fCode = item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
+                    string fText = string.IsNullOrEmpty(fCode) ? fName : $"{fName} - {fCode}";
+                    var rangeFabric = ws.Cells[currentRow, 10, toRow, 10];
+                    rangeFabric.Merge = true;
+                    rangeFabric.Value = fText;
+                    rangeFabric.Style.Font.Color.SetColor(Color.FromArgb(22, 101, 52));
+                    rangeFabric.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    rangeFabric.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(240, 253, 244));
+                    rangeFabric.Style.Font.Bold = true;
+                    rangeFabric.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    rangeFabric.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeFabric.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    // Calculations
+                    decimal fabricGroupUnitUSD = 0, fabricGroupUnitBRL = 0;
+                    decimal fabricGroupTotalUSD = 0, fabricGroupTotalBRL = 0;
+                    foreach(var g in groupItems) {
+                        decimal mQty = g.Quantidade > 0 ? (decimal)g.Quantidade : 1m;
+                        decimal mUnitBRL = g.ValorFinalItemBRL / mQty;
+                        decimal mUnitFreteBRL = showFreight ? g.ValorFreteRateadoBRL : 0;
+                        decimal mFinalUnitBRL = mUnitBRL + mUnitFreteBRL;
+                        decimal mUnitUSD = g.ValorEXW;
+                        decimal mUnitFreteUSD = showFreight ? g.ValorFreteRateadoUSD : 0;
+                        decimal mFinalUnitUSD = mUnitUSD + mUnitFreteUSD;
+
+                        fabricGroupUnitBRL += mFinalUnitBRL;
+                        fabricGroupTotalBRL += (mFinalUnitBRL * mQty);
+                        
+                        fabricGroupUnitUSD += mFinalUnitUSD;
+                        fabricGroupTotalUSD += (mFinalUnitUSD * mQty);
+                    }
+
+                    // Unit Price
+                    var rangeUnit = ws.Cells[currentRow, unitCol, toRow, unitCol];
+                    rangeUnit.Merge = true;
+                    rangeUnit.Value = currency == "BRL" ? fabricGroupUnitBRL : fabricGroupUnitUSD;
+                    rangeUnit.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    rangeUnit.Style.Fill.BackgroundColor.SetColor(currency == "BRL" ? Color.FromArgb(240, 249, 255) : Color.FromArgb(255, 241, 242));
+                    rangeUnit.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeUnit.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    // Total Price
+                    var rangeTotal = ws.Cells[currentRow, totalCol, toRow, totalCol];
+                    rangeTotal.Merge = true;
+                    rangeTotal.Value = currency == "BRL" ? fabricGroupTotalBRL : fabricGroupTotalUSD;
+                    rangeTotal.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    rangeTotal.Style.Fill.BackgroundColor.SetColor(currency == "BRL" ? Color.FromArgb(240, 249, 255) : Color.FromArgb(255, 241, 242));
+                    rangeTotal.Style.Font.Bold = true;
+                    rangeTotal.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeTotal.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
-                ws.Cells[currentRow, unitCol].Value = unitPrice;
-                ws.Cells[currentRow, totalCol].Value = totalPrice;
+                // Individual columns
+                ws.Cells[currentRow, 4].Value = item.Largura;
+                ws.Cells[currentRow, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[currentRow, 5].Value = item.Profundidade;
+                ws.Cells[currentRow, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[currentRow, 6].Value = item.Altura;
+                ws.Cells[currentRow, 6].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[currentRow, 7].Value = item.Quantidade;
+                ws.Cells[currentRow, 7].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[currentRow, 9].Value = item.M3 * item.Quantidade;
+                ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
+                if (showFreight) {
+                    ws.Cells[currentRow, 14].Value = currency == "BRL" ? (item.ValorFreteRateadoBRL + (item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1))) : (item.ValorFreteRateadoUSD + item.ValorEXW);
+                    ws.Cells[currentRow, 14].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[currentRow, 14].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232)); // #fefce8
+                    ws.Cells[currentRow, 14].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
+
+                if (spanFeet[i] > 0) {
+                    int toRow = currentRow + spanFeet[i] - 1;
+                    var range = ws.Cells[currentRow, 11, toRow, 11];
+                    range.Merge = true; range.Value = item.Feet;
+                    range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
+                if (spanFinishing[i] > 0) {
+                    int toRow = currentRow + spanFinishing[i] - 1;
+                    var range = ws.Cells[currentRow, 12, toRow, 12];
+                    range.Merge = true; range.Value = item.Finishing;
+                    range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
+                if (spanObservation[i] > 0) {
+                    int toRow = currentRow + spanObservation[i] - 1;
+                    var range = ws.Cells[currentRow, 13, toRow, 13];
+                    range.Merge = true; range.Value = item.Observacao;
+                    range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
+                
                 ws.Row(currentRow).Height = 25;
-                for (int i = 3; i <= totalCol; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 
                 totalQty += item.Quantidade;
                 totalM3 += (item.M3 * item.Quantidade);
+                // The total value calculates per item in the global scope
                 totalValue += (currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0)));
+                
                 currentRow++;
             }
 
