@@ -143,8 +143,13 @@ export default function ModulosPage() {
 
   useEffect(() => {
     loadConfigData();
-    getCotacaoUSD().then(setCotacao).catch(console.error);
   }, [filterFornecedor]);
+
+  useEffect(() => {
+    getCotacaoUSD().then(val => {
+      setCotacao(val ? Number(val.toFixed(2)) : 0);
+    }).catch(console.error);
+  }, []);
 
   // Load filters AND all modules whenever filter selection changes
   useEffect(() => {
@@ -455,6 +460,19 @@ export default function ModulosPage() {
             mapMarca={marcaMap}
             mapTecido={tecidoMap}
             calcExw={calcEXW}
+          />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 8, borderRight: '1px solid rgba(255,255,255,0.1)' }}>
+          <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 500 }}>US$</span>
+          <input
+            type="number"
+            step="0.01"
+            className="cl-input"
+            value={cotacao || ''}
+            onChange={(e) => setCotacao(parseFloat(e.target.value) || 0)}
+            style={{ width: 80, height: 38 }}
+            title="Cotação do Dólar para cálculo EXW"
           />
         </div>
 

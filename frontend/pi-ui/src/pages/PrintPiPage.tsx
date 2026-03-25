@@ -428,25 +428,30 @@ export default function PrintPiPage() {
                         border: "1px solid #000", 
                         padding: "2px 5px", 
                         verticalAlign: "middle", 
-                        textAlign: field === 'fabric' ? "center" : "left",
+                        textAlign: "center",
                         background: field === 'fabric' ? '#f0fdf4' : 'inherit',
                         color: field === 'fabric' ? '#166534' : 'inherit',
                         fontWeight: field === 'fabric' ? 'bold' : 'normal'
                     };
 
+                    if (field === 'fabric') {
+                        const firstItem = groupItems[0];
+                        const fName = firstItem.mt?.tecido?.nome || "Sem Tecido";
+                        const fCode = firstItem.item.tempCodigoModuloTecido || firstItem.mt?.codigoModuloTecido || "";
+                        const text = fCode ? `${fName} - ${fCode}` : fName;
+                        return (
+                            <td rowSpan={span} style={cellStyle}>
+                                {text}
+                            </td>
+                        );
+                    }
+
                     return (
                         <td rowSpan={span} style={cellStyle}>
                             {groupItems.map((g, i) => {
-                                let text = "";
-                                if (field === 'description') {
-                                    text = (g.item.quantidade > 1 ? `${g.item.quantidade} ` : "") + (g.mt?.modulo?.descricao || `Modulo #${g.item.idModuloTecido}`);
-                                } else { // fabric
-                                    const fName = g.mt?.tecido?.nome || "Sem Tecido";
-                                    const fCode = g.item.tempCodigoModuloTecido || g.mt?.codigoModuloTecido || "";
-                                    text = fCode ? `${fName} - ${fCode}` : fName;
-                                }
+                                const text = (g.item.quantidade > 1 ? `${g.item.quantidade} ` : "") + (g.mt?.modulo?.descricao || `Modulo #${g.item.idModuloTecido}`);
                                 return (
-                                    <div key={i} style={{ marginBottom: 4, borderBottom: i < groupItems.length - 1 ? "1px dashed #ccc" : "none" }}>
+                                    <div key={i} style={{ marginBottom: 4 }}>
                                         {text}
                                     </div>
                                 );
@@ -461,17 +466,32 @@ export default function PrintPiPage() {
                             const { item } = entry;
                             const isFirstInBrand = index === 0;
 
-                            // Calculate Fabric Group Total EXW
-                            let fabricGroupTotal = 0;
+                            // Calculate Fabric Group Totals
+                            let fabricGroupUnitUSD = 0;
+                            let fabricGroupUnitBRL = 0;
+                            let fabricGroupTotalUSD = 0;
+                            let fabricGroupTotalBRL = 0;
+
                             if (spans['totalExw'][index] > 0) {
                                 const span = spans['totalExw'][index];
                                 const groupRange = sortedItems.slice(index, index + span);
-                                fabricGroupTotal = groupRange.reduce((sum, g) => {
-                                    if (currency === "BRL") {
-                                        return sum + (Number(g.item.valorFinalItemBRL) || 0);
-                                    }
-                                    return sum + ((Number(g.item.valorEXW) || 0) * (Number(g.item.quantidade) || 0));
-                                }, 0);
+                                groupRange.forEach((g) => {
+                                    const mQty = (Number(g.item.quantidade ?? (g.item as any).Quantidade) || 1);
+                                    
+                                    const mUnitBRL = (Number(g.item.valorFinalItemBRL ?? (g.item as any).ValorFinalItemBRL) || 0) / mQty;
+                                    const mUnitFreteBRL = showFreight ? (Number(g.item.valorFreteRateadoBRL ?? (g.item as any).ValorFreteRateadoBRL) || 0) : 0;
+                                    const mFinalUnitBRL = mUnitBRL + mUnitFreteBRL;
+                                    
+                                    const mUnitUSD = (Number(g.item.valorEXW ?? (g.item as any).ValorEXW) || 0);
+                                    const mUnitFreteUSD = showFreight ? (Number(g.item.valorFreteRateadoUSD ?? (g.item as any).ValorFreteRateadoUSD) || 0) : 0;
+                                    const mFinalUnitUSD = mUnitUSD + mUnitFreteUSD;
+
+                                    fabricGroupUnitBRL += mFinalUnitBRL;
+                                    fabricGroupTotalBRL += (mFinalUnitBRL * mQty);
+                                    
+                                    fabricGroupUnitUSD += mFinalUnitUSD;
+                                    fabricGroupTotalUSD += (mFinalUnitUSD * mQty);
+                                });
                             }
 
                             const renderMergedCellForCurrentRow = (field: string, content: React.ReactNode, extraStyle: React.CSSProperties = {}) => {
@@ -528,20 +548,19 @@ export default function PrintPiPage() {
                                     {showFreight && (
                                         <td style={{ border: "1px solid #000", textAlign: "right", background: "#fefce8" }}>
                                             {currency === "BRL" ? 
-                                                `R$ ${fmt(item.valorFreteRateadoBRL ?? (item as any).ValorFreteRateadoBRL)}` : 
-                                                `$ ${fmt(item.valorFreteRateadoUSD ?? (item as any).ValorFreteRateadoUSD)}`}
+                                                `R$ ${fmt((Number(item.valorFreteRateadoBRL ?? (item as any).ValorFreteRateadoBRL) || 0) + ((item.valorFinalItemBRL ?? (item as any).ValorFinalItemBRL) / ((item.quantidade ?? (item as any).Quantidade) || 1)))}` : 
+                                                `$ ${fmt((Number(item.valorFreteRateadoUSD ?? (item as any).ValorFreteRateadoUSD) || 0) + (Number(item.valorEXW ?? (item as any).ValorEXW) || 0))}`}
                                         </td>
                                     )}
 
-                                    {/* Unit EXW: Per Item */}
-                                    {currency === "BRL" ? (
-                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#f0f9ff" }}>R$ {fmt((item.valorFinalItemBRL ?? (item as any).ValorFinalItemBRL) / ((item.quantidade ?? (item as any).Quantidade) || 1))}</td>
-                                    ) : (
-                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fff1f2" }}>$ {fmt(item.valorEXW ?? (item as any).ValorEXW)}</td>
-                                    )}
+                                    {/* Unit Group EXW Sofa */}
+                                    {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupUnitBRL)}` : `$ ${fmt(fabricGroupUnitUSD)}`, { 
+                                        textAlign: "right", 
+                                        background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" 
+                                    })}
                                     
-                                    {/* Total Group EXW: Broken down by Fabric */}
-                                    {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupTotal)}` : `$ ${fmt(fabricGroupTotal)}`, { 
+                                    {/* Total Group EXW: Sofa Total */}
+                                    {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupTotalBRL)}` : `$ ${fmt(fabricGroupTotalUSD)}`, { 
                                         textAlign: "right", 
                                         fontWeight: "bold", 
                                         background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" 
