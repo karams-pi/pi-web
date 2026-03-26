@@ -679,8 +679,9 @@ export default function ConfiguracoesPage() {
       {/* Freight Grids - Outside form */}
       <div style={{ marginTop: 32 }}>
         <FreightGrid title="Custos FOB" color="#10b981" idFrete={1} fornecedores={fornecedores} />
-        <FreightGrid title="Custos FCA" color="#8b5cf6" idFrete={2} fornecedores={fornecedores} />
+        <FreightGrid title="Custos FCA (Fronteira)" color="#8b5cf6" idFrete={2} fornecedores={fornecedores} />
         <FreightGrid title="Custos CIF" color="#f59e0b" idFrete={3} fornecedores={fornecedores} />
+        <FreightGrid title="Custos FCA (Fábrica)" color="#eab308" idFrete={6} fornecedores={fornecedores} />
       </div>
     </div>
   );

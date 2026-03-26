@@ -127,6 +127,21 @@ static void SeedFreightData(AppDbContext db)
         db.SaveChanges();
     }
 
+    // 1b. Garantir que o FCA (Fábrica) existe
+    if (!db.Fretes.Any(f => f.Id == 6))
+    {
+        db.Fretes.Add(new Pi.Api.Models.Frete { Id = 6, Nome = "FCA (Fábrica)" });
+        db.SaveChanges();
+    }
+
+    // 1c. Atualizar FCA existente para FCA (Fronteira) se necessário
+    var fcaOriginal = db.Fretes.FirstOrDefault(f => f.Id == 2);
+    if (fcaOriginal != null && fcaOriginal.Nome == "FCA")
+    {
+        fcaOriginal.Nome = "FCA (Fronteira)";
+        db.SaveChanges();
+    }
+
     // 2. Garantir 17 itens globais (id_fornecedor IS NULL)
     // Se não houver nenhum, criamos a base
     var hasGlobalDefaults = db.ConfiguracoesFreteItens.Any(c => c.IdFornecedor == null);

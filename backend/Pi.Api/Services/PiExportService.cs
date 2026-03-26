@@ -243,7 +243,7 @@ public class PiExportService
         ws.Cells[startRow, 12, startRow + 1, 12].Merge = true; ws.Cells[startRow, 12].Value = "ACABADO";
         ws.Cells[startRow, 13, startRow + 1, 13].Merge = true; ws.Cells[startRow, 13].Value = "OBSERVACIÓN";
 
-        bool showFreight = new[] { "FOB", "FCA", "CIF" }.Contains(pi.Frete?.Nome?.ToUpper());
+        bool showFreight = new[] { "FOB", "FCA (FRONTEIRA)", "CIF", "FCA (FÁBRICA)" }.Contains(pi.Frete?.Nome?.ToUpper());
         int unitCol = 14;
         int totalCol = 15;
 
@@ -587,7 +587,7 @@ public class PiExportService
         string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
         string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
         
-        bool showFreight = new[] { "FOB", "FCA", "CIF" }.Contains(pi.Frete?.Nome?.ToUpper());
+        bool showFreight = new[] { "FOB", "FCA (FRONTEIRA)", "CIF", "FCA (FÁBRICA)" }.Contains(pi.Frete?.Nome?.ToUpper());
         int unitCol = 13;
         int totalCol = 14;
 

@@ -213,9 +213,10 @@ public class AppDbContext : DbContext
             // Seed data
             entity.HasData(
                 new Frete { Id = 1, Nome = "FOB" },
-                new Frete { Id = 2, Nome = "FCA" },
+                new Frete { Id = 2, Nome = "FCA (Fronteira)" },
                 new Frete { Id = 3, Nome = "CIF" },
-                new Frete { Id = 4, Nome = "EXW" }
+                new Frete { Id = 4, Nome = "EXW" },
+                new Frete { Id = 6, Nome = "FCA (Fábrica)" }
             );
         });
 

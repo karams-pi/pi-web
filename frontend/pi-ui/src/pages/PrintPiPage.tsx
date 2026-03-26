@@ -60,7 +60,7 @@ export default function PrintPiPage() {
 
   const displayClient = cliente || (pi as any)?.cliente;
   const incoterm = pi?.frete?.nome || (pi as any)?.Frete?.Nome || "EXW";
-  const showFreight = ["FOB", "FCA", "CIF"].includes(incoterm.toUpperCase());
+  const showFreight = ["FOB", "FCA (FRONTEIRA)", "CIF", "FCA (FÁBRICA)"].includes(incoterm.toUpperCase());
 
   const supplierMetadata = useMemo(() => {
     const sName = (pi?.fornecedor?.nome || (pi as any)?.Fornecedor?.Nome || "karams");
