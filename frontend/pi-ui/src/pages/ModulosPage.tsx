@@ -26,6 +26,7 @@ import { getCotacaoUSD } from "../api/pis";
 import { listMarcas } from "../api/marcas";
 import { listFornecedores } from "../api/fornecedores";
 import { listCategorias } from "../api/categorias";
+import { listTecidos } from "../api/tecidos";
 
 type FormState = Partial<Modulo> & {
   larguraStr?: string;
@@ -55,6 +56,7 @@ export default function ModulosPage() {
   const [allFornecedores, setAllFornecedores] = useState<Fornecedor[]>([]);
   const [allCategorias, setAllCategorias] = useState<Categoria[]>([]);
   const [allMarcas, setAllMarcas] = useState<Marca[]>([]);
+  const [allTecidos, setAllTecidos] = useState<Tecido[]>([]);
 
   const [config, setConfig] = useState<Configuracao | null>(null);
   const [configsMap, setConfigsMap] = useState<Map<number | null, Configuracao>>(new Map());
@@ -157,11 +159,12 @@ export default function ModulosPage() {
       setCotacao(val ? Number(val.toFixed(2)) : 0);
     }).catch(console.error);
 
-    Promise.all([listFornecedores(), listCategorias(), listMarcas()])
-      .then(([f, c, m]) => {
+    Promise.all([listFornecedores(), listCategorias(), listMarcas(), listTecidos()])
+      .then(([f, c, m, t]) => {
         setAllFornecedores(f);
         setAllCategorias(c);
         setAllMarcas(m);
+        setAllTecidos(t);
       })
       .catch(console.error);
   }, []);
@@ -818,7 +821,7 @@ export default function ModulosPage() {
               ) : (
                 <TecidosTab
                   moduloId={editing!.id}
-                  allTecidos={tecidos}
+                  allTecidos={allTecidos}
                   currentLinks={editing?.modulosTecidos || []}
                   onUpdate={onFabricsUpdated}
                 />
