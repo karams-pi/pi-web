@@ -23,6 +23,9 @@ import { ModuloSelect } from "../components/ModuloSelect";
 import { PrintModulesModal } from "../components/PrintModulesModal";
 import { printModulesReport } from "../utils/reports/printModulesReport";
 import { getCotacaoUSD } from "../api/pis";
+import { listMarcas } from "../api/marcas";
+import { listFornecedores } from "../api/fornecedores";
+import { listCategorias } from "../api/categorias";
 
 type FormState = Partial<Modulo> & {
   larguraStr?: string;
@@ -48,6 +51,10 @@ export default function ModulosPage() {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [tecidos, setTecidos] = useState<Tecido[]>([]);
+
+  const [allFornecedores, setAllFornecedores] = useState<Fornecedor[]>([]);
+  const [allCategorias, setAllCategorias] = useState<Categoria[]>([]);
+  const [allMarcas, setAllMarcas] = useState<Marca[]>([]);
 
   const [config, setConfig] = useState<Configuracao | null>(null);
   const [configsMap, setConfigsMap] = useState<Map<number | null, Configuracao>>(new Map());
@@ -149,6 +156,14 @@ export default function ModulosPage() {
     getCotacaoUSD().then(val => {
       setCotacao(val ? Number(val.toFixed(2)) : 0);
     }).catch(console.error);
+
+    Promise.all([listFornecedores(), listCategorias(), listMarcas()])
+      .then(([f, c, m]) => {
+        setAllFornecedores(f);
+        setAllCategorias(c);
+        setAllMarcas(m);
+      })
+      .catch(console.error);
   }, []);
 
   // Load filters AND all modules whenever filter selection changes
@@ -725,7 +740,7 @@ export default function ModulosPage() {
                       <SearchableSelect
                         value={form.idFornecedor || ""}
                         onChange={(val) => setForm({ ...form, idFornecedor: Number(val) })}
-                        options={fornecedores.map(f => ({ value: f.id, label: f.nome }))}
+                        options={allFornecedores.map(f => ({ value: f.id, label: f.nome }))}
                         placeholder="Selecione..."
                       />
                     </div>
@@ -734,7 +749,7 @@ export default function ModulosPage() {
                       <SearchableSelect
                         value={form.idCategoria || ""}
                         onChange={(val) => setForm({ ...form, idCategoria: Number(val) })}
-                        options={categorias.map(c => ({ value: c.id, label: c.nome }))}
+                        options={allCategorias.map(c => ({ value: c.id, label: c.nome }))}
                         placeholder="Selecione..."
                       />
                     </div>
@@ -745,7 +760,7 @@ export default function ModulosPage() {
                           <SearchableSelect
                             value={form.idMarca || ""}
                             onChange={(val) => setForm({ ...form, idMarca: Number(val) })}
-                            options={marcas.map(m => ({ value: m.id, label: m.nome }))}
+                            options={allMarcas.map(m => ({ value: m.id, label: m.nome }))}
                             placeholder="Selecione..."
                           />
                         </div>
