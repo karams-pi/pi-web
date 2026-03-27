@@ -23,6 +23,7 @@ export type Modulo = {
   idFornecedor: number;
   idCategoria: number;
   idMarca: number;
+  idModelo?: number | null;
   descricao: string;
   largura: number;
   profundidade: number;

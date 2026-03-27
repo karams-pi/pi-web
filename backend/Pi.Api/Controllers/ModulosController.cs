@@ -64,7 +64,7 @@ public class ModulosController : ControllerBase
             .OrderByDescending(c => c.DataConfig)
             .ToListAsync();
 
-        var fileBytes = _exportService.ExportToExcel(modules, request.Currency, request.Cotacao, configs);
+        var fileBytes = _exportService.ExportToExcel(modules, request.Currency, request.Cotacao, configs, request.ValidityDays);
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RelatorioModulos.xlsx");
     }
 
@@ -79,6 +79,7 @@ public class ModulosController : ControllerBase
         public long? IdMarca { get; set; }
         public long? IdTecido { get; set; }
         public string? Status { get; set; }
+        public int ValidityDays { get; set; } = 30;
     }
 
     private static decimal CalcM3(Modulo m)

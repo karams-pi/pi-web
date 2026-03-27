@@ -8,7 +8,7 @@ namespace Pi.Api.Services;
 
 public class ModuloExportService
 {
-    public byte[] ExportToExcel(List<Modulo> modules, string currency, decimal cotacao, List<Configuracao> configs)
+    public byte[] ExportToExcel(List<Modulo> modules, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30)
     {
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Relatório de Módulos");
@@ -24,12 +24,28 @@ public class ModuloExportService
         ws.Cells["A1"].Style.Font.Bold = true;
         ws.Cells["A1"].Style.Font.Size = 14;
 
-        ws.Cells["A2"].Value = "Fecha de Emisión:";
-        ws.Cells["A2"].Style.Font.Bold = true;
-        ws.Cells["B2"].Value = DateTime.Now.ToString("dd/MM/yyyy");
+        // Hidden Quote (White font)
+        if (currency == "EXW" && cotacao > 0 && configs.Any())
+        {
+            var config = configs.FirstOrDefault(); // Matches print logic logic of using a "primary" config
+            if (config != null)
+            {
+                var fornName = config.IdFornecedor.HasValue ? modules.FirstOrDefault(m => m.IdFornecedor == config.IdFornecedor)?.Fornecedor?.Nome ?? "" : "";
+                bool isFerguile = fornName.ToLower().Contains("ferguile") || fornName.ToLower().Contains("livintus");
+                decimal valorQuote = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
+                
+                ws.Cells["A2"].Value = $"Cotação na exportação: {valorQuote:N2}";
+                ws.Cells["A2"].Style.Font.Color.SetColor(Color.White);
+                ws.Cells["A2"].Style.Font.Size = 10;
+            }
+        }
+
+        ws.Cells["B2"].Value = "Fecha de Emisión:";
+        ws.Cells["B2"].Style.Font.Bold = true;
+        ws.Cells["C2"].Value = DateTime.Now.ToString("dd/MM/yyyy");
         
         ws.Cells["F1:J1"].Merge = true;
-        ws.Cells["F1"].Value = "* Esta lista de precios es válida por 30 días a partir de la fecha de emisión.";
+        ws.Cells["F1"].Value = $"* Esta lista de precios es válida por {validityDays} días a partir de la fecha de emisión.";
         ws.Cells["F1"].Style.Font.Color.SetColor(Color.FromArgb(217, 83, 79)); // #d9534f
         ws.Cells["F1"].Style.Font.Bold = true;
         ws.Cells["F1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;

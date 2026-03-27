@@ -83,6 +83,7 @@ export default function ModulosPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"geral" | "tecidos">("geral");
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [printLoading, setPrintLoading] = useState(false);
   const [calcModalData, setCalcModalData] = useState<{ valorTecido: number; idFornecedor: number } | null>(null);
 
   // Selection state for combo
@@ -371,25 +372,22 @@ export default function ModulosPage() {
     setIsPrintModalOpen(false);
   }
 
-  async function onConfirmExcel(scope: 'screen' | 'all', currency: 'BRL' | 'EXW') {
+  async function onConfirmExcel(scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) {
+    setPrintLoading(true);
     try {
-      setLoading(true);
-      const params: any = {
+      const ids = scope === 'screen' ? items.map(x => x.id) : undefined;
+      const blob = await exportModulosExcel({
+        ids,
         currency,
         cotacao,
         search,
+        status: filterStatus,
         idFornecedor: filterFornecedor ? Number(filterFornecedor) : undefined,
         idCategoria: filterCategoria ? Number(filterCategoria) : undefined,
         idMarca: filterMarca ? Number(filterMarca) : undefined,
         idTecido: filterTecido ? Number(filterTecido) : undefined,
-        status: filterStatus
-      };
-
-      if (scope === 'screen') {
-        params.ids = items.map(m => m.id);
-      }
-
-      const blob = await exportModulosExcel(params);
+        validityDays
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -401,7 +399,7 @@ export default function ModulosPage() {
     } catch (e) {
       alert("Erro ao exportar Excel");
     } finally {
-      setLoading(false);
+      setPrintLoading(false);
       setIsPrintModalOpen(false);
     }
   }
@@ -836,7 +834,7 @@ export default function ModulosPage() {
         onClose={() => setIsPrintModalOpen(false)}
         onConfirm={onConfirmPrint}
         onExcelConfirm={onConfirmExcel}
-        loading={loading}
+        loading={printLoading}
       />
 
       {calcModalData && (

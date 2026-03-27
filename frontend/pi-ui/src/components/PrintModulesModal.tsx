@@ -4,7 +4,7 @@ interface PrintModulesModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) => void;
-  onExcelConfirm?: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW') => void;
+  onExcelConfirm?: (scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) => void;
   loading?: boolean;
 }
 
@@ -103,7 +103,7 @@ export function PrintModulesModal({ isOpen, onClose, onConfirm, onExcelConfirm, 
             {onExcelConfirm && (
                 <button 
                 className="btn btn-primary" 
-                onClick={() => onExcelConfirm(scope, currency)}
+                onClick={() => onExcelConfirm(scope, currency, validityDays)}
                 disabled={loading}
                 style={{ background: '#1d6f42' }} // Excel Green
                 >

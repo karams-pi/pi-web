@@ -94,6 +94,7 @@ export async function exportModulosExcel(params: {
   idMarca?: number;
   idTecido?: number;
   status?: string;
+  validityDays?: number;
 }) {
   const res = await fetch(`${API_BASE}/api/modulos/excel`, {
     method: "POST",
