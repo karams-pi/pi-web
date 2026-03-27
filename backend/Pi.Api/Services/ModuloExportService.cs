@@ -24,20 +24,30 @@ public class ModuloExportService
         ws.Cells["A1"].Style.Font.Bold = true;
         ws.Cells["A1"].Style.Font.Size = 14;
 
+        // Deployment Verification Marker
+        ws.Cells["Z1"].Value = "v2-quote";
+        ws.Cells["Z1"].Style.Font.Color.SetColor(Color.White);
+
         // Hidden Quote (White font)
-        if (currency == "EXW" && cotacao > 0 && configs.Any())
+        string hiddenQuoteValue = "";
+        if (currency == "EXW" && cotacao > 0)
         {
-            var config = configs.FirstOrDefault(); // Matches print logic logic of using a "primary" config
+            var config = configs.FirstOrDefault(); 
             if (config != null)
             {
                 var fornName = config.IdFornecedor.HasValue ? modules.FirstOrDefault(m => m.IdFornecedor == config.IdFornecedor)?.Fornecedor?.Nome ?? "" : "";
                 bool isFerguile = fornName.ToLower().Contains("ferguile") || fornName.ToLower().Contains("livintus");
                 decimal valorQuote = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
-                
-                ws.Cells["A2"].Value = $"Cotação na exportação: {valorQuote:N2}";
-                ws.Cells["A2"].Style.Font.Color.SetColor(Color.White);
-                ws.Cells["A2"].Style.Font.Size = 10;
+                hiddenQuoteValue = $"Cotação na exportação: {valorQuote:N2}";
             }
+            else
+            {
+                hiddenQuoteValue = $"Cotação na exportação: {cotacao:N2} (Simples)";
+            }
+
+            ws.Cells["A2"].Value = hiddenQuoteValue;
+            ws.Cells["A2"].Style.Font.Color.SetColor(Color.White);
+            ws.Cells["A2"].Style.Font.Size = 10;
         }
 
         ws.Cells["B2"].Value = "Fecha de Emisión:";

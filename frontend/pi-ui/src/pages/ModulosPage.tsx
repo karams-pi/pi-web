@@ -373,6 +373,7 @@ export default function ModulosPage() {
   }
 
   async function onConfirmExcel(scope: 'screen' | 'all', currency: 'BRL' | 'EXW', validityDays: number) {
+    console.log("Exporting Excel with:", { scope, currency, validityDays, cotacao });
     setPrintLoading(true);
     try {
       const ids = scope === 'screen' ? items.map(x => x.id) : undefined;
