@@ -276,9 +276,15 @@ public class PiExportService
             .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
             .ToList();
 
+        // Recalculate freight exactly as the screen does
+        decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
+        decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
+        decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
+
         decimal totalQty = 0;
         decimal totalM3 = 0;
         decimal totalValue = 0;
+
 
         foreach (var group in itemsByBrand)
         {
@@ -367,17 +373,16 @@ public class PiExportService
                     foreach(var g in groupItems) {
                         decimal mQty = g.Quantidade > 0 ? (decimal)g.Quantidade : 1m;
                         decimal mUnitBRL = g.ValorFinalItemBRL / mQty;
-                        decimal mUnitFreteBRL = showFreight ? g.ValorFreteRateadoBRL : 0;
-                        decimal mFinalUnitBRL = mUnitBRL + mUnitFreteBRL;
-                        decimal mUnitUSD = g.ValorEXW;
-                        decimal mUnitFreteUSD = showFreight ? g.ValorFreteRateadoUSD : 0;
-                        decimal mFinalUnitUSD = mUnitUSD + mUnitFreteUSD;
+                        decimal mFinalUnitBRL = mUnitBRL;
+                        // Recalculate per-item freight like the screen does
+                        decimal mFreteUSD = piTotalM3 > 0 ? piTotalFreteUSD / piTotalM3 * g.M3 : 0;
+                        decimal mFinalUnitUSD = g.ValorEXW; // unit = EXW only
 
                         fabricGroupUnitBRL += mFinalUnitBRL;
                         fabricGroupTotalBRL += (mFinalUnitBRL * mQty);
                         
                         fabricGroupUnitUSD += mFinalUnitUSD;
-                        fabricGroupTotalUSD += (mFinalUnitUSD * mQty);
+                        fabricGroupTotalUSD += (g.ValorEXW + mFreteUSD) * mQty; // total = (EXW + frete) × qty
                     }
 
                     // Unit Price
@@ -413,9 +418,13 @@ public class PiExportService
                 ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                 if (showFreight) {
-                    ws.Cells[currentRow, 14].Value = currency == "BRL" ? item.ValorFreteRateadoBRL : item.ValorFreteRateadoUSD;
+                    // Recalculate like the screen: totalFrete / totalM3 * itemM3
+                    decimal freightUnit = piTotalM3 > 0
+                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                        : 0;
+                    ws.Cells[currentRow, 14].Value = freightUnit;
                     ws.Cells[currentRow, 14].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[currentRow, 14].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232)); // #fefce8
+                    ws.Cells[currentRow, 14].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232));
                     ws.Cells[currentRow, 14].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
@@ -446,7 +455,7 @@ public class PiExportService
                 totalQty += item.Quantidade;
                 totalM3 += (item.M3 * item.Quantidade);
                 // The total value calculates per item in the global scope
-                totalValue += (currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0)));
+                totalValue += (currency == "BRL" ? item.ValorFinalItemBRL : item.ValorFinalItemUSDRisco);
                 
                 currentRow++;
             }
@@ -618,6 +627,11 @@ public class PiExportService
             cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
 
+        // Recalculate freight exactly as the screen does
+        decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
+        decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
+        decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
+
         int currentRow = startRow + 1;
         var groups = pi.PiItens.GroupBy(i => i.ModuloTecido?.Modulo?.Marca).ToList();
         decimal totalQty = 0;
@@ -645,13 +659,25 @@ public class PiExportService
 
                 if (showFreight)
                 {
-                    decimal freightValue = currency == "BRL" ? item.ValorFreteRateadoBRL : item.ValorFreteRateadoUSD;
-                    ws.Cells[currentRow, 13].Value = freightValue;
+                    // Recalculate like the screen: totalFrete / totalM3 * itemM3
+                    decimal freightUnit = piTotalM3 > 0
+                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                        : 0;
+                    ws.Cells[currentRow, 13].Value = freightUnit;
                     ws.Cells[currentRow, 13].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
-                decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : (item.ValorEXW + (showFreight ? item.ValorFreteRateadoUSD : 0));
-                decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0));
+                // UNIT = EXW (unit price, same as original working code)
+                // TOTAL = (EXW + freight) * qty, to match screen's ValorFinalItemUSDRisco logic
+                decimal freightUnitForTotal = piTotalM3 > 0
+                    ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                    : 0;
+                decimal unitPrice = currency == "BRL"
+                    ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1)
+                    : item.ValorEXW;
+                decimal totalPrice = currency == "BRL"
+                    ? item.ValorFinalItemBRL
+                    : (item.ValorEXW + freightUnitForTotal) * item.Quantidade;
 
                 ws.Cells[currentRow, unitCol].Value = unitPrice;
                 ws.Cells[currentRow, totalCol].Value = totalPrice;
