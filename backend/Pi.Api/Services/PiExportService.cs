@@ -413,7 +413,7 @@ public class PiExportService
                 ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                 if (showFreight) {
-                    ws.Cells[currentRow, 14].Value = currency == "BRL" ? (item.ValorFreteRateadoBRL + (item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1))) : (item.ValorFreteRateadoUSD + item.ValorEXW);
+                    ws.Cells[currentRow, 14].Value = currency == "BRL" ? item.ValorFreteRateadoBRL : item.ValorFreteRateadoUSD;
                     ws.Cells[currentRow, 14].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     ws.Cells[currentRow, 14].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232)); // #fefce8
                     ws.Cells[currentRow, 14].Style.Border.BorderAround(ExcelBorderStyle.Thin);
@@ -566,6 +566,7 @@ public class PiExportService
         ws.Cells["A7"].Value = "TIEMPO DE ENTREGA: " + (!string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "60 dias");
         ws.Cells["A8"].Value = "INCOTERM: " + pi.Frete?.Nome + " - ARAPONGAS PR";
         ws.Cells["A9"].Value = "CONDICIÓN DE PAGO: " + (!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA"));
+        ws.Cells["A10"].Value = "";
 
 
         ws.Cells["H1:N9"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
@@ -580,10 +581,10 @@ public class PiExportService
         ws.Cells["H7"].Value = "CÓDIGO POSTAL: " + pi.Cliente?.Cep;
         ws.Cells["H8"].Value = "NIT: " + pi.Cliente?.Nit;
         ws.Cells["H9"].Value = "RESPONSABLE: " + (pi.Cliente?.PessoaContato ?? "..");
-        ws.Cells[1, 1, 9, 14].Style.Font.Size = 8;
+        ws.Cells[1, 1, 10, 14].Style.Font.Size = 8;
 
         // ═══════════════ TABLE ═══════════════
-        int startRow = 8;
+        int startRow = 10;
         string currentCurrency = currency?.Trim().ToUpper() ?? "EXW";
         string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
         string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
