@@ -200,7 +200,7 @@ export default function PrintPiPage() {
     });
 
     return { brandGroups, totalSofaQty, totalQty, totalM3, totalValue };
-  }, [pi, currency]);
+  }, [pi, currency, showFreight]);
 
   const formattedPiNumber = useMemo(() => {
     if (!pi) return "";

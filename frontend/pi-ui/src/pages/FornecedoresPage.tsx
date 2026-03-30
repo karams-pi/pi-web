@@ -255,7 +255,6 @@ function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
   if (typeof e === 'string') return e;
   if (e && typeof e === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyE = e as any;
     if (typeof anyE.message === 'string') return anyE.message;
     if (typeof anyE.error === 'string') return anyE.error;

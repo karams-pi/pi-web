@@ -1,0 +1,45 @@
+﻿
+> pi-ui@0.0.0 lint
+> eslint .
+
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\CategoriasPage.tsx
+  241:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  243:7  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\ClientesPage.tsx
+  510:5  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\ConfiguracoesPage.tsx
+  204:6  warning  React Hook useEffect has a missing dependency: 'selectedFornecedor'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  212:6  warning  React Hook useEffect has a missing dependency: 'loadItems'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\FornecedoresPage.tsx
+  258:5  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\MarcasPage.tsx
+  390:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\ModulosPage.tsx
+   399:14  warning  'e' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  1210:3   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\PrintPiFerguilePage.tsx
+  191:6  warning  React Hook useMemo has missing dependencies: 'showFreight' and 'supplierMetadata.details.brand'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\PrintPiPage.tsx
+  203:6  warning  React Hook useMemo has a missing dependency: 'showFreight'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\ProformaInvoicePage.tsx
+  128:6  warning  React Hook useEffect has a missing dependency: 'loadFilters'. Either include it or remove the dependency array                                                                                   react-hooks/exhaustive-deps
+  152:6  warning  React Hook useEffect has a missing dependency: 'loadFreteTotals'. Either include it or remove the dependency array                                                                               react-hooks/exhaustive-deps
+  157:6  warning  React Hook useEffect has a missing dependency: 'recalcularRateio'. Either include it or remove the dependency array                                                                              react-hooks/exhaustive-deps
+  188:6  warning  React Hook useEffect has missing dependencies: 'form.cotacaoAtualUSD', 'form.prefixo', 'form.valorTotalFreteBRL', and 'recalculateAllItems'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Portif├│lio\pi-web\frontend\pi-ui\src\pages\TecidosPage.tsx
+  239:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  241:7  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+Ô£û 17 problems (0 errors, 17 warnings)
+  0 errors and 8 warnings potentially fixable with the `--fix` option.
+

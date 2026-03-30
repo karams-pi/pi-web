@@ -188,7 +188,7 @@ export default function PrintPiFerguilePage() {
     const totalQty = rows.reduce((s, r) => s + r.quantidade, 0);
 
     return { rows, brandSpans, descSpans, totalValue, totalM3, totalQty };
-  }, [pi, modulosTecidos, currency]);
+  }, [pi, modulosTecidos, currency, showFreight, supplierMetadata?.details?.brand]);
 
   const formattedPiNumber = useMemo(() => {
     if (!pi) return "";

@@ -52,7 +52,7 @@ export default function ClientesPage() {
   // debounce da busca
   const debouncedSearch = useDebounce(search, 350);
 
-  async function load() {
+  const load = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -67,12 +67,11 @@ export default function ClientesPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [debouncedSearch, page, pageSize]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, page, pageSize]);
+  }, [debouncedSearch, page, pageSize, load]);
 
   function openCreate() {
     setEditing(null);
@@ -507,7 +506,6 @@ function getErrorMessage(e: unknown): string {
 
   // Casos comuns (axios/fetch wrappers, etc.)
   if (e && typeof e === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyE = e as any;
     if (typeof anyE.message === 'string') return anyE.message;
     if (typeof anyE.error === 'string') return anyE.error;

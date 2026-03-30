@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { HelpCircle, Calculator, Grid } from "lucide-react"; // Import icons
 import "./ClientesPage.css";
@@ -96,7 +96,7 @@ export default function ModulosPage() {
   const tecidoMap = useMemo(() => new Map(tecidos.map((x) => [x.id, x.nome])), [tecidos]);
 
   // Dynamic Filters Loader
-  async function loadFilters() {
+  const loadFilters = useCallback(async () => {
     try {
       const res = await getModuleFilters(
         filterFornecedor ? Number(filterFornecedor) : undefined,
@@ -111,10 +111,10 @@ export default function ModulosPage() {
     } catch (e) {
       console.error("Erro ao carregar filtros", e);
     }
-  }
+  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido]);
 
   // Load All Modules for Combo
-  async function loadAllModules() {
+  const loadAllModules = useCallback(async () => {
     try {
       const res = await listModulos(
         "",
@@ -130,10 +130,10 @@ export default function ModulosPage() {
     } catch (e) {
       console.error("Erro ao carregar lista completa de módulos", e);
     }
-  }
+  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido, filterStatus]);
 
   // Load Config and Cotacao
-  const loadConfigData = async () => {
+  const loadConfigData = useCallback(async () => {
     try {
       const allConfigs = await getLatestConfigsAll();
       const map = new Map<number | null, Configuracao>();
@@ -149,11 +149,11 @@ export default function ModulosPage() {
       console.error("Erro ao carregar configs", e);
       setError("Erro ao carregar configurações: " + getErrorMessage(e));
     }
-  };
+  }, [filterFornecedor]);
 
   useEffect(() => {
     loadConfigData();
-  }, [filterFornecedor]);
+  }, [loadConfigData]);
 
   useEffect(() => {
     getCotacaoUSD().then(val => {
@@ -174,11 +174,10 @@ export default function ModulosPage() {
   useEffect(() => {
     loadFilters();
     loadAllModules();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterFornecedor, filterCategoria, filterMarca, filterTecido, filterStatus]);
+  }, [loadFilters, loadAllModules]);
 
   // Main Loader
-  async function loadItems() {
+  const loadItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -196,12 +195,12 @@ export default function ModulosPage() {
       setItems(res.items);
       setTotalPages(res.totalPages);
       setTotalItems(res.total);
-    } catch (e: unknown) {
-      setError(getErrorMessage(e));
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
-  }
+  }, [search, page, filterFornecedor, filterCategoria, filterMarca, filterTecido, filterStatus]);
 
   // Effect: reload items when page or search changes (and filters)
   useEffect(() => {
@@ -209,7 +208,7 @@ export default function ModulosPage() {
       loadItems();
     }, 300);
     return () => clearTimeout(timer);
-  }, [page, search, filterFornecedor, filterCategoria, filterMarca, filterTecido, filterStatus]);
+  }, [loadItems]);
 
   function openCreate() {
     setEditing(null);
@@ -281,9 +280,9 @@ export default function ModulosPage() {
   }
 
   // Callback when fabrics are changed in the modal
-  async function onFabricsUpdated() {
+  const onFabricsUpdated = useCallback(async () => {
     await loadItems();
-  }
+  }, [loadItems]);
 
   // Update editing object when items change (to refresh fabrics in modal)
   useEffect(() => {
@@ -291,7 +290,7 @@ export default function ModulosPage() {
       const fresh = items.find(i => i.id === editing.id);
       if (fresh) setEditing(fresh);
     }
-  }, [items]);
+  }, [editing, items]);
 
   function calcEXW(valorTecido: number, idFornecedor: number) {
     const c = configsMap.get(idFornecedor) || configsMap.get(null);
@@ -347,7 +346,7 @@ export default function ModulosPage() {
           filterStatus
         );
         list = res.items;
-      } catch (e) {
+      } catch {
         alert("Erro ao carregar tudo");
         return;
       } finally {
@@ -397,7 +396,7 @@ export default function ModulosPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (e) {
+    } catch {
       alert("Erro ao exportar Excel");
     } finally {
       setPrintLoading(false);
@@ -1208,7 +1207,6 @@ function parse(s: string | undefined): number {
 
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (typeof e === "object" && e && (e as any).message) return (e as any).message;
   return "Erro desconhecido";
 }

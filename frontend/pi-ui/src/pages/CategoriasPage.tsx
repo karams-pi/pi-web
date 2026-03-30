@@ -238,9 +238,7 @@ const td: React.CSSProperties = { borderBottom: "1px solid #eee", padding: 8 };
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
   if (typeof e === "string") return e;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (e && typeof e === "object" && "message" in e && typeof e.message === "string") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (e as any).message;
   }
   try {

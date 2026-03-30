@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Settings } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import {
@@ -201,17 +201,9 @@ const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) 
     if (fornecedores.length > 0 && !selectedFornecedor) {
         setSelectedFornecedor(String(fornecedores[0].id));
     }
-  }, [fornecedores]);
+  }, [fornecedores, selectedFornecedor]);
 
-  useEffect(() => {
-    if (selectedFornecedor) {
-        loadItems();
-    } else {
-        setItems([]);
-    }
-  }, [idFrete, selectedFornecedor]);
-
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       setLoading(true);
       const idForn = selectedFornecedor ? Number(selectedFornecedor) : undefined;
@@ -223,7 +215,15 @@ const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [idFrete, selectedFornecedor, title]);
+
+  useEffect(() => {
+    if (selectedFornecedor) {
+        loadItems();
+    } else {
+        setItems([]);
+    }
+  }, [selectedFornecedor, loadItems]);
 
   const handleToggleDesconsidera = async (item: ConfiguracoesFreteItem) => {
     try {

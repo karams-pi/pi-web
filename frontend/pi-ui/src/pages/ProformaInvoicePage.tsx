@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import "./ClientesPage.css";
 
 
@@ -123,69 +123,29 @@ export default function ProformaInvoicePage() {
     loadInitialData();
   }, []);
 
-  useEffect(() => {
-    loadFilters();
+  const loadFilters = useCallback(async () => {
+    try {
+      const res = await getModuleFilters(
+        filterFornecedor ? Number(filterFornecedor) : undefined,
+        filterCategoria ? Number(filterCategoria) : undefined,
+        filterMarca ? Number(filterMarca) : undefined,
+        filterTecido ? Number(filterTecido) : undefined
+      );
+      setFornecedores(res.fornecedores);
+      setCategorias(res.categorias);
+      setMarcas(res.marcas);
+      setTecidos(res.tecidos);
+    } catch (e) {
+      console.error("Erro ao carregar filtros", e);
+    }
   }, [filterFornecedor, filterCategoria, filterMarca, filterTecido]);
 
-  async function loadFilters() {
-      try {
-        const res = await getModuleFilters(
-          filterFornecedor ? Number(filterFornecedor) : undefined,
-          filterCategoria ? Number(filterCategoria) : undefined,
-          filterMarca ? Number(filterMarca) : undefined,
-          filterTecido ? Number(filterTecido) : undefined
-        );
-        setFornecedores(res.fornecedores);
-        setCategorias(res.categorias);
-        setMarcas(res.marcas);
-        setTecidos(res.tecidos);
-      } catch (e) {
-        console.error("Erro ao carregar filtros", e);
-      }
-    }
+
+  // Effects Moved below function declarations to avoid hoisting issues with useCallback
 
 
-  useEffect(() => {
-    if (form.idFrete) {
-      loadFreteTotals();
-    }
-  }, [form.idFrete, form.idFornecedor]);
+  // Dynamic Configuration and Prefix Effect (Moved below recalculateAllItems to avoid hoisting issues)
 
-  useEffect(() => {
-    // Recalcular rateio quando itens mudarem ou totais de frete mudarem
-    recalcularRateio();
-  }, [itens, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config]); 
-
-  // Load config when supplier changes
-  useEffect(() => {
-    const idForn = form.idFornecedor ? Number(form.idFornecedor) : undefined;
-    getLatestConfig(idForn).then(newConfig => {
-        setConfig(newConfig);
-        if (newConfig && form.cotacaoAtualUSD) {
-            const supplier = idForn ? fornecedores.find(f => f.id === idForn) : undefined;
-            const risk = calculateCotacaoRisco(supplier?.nome, form.cotacaoAtualUSD, newConfig.valorReducaoDolar);
-
-            setForm(prev => ({ ...prev, cotacaoRisco: risk }));
-            // Trigger recalculation with new risk rate
-            recalculateAllItems(risk, form.valorTotalFreteBRL / risk, form.valorTotalFreteBRL, newConfig);
-        }
-    }).catch(console.error);
-
-    // Dynamic Prefix
-    if (idForn) {
-      const supplier = fornecedores.find(f => f.id === idForn);
-      if (supplier) {
-        const name = supplier.nome.toLowerCase();
-        if (name.includes("ferguile") || name.includes("livintus")) {
-          const year = new Date(form.dataPi).getFullYear();
-          const newPrefix = `FRG${year}-PO`;
-          if (form.prefixo !== newPrefix) {
-            setForm(prev => ({ ...prev, prefixo: newPrefix }));
-          }
-        }
-      }
-    }
-  }, [form.idFornecedor, form.dataPi, fornecedores]);
 
 
 
@@ -307,7 +267,7 @@ export default function ProformaInvoicePage() {
     }));
   }
 
-  function recalculateAllItems(cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number, overrideConfig?: Configuracao) {
+  const recalculateAllItems = useCallback((cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number, overrideConfig?: Configuracao) => {
      if (itens.length === 0) return;
 
      const activeConfig = overrideConfig || config;
@@ -365,9 +325,9 @@ export default function ProformaInvoicePage() {
      });
 
      setItens(novosItens);
-  }
+  }, [itens, config]);
 
-  async function loadFreteTotals() {
+  const loadFreteTotals = useCallback(async () => {
     try {
       const total = await getTotalFrete(form.idFrete, form.idFornecedor ? Number(form.idFornecedor) : undefined);
       const cotacao = Number(form.cotacaoRisco) || 0;
@@ -381,9 +341,9 @@ export default function ProformaInvoicePage() {
     } catch (e) {
       console.error("Erro ao carregar totais de frete:", e);
     }
-  }
+  }, [form.idFrete, form.idFornecedor, form.cotacaoRisco]);
 
-  function recalcularRateio() {
+  const recalcularRateio = useCallback(() => {
     if (itens.length === 0) return;
 
     const totalM3 = itens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
@@ -422,7 +382,55 @@ export default function ProformaInvoicePage() {
         setItens(novosItens);
     }
 
-  }
+  }, [itens, form.valorTotalFreteBRL, form.valorTotalFreteUSD, form.cotacaoRisco]);
+
+  // Load config when supplier changes
+  useEffect(() => {
+    const idForn = form.idFornecedor ? Number(form.idFornecedor) : undefined;
+    getLatestConfig(idForn).then(newConfig => {
+        setConfig(newConfig);
+        if (newConfig && form.cotacaoAtualUSD) {
+            const supplier = idForn ? fornecedores.find(f => f.id === idForn) : undefined;
+            const risk = calculateCotacaoRisco(supplier?.nome, form.cotacaoAtualUSD, newConfig.valorReducaoDolar);
+
+            setForm(prev => ({ ...prev, cotacaoRisco: risk }));
+            // Trigger recalculation with new risk rate
+            recalculateAllItems(risk, form.valorTotalFreteBRL / risk, form.valorTotalFreteBRL, newConfig);
+        }
+    }).catch(console.error);
+
+    // Dynamic Prefix
+    if (idForn) {
+      const supplier = fornecedores.find(f => f.id === idForn);
+      if (supplier) {
+        const name = supplier.nome.toLowerCase();
+        if (name.includes("ferguile") || name.includes("livintus")) {
+          const year = new Date(form.dataPi).getFullYear();
+          const newPrefix = `FRG${year}-PO`;
+          if (form.prefixo !== newPrefix) {
+            setForm(prev => ({ ...prev, prefixo: newPrefix }));
+          }
+        }
+      }
+    }
+  }, [form.idFornecedor, form.dataPi, fornecedores, form.cotacaoAtualUSD, form.prefixo, form.valorTotalFreteBRL, recalculateAllItems]);
+
+
+  useEffect(() => {
+    loadFilters();
+  }, [loadFilters]);
+
+  useEffect(() => {
+    if (form.idFrete) {
+      loadFreteTotals();
+    }
+  }, [form.idFrete, form.idFornecedor, loadFreteTotals]);
+
+  useEffect(() => {
+    // Recalcular rateio quando itens mudarem ou totais de frete mudarem
+    recalcularRateio();
+  }, [recalcularRateio]); 
+
 
 
 
