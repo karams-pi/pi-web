@@ -13,7 +13,7 @@ public class ModuloExportServiceTests
 
     public ModuloExportServiceTests()
     {
-        ExcelPackage.License.SetNonCommercialPersonal("PI Web Test");
+        ExcelPackage.License.SetNonCommercialPersonal("PI Web User");
         _service = new ModuloExportService();
     }
 

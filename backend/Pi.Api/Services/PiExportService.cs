@@ -243,13 +243,14 @@ public class PiExportService
         ws.Cells[startRow, 12, startRow + 1, 12].Merge = true; ws.Cells[startRow, 12].Value = "ACABADO";
         ws.Cells[startRow, 13, startRow + 1, 13].Merge = true; ws.Cells[startRow, 13].Value = "OBSERVACIÓN";
 
-        bool showFreight = new[] { "FOB", "FCA (FRONTEIRA)", "CIF", "FCA (FÁBRICA)" }.Contains(pi.Frete?.Nome?.ToUpper());
+        bool showFreight = true; // Always show in Excel as requested
         int unitCol = 14;
         int totalCol = 15;
 
         if (showFreight)
         {
-            ws.Cells[startRow, 14, startRow + 1, 14].Merge = true; ws.Cells[startRow, 14].Value = "FRETE";
+            ws.Cells[startRow, 14, startRow + 1, 14].Merge = true; 
+            ws.Cells[startRow, 14].Value = "FRETE";
             unitCol = 15;
             totalCol = 16;
         }
@@ -587,11 +588,19 @@ public class PiExportService
         string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
         string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
         
-        bool showFreight = new[] { "FOB", "FCA (FRONTEIRA)", "CIF", "FCA (FÁBRICA)" }.Contains(pi.Frete?.Nome?.ToUpper());
+        bool showFreight = true; // Always show in Excel as requested
         int unitCol = 13;
         int totalCol = 14;
 
         List<string> headerList = new List<string> { "FOTO", "REFERENCIA", "DESCRIPCIÓN", "MARCA", "LARG.", "ALT.", "PROF.", "CANT.", "TOTAL M3", "FABRIC", "TELA N", "OBSERVACIÓN" };
+        
+        if (showFreight)
+        {
+            headerList.Add("FRETE");
+            unitCol = 14;
+            totalCol = 15;
+        }
+
         headerList.Add(unitLabel);
         headerList.Add(totalLabel);
 
@@ -632,6 +641,13 @@ public class PiExportService
                 ws.Cells[currentRow, 10].Value = item.ModuloTecido?.Tecido?.Nome;
                 ws.Cells[currentRow, 11].Value = item.ModuloTecido?.CodigoModuloTecido;
                 ws.Cells[currentRow, 12].Value = item.Observacao;
+
+                if (showFreight)
+                {
+                    decimal freightValue = currency == "BRL" ? item.ValorFreteRateadoBRL : item.ValorFreteRateadoUSD;
+                    ws.Cells[currentRow, 13].Value = freightValue;
+                    ws.Cells[currentRow, 13].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
 
                 decimal unitPrice = currency == "BRL" ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1) : (item.ValorEXW + (showFreight ? item.ValorFreteRateadoUSD : 0));
                 decimal totalPrice = currency == "BRL" ? item.ValorFinalItemBRL : ((item.ValorEXW * item.Quantidade) + (showFreight ? (item.ValorFreteRateadoUSD * item.Quantidade) : 0));
