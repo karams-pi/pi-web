@@ -145,7 +145,7 @@ export default function ClientesPage() {
         setLoading(true);
         const res = await listClientes({ pageSize: 100000 });
         printData(res.items, exportColumns, "Relatório Geral de Clientes");
-      } catch (e) {
+      } catch {
         alert("Erro ao carregar dados completos");
       } finally {
         setLoading(false);
@@ -161,7 +161,7 @@ export default function ClientesPage() {
         setLoading(true);
         const res = await listClientes({ pageSize: 100000 });
         exportToCSV(res.items, exportColumns, "clientes_completo");
-      } catch (e) {
+      } catch {
         alert("Erro ao carregar dados completos");
       } finally {
         setLoading(false);

@@ -1,0 +1,81 @@
+﻿
+> pi-ui@0.0.0 lint
+> eslint .
+
+node.exe : 
+No linha:1 caractere:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (:  
+  String) [], RemoteExc   
+ eption
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Oops! Something went 
+wrong! :(
+
+ESLint: 9.39.2
+
+ConfigError: Config 
+(unnamed): Key "plugins": 
+Cannot redefine plugin 
+"react-refresh".
+    at rethrowConfigError 
+(C:\Portif├│lio\pi-web\fro
+ntend\pi-ui\node_modules\@
+eslint\config-array\dist\c
+js\index.cjs:343:8)
+    at C:\Portif├│lio\pi-w
+eb\frontend\pi-ui\node_mod
+ules\@eslint\config-array\
+dist\cjs\index.cjs:1405:5
+    at Array.reduce 
+(<anonymous>)
+    at FlatConfigArray.get
+ConfigWithStatus (C:\Porti
+f├│lio\pi-web\frontend\pi-
+ui\node_modules\@eslint\co
+nfig-array\dist\cjs\index.
+cjs:1398:43)
+    at 
+FlatConfigArray.getConfig 
+(C:\Portif├│lio\pi-web\fro
+ntend\pi-ui\node_modules\@
+eslint\config-array\dist\c
+js\index.cjs:1427:15)
+    at entryFilter (C:\Por
+tif├│lio\pi-web\frontend\p
+i-ui\node_modules\eslint\l
+ib\eslint\eslint-helpers.j
+s:323:27)
+    at async 
+NodeHfs.<anonymous> (file:
+///C:/Portif%C3%B3lio/pi-w
+eb/frontend/pi-ui/node_mod
+ules/@humanfs/core/src/hfs
+.js:574:24)
+    at async 
+NodeHfs.<anonymous> (file:
+///C:/Portif%C3%B3lio/pi-w
+eb/frontend/pi-ui/node_mod
+ules/@humanfs/core/src/hfs
+.js:604:6)
+    at async 
+NodeHfs.<anonymous> (file:
+///C:/Portif%C3%B3lio/pi-w
+eb/frontend/pi-ui/node_mod
+ules/@humanfs/core/src/hfs
+.js:604:6)
+    at async NodeHfs.walk 
+(file:///C:/Portif%C3%B3li
+o/pi-web/frontend/pi-ui/no
+de_modules/@humanfs/core/s
+rc/hfs.js:614:3)
