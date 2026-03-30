@@ -214,7 +214,7 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    private decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, string? fornecedorName)
+    internal decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, string? fornecedorName)
     {
         if (config == null) return valorTecido;
         

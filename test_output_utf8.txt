@@ -1,0 +1,109 @@
+﻿  Determinando os projetos a serem restaurados...
+  Todos os projetos est├úo atualizados para restaura├º├úo.
+  Pi.Api -> C:\Portif├│lio\pi-web\backend\Pi.Api\bin\Debug\net8.0\Pi.Api.dll
+  Pi.Tests -> C:\Portif├│lio\pi-web\backend\Pi.Tests\bin\Debug\net8.0\Pi.Tests.dll
+Execu├º├úo de teste para C:\Portif├│lio\pi-web\backend\Pi.Tests\bin\Debug\net8.0\Pi.Tests.dll (.NETCoreApp,Version=v8.0)
+Vers├úo do VSTest 17.11.1 (x64)
+
+Iniciando execu├º├úo de teste, espere...
+1 arquivos de teste no total corresponderam ao padr├úo especificado.
+dotnet : [xUnit.net 
+00:00:00.13]     Pi.Tests.
+Services.ModuloExportServi
+ceTests.CalcPrice_Calculat
+esCorrectlyBasedOnCurrency
+AndSupplier(valorTecido: 
+100, currency: "EXW", 
+cotacao: 5, comissao: 10, 
+gordura: 5, supplier: 
+"Karams", expected: 
+23,47) [FAIL]
+No linha:1 caractere:1
++ dotnet test backend\Pi.T
+ests\Pi.Tests.csproj 
+--filter "Pi.Tests.Servi 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: ([  
+  xUnit.net 00:0...: 23   
+ ,47) [FAIL]:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+[xUnit.net 00:00:00.14]   
+  Pi.Tests.Services.Modulo
+ExportServiceTests.CalcPri
+ce_CalculatesCorrectlyBase
+dOnCurrencyAndSupplier(val
+orTecido: 100, currency: 
+"BRL", cotacao: 5, 
+comissao: 10, gordura: 5, 
+supplier: "Standard", 
+expected: 115) [FAIL]
+[xUnit.net 00:00:00.14]   
+  Pi.Tests.Services.Modulo
+ExportServiceTests.CalcPri
+ce_CalculatesCorrectlyBase
+dOnCurrencyAndSupplier(val
+orTecido: 100, currency: 
+"EXW", cotacao: 5, 
+comissao: 10, gordura: 5, 
+supplier: "Ferguile", 
+expected: 1150) [FAIL]
+[xUnit.net 00:00:00.14]   
+  Pi.Tests.Services.Modulo
+ExportServiceTests.CalcPri
+ce_CalculatesCorrectlyBase
+dOnCurrencyAndSupplier(val
+orTecido: 50, currency: 
+"BRL", cotacao: 5, 
+comissao: 0, gordura: 0, 
+supplier: "Standard", 
+expected: 50) [FAIL]
+[xUnit.net 00:00:00.14]   
+  Pi.Tests.Services.Modulo
+ExportServiceTests.ExportT
+oExcel_ShouldReturnNonEmpt
+yByteArray [FAIL]
+  Com falha Pi.Tests.Services.ModuloExportServiceTests.CalcPrice_CalculatesCorrectlyBasedOnCurrencyAndSupplier(valorTecido: 100, currency: "EXW", cotacao: 5, comissao: 10, gordura: 5, supplier: "Karams", expected: 23,47) [1 ms]
+  Mensagem de erro:
+   OfficeOpenXml.LicenseContextPropertyObsoleteException : Please use the static 'ExcelPackage.License' property to set the required license information from EPPlus 8 and later versions. For more info see http://epplussoftware.com/developers/licensenotsetexception.
+  Rastreamento de pilha:
+     at OfficeOpenXml.ExcelPackage.set_LicenseContext(Nullable`1 value)
+   at Pi.Tests.Services.ModuloExportServiceTests..ctor() in C:\Portif├│lio\pi-web\backend\Pi.Tests\Services\ModuloExportServiceTests.cs:line 16
+   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean wrapExceptions)
+  Com falha Pi.Tests.Services.ModuloExportServiceTests.CalcPrice_CalculatesCorrectlyBasedOnCurrencyAndSupplier(valorTecido: 100, currency: "BRL", cotacao: 5, comissao: 10, gordura: 5, supplier: "Standard", expected: 115) [1 ms]
+  Mensagem de erro:
+   OfficeOpenXml.LicenseContextPropertyObsoleteException : Please use the static 'ExcelPackage.License' property to set the required license information from EPPlus 8 and later versions. For more info see http://epplussoftware.com/developers/licensenotsetexception.
+  Rastreamento de pilha:
+     at OfficeOpenXml.ExcelPackage.set_LicenseContext(Nullable`1 value)
+   at Pi.Tests.Services.ModuloExportServiceTests..ctor() in C:\Portif├│lio\pi-web\backend\Pi.Tests\Services\ModuloExportServiceTests.cs:line 16
+   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean wrapExceptions)
+  Com falha Pi.Tests.Services.ModuloExportServiceTests.CalcPrice_CalculatesCorrectlyBasedOnCurrencyAndSupplier(valorTecido: 100, currency: "EXW", cotacao: 5, comissao: 10, gordura: 5, supplier: "Ferguile", expected: 1150) [1 ms]
+  Mensagem de erro:
+   OfficeOpenXml.LicenseContextPropertyObsoleteException : Please use the static 'ExcelPackage.License' property to set the required license information from EPPlus 8 and later versions. For more info see http://epplussoftware.com/developers/licensenotsetexception.
+  Rastreamento de pilha:
+     at OfficeOpenXml.ExcelPackage.set_LicenseContext(Nullable`1 value)
+   at Pi.Tests.Services.ModuloExportServiceTests..ctor() in C:\Portif├│lio\pi-web\backend\Pi.Tests\Services\ModuloExportServiceTests.cs:line 16
+   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean wrapExceptions)
+  Com falha Pi.Tests.Services.ModuloExportServiceTests.CalcPrice_CalculatesCorrectlyBasedOnCurrencyAndSupplier(valorTecido: 50, currency: "BRL", cotacao: 5, comissao: 0, gordura: 0, supplier: "Standard", expected: 50) [1 ms]
+  Mensagem de erro:
+   OfficeOpenXml.LicenseContextPropertyObsoleteException : Please use the static 'ExcelPackage.License' property to set the required license information from EPPlus 8 and later versions. For more info see http://epplussoftware.com/developers/licensenotsetexception.
+  Rastreamento de pilha:
+     at OfficeOpenXml.ExcelPackage.set_LicenseContext(Nullable`1 value)
+   at Pi.Tests.Services.ModuloExportServiceTests..ctor() in C:\Portif├│lio\pi-web\backend\Pi.Tests\Services\ModuloExportServiceTests.cs:line 16
+   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean wrapExceptions)
+  Com falha Pi.Tests.Services.ModuloExportServiceTests.ExportToExcel_ShouldReturnNonEmptyByteArray [1 ms]
+  Mensagem de erro:
+   OfficeOpenXml.LicenseContextPropertyObsoleteException : Please use the static 'ExcelPackage.License' property to set the required license information from EPPlus 8 and later versions. For more info see http://epplussoftware.com/developers/licensenotsetexception.
+  Rastreamento de pilha:
+     at OfficeOpenXml.ExcelPackage.set_LicenseContext(Nullable`1 value)
+   at Pi.Tests.Services.ModuloExportServiceTests..ctor() in C:\Portif├│lio\pi-web\backend\Pi.Tests\Services\ModuloExportServiceTests.cs:line 16
+   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean wrapExceptions)
+
+Com falha! ÔÇô Com falha:     5, Aprovado:     0, Ignorado:     0, Total:     5, Dura├º├úo: 4 ms - Pi.Tests.dll (net8.0)
