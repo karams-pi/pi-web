@@ -268,32 +268,33 @@ export default function ProformaInvoicePage() {
   }
 
   const recalculateAllItems = useCallback((cotacaoRisco: number, totalFreteUSD: number, totalFreteBRL: number, overrideConfig?: Configuracao) => {
-     if (itens.length === 0) return;
+    setItens(prevItens => {
+      if (prevItens.length === 0) return prevItens;
 
-     const activeConfig = overrideConfig || config;
-     const comissao = activeConfig?.percentualComissao || 0;
-     const gordura = activeConfig?.percentualGordura || 0;
-     const totalM3 = itens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
+      const activeConfig = overrideConfig || config;
+      const comissao = activeConfig?.percentualComissao || 0;
+      const gordura = activeConfig?.percentualGordura || 0;
+      const totalM3 = prevItens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
 
-     const novosItens = itens.map(item => {
+      return prevItens.map(item => {
         // 1. Recalculate EXW
         let valorEXW = item.valorEXW;
         let exwTooltip = item.exwTooltip;
 
         if (item.moduloTecido) {
-             valorEXW = calculateEXW(
-                 item.moduloTecido.valorTecido, 
-                 cotacaoRisco, 
-                 comissao, 
-                 gordura
-             );
+          valorEXW = calculateEXW(
+            item.moduloTecido.valorTecido, 
+            cotacaoRisco, 
+            comissao, 
+            gordura
+          );
 
-             const valorBase = cotacaoRisco > 0 ? item.moduloTecido.valorTecido / cotacaoRisco : 0;
-             exwTooltip = 
-               `Base (R$ ${fmt(item.moduloTecido.valorTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
-               `+ Comissão (${fmt(comissao)}%) = $ ${fmt(valorBase * (comissao / 100))}\n` +
-               `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(valorBase * (gordura / 100))}\n` +
-               `= $ ${fmt(valorEXW)}`;
+          const valorBase = cotacaoRisco > 0 ? item.moduloTecido.valorTecido / cotacaoRisco : 0;
+          exwTooltip = 
+            `Base (R$ ${fmt(item.moduloTecido.valorTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
+            `+ Comissão (${fmt(comissao)}%) = $ ${fmt(valorBase * (comissao / 100))}\n` +
+            `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(valorBase * (gordura / 100))}\n` +
+            `= $ ${fmt(valorEXW)}`;
         }
 
         const freteUnitarioBRL = calculateFreteRateio(totalFreteBRL, totalM3, item.m3);
@@ -322,10 +323,9 @@ export default function ProformaInvoicePage() {
           freteBrlTooltip,
           freteUsdTooltip
         };
-     });
-
-     setItens(novosItens);
-  }, [itens, config]);
+      });
+    });
+  }, [config]);
 
   const loadFreteTotals = useCallback(async () => {
     try {
@@ -344,45 +344,47 @@ export default function ProformaInvoicePage() {
   }, [form.idFrete, form.idFornecedor, form.cotacaoRisco]);
 
   const recalcularRateio = useCallback(() => {
-    if (itens.length === 0) return;
+    setItens(prevItens => {
+      if (prevItens.length === 0) return prevItens;
 
-    const totalM3 = itens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
-    
-    const novosItens = itens.map(item => {
-       const custoPorM3BRL = totalM3 > 0 ? (form.valorTotalFreteBRL || 0) / totalM3 : 0;
-       const custoPorM3USD = totalM3 > 0 ? (form.valorTotalFreteUSD || 0) / totalM3 : 0;
-
-       const freteUnitarioBRL = custoPorM3BRL * item.m3;
-       const freteUnitarioUSD = custoPorM3USD * item.m3;
+      const totalM3 = prevItens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
       
-       const valorBaseBRL = item.valorEXW * (Number(form.cotacaoRisco) || 0);
-      const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
-      const valorFinalUSD = (item.valorEXW + freteUnitarioUSD) * item.quantidade;
+      const novosItens = prevItens.map(item => {
+        const custoPorM3BRL = totalM3 > 0 ? (form.valorTotalFreteBRL || 0) / totalM3 : 0;
+        const custoPorM3USD = totalM3 > 0 ? (form.valorTotalFreteUSD || 0) / totalM3 : 0;
 
-      const freteBrlTooltip = 
-        `Total Frete R$ ${fmt(form.valorTotalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(custoPorM3BRL)}/m³\n` +
-        `x Item M³ ${fmt(item.m3)} = R$ ${fmt(freteUnitarioBRL)}`;
-      
-      const freteUsdTooltip = 
-        `Total Frete $ ${fmt(form.valorTotalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(custoPorM3USD)}/m³\n` +
-        `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
+        const freteUnitarioBRL = custoPorM3BRL * item.m3;
+        const freteUnitarioUSD = custoPorM3USD * item.m3;
+        
+        const valorBaseBRL = item.valorEXW * (Number(form.cotacaoRisco) || 0);
+        const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
+        const valorFinalUSD = (item.valorEXW + freteUnitarioUSD) * item.quantidade;
 
-      return {
-        ...item,
-        valorFreteRateadoBRL: freteUnitarioBRL,
-        valorFreteRateadoUSD: freteUnitarioUSD,
-        valorFinalItemBRL: valorFinalBRL,
-        valorFinalItemUSDRisco: valorFinalUSD,
-        freteBrlTooltip,
-        freteUsdTooltip
-      };
+        const freteBrlTooltip = 
+          `Total Frete R$ ${fmt(form.valorTotalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(custoPorM3BRL)}/m³\n` +
+          `x Item M³ ${fmt(item.m3)} = R$ ${fmt(freteUnitarioBRL)}`;
+        
+        const freteUsdTooltip = 
+          `Total Frete $ ${fmt(form.valorTotalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(custoPorM3USD)}/m³\n` +
+          `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
+
+        return {
+          ...item,
+          valorFreteRateadoBRL: freteUnitarioBRL,
+          valorFreteRateadoUSD: freteUnitarioUSD,
+          valorFinalItemBRL: valorFinalBRL,
+          valorFinalItemUSDRisco: valorFinalUSD,
+          freteBrlTooltip,
+          freteUsdTooltip
+        };
+      });
+
+      if (JSON.stringify(novosItens) === JSON.stringify(prevItens)) {
+          return prevItens;
+      }
+      return novosItens;
     });
-
-    if (JSON.stringify(novosItens) !== JSON.stringify(itens)) {
-        setItens(novosItens);
-    }
-
-  }, [itens, form.valorTotalFreteBRL, form.valorTotalFreteUSD, form.cotacaoRisco]);
+  }, [form.valorTotalFreteBRL, form.valorTotalFreteUSD, form.cotacaoRisco]);
 
   // Load config when supplier changes
   useEffect(() => {
@@ -413,7 +415,9 @@ export default function ProformaInvoicePage() {
         }
       }
     }
-  }, [form.idFornecedor, form.dataPi, fornecedores, form.cotacaoAtualUSD, form.prefixo, form.valorTotalFreteBRL, recalculateAllItems]);
+    // Removed recalculateAllItems from dependencies to break the loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.idFornecedor, form.dataPi, fornecedores, form.cotacaoAtualUSD, form.prefixo, form.valorTotalFreteBRL]);
 
 
   useEffect(() => {
@@ -1224,15 +1228,7 @@ export default function ProformaInvoicePage() {
         title={currencyModalType === "print" ? "Moneda para Impresión" : "Moneda para Excel"}
       />
       
-      {showSearchModal && (
-        <PiSearchModal 
-          onClose={() => setShowSearchModal(false)} 
-          onSelect={(pi) => {
-              setShowSearchModal(false);
-              handleSelectPi(pi);
-          }}
-        />
-      )}
+      {/* Removed redundant PiSearchModal */}
     </div>
   );
 }
