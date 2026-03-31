@@ -243,26 +243,25 @@ public class PiExportService
         ws.Cells[startRow, 12, startRow + 1, 12].Merge = true; ws.Cells[startRow, 12].Value = "ACABADO";
         ws.Cells[startRow, 13, startRow + 1, 13].Merge = true; ws.Cells[startRow, 13].Value = "OBSERVACIÓN";
 
-        bool showFreight = true; // Always show in Excel as requested
-        int unitCol = 14;
-        int totalCol = 15;
+        int colIndividualEXW = 14;
+        int colIndividualFreight = 15;
+        int colGroupUnit = 16;
+        int colGroupTotal = 17;
+        int totalCol = colGroupTotal; // For footer compatibility
 
-        if (showFreight)
-        {
-            ws.Cells[startRow, 14, startRow + 1, 14].Merge = true; 
-            ws.Cells[startRow, 14].Value = "FRETE";
-            unitCol = 15;
-            totalCol = 16;
-        }
+        ws.Cells[startRow, colIndividualEXW, startRow + 1, colIndividualEXW].Merge = true; 
+        ws.Cells[startRow, colIndividualEXW].Value = currency == "BRL" ? "R$" : "USD";
+        
+        ws.Cells[startRow, colIndividualFreight, startRow + 1, colIndividualFreight].Merge = true; 
+        ws.Cells[startRow, colIndividualFreight].Value = "FRETE";
+        
+        ws.Cells[startRow, colGroupUnit, startRow + 1, colGroupUnit].Merge = true; 
+        ws.Cells[startRow, colGroupUnit].Value = currency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
+        
+        ws.Cells[startRow, colGroupTotal, startRow + 1, colGroupTotal].Merge = true; 
+        ws.Cells[startRow, colGroupTotal].Value = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
 
-        string currentCurrency = currency?.Trim().ToUpper() ?? "EXW";
-        string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
-        string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
-
-        ws.Cells[startRow, unitCol, startRow + 1, unitCol].Merge = true; ws.Cells[startRow, unitCol].Value = unitLabel;
-        ws.Cells[startRow, totalCol, startRow + 1, totalCol].Merge = true; ws.Cells[startRow, totalCol].Value = totalLabel;
-
-        var headerRange = ws.Cells[startRow, 1, startRow + 1, totalCol];
+        var headerRange = ws.Cells[startRow, 1, startRow + 1, colGroupTotal];
         headerRange.Style.Font.Bold = true;
         headerRange.Style.Font.Color.SetColor(Color.White);
         headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -276,7 +275,6 @@ public class PiExportService
             .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
             .ToList();
 
-        // Recalculate freight exactly as the screen does
         decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
@@ -329,11 +327,11 @@ public class PiExportService
             for (int i = 0; i < sortedItems.Count; i++)
             {
                 var item = sortedItems[i];
+                bool isFirstOfGroup = spanFabric[i] > 0;
 
-                if (spanFabric[i] > 0) {
+                if (isFirstOfGroup) {
                     int toRow = currentRow + spanFabric[i] - 1;
                     
-                    // Description
                     var groupItems = sortedItems.Skip(i).Take(spanFabric[i]).ToList();
                     var descLines = groupItems.Select(g => (g.Quantidade > 1 ? $"{g.Quantidade} " : "") + (g.ModuloTecido?.Modulo?.Descricao ?? $"Modulo #{g.IdModuloTecido}")).ToList();
                     var rangeDesc = ws.Cells[currentRow, 3, toRow, 3];
@@ -343,7 +341,6 @@ public class PiExportService
                     rangeDesc.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     rangeDesc.Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-                    // Qty Sofa
                     var rangeQtySofa = ws.Cells[currentRow, 8, toRow, 8];
                     rangeQtySofa.Merge = true;
                     rangeQtySofa.Value = item.Quantidade;
@@ -352,7 +349,6 @@ public class PiExportService
                     rangeQtySofa.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     rangeQtySofa.Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-                    // Fabric
                     string fName = item.ModuloTecido?.Tecido?.Nome ?? "Sem Tecido";
                     string fCode = item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
                     string fText = string.IsNullOrEmpty(fCode) ? fName : $"{fName} - {fCode}";
@@ -366,43 +362,6 @@ public class PiExportService
                     rangeFabric.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     rangeFabric.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     rangeFabric.Style.Border.BorderAround(ExcelBorderStyle.Thin);
-
-                    // Calculations
-                    decimal fabricGroupUnitUSD = 0, fabricGroupUnitBRL = 0;
-                    decimal fabricGroupTotalUSD = 0, fabricGroupTotalBRL = 0;
-                    foreach(var g in groupItems) {
-                        decimal mQty = g.Quantidade > 0 ? (decimal)g.Quantidade : 1m;
-                        decimal mUnitBRL = g.ValorFinalItemBRL / mQty;
-                        decimal mFinalUnitBRL = mUnitBRL;
-                        // Recalculate per-item freight like the screen does
-                        decimal mFreteUSD = piTotalM3 > 0 ? piTotalFreteUSD / piTotalM3 * g.M3 : 0;
-                        decimal mFinalUnitUSD = g.ValorEXW; // unit = EXW only
-
-                        fabricGroupUnitBRL += mFinalUnitBRL;
-                        fabricGroupTotalBRL += (mFinalUnitBRL * mQty);
-                        
-                        fabricGroupUnitUSD += mFinalUnitUSD;
-                        fabricGroupTotalUSD += (g.ValorEXW + mFreteUSD) * mQty; // total = (EXW + frete) × qty
-                    }
-
-                    // Unit Price
-                    var rangeUnit = ws.Cells[currentRow, unitCol, toRow, unitCol];
-                    rangeUnit.Merge = true;
-                    rangeUnit.Value = currency == "BRL" ? fabricGroupUnitBRL : fabricGroupUnitUSD;
-                    rangeUnit.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    rangeUnit.Style.Fill.BackgroundColor.SetColor(currency == "BRL" ? Color.FromArgb(240, 249, 255) : Color.FromArgb(255, 241, 242));
-                    rangeUnit.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                    rangeUnit.Style.Border.BorderAround(ExcelBorderStyle.Thin);
-
-                    // Total Price
-                    var rangeTotal = ws.Cells[currentRow, totalCol, toRow, totalCol];
-                    rangeTotal.Merge = true;
-                    rangeTotal.Value = currency == "BRL" ? fabricGroupTotalBRL : fabricGroupTotalUSD;
-                    rangeTotal.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    rangeTotal.Style.Fill.BackgroundColor.SetColor(currency == "BRL" ? Color.FromArgb(240, 249, 255) : Color.FromArgb(255, 241, 242));
-                    rangeTotal.Style.Font.Bold = true;
-                    rangeTotal.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                    rangeTotal.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
                 // Individual columns
@@ -417,15 +376,60 @@ public class PiExportService
                 ws.Cells[currentRow, 9].Value = item.M3 * item.Quantidade;
                 ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-                if (showFreight) {
-                    // Recalculate like the screen: totalFrete / totalM3 * itemM3
-                    decimal freightUnit = piTotalM3 > 0
-                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
-                        : 0;
-                    ws.Cells[currentRow, 14].Value = freightUnit;
-                    ws.Cells[currentRow, 14].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[currentRow, 14].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232));
-                    ws.Cells[currentRow, 14].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                // Individual Values per row
+                decimal rowUnitEXW = item.ValorEXW;
+                if (currency == "BRL") rowUnitEXW *= (decimal)pi.CotacaoRisco;
+                
+                ws.Cells[currentRow, colIndividualEXW].Value = rowUnitEXW;
+                ws.Cells[currentRow, colIndividualEXW].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[currentRow, colIndividualEXW].Style.Numberformat.Format = "#,##0.00";
+
+                decimal freightUnit = piTotalM3 > 0
+                    ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                    : 0;
+                ws.Cells[currentRow, colIndividualFreight].Value = freightUnit;
+                ws.Cells[currentRow, colIndividualFreight].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[currentRow, colIndividualFreight].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                ws.Cells[currentRow, colIndividualFreight].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232));
+                ws.Cells[currentRow, colIndividualFreight].Style.Numberformat.Format = "#,##0.00";
+
+                // Group-level Values (Unit Sum and Total)
+                if (isFirstOfGroup)
+                {
+                    int endRowGrp = currentRow + spanFabric[i] - 1;
+                    decimal fabricGroupUnit = 0;
+                    decimal fabricGroupTotal = 0;
+                    
+                    var groupItems = sortedItems.Skip(i).Take(spanFabric[i]).ToList();
+                    foreach (var g in groupItems)
+                    {
+                        decimal mQty = g.Quantidade > 0 ? (decimal)g.Quantidade : 1m;
+                        decimal mUnitEXW = g.ValorEXW;
+                        if (currency == "BRL") mUnitEXW *= (decimal)pi.CotacaoRisco;
+                        
+                        fabricGroupUnit += mUnitEXW;
+
+                        decimal mFreight = piTotalM3 > 0 
+                            ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * g.M3 
+                            : 0;
+                        
+                        fabricGroupTotal += (mUnitEXW + mFreight) * mQty;
+                    }
+
+                    var rangeGroupUnit = ws.Cells[currentRow, colGroupUnit, endRowGrp, colGroupUnit];
+                    rangeGroupUnit.Merge = true;
+                    rangeGroupUnit.Value = fabricGroupUnit;
+                    rangeGroupUnit.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeGroupUnit.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                    rangeGroupUnit.Style.Numberformat.Format = "#,##0.00";
+
+                    var rangeGroupTotal = ws.Cells[currentRow, colGroupTotal, endRowGrp, colGroupTotal];
+                    rangeGroupTotal.Merge = true;
+                    rangeGroupTotal.Value = fabricGroupTotal;
+                    rangeGroupTotal.Style.Font.Bold = true;
+                    rangeGroupTotal.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeGroupTotal.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                    rangeGroupTotal.Style.Numberformat.Format = "#,##0.00";
                 }
 
                 if (spanFeet[i] > 0) {
@@ -673,7 +677,7 @@ public class PiExportService
                     ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
                     : 0;
                 decimal unitPrice = currency == "BRL"
-                    ? item.ValorFinalItemBRL / (item.Quantidade > 0 ? item.Quantidade : 1)
+                    ? item.ValorEXW * (decimal)pi.CotacaoRisco
                     : item.ValorEXW;
                 decimal totalPrice = currency == "BRL"
                     ? item.ValorFinalItemBRL

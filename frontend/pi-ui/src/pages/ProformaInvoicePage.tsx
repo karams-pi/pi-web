@@ -46,11 +46,11 @@ type ItemGrid = {
   altura: number;
   pa: number;
   m3: number;
-  valorEXW: number;
-  valorFreteRateadoBRL: number;
-  valorFreteRateadoUSD: number;
-  valorFinalItemBRL: number;
-  valorFinalItemUSDRisco: number;
+  ValorEXW: number;
+  ValorFreteRateadoBRL: number;
+  ValorFreteRateadoUSD: number;
+  ValorFinalItemBRL: number;
+  ValorFinalItemUSDRisco: number;
   codigoModuloTecido?: string;
   exwTooltip?: string;
   freteBrlTooltip?: string;
@@ -278,11 +278,11 @@ export default function ProformaInvoicePage() {
 
       return prevItens.map(item => {
         // 1. Recalculate EXW
-        let valorEXW = item.valorEXW;
-        let exwTooltip = item.exwTooltip;
+        let currentValorEXW = item.ValorEXW;
+        let currentExwTooltip = item.exwTooltip;
 
         if (item.moduloTecido) {
-          valorEXW = calculateEXW(
+          currentValorEXW = calculateEXW(
             item.moduloTecido.valorTecido, 
             cotacaoRisco, 
             comissao, 
@@ -290,19 +290,19 @@ export default function ProformaInvoicePage() {
           );
 
           const valorBase = cotacaoRisco > 0 ? item.moduloTecido.valorTecido / cotacaoRisco : 0;
-          exwTooltip = 
+          currentExwTooltip = 
             `Base (R$ ${fmt(item.moduloTecido.valorTecido)} / ${fmt(cotacaoRisco)}) = $ ${fmt(valorBase)}\n` +
             `+ Comissão (${fmt(comissao)}%) = $ ${fmt(valorBase * (comissao / 100))}\n` +
             `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(valorBase * (gordura / 100))}\n` +
-            `= $ ${fmt(valorEXW)}`;
+            `= $ ${fmt(currentValorEXW)}`;
         }
 
         const freteUnitarioBRL = calculateFreteRateio(totalFreteBRL, totalM3, item.m3);
         const freteUnitarioUSD = calculateFreteRateio(totalFreteUSD, totalM3, item.m3);
         
-        const valorBaseBRL = valorEXW * cotacaoRisco;
+        const valorBaseBRL = currentValorEXW * cotacaoRisco;
         const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
-        const valorFinalUSD = (valorEXW + freteUnitarioUSD) * item.quantidade;
+        const valorFinalUSD = (currentValorEXW + freteUnitarioUSD) * item.quantidade;
 
         const freteBrlTooltip = 
           `Total Frete R$ ${fmt(totalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(totalM3 > 0 ? totalFreteBRL / totalM3 : 0)}/m³\n` +
@@ -314,12 +314,12 @@ export default function ProformaInvoicePage() {
 
         return {
           ...item,
-          valorEXW,
-          valorFreteRateadoBRL: freteUnitarioBRL,
-          valorFreteRateadoUSD: freteUnitarioUSD,
-          valorFinalItemBRL: valorFinalBRL,
-          valorFinalItemUSDRisco: valorFinalUSD,
-          exwTooltip,
+          ValorEXW: currentValorEXW,
+          ValorFreteRateadoBRL: freteUnitarioBRL,
+          ValorFreteRateadoUSD: freteUnitarioUSD,
+          ValorFinalItemBRL: valorFinalBRL,
+          ValorFinalItemUSDRisco: valorFinalUSD,
+          exwTooltip: currentExwTooltip,
           freteBrlTooltip,
           freteUsdTooltip
         };
@@ -356,9 +356,9 @@ export default function ProformaInvoicePage() {
         const freteUnitarioBRL = custoPorM3BRL * item.m3;
         const freteUnitarioUSD = custoPorM3USD * item.m3;
         
-        const valorBaseBRL = item.valorEXW * (Number(form.cotacaoRisco) || 0);
+        const valorBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
         const valorFinalBRL = (valorBaseBRL + freteUnitarioBRL) * item.quantidade;
-        const valorFinalUSD = (item.valorEXW + freteUnitarioUSD) * item.quantidade;
+        const valorFinalUSD = (item.ValorEXW + freteUnitarioUSD) * item.quantidade;
 
         const freteBrlTooltip = 
           `Total Frete R$ ${fmt(form.valorTotalFreteBRL)} / Total M³ ${fmt(totalM3)} = R$ ${fmt(custoPorM3BRL)}/m³\n` +
@@ -370,10 +370,10 @@ export default function ProformaInvoicePage() {
 
         return {
           ...item,
-          valorFreteRateadoBRL: freteUnitarioBRL,
-          valorFreteRateadoUSD: freteUnitarioUSD,
-          valorFinalItemBRL: valorFinalBRL,
-          valorFinalItemUSDRisco: valorFinalUSD,
+          ValorFreteRateadoBRL: freteUnitarioBRL,
+          ValorFreteRateadoUSD: freteUnitarioUSD,
+          ValorFinalItemBRL: valorFinalBRL,
+          ValorFinalItemUSDRisco: valorFinalUSD,
           freteBrlTooltip,
           freteUsdTooltip
         };
@@ -456,23 +456,22 @@ export default function ProformaInvoicePage() {
     const pa = modulo?.pa || 0;
     const m3 = modulo?.m3 || (largura * profundidade * altura);
 
-    const valorModuloTecido = moduloTecido.valorTecido;
+    const cotacao = Number(form.cotacaoRisco) || 0;
     const comissao = config?.percentualComissao || 0;
     const gordura = config?.percentualGordura || 0;
-    
-    // Calculation
-    const cotacao = Number(form.cotacaoRisco) || 0;
+
+    const valorModuloTecido = moduloTecido.valorTecido || 0;
     const valorBase = cotacao > 0 ? valorModuloTecido / cotacao : 0;
     const vComissao = valorBase * (comissao / 100);
     // Reverted: Gordura on Base Only
     const vGordura = valorBase * (gordura / 100);
-    const valorEXW = valorBase + vComissao + vGordura;
+    const finalValorEXW = valorBase + vComissao + vGordura;
 
-    const exwTooltip = 
+    const currentExwTooltip = 
       `Base (R$ ${fmt(valorModuloTecido)} / ${fmt(cotacao)}) = $ ${fmt(valorBase)}\n` +
       `+ Comissão (${fmt(comissao)}%) = $ ${fmt(vComissao)}\n` +
       `+ Gordura (Sobre Base) (${fmt(gordura)}%) = $ ${fmt(vGordura)}\n` +
-      `= $ ${fmt(valorEXW)}`;
+      `= $ ${fmt(finalValorEXW)}`;
 
     const novoItem: ItemGrid = {
       tempId: Date.now(),
@@ -484,16 +483,18 @@ export default function ProformaInvoicePage() {
       altura,
       pa,
       m3,
-      valorEXW,
-      valorFreteRateadoBRL: 0,
-      valorFreteRateadoUSD: 0,
-      valorFinalItemBRL: 0,
-      valorFinalItemUSDRisco: 0,
+      ValorEXW: finalValorEXW,
+      ValorFreteRateadoBRL: 0,
+      ValorFreteRateadoUSD: 0,
+      ValorFinalItemBRL: 0,
+      ValorFinalItemUSDRisco: 0,
       codigoModuloTecido: codigoModuloTecido,
-      exwTooltip,
+      exwTooltip: currentExwTooltip,
       freteBrlTooltip: "",
       freteUsdTooltip: "",
       observacao: "",
+      feet: "",
+      finishing: ""
     };
 
     setItens(prev => [...prev, novoItem]);
@@ -543,8 +544,8 @@ export default function ProformaInvoicePage() {
   };
 
   async function salvar() {
-    // Garantir que o rateio está atualizado antes de salvar
-    recalcularRateio();
+    // DO NOT rely on recalcularRateio() here as state update is async.
+    // We calculate the values explicitly during map below.
     try {
       if (!form.idCliente) {
         alert("Selecione um cliente");
@@ -558,7 +559,7 @@ export default function ProformaInvoicePage() {
 
       setSaving(true);
 
-      const valorTecido = itens.reduce((sum, item) => sum + (item.valorEXW * item.quantidade), 0);
+      const valorTecido = itens.reduce((sum, item) => sum + (item.ValorEXW * item.quantidade), 0);
 
       const piData = {
         id: form.id,
@@ -576,26 +577,36 @@ export default function ProformaInvoicePage() {
         cotacaoRisco: Number(form.cotacaoRisco),
         tempoEntrega: form.tempoEntrega,
         condicaoPagamento: form.condicaoPagamento,
-        piItens: itens.map(item => ({
-          id: item.id || 0, // Include ID for items (0 if new)
-          idModuloTecido: item.idModuloTecido,
-          quantidade: item.quantidade,
-          largura: item.largura,
-          profundidade: item.profundidade,
-          altura: item.altura,
-          pa: item.pa,
-          m3: item.m3,
-          valorEXW: item.valorEXW,
-          valorFreteRateadoBRL: item.valorFreteRateadoBRL,
-          valorFreteRateadoUSD: item.valorFreteRateadoUSD,
-          valorFinalItemBRL: item.valorFinalItemBRL,
-          valorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
-          observacao: item.observacao,
-          feet: item.feet,
-          finishing: item.finishing,
-          tempCodigoModuloTecido: item.codigoModuloTecido,
-          rateioFrete: 0 
-        })) as any[]
+        piItens: itens.map(item => {
+          const totalM3 = itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
+          const freteUnitBRL = totalM3 > 0 ? (form.valorTotalFreteBRL / totalM3) * item.m3 : 0;
+          const freteUnitUSD = totalM3 > 0 ? (form.valorTotalFreteUSD / totalM3) * item.m3 : 0;
+
+          const valorBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
+          const totalBRL = (valorBaseBRL + freteUnitBRL) * item.quantidade;
+          const totalUSD = (item.ValorEXW + freteUnitUSD) * item.quantidade;
+
+          return {
+            id: item.id || 0,
+            idModuloTecido: item.idModuloTecido,
+            quantidade: item.quantidade,
+            largura: item.largura,
+            profundidade: item.profundidade,
+            altura: item.altura,
+            pa: item.pa,
+            m3: item.m3,
+            ValorEXW: item.ValorEXW,
+            ValorFreteRateadoBRL: freteUnitBRL,
+            ValorFreteRateadoUSD: freteUnitUSD,
+            ValorFinalItemBRL: totalBRL,
+            ValorFinalItemUSDRisco: totalUSD,
+            observacao: item.observacao,
+            feet: item.feet,
+            finishing: item.finishing,
+            tempCodigoModuloTecido: item.codigoModuloTecido,
+            rateioFrete: 0 
+          };
+        }) as any[]
       };
 
       if (form.id) {
@@ -660,11 +671,11 @@ export default function ProformaInvoicePage() {
                    altura,
                    pa,
                    m3,
-                   valorEXW: item.valorEXW ?? item.ValorEXW ?? 0,
-                   valorFreteRateadoBRL: item.valorFreteRateadoBRL ?? item.ValorFreteRateadoBRL ?? 0,
-                   valorFreteRateadoUSD: item.valorFreteRateadoUSD ?? item.ValorFreteRateadoUSD ?? 0,
-                   valorFinalItemBRL: item.valorFinalItemBRL ?? item.ValorFinalItemBRL ?? 0,
-                   valorFinalItemUSDRisco: item.valorFinalItemUSDRisco ?? item.ValorFinalItemUSDRisco ?? 0,
+                   ValorEXW: item.ValorEXW ?? item.valorEXW ?? 0,
+                   ValorFreteRateadoBRL: item.ValorFreteRateadoBRL ?? item.valorFreteRateadoBRL ?? 0,
+                   ValorFreteRateadoUSD: item.ValorFreteRateadoUSD ?? item.valorFreteRateadoUSD ?? 0,
+                   ValorFinalItemBRL: item.ValorFinalItemBRL ?? item.valorFinalItemBRL ?? 0,
+                   ValorFinalItemUSDRisco: item.ValorFinalItemUSDRisco ?? item.valorFinalItemUSDRisco ?? 0,
                    exwTooltip: "Cálculo importado",
                    freteBrlTooltip: "Cálculo importado",
                    freteUsdTooltip: "Cálculo importado",
@@ -715,11 +726,11 @@ export default function ProformaInvoicePage() {
 
 
   const totalGeralBRL = useMemo(() => {
-    return itens.reduce((sum, item) => sum + item.valorFinalItemBRL, 0);
+    return itens.reduce((sum, item) => sum + item.ValorFinalItemBRL, 0);
   }, [itens]);
 
   const totalGeralUSD = useMemo(() => {
-    return itens.reduce((sum, item) => sum + item.valorFinalItemUSDRisco, 0);
+    return itens.reduce((sum, item) => sum + item.ValorFinalItemUSDRisco, 0);
   }, [itens]);
 
   if (loading) return <div style={{ padding: 16 }}>Carregando...</div>;
@@ -1141,7 +1152,7 @@ export default function ProformaInvoicePage() {
                   <td style={td}>{fmt(item.m3, 3)}</td>
                   <td style={{...td, textAlign:"right"}} title={item.exwTooltip}>
                       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                          R$ {fmt(item.valorEXW)}
+                          $ {fmt(item.ValorEXW)}
                           <span className="mobile-help-icon" onClick={() => openHelp("Cálculo EXW", item.exwTooltip)}>?</span>
                       </div>
                   </td>
@@ -1149,20 +1160,20 @@ export default function ProformaInvoicePage() {
                       <>
                         <td style={{...td, textAlign:"right"}} title={item.freteBrlTooltip}>
                             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                                R$ {fmt(item.valorFreteRateadoBRL)}
+                                R$ {fmt(item.ValorFreteRateadoBRL)}
                                 <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete R$", item.freteBrlTooltip)}>?</span>
                             </div>
                         </td>
                         <td style={{...td, textAlign:"right"}} title={item.freteUsdTooltip}>
                             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                                $ {fmt(item.valorFreteRateadoUSD)}
+                                $ {fmt(item.ValorFreteRateadoUSD)}
                                 <span className="mobile-help-icon" onClick={() => openHelp("Cálculo Frete USD", item.freteUsdTooltip)}>?</span>
                             </div>
                         </td>
                       </>
                    )}
-                  <td style={{...td, textAlign:"right"}}>R$ {fmt(item.valorFinalItemBRL)}</td>
-                  <td style={{...td, textAlign:"right"}}>$ {fmt(item.valorFinalItemUSDRisco)}</td>
+                  <td style={{...td, textAlign:"right"}}>R$ {fmt(item.ValorFinalItemBRL)}</td>
+                  <td style={{...td, textAlign:"right"}}>$ {fmt(item.ValorFinalItemUSDRisco)}</td>
                 </tr>
               ))}
               {itens.length === 0 && (

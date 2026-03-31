@@ -405,9 +405,9 @@ export default function PrintPiPage() {
               <th rowSpan={2} style={{ width: "10%" }}>PIES</th>
                <th rowSpan={2} style={{ width: "10%" }}>ACABADO</th>
                <th rowSpan={2} style={{ width: "10%" }}>OBSERVACIÓN</th>
-               {showFreight && <th rowSpan={2} style={{ width: "10%" }}>FRETE</th>}
+               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "R$" : "USD"}</th>
                <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "UNIT R$" : "UNIT DOLAR"}</th>
-              <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
+               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
             </tr>
             <tr>
                <th style={{ width: "5%" }}>LARG.</th>
@@ -478,19 +478,14 @@ export default function PrintPiPage() {
                                 groupRange.forEach((g) => {
                                     const mQty = (Number(g.item.quantidade ?? (g.item as any).Quantidade) || 1);
                                     
-                                    const mUnitBRL = (Number(g.item.valorFinalItemBRL ?? (g.item as any).ValorFinalItemBRL) || 0) / mQty;
-                                    const mUnitFreteBRL = showFreight ? (Number(g.item.valorFreteRateadoBRL ?? (g.item as any).ValorFreteRateadoBRL) || 0) : 0;
-                                    const mFinalUnitBRL = mUnitBRL + mUnitFreteBRL;
-                                    
-                                    const mUnitUSD = (Number(g.item.valorEXW ?? (g.item as any).ValorEXW) || 0);
-                                    const mUnitFreteUSD = showFreight ? (Number(g.item.valorFreteRateadoUSD ?? (g.item as any).ValorFreteRateadoUSD) || 0) : 0;
-                                    const mFinalUnitUSD = mUnitUSD + mUnitFreteUSD;
+                                    const mUnitBRL = (Number(g.item.valorEXW || 0) * (Number(pi.cotacaoRisco) || 1));
+                                    const mUnitUSD = (Number(g.item.valorEXW || 0));
 
-                                    fabricGroupUnitBRL += mFinalUnitBRL;
-                                    fabricGroupTotalBRL += (mFinalUnitBRL * mQty);
+                                    fabricGroupUnitBRL += mUnitBRL;
+                                    fabricGroupTotalBRL += (mUnitBRL * mQty);
                                     
-                                    fabricGroupUnitUSD += mFinalUnitUSD;
-                                    fabricGroupTotalUSD += (mFinalUnitUSD * mQty);
+                                    fabricGroupUnitUSD += mUnitUSD;
+                                    fabricGroupTotalUSD += (mUnitUSD * mQty);
                                 });
                             }
 
@@ -544,22 +539,20 @@ export default function PrintPiPage() {
                                     {/* Observation */}
                                     {renderMergedCellForCurrentRow('observation', item.observacao || "", { })}
                                     
-                                    {/* Freight: Only for non-EXW */}
-                                    {showFreight && (
-                                        <td style={{ border: "1px solid #000", textAlign: "right", background: "#fefce8" }}>
-                                            {currency === "BRL" ? 
-                                                `R$ ${fmt((Number(item.valorFreteRateadoBRL ?? (item as any).ValorFreteRateadoBRL) || 0) + ((item.valorFinalItemBRL ?? (item as any).ValorFinalItemBRL) / ((item.quantidade ?? (item as any).Quantidade) || 1)))}` : 
-                                                `$ ${fmt((Number(item.valorFreteRateadoUSD ?? (item as any).ValorFreteRateadoUSD) || 0) + (Number(item.valorEXW ?? (item as any).ValorEXW) || 0))}`}
-                                        </td>
-                                    )}
+                                    {/* Individual EXW */}
+                                    <td style={{ border: "1px solid #000", textAlign: "right" }}>
+                                        {currency === "BRL" ? 
+                                            `R$ ${fmt(Number(item.valorEXW || 0) * (Number(pi.cotacaoRisco) || 1))}` : 
+                                            `$ ${fmt(Number(item.valorEXW || 0))}`}
+                                    </td>
 
-                                    {/* Unit Group EXW Sofa */}
+                                    {/* Unit Group Sum EXW */}
                                     {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupUnitBRL)}` : `$ ${fmt(fabricGroupUnitUSD)}`, { 
                                         textAlign: "right", 
                                         background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" 
                                     })}
                                     
-                                    {/* Total Group EXW: Sofa Total */}
+                                    {/* Total Group EXW * Qty */}
                                     {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupTotalBRL)}` : `$ ${fmt(fabricGroupTotalUSD)}`, { 
                                         textAlign: "right", 
                                         fontWeight: "bold", 
@@ -578,7 +571,7 @@ export default function PrintPiPage() {
               <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalQty}</td>
               <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalSofaQty}</td>
               <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3(processedData.totalM3)}</td>
-              <td colSpan={showFreight ? 6 : 5} style={{ border: "1px solid #000" }}></td>
+              <td colSpan={5} style={{ border: "1px solid #000" }}></td>
               <td style={{ border: "1px solid #000", textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2", fontWeight: "bold" }}>
                 {currency === "BRL" ? "R$" : "$"} {fmt(processedData.totalValue)}
               </td>
