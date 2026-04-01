@@ -956,14 +956,10 @@ export default function ProformaInvoiceV2Page() {
                                      />
                                   </td>
 
-                                 {!isFerguile && isFirst && (
+                                 {!isFerguile && (
                                    <>
-                                     <td rowSpan={group.span} style={{ ...tdStyle, textAlign: "right", verticalAlign: "middle", color: "#94a3b8", background: "rgba(255, 255, 255, 0.02)" }}>
-                                       $ {fmt(group.items.reduce((s: number, i: any) => s + i.ValorEXW, 0))}
-                                     </td>
-                                     <td rowSpan={group.span} style={{ ...tdStyle, textAlign: "right", verticalAlign: "middle", color: "#94a3b8", background: "rgba(255, 255, 255, 0.02)" }}>
-                                       $ {fmt(group.items.reduce((s: number, i: any) => s + i.ValorFreteRateadoUSD, 0))}
-                                     </td>
+                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorEXW)}</td>
+                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
                                    </>
                                  )}
                                  
