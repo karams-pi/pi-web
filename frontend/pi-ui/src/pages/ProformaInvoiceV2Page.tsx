@@ -70,14 +70,6 @@ type ItemGrid = {
   finishing?: string;
 };
 
-interface FabricGroup {
-  fabricName: string;
-  items: ItemGrid[];
-  span: number;
-  totalUsdUnit: number;
-  totalUsdGroup: number;
-}
-
 const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 const fmt3 = (n: number | undefined) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
@@ -114,6 +106,12 @@ export default function ProformaInvoiceV2Page() {
   const [showItemModal, setShowItemModal] = useState(false);
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
   const [currencyModalType, setCurrencyModalType] = useState<"print" | "excel">("print");
+
+  const isFerguile = useMemo(() => {
+    const s = fornecedores.find(f => String(f.id) === form.idFornecedor);
+    const name = (s?.nome || "").toLowerCase();
+    return name.includes("ferguile") || name.includes("livintus");
+  }, [fornecedores, form.idFornecedor]);
 
   // Filters for Item Selection Modal
   const [filterFornecedor, setFilterFornecedor] = useState("");
@@ -316,7 +314,25 @@ export default function ProformaInvoiceV2Page() {
         recalculateAllItems(risk, form.valorTotalFreteBRL / risk, form.valorTotalFreteBRL, newConfig);
       }
     }).catch(console.error);
-  }, [form.idFornecedor, form.cotacaoAtualUSD]);
+
+    // Dynamic Prefix for Ferguile
+    if (idForn) {
+      const supplier = fornecedores.find(f => f.id === idForn);
+      if (supplier) {
+        const name = supplier.nome.toLowerCase();
+        if (name.includes("ferguile") || name.includes("livintus")) {
+          const year = new Date(form.dataPi).getFullYear();
+          const newPrefix = `FRG${year}-PO`;
+          if (form.prefixo !== newPrefix) {
+            setForm(prev => ({ ...prev, prefixo: newPrefix }));
+          }
+        } else if (form.prefixo.startsWith("FRG")) {
+           // Reset prefix if switching away from Ferguile
+           setForm(prev => ({ ...prev, prefixo: "SW" }));
+        }
+      }
+    }
+  }, [form.idFornecedor, form.cotacaoAtualUSD, form.dataPi, fornecedores]);
 
   useEffect(() => {
     if (form.idFrete) loadFreteTotals();
@@ -358,38 +374,90 @@ export default function ProformaInvoiceV2Page() {
   }, [fornecedores, form.idFornecedor]);
 
   const processedData = useMemo(() => {
-    if (itens.length === 0 || !modulosTecidos) return { groups: [] as FabricGroup[] };
+    if (itens.length === 0 || !modulosTecidos) return { groups: [] };
 
+    // 1. Sort the items
     const sorted = [...itens].sort((a, b) => {
        const mtA = (modulosTecidos || []).find(m => m.id === a.idModuloTecido);
        const mtB = (modulosTecidos || []).find(m => m.id === b.idModuloTecido);
+       
+       if (isFerguile) {
+         // Sort by Brand (Referencia) -> Description -> Fabric
+         const bA = mtA?.modulo?.marca?.nome || "";
+         const bB = mtB?.modulo?.marca?.nome || "";
+         if (bA !== bB) return bA.localeCompare(bB);
+         
+         const dA = mtA?.modulo?.descricao || "";
+         const dB = mtB?.modulo?.descricao || "";
+         if (dA !== dB) return dA.localeCompare(dB);
+       }
+       
        const fA = mtA?.tecido?.nome || "";
        const fB = mtB?.tecido?.nome || "";
        return fA.localeCompare(fB);
     });
 
-    const groups: FabricGroup[] = [];
-    let currentGroup: FabricGroup | null = null;
+    // 2. Group them
+    const groups: any[] = [];
+    let currentGroup: any = null;
 
     sorted.forEach(item => {
       const mt = (modulosTecidos || []).find(m => m.id === item.idModuloTecido);
-      const fabricName = mt?.tecido?.nome || "Sem Tecido";
       
-      const usdUnit = Number((item.ValorFinalItemUSDRisco).toFixed(2));
-      const totalUsd = Number((usdUnit * item.quantidade).toFixed(2));
+      let groupKey = "";
+      if (isFerguile) {
+        groupKey = mt?.modulo?.marca?.nome || "Sem Marca";
+      } else {
+        groupKey = mt?.tecido?.nome || "Sem Tecido";
+      }
+
+      const unitPrice = Number((item.ValorEXW + item.ValorFreteRateadoUSD).toFixed(2));
+      const totalUsd = Number((unitPrice * item.quantidade).toFixed(2));
       
-      if (!currentGroup || currentGroup.fabricName !== fabricName) {
-        currentGroup = { fabricName, items: [], span: 0, totalUsdUnit: 0, totalUsdGroup: 0 };
+      if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
+        currentGroup = { 
+          fabricName: groupKey, // For Karams compatibility
+          brandName: groupKey,  // For Ferguile compatibility
+          items: [], 
+          span: 0, 
+          totalUsdUnit: 0, 
+          totalUsdGroup: 0 
+        };
         groups.push(currentGroup);
       }
       currentGroup.items.push(item);
       currentGroup.span++;
-      currentGroup.totalUsdUnit += usdUnit;
+      currentGroup.totalUsdUnit += unitPrice;
       currentGroup.totalUsdGroup += totalUsd;
     });
 
+    // 3. If Ferguile, calculate sub-spans for Descriptions within each brand group
+    if (isFerguile) {
+      groups.forEach(group => {
+        const descInfo: { [key: string]: number } = {};
+        group.items.forEach((item: any) => {
+          const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+          const desc = mt?.modulo?.descricao || "";
+          descInfo[desc] = (descInfo[desc] || 0) + 1;
+        });
+        
+        // Tag items with their spans
+        let lastDesc = "";
+        group.items.forEach((item: any) => {
+          const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+          const desc = mt?.modulo?.descricao || "";
+          if (desc !== lastDesc) {
+            item._descSpan = descInfo[desc];
+            lastDesc = desc;
+          } else {
+            item._descSpan = 0;
+          }
+        });
+      });
+    }
+
     return { groups };
-  }, [itens, modulosTecidos]);
+  }, [itens, modulosTecidos, isFerguile]);
 
   const addItem = () => {
     setShowItemModal(true);
@@ -425,9 +493,6 @@ export default function ProformaInvoiceV2Page() {
   const handleConfirmCurrency = (currency: string, validity: number) => {
     setCurrencyModalOpen(false);
     if (currencyModalType === "print") {
-      const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
-      const sName = (supplier?.nome || "").toLowerCase();
-      const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
       const route = isFerguile ? "print-pi-ferguile" : "print-pi";
       window.open(`#/${route}/${form.id}?currency=${currency}&validity=${validity}`, "_blank");
     } else {
@@ -700,36 +765,61 @@ export default function ProformaInvoiceV2Page() {
               <table className="cl-table" style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0", minWidth: "1400px" }}>
                 <thead style={{ position: "sticky", top: 0, zIndex: 10 }}>
                   <tr style={{ background: "#0f172a" }}>
-                    <th style={{ ...thStyle, width: "40px", textAlign: "center" }}>#</th>
-                    <th style={{ ...thStyle, width: "60px", textAlign: "center" }}>Img</th>
-                    <th style={{ ...thStyle, width: "120px", textAlign: "center" }}>Marca</th>
-                    <th style={{ ...thStyle, width: "400px" }}>Módulo / Descrição</th>
-                    <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>L</th>
-                    <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>P</th>
-                    <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>A</th>
-                    <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>Qtd</th>
-                    <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>M³ Total</th>
-                    <th style={{ ...thStyle, width: "140px", textAlign: "center" }}>Tecido</th>
-                    <th style={{ ...thStyle, width: "100px" }}>Pés</th>
-                    <th style={{ ...thStyle, width: "120px" }}>Acabamento</th>
-                    <th style={{ ...thStyle, width: "140px" }}>Observação</th>
-                    <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
-                    <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>Frete</th>
-                    <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>USD Unit</th>
-                    <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL USD</th>
+                    {!isFerguile ? (
+                      <>
+                        <th style={{ ...thStyle, width: "40px", textAlign: "center" }}>#</th>
+                        <th style={{ ...thStyle, width: "60px", textAlign: "center" }}>Img</th>
+                        <th style={{ ...thStyle, width: "120px", textAlign: "center" }}>Marca</th>
+                        <th style={{ ...thStyle, width: "400px" }}>Módulo / Descrição</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>L</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>P</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>A</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>Qtd</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>M³ Total</th>
+                        <th style={{ ...thStyle, width: "140px", textAlign: "center" }}>Tecido</th>
+                        <th style={{ ...thStyle, width: "100px" }}>Pés</th>
+                        <th style={{ ...thStyle, width: "120px" }}>Acabamento</th>
+                        <th style={{ ...thStyle, width: "140px" }}>Observação</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>Frete</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>USD Unit</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL USD</th>
+                      </>
+                    ) : (
+                      <>
+                        <th style={{ ...thStyle, width: "60px" }}>FOTO</th>
+                        <th style={{ ...thStyle, width: "100px" }}>REFERENCIA</th>
+                        <th style={{ ...thStyle, width: "300px" }}>DESCRIPCIÓN</th>
+                        <th style={{ ...thStyle, width: "100px" }}>MARCA</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>LARG.</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>ALT.</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>PROF.</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>CANT.</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>VOL M³</th>
+                        <th style={{ ...thStyle, width: "120px" }}>FABRIC</th>
+                        <th style={{ ...thStyle, width: "100px" }}>TELA N</th>
+                        <th style={{ ...thStyle, width: "140px" }}>OBSERVACIÓN</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "90px" }}>UNIT</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>TOTAL</th>
+                      </>
+                    )}
                     <th style={{ ...thStyle, width: "50px" }}></th>
                   </tr>
                 </thead>
                 <tbody style={{ background: "rgba(15, 23, 42, 0.4)" }}>
-                  {processedData.groups.map((group: FabricGroup, groupIndex: number) => (
+                  {processedData.groups.map((group: any, groupIndex: number) => (
                      <React.Fragment key={groupIndex}>
-                        {group.items.map((item: ItemGrid, itemIndex: number) => {
+                        {group.items.map((item: any, itemIndex: number) => {
                            const isFirst = itemIndex === 0;
                            const mtInfo = modulosTecidos.find(m => m.id === item.idModuloTecido);
                            
                            return (
                               <tr key={item.tempId} className="table-row-v2">
-                                 <td style={{ ...tdStyle, textAlign: "center", color: "var(--muted)", opacity: 0.5 }}>{itemIndex + 1}</td>
+                                 {!isFerguile && (
+                                   <td style={{ ...tdStyle, textAlign: "center", color: "var(--muted)", opacity: 0.5 }}>{itemIndex + 1}</td>
+                                 )}
+
+                                 {/* FOTO/Img Column */}
                                  {isFirst && (
                                    <td rowSpan={group.span} style={{ ...tdStyle, textAlign: "center", verticalAlign: "middle", background: "rgba(255,255,255,0.02)" }}>
                                        {getModelImage(item.idModuloTecido) ? (
@@ -743,32 +833,57 @@ export default function ProformaInvoiceV2Page() {
                                        )}
                                     </td>
                                  )}
+
+                                 {/* REFERENCIA / Marca Column */}
                                  {isFirst && (
                                    <td 
                                      rowSpan={group.span} 
-                                     title={mtInfo?.modulo?.marca?.nome || ""}
+                                     title={group.brandName || ""}
                                      style={{ ...tdStyle, color: "#60a5fa", fontWeight: "600", verticalAlign: "middle", textAlign: "center", background: "rgba(255,255,255,0.02)" }}
                                    >
-                                     {mtInfo?.modulo?.marca?.nome || "-"}
+                                     {group.brandName || "-"}
                                    </td>
                                  )}
-                                 <td style={tdStyle}>
-                                   <select 
-                                     className="cl-select" 
-                                     style={{ width: "100%", background: "transparent", border: "none", padding: "4px 0", height: "auto" }} 
-                                     value={item.idModuloTecido} 
-                                     onChange={e => updateItem(item.tempId, "idModuloTecido", Number(e.target.value))}
-                                     title={mtInfo?.modulo?.descricao || "Selecione um módulo"}
-                                   >
-                                     <option value="0">Selecione um módulo...</option>
-                                     {modulosTecidos.map(mt => (
-                                        <option key={mt.id} value={mt.id} style={{ background: "#1e293b" }}>{mt.modulo?.descricao} ({mt.tecido?.nome})</option>
-                                     ))}
-                                   </select>
-                                 </td>
+
+                                 {/* Module / Description Column */}
+                                 {(!isFerguile || item._descSpan > 0) && (
+                                   <td rowSpan={isFerguile ? item._descSpan : 1} style={tdStyle}>
+                                     <select 
+                                       className="cl-select" 
+                                       style={{ width: "100%", background: "transparent", border: "none", padding: "4px 0", height: "auto" }} 
+                                       value={item.idModuloTecido} 
+                                       onChange={e => updateItem(item.tempId, "idModuloTecido", Number(e.target.value))}
+                                       title={mtInfo?.modulo?.descricao || "Selecione um módulo"}
+                                     >
+                                       <option value="0">Selecione um módulo...</option>
+                                       {modulosTecidos.map(mt => (
+                                          <option key={mt.id} value={mt.id} style={{ background: "#1e293b" }}>{mt.modulo?.descricao} ({mt.tecido?.nome})</option>
+                                       ))}
+                                     </select>
+                                   </td>
+                                 )}
+
+                                 {/* Marca (Fornecedor) Column - Ferguile Only */}
+                                 {isFerguile && (
+                                   <td style={{ ...tdStyle, fontSize: "11px", color: "var(--muted)" }}>
+                                      {mtInfo?.modulo?.fornecedor?.nome || "-"}
+                                   </td>
+                                 )}
+
+                                 {/* Dimensions */}
                                  <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.largura)}</td>
-                                 <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.profundidade)}</td>
-                                 <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.altura)}</td>
+                                 {isFerguile ? (
+                                    <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.altura)}</td>
+                                 ) : (
+                                    <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.profundidade)}</td>
+                                 )}
+                                 {isFerguile ? (
+                                    <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.profundidade)}</td>
+                                 ) : (
+                                    <td style={{ ...tdStyle, textAlign: "center" }}>{fmt(item.altura)}</td>
+                                 )}
+
+                                 {/* Quantity */}
                                  <td style={{ ...tdStyle, textAlign: "center" }}>
                                     <input 
                                       type="number" 
@@ -778,43 +893,59 @@ export default function ProformaInvoiceV2Page() {
                                       onChange={e => updateItem(item.tempId, "quantidade", parseInt(e.target.value) || 1)}
                                     />
                                  </td>
+                                 
+                                 {/* Vol Total M3 */}
                                  <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa" }}>{fmt3(item.m3 * item.quantidade)}</td>
                                  
-                                 {isFirst && (
-                                    <td rowSpan={group.span} style={{ 
-                                      verticalAlign: "middle", 
-                                      background: "rgba(59, 130, 246, 0.1)", 
-                                      backdropFilter: "blur(4px)",
-                                      borderLeft: "1px solid rgba(255, 255, 255, 0.05)", 
-                                      borderRight: "1px solid rgba(255, 255, 255, 0.05)",
-                                      color: "#93c5fd", 
-                                      fontWeight: "700", 
-                                      textAlign: "center",
-                                      fontSize: "14px",
-                                      letterSpacing: "0.5px"
-                                    }}>
-                                       {group.fabricName}
-                                    </td>
-                                  )}
+                                 {/* Fabric Column (Merged for Karams, single for Ferguile) */}
+                                 {(!isFerguile || true) && (
+                                    (!isFerguile && isFirst) ? (
+                                      <td rowSpan={group.span} style={{ 
+                                        verticalAlign: "middle", 
+                                        background: "rgba(59, 130, 246, 0.1)", 
+                                        backdropFilter: "blur(4px)",
+                                        borderLeft: "1px solid rgba(255, 255, 255, 0.05)", 
+                                        borderRight: "1px solid rgba(255, 255, 255, 0.05)",
+                                        color: "#93c5fd", 
+                                        fontWeight: "700", 
+                                        textAlign: "center",
+                                        fontSize: "14px",
+                                        letterSpacing: "0.5px"
+                                      }}>
+                                         {group.fabricName}
+                                      </td>
+                                    ) : (
+                                      isFerguile && (
+                                        <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
+                                          {mtInfo?.tecido?.nome || "-"}
+                                        </td>
+                                      )
+                                    )
+                                 )}
 
+                                 {/* Pés / Tela N */}
                                  <td style={tdStyle}>
                                      <input 
                                        className="cl-input" 
                                        style={{ width: "100%", height: "28px", padding: "4px", fontSize: "12px", background: "transparent" }} 
-                                       value={item.feet || ""} 
-                                       onChange={e => updateItem(item.tempId, "feet", e.target.value)}
-                                       placeholder="Pés..."
+                                       value={isFerguile ? (item.codigoModuloTecido || "") : (item.feet || "")} 
+                                       onChange={e => updateItem(item.tempId, isFerguile ? "codigoModuloTecido" : "feet", e.target.value)}
+                                       placeholder={isFerguile ? "Tela..." : "Pés..."}
                                      />
                                   </td>
-                                  <td style={tdStyle}>
-                                     <input 
-                                       className="cl-input" 
-                                       style={{ width: "100%", height: "28px", padding: "4px", fontSize: "12px", background: "transparent" }} 
-                                       value={item.finishing || ""} 
-                                       onChange={e => updateItem(item.tempId, "finishing", e.target.value)}
-                                       placeholder="Acabamento..."
-                                     />
-                                  </td>
+
+                                  {!isFerguile && (
+                                    <td style={tdStyle}>
+                                      <input 
+                                        className="cl-input" 
+                                        style={{ width: "100%", height: "28px", padding: "4px", fontSize: "12px", background: "transparent" }} 
+                                        value={item.finishing || ""} 
+                                        onChange={e => updateItem(item.tempId, "finishing", e.target.value)}
+                                        placeholder="Acabamento..."
+                                      />
+                                    </td>
+                                  )}
+
                                   <td style={tdStyle}>
                                      <input 
                                        className="cl-input" 
@@ -825,23 +956,38 @@ export default function ProformaInvoiceV2Page() {
                                      />
                                   </td>
 
-                                 <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorEXW)}</td>
-                                 <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
+                                 {!isFerguile && isFirst && (
+                                   <>
+                                     <td rowSpan={group.span} style={{ ...tdStyle, textAlign: "right", verticalAlign: "middle", color: "#94a3b8", background: "rgba(255, 255, 255, 0.02)" }}>
+                                       $ {fmt(group.items.reduce((s: number, i: any) => s + i.ValorEXW, 0))}
+                                     </td>
+                                     <td rowSpan={group.span} style={{ ...tdStyle, textAlign: "right", verticalAlign: "middle", color: "#94a3b8", background: "rgba(255, 255, 255, 0.02)" }}>
+                                       $ {fmt(group.items.reduce((s: number, i: any) => s + i.ValorFreteRateadoUSD, 0))}
+                                     </td>
+                                   </>
+                                 )}
                                  
-                                 {isFirst && (
-                                    <td rowSpan={group.span} style={{ 
-                                       textAlign: "right", 
-                                       verticalAlign: "middle", 
-                                       background: "rgba(255, 255, 255, 0.02)", 
-                                       color: "#e5e7eb",
-                                       fontWeight: "600",
-                                       paddingRight: "10px"
-                                     }}>
-                                        $ {fmt(group.totalUsdUnit)}
-                                    </td>
-                                  )}
-
-                                 {isFirst && (
+                                 {isFerguile ? (
+                                   <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }}>
+                                     $ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}
+                                   </td>
+                                 ) : (
+                                   isFirst && (
+                                     <td rowSpan={group.span} style={{ 
+                                        ...tdStyle, 
+                                        textAlign: "right", 
+                                        verticalAlign: "middle", 
+                                        color: "#94a3b8",
+                                        background: "rgba(255, 255, 255, 0.02)",
+                                        fontSize: "15px",
+                                        fontWeight: "600"
+                                      }}>
+                                         $ {fmt(group.totalUsdUnit)}
+                                     </td>
+                                   )
+                                 )}
+                                 
+                                 {(!isFerguile && isFirst) ? (
                                     <td rowSpan={group.span} style={{ 
                                        textAlign: "right", 
                                        verticalAlign: "middle", 
@@ -853,6 +999,12 @@ export default function ProformaInvoiceV2Page() {
                                      }}>
                                         $ {fmt(group.totalUsdGroup)}
                                     </td>
+                                  ) : (
+                                    isFerguile && (
+                                      <td style={{ ...tdStyle, textAlign: "right", fontWeight: "700", color: "#fca5a5" }}>
+                                        $ {fmt((item.ValorEXW + item.ValorFreteRateadoUSD) * item.quantidade)}
+                                      </td>
+                                    )
                                   )}
 
                                  <td style={{ ...tdStyle, textAlign: "center" }}>
