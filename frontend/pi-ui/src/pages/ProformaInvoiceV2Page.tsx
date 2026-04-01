@@ -46,6 +46,7 @@ type FormState = {
   valorTotalFreteUSD: number;
   tempoEntrega?: string;
   condicaoPagamento?: string;
+  idioma?: string;
 };
 
 type ItemGrid = {
@@ -168,6 +169,28 @@ export default function ProformaInvoiceV2Page() {
       default: return "";
     }
   }, [form.cotacaoAtualUSD, form.cotacaoRisco, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config, isFerguile, modulosTecidos, totalM3Pi]);
+
+  const translate = useCallback((key: string) => {
+    const lang = form.idioma || "PT";
+    const dicts: Record<string, Record<string, string>> = {
+      PT: {
+        FOTO: "FOTO", MARCA: "MARCA", DESC: "MÓDULO / DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "QTD", M3: "M³ TOTAL", 
+        TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", UNIT: "USD UNIT", TOTAL: "TOTAL USD",
+        IDIOMA: "Idioma", COND_PAG: "Condição de Pagamento"
+      },
+      ES: {
+        FOTO: "FOTO", MARCA: "MARCA", DESC: "MODULO / DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "CANT", M3: "M³ TOTAL", 
+        TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
+        IDIOMA: "Idioma", COND_PAG: "Condición de Pago"
+      },
+      EN: {
+        FOTO: "PHOTO", MARCA: "BRAND", DESC: "MODULE / DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", QTD: "QTY", M3: "TOTAL M³", 
+        TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
+        IDIOMA: "Language", COND_PAG: "Payment Condition"
+      }
+    };
+    return dicts[lang]?.[key] || key;
+  }, [form.idioma]);
 
   // Filters for Item Selection Modal
   const [filterFornecedor, setFilterFornecedor] = useState("");
@@ -550,15 +573,16 @@ export default function ProformaInvoiceV2Page() {
 
   const handleConfirmCurrency = (currency: string, validity: number) => {
     setCurrencyModalOpen(false);
+    if (!form.id) return;
+
     if (currencyModalType === "print") {
-      const route = isFerguile ? "print-pi-ferguile" : "print-pi";
-      window.open(`#/${route}/${form.id}?currency=${currency}&validity=${validity}`, "_blank");
+      const url = isFerguile ? `/print-pi-ferguile/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}` : `/print-pi/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}`;
+      window.open(url, "_blank");
     } else {
       (async () => {
-        if (!form.id) return;
         try {
           setLoading(true);
-          const blob = await exportPiExcel(form.id, currency, validity);
+          const blob = await exportPiExcel(form.id!, currency, validity, form.idioma || "PT");
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -659,6 +683,7 @@ export default function ProformaInvoiceV2Page() {
         cotacaoRisco: Number(form.cotacaoRisco),
         tempoEntrega: form.tempoEntrega || "",
         condicaoPagamento: form.condicaoPagamento || "",
+        idioma: form.idioma || "PT",
         piItens: itens.map(item => {
           const freteUnitBRL = totalM3 > 0 ? (form.valorTotalFreteBRL / totalM3) * item.m3 : 0;
           const freteUnitUSD = totalM3 > 0 ? (form.valorTotalFreteUSD / totalM3) * item.m3 : 0;
@@ -820,15 +845,27 @@ export default function ProformaInvoiceV2Page() {
                  <label className="label">Tempo Entrega</label>
                  <input type="text" className="cl-input" value={form.tempoEntrega || ""} onChange={e => setForm({...form, tempoEntrega: e.target.value})} placeholder="Ex: 30 dias" />
                </div>
-               <div className="field">
-                 <label className="label">Cond. Pagamento</label>
-                 <SearchableSelect 
-                   options={condicaoOptions}
-                   value={form.condicaoPagamento || ""}
-                   onChange={(val) => setForm({...form, condicaoPagamento: val})}
-                   placeholder="Selecione"
-                 />
-               </div>
+               <div className="field" style={{ flex: 2 }}>
+                  <label className="cl-label">{translate("COND_PAG")}</label>
+                  <SearchableSelect
+                    options={condicaoOptions}
+                    value={form.condicaoPagamento || ""}
+                    onChange={(val) => setForm(prev => ({ ...prev, condicaoPagamento: val }))}
+                  />
+                </div>
+
+                <div className="field" style={{ flex: 1 }}>
+                  <label className="cl-label">{translate("IDIOMA")}</label>
+                  <SearchableSelect
+                    options={[
+                      { value: "PT", label: "Português (PT-BR)" },
+                      { value: "ES", label: "Español (ES)" },
+                      { value: "EN", label: "English (EN)" }
+                    ]}
+                    value={form.idioma || "PT"}
+                    onChange={(val) => setForm(prev => ({ ...prev, idioma: val }))}
+                  />
+                </div>
             </div>
           </div>
 

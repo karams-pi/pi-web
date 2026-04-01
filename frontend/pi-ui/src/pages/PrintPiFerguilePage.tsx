@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
 import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
@@ -21,6 +21,37 @@ export default function PrintPiFerguilePage() {
     return new URLSearchParams(searchPart || window.location.search);
   }, []);
   const currency = (urlParams.get("currency") as "BRL" | "EXW") || "EXW";
+  const lang = (urlParams.get("lang") || "PT").toUpperCase();
+
+  const t = useCallback((key: string) => {
+    const dicts: Record<string, Record<string, string>> = {
+      PT: {
+        IMPORTER: "IMPORTADOR:", ADDRESS: "ENDEREÇO:", CITY: "CIDADE:", COUNTRY: "PAÍS:", NIT: "CNPJ:", PHONE: "TELEFONE:", RESPONSIBLE: "RESPONSÁVEL:", EMAIL: "E-MAIL:",
+        DATE: "DATA:", ORDER_DATE: "DATA PEDIDO:", SHIPMENT_POINT: "PONTO DE EMBARQUE:", DESTINATION_POINT: "PONTO DE DESTINO:", DELIVERY_TIME: "TEMPO DE ENTREGA:",
+        INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "CONDIÇÃO DE PAGAMENTO:", PHOTO: "FOTO", NAME: "NOME", DESCRIPTION: "DESCRIÇÃO", DIMENSIONS: "DIMENSÕES (m)",
+        WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "CANT", TOTAL_VOLUME: "TOTAL VOL M³", FABRIC: "TECIDO", TELA: "TELA N", OBSERVATION: "OBSERVAÇÃO", 
+        TOTAL: "TOTAL", BANK_DETAILS: "DETALLES BANCARIOS:", PRODUCT_DATA: "DATOS GENERALES DEL PRODUCTO", VALIDITY_NOTE: "* Esta proforma é válida por {0} dias a partir da data de emissão.",
+        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Produto", LOADING: "Carregando documento...", REFERENCIA: "REFERÊNCIA", MARCA: "MARCA"
+      },
+      ES: {
+        IMPORTER: "IMPORTADOR:", ADDRESS: "DIRECCIÓN:", CITY: "CIUDAD:", COUNTRY: "PAÍS:", NIT: "NIT:", PHONE: "TELÉFONO:", RESPONSIBLE: "RESPONSABLE:", EMAIL: "E-MAIL:",
+        DATE: "FECHA:", ORDER_DATE: "PEDIDO FECHA:", SHIPMENT_POINT: "PUNTO DE EMBARQUE:", DESTINATION_POINT: "PUNTO DE DESTINO:", DELIVERY_TIME: "TIEMPO DE ENTREGA:",
+        INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "CONDICIÓN DE PAGO:", PHOTO: "FOTO", NAME: "NOMBRE", DESCRIPTION: "DESCRIPCIÓN", DIMENSIONS: "DIMENSIONES (m)",
+        WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "CANT", TOTAL_VOLUME: "TOTAL VOL M³", FABRIC: "TELA", TELA: "TELA N", OBSERVATION: "OBSERVACIÓN", 
+        TOTAL: "TOTAL", BANK_DETAILS: "DETALLES BANCARIOS:", PRODUCT_DATA: "DATOS GENERALES DEL PRODUCTO", VALIDITY_NOTE: "* Esta proforma es válida por {0} días a partir de la fecha de emisión.",
+        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Producto", LOADING: "Cargando documento...", REFERENCIA: "REFERENCIA", MARCA: "MARCA"
+      },
+      EN: {
+        IMPORTER: "IMPORTER:", ADDRESS: "ADDRESS:", CITY: "CITY:", COUNTRY: "COUNTRY:", NIT: "TAX ID / VAT:", PHONE: "PHONE:", RESPONSIBLE: "RESPONSIBLE:", EMAIL: "E-MAIL:",
+        DATE: "DATE:", ORDER_DATE: "ORDER DATE:", SHIPMENT_POINT: "SHIPMENT POINT:", DESTINATION_POINT: "DESTINATION POINT:", DELIVERY_TIME: "DELIVERY TIME:",
+        INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "PAYMENT CONDITION:", PHOTO: "PHOTO", NAME: "NAME", DESCRIPTION: "DESCRIPTION", DIMENSIONS: "DIMENSIONS (m)",
+        WIDTH: "WIDTH", DEPTH: "DEPTH", HEIGHT: "HEIGHT", QTY_UNIT: "QTY", TOTAL_VOLUME: "TOTAL CBM", FABRIC: "FABRIC", TELA: "FABRIC N", OBSERVATION: "OBSERVATION", 
+        TOTAL: "TOTAL", BANK_DETAILS: "BANKING DETAILS:", PRODUCT_DATA: "GENERAL PRODUCT DATA", VALIDITY_NOTE: "* This proforma is valid for {0} days from the date of issue.",
+        ORIGIN: "Made in Brazil", BRAND: "Brand", PRODUCT: "Product", LOADING: "Loading document...", REFERENCIA: "REFERENCE", MARCA: "BRAND"
+      }
+    };
+    return dicts[lang]?.[key] || key;
+  }, [lang]);
 
   useEffect(() => {
     async function load() {
@@ -209,7 +240,7 @@ export default function PrintPiFerguilePage() {
     return base;
   }, [pi, modulosTecidos, dateObj]);
 
-  if (loading) return <div style={{ padding: 20 }}>Carregando documento...</div>;
+  if (loading) return <div style={{ padding: 20 }}>{t("LOADING")}</div>;
   if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
   const cellStyle: React.CSSProperties = {
@@ -289,21 +320,21 @@ export default function PrintPiFerguilePage() {
             </div>
             <img src={supplierMetadata.logo} alt={supplierMetadata.details.brand} style={{ maxWidth: "80px", maxHeight: "40px" }} />
           </div>
-          <div>CNPJ: {supplierMetadata.cnpj}</div>
-          <div>DIRECCIÓN: {supplierMetadata.address}</div>
-          <div>RIBEIRÃO BANDEIRANTE DO NORTE</div>
-          <div>CÓDIGO POSTAL: {supplierMetadata.zip}</div>
+          <div>{t("NIT")} {supplierMetadata.cnpj}</div>
+          <div>{t("ADDRESS")} {supplierMetadata.address}</div>
+          <div>{t("CITY")} Ribeirão Bandeirante do Norte</div>
+          <div>CÓDIGO POSTAL / ZIP CODE: {supplierMetadata.zip}</div>
           <div>{supplierMetadata.city} - {supplierMetadata.state}</div>
-          <div>PAÍS: {supplierMetadata.country}</div>
+          <div>{t("COUNTRY")} {supplierMetadata.country}</div>
           <div style={{ marginTop: 6 }}>
-            <strong>TIEMPO DE ENTREGA:</strong>{" "}
-            {pi.tempoEntrega || "60 dias"}
+            <strong>{t("DELIVERY_TIME")}</strong>{" "}
+            {pi.tempoEntrega || (lang === "ES" ? "60 dias" : (lang === "EN" ? "60 days" : "60 dias"))}
           </div>
           <div>
-            <strong>INCOTERM:</strong> {incoterm} - ARAPONGAS PR
+            <strong>{t("INCOTERM")}</strong> {incoterm} - ARAPONGAS PR
           </div>
           <div>
-            <strong>CONDICIÓN DE PAGO:</strong> {pi.condicaoPagamento || pi.configuracoes?.condicoesPagamento || "A VISTA"}
+            <strong>{t("PAYMENT_CONDITION")}</strong> {pi.condicaoPagamento || pi.configuracoes?.condicoesPagamento || "A VISTA"}
           </div>
         </div>
 
@@ -316,24 +347,24 @@ export default function PrintPiFerguilePage() {
             </span>
           </div>
           <div>
-            FECHA: {dateObj.toLocaleDateString("pt-BR")}
+            {t("DATE")} {dateObj.toLocaleDateString("pt-BR")}
           </div>
           <div>
             PROFORMA INVOICE: {formattedPiNumber}
           </div>
           <div>
-            PEDIDO FECHA: {dateObj.toLocaleDateString("pt-BR")}
+            {t("ORDER_DATE")} {dateObj.toLocaleDateString("pt-BR")}
           </div>
-          <div style={{ marginTop: 6, fontWeight: "bold" }}>IMPORTADOR:</div>
+          <div style={{ marginTop: 6, fontWeight: "bold" }}>{t("IMPORTER")}</div>
           <div style={{ marginLeft: 20 }}>
             <div>{displayClient?.empresa || displayClient?.nome || ""}</div>
-            {displayClient?.nit && <div>NIT: {displayClient.nit}</div>}
-            {displayClient?.endereco && <div>DIRECCIÓN: {displayClient.endereco}{displayClient?.cidade ? `, ${displayClient.cidade}` : ""}</div>}
-            {displayClient?.cep && <div>CÓDIGO POSTAL: {displayClient.cep}</div>}
-            {displayClient?.pais && <div>PAÍS: {displayClient.pais}</div>}
-            {displayClient?.pessoaContato && <div>RESPONSABLE: {displayClient.pessoaContato}</div>}
-            {displayClient?.telefone && <div>TEL.: {displayClient.telefone}</div>}
-            {displayClient?.email && <div>E-MAIL: {displayClient.email}</div>}
+            {displayClient?.nit && <div>{t("NIT")} {displayClient.nit}</div>}
+            {displayClient?.endereco && <div>{t("ADDRESS")} {displayClient.endereco}{displayClient?.cidade ? `, ${displayClient.cidade}` : ""}</div>}
+            {displayClient?.cep && <div>CÓDIGO POSTAL / ZIP CODE: {displayClient.cep}</div>}
+            {displayClient?.pais && <div>{t("COUNTRY")} {displayClient.pais}</div>}
+            {displayClient?.pessoaContato && <div>{t("RESPONSIBLE")} {displayClient.pessoaContato}</div>}
+            {displayClient?.telefone && <div>{t("PHONE")} {displayClient.telefone}</div>}
+            {displayClient?.email && <div>{t("EMAIL")} {displayClient.email}</div>}
           </div>
         </div>
       </div>
@@ -342,18 +373,18 @@ export default function PrintPiFerguilePage() {
       <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", marginTop: 0 }}>
         <thead>
           <tr>
-            <th style={{ ...thStyle, width: "6%" }}>FOTO</th>
-            <th style={{ ...thStyle, width: "8%" }}>REFERENCIA</th>
-            <th style={{ ...thStyle, width: "14%" }}>DESCRIPCIÓN</th>
-            <th style={{ ...thStyle, width: "7%" }}>MARCA</th>
-            <th style={{ ...thStyle, width: "5%" }}>LARG.</th>
-            <th style={{ ...thStyle, width: "5%" }}>ALT.</th>
-            <th style={{ ...thStyle, width: "5%" }}>PROF.</th>
-            <th style={{ ...thStyle, width: "5%" }}>CANT.<br/>UNIDAD</th>
-            <th style={{ ...thStyle, width: "5%" }}>TOTAL<br/>VOL M³</th>
-            <th style={{ ...thStyle, width: "7%" }}>FABRIC</th>
-            <th style={{ ...thStyle, width: "5%" }}>TELA<br/>N</th>
-            <th style={{ ...thStyle, width: "10%" }}>OBSERVACIÓN</th>
+            <th style={{ ...thStyle, width: "6%" }}>{t("PHOTO")}</th>
+            <th style={{ ...thStyle, width: "8%" }}>{t("REFERENCIA")}</th>
+            <th style={{ ...thStyle, width: "14%" }}>{t("DESCRIPTION")}</th>
+            <th style={{ ...thStyle, width: "7%" }}>{t("MARCA")}</th>
+            <th style={{ ...thStyle, width: "5%" }}>{t("WIDTH")}</th>
+            <th style={{ ...thStyle, width: "5%" }}>{t("HEIGHT")}</th>
+            <th style={{ ...thStyle, width: "5%" }}>{t("DEPTH")}</th>
+            <th style={{ ...thStyle, width: "5%" }}>{t("QTY_UNIT")}</th>
+            <th style={{ ...thStyle, width: "5%" }}>{t("TOTAL_VOLUME")}</th>
+            <th style={{ ...thStyle, width: "7%" }}>{t("FABRIC")}</th>
+            <th style={{ ...thStyle, width: "5%" }}>{t("TELA")}</th>
+            <th style={{ ...thStyle, width: "10%" }}>{t("OBSERVATION")}</th>
             <th style={{ ...thStyle, width: "7%" }}>{incoterm} UNIT<br/>{currency === "BRL" ? "R$" : "DOLAR"}</th>
             <th style={{ ...thStyle, width: "8%" }}>TOTAL {incoterm}<br/>{currency === "BRL" ? "R$" : "USD"}</th>
           </tr>
@@ -464,7 +495,7 @@ export default function PrintPiFerguilePage() {
         <tfoot>
           <tr style={{ fontWeight: "bold", background: "#f8f9fa" }}>
             <td colSpan={7} style={{ ...cellStyle, textAlign: "right", fontSize: "10px" }}>
-              TOTAL
+              {t("TOTAL")}
             </td>
             <td style={{ ...cellStyle, fontWeight: "bold", textAlign: "center" }}>
               {processedData.totalQty}
@@ -493,26 +524,26 @@ export default function PrintPiFerguilePage() {
       >
         <div style={{ padding: 10, borderRight: "1px solid #000" }}>
           <h3 style={{ margin: "0 0 5px 0", fontSize: "12px", textTransform: "uppercase" }}>
-            DETALLES BANCARIOS:
+            {t("BANK_DETAILS")}
           </h3>
-          <p style={{ margin: "2px 0" }}><strong>Beneficiario:</strong> {supplierMetadata.bankDetails.beneficiaryName}</p>
-          <p style={{ margin: "2px 0" }}><strong>CNPJ:</strong> {supplierMetadata.cnpj}</p>
-          <p style={{ margin: "2px 0" }}><strong>BANCO:</strong> {supplierMetadata.bankDetails.beneficiary}</p>
-          <p style={{ margin: "2px 0" }}><strong>CUENTA BENEFICIARIA:</strong> {supplierMetadata.bankDetails.beneficiaryAccount}</p>
-          {supplierMetadata.bankDetails.beneficiaryIban && <p style={{ margin: "2px 0" }}><strong>CÓDIGO IBAN:</strong> {supplierMetadata.bankDetails.beneficiaryIban}</p>}
-          <p style={{ margin: "2px 0" }}><strong>CÓDIGO SWIFT:</strong> {supplierMetadata.bankDetails.beneficiarySwift}</p>
+          <p style={{ margin: "2px 0" }}><strong>{t("NAME")}:</strong> {supplierMetadata.bankDetails.beneficiaryName}</p>
+          <p style={{ margin: "2px 0" }}><strong>{t("NIT")}</strong> {supplierMetadata.cnpj}</p>
+          <p style={{ margin: "2px 0" }}><strong>{lang === "EN" ? "BANK:" : "BANCO:"}</strong> {supplierMetadata.bankDetails.beneficiary}</p>
+          <p style={{ margin: "2px 0" }}><strong>{lang === "EN" ? "BENEFICIARY ACCOUNT:" : "CUENTA BENEFICIARIA:"}</strong> {supplierMetadata.bankDetails.beneficiaryAccount}</p>
+          {supplierMetadata.bankDetails.beneficiaryIban && <p style={{ margin: "2px 0" }}><strong>IBAN:</strong> {supplierMetadata.bankDetails.beneficiaryIban}</p>}
+          <p style={{ margin: "2px 0" }}><strong>SWIFT:</strong> {supplierMetadata.bankDetails.beneficiarySwift}</p>
 
         </div>
         <div style={{ padding: 10 }}>
-          <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DATOS GENERALES DEL PRODUCTO</h3>
+          <h3 style={{ borderBottom: "none", marginBottom: 5 }}>{t("PRODUCT_DATA")}</h3>
           <p style={{ margin: "2px 0" }}>
-            <strong>Marca:</strong> {supplierMetadata.details.brand}
+            <strong>{t("BRAND")}:</strong> {supplierMetadata.details.brand}
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>NCM:</strong> {supplierMetadata.details.ncm || "94016100"}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Producto:</strong> {fmt(processedData.totalQty, 0)}
+            <strong>{t("PRODUCT")}:</strong> {fmt(processedData.totalQty, 0)}
           </p>
           <p style={{ margin: "2px 0" }}>
             <strong>CBM M³:</strong> {fmtBR(processedData.totalM3, 3)}
@@ -524,16 +555,16 @@ export default function PrintPiFerguilePage() {
             <strong>P.B. TOTAL:</strong>
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>VOLUMEN TOTAL:</strong> {fmtBR(processedData.totalM3, 3)}
+            <strong>{lang === "EN" ? "TOTAL VOLUME:" : "VOLUMEN TOTAL:"}</strong> {fmtBR(processedData.totalM3, 3)}
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Productos originales de fabrica</strong>
+            <strong>{lang === "PT" ? "Produtos originais de fabrica" : (lang === "EN" ? "Original factory products" : "Productos originales de fabrica")}</strong>
           </p>
           <p style={{ margin: "2px 0" }}>
-            <strong>Hecho en Brasil</strong>
+            <strong>{t("ORIGIN")}</strong>
           </p>
           <p style={{ marginTop: 15, fontSize: "10px", fontStyle: "italic" }}>
-            * Esta proforma es válida por {urlParams.get("validity") || 30} días a partir de la fecha de emisión.
+            {t("VALIDITY_NOTE").replace("{0}", urlParams.get("validity") || "30")}
           </p>
         </div>
       </div>

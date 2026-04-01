@@ -111,7 +111,7 @@ public class PiExportService
         _context = context;
     }
 
-    public async Task<byte[]> ExportToExcelAsync(long piId, string currency = "EXW", int validity = 30)
+    public async Task<byte[]> ExportToExcelAsync(long piId, string currency = "EXW", int validity = 30, string lang = "PT")
     {
         var pi = await _context.Pis
             .Include(p => p.Cliente)
@@ -152,18 +152,66 @@ public class PiExportService
 
         if (isFerguileGroup)
         {
-            BuildFerguileLayout(ws, pi, currency, validity, metadata);
+            BuildFerguileLayout(ws, pi, currency, validity, metadata, lang);
         }
         else
         {
-            BuildGenericLayout(ws, pi, currency, validity, metadata);
+            BuildGenericLayout(ws, pi, currency, validity, metadata, lang);
         }
 
 
         return await package.GetAsByteArrayAsync();
     }
 
-    private void BuildGenericLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata)
+    private string t(string key, string lang)
+    {
+        var dict = new Dictionary<string, Dictionary<string, string>>
+        {
+            ["PT"] = new Dictionary<string, string> {
+                ["IMPORTER"] = "IMPORTADOR:", ["ADDRESS"] = "ENDEREÇO:", ["CITY"] = "CIDADE:", ["COUNTRY"] = "PAÍS:", 
+                ["NIT"] = "CNPJ:", ["PHONE"] = "TELEFONE:", ["RESPONSIBLE"] = "RESPONSÁVEL:", ["EMAIL"] = "EMAIL:",
+                ["DATE"] = "DATA:", ["ORDER_DATE"] = "DATA PEDIDO:", ["SHIPMENT_POINT"] = "PONTO DE EMBARQUE:", ["DESTINATION_POINT"] = "PONTO DE DESTINO:",
+                ["DELIVERY_TIME"] = "TEMPO DE ENTREGA:", ["INCOTERM"] = "INCOTERM:", ["PAYMENT_CONDITION"] = "CONDIÇÃO DE PAGAMENTO:",
+                ["PHOTO"] = "FOTO", ["NAME"] = "NOME", ["DESCRIPTION"] = "DESCRIÇÃO", ["DIMENSIONS"] = "DIMENSÕES (m)",
+                ["WIDTH"] = "LARG.", ["DEPTH"] = "PROF.", ["HEIGHT"] = "ALT.", ["QTY_UNIT"] = "QTD UNID", ["QTY_SOFA"] = "QTD SOFÁ",
+                ["TOTAL_VOLUME"] = "VOL. TOTAL M³", ["FABRIC"] = "TECIDO", ["FEET"] = "PÉS", ["FINISHING"] = "ACABAMENTO", ["OBSERVATION"] = "OBSERVAÇÃO",
+                ["TOTAL"] = "TOTAL", ["BANK_DETAILS"] = "DADOS BANCÁRIOS:", ["INTERMEDIARY_BANK"] = "BANCO INTERMEDIÁRIO:", ["BENEFICIARY_BANK"] = "BANCO BENEFICIÁRIO:",
+                ["PRODUCT_DATA"] = "DADOS GERAIS DO PRODUTO", ["VALIDITY_NOTE"] = "* Esta proforma é válida por {0} dias a partir da data de emissão.",
+                ["ORIGIN"] = "Hecho en Brasil", ["BRAND"] = "MARCA", ["REFERENCIA"] = "REFERÊNCIA", ["UNIT"] = "UNITÁRIO", ["FABRIC_N"] = "TELA N"
+            },
+            ["ES"] = new Dictionary<string, string> {
+                ["IMPORTER"] = "IMPORTADOR:", ["ADDRESS"] = "DIRECCIÓN:", ["CITY"] = "CIUDAD:", ["COUNTRY"] = "PAÍS:", 
+                ["NIT"] = "NIT:", ["PHONE"] = "TELÉFONO:", ["RESPONSIBLE"] = "RESPONSABLE:", ["EMAIL"] = "EMAIL:",
+                ["DATE"] = "FECHA:", ["ORDER_DATE"] = "PEDIDO FECHA:", ["SHIPMENT_POINT"] = "PUNTO DE EMBARQUE:", ["DESTINATION_POINT"] = "PUNTO DE DESTINO:",
+                ["DELIVERY_TIME"] = "TIEMPO DE ENTREGA:", ["INCOTERM"] = "INCOTERM:", ["PAYMENT_CONDITION"] = "CONDICIÓN DE PAGO:",
+                ["PHOTO"] = "FOTO", ["NAME"] = "NOMBRE", ["DESCRIPTION"] = "DESCRIPCIÓN", ["DIMENSIONS"] = "DIMENSIONES (m)",
+                ["WIDTH"] = "LARG.", ["DEPTH"] = "Prof.", ["HEIGHT"] = "ALT.", ["QTY_UNIT"] = "CANT UNID", ["QTY_SOFA"] = "CANT SOFA",
+                ["TOTAL_VOLUME"] = "TOTAL VOLUMEN M³", ["FABRIC"] = "TELA", ["FEET"] = "PIES", ["FINISHING"] = "ACABADO", ["OBSERVATION"] = "OBSERVACIÓN",
+                ["TOTAL"] = "TOTAL", ["BANK_DETAILS"] = "DETALLES BANCARIOS:", ["INTERMEDIARY_BANK"] = "BANCO INTERMEDIARIO:", ["BENEFICIARY_BANK"] = "BANCO BENEFICIARIO:",
+                ["PRODUCT_DATA"] = "DATOS GENERALES DEL PRODUCTO", ["VALIDITY_NOTE"] = "* Esta proforma es válida por {0} días a partir de la fecha de emisión.",
+                ["ORIGIN"] = "Hecho en Brasil", ["BRAND"] = "MARCA", ["REFERENCIA"] = "REFERENCIA", ["UNIT"] = "UNIT", ["FABRIC_N"] = "TELA N"
+            },
+            ["EN"] = new Dictionary<string, string> {
+                ["IMPORTER"] = "IMPORTER:", ["ADDRESS"] = "ADDRESS:", ["CITY"] = "CITY:", ["COUNTRY"] = "COUNTRY:", 
+                ["NIT"] = "TAX ID / VAT:", ["PHONE"] = "PHONE:", ["RESPONSIBLE"] = "RESPONSIBLE:", ["EMAIL"] = "EMAIL:",
+                ["DATE"] = "DATE:", ["ORDER_DATE"] = "ORDER DATE:", ["SHIPMENT_POINT"] = "SHIPMENT POINT:", ["DESTINATION_POINT"] = "DESTINATION POINT:",
+                ["DELIVERY_TIME"] = "DELIVERY TIME:", ["INCOTERM"] = "INCOTERM:", ["PAYMENT_CONDITION"] = "PAYMENT CONDITION:",
+                ["PHOTO"] = "PHOTO", ["NAME"] = "NAME", ["DESCRIPTION"] = "DESCRIPTION", ["DIMENSIONS"] = "DIMENSIONS (m)",
+                ["WIDTH"] = "WIDTH", ["DEPTH"] = "DEPTH", ["HEIGHT"] = "HEIGHT", ["QTY_UNIT"] = "QTY UNIT", ["QTY_SOFA"] = "QTY PIECE",
+                ["TOTAL_VOLUME"] = "TOTAL M³", ["FABRIC"] = "FABRIC", ["FEET"] = "FEET", ["FINISHING"] = "FINISHING", ["OBSERVATION"] = "OBSERVATION",
+                ["TOTAL"] = "TOTAL", ["BANK_DETAILS"] = "BANKING DETAILS:", ["INTERMEDIARY_BANK"] = "INTERMEDIARY BANK:", ["BENEFICIARY_BANK"] = "BENEFICIARY BANK:",
+                ["PRODUCT_DATA"] = "GENERAL PRODUCT DATA", ["VALIDITY_NOTE"] = "* This proforma is valid for {0} days from the date of issue.",
+                ["ORIGIN"] = "Made in Brazil", ["BRAND"] = "BRAND", ["REFERENCIA"] = "REFERENCE", ["UNIT"] = "UNIT", ["FABRIC_N"] = "FABRIC N"
+            }
+        };
+
+        var curLang = lang.ToUpper();
+        if (!dict.ContainsKey(curLang)) curLang = "PT";
+        
+        return dict[curLang].ContainsKey(key) ? dict[curLang][key] : key;
+    }
+
+    private void BuildGenericLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata, string lang)
     {
         string piNumber = GetFormattedPiNumber(pi);
         var dateObj = pi.DataPi.DateTime;
@@ -195,53 +243,53 @@ public class PiExportService
         // ═══════════════ IMPORTER & PI DETAILS GRID ═══════════════
         int gridRow = 6;
         // Importer Column (Left)
-        ws.Cells[gridRow, 1].Value = "IMPORTADOR:";
+        ws.Cells[gridRow, 1].Value = t("IMPORTER", lang);
         ws.Cells[gridRow, 1].Style.Font.Bold = true;
         ws.Cells[gridRow + 1, 1].Value = pi.Cliente?.Nome;
-        ws.Cells[gridRow + 2, 1].Value = "DIRECCIÓN: " + pi.Cliente?.Endereco;
-        ws.Cells[gridRow + 3, 1].Value = "CIUDAD: " + pi.Cliente?.Cidade;
-        ws.Cells[gridRow + 4, 1].Value = "PAÍS: " + (pi.Cliente?.Pais ?? "BRASIL");
-        ws.Cells[gridRow + 5, 1].Value = "NIT: " + pi.Cliente?.Nit;
-        ws.Cells[gridRow + 6, 1].Value = "TELÉFONO: " + pi.Cliente?.Telefone;
-        ws.Cells[gridRow + 7, 1].Value = "RESPONSABLE: " + (pi.Cliente?.PessoaContato ?? "..");
-        ws.Cells[gridRow + 8, 1].Value = "EMAIL: " + pi.Cliente?.Email;
+        ws.Cells[gridRow + 2, 1].Value = t("ADDRESS", lang) + " " + pi.Cliente?.Endereco;
+        ws.Cells[gridRow + 3, 1].Value = t("CITY", lang) + " " + pi.Cliente?.Cidade;
+        ws.Cells[gridRow + 4, 1].Value = t("COUNTRY", lang) + " " + (pi.Cliente?.Pais ?? "BRASIL");
+        ws.Cells[gridRow + 5, 1].Value = t("NIT", lang) + " " + pi.Cliente?.Nit;
+        ws.Cells[gridRow + 6, 1].Value = t("PHONE", lang) + " " + pi.Cliente?.Telefone;
+        ws.Cells[gridRow + 7, 1].Value = t("RESPONSIBLE", lang) + " " + (pi.Cliente?.PessoaContato ?? "..");
+        ws.Cells[gridRow + 8, 1].Value = t("EMAIL", lang) + " " + pi.Cliente?.Email;
 
         // PI Details Column (Right)
         int rightCol = 8;
         ws.Cells[gridRow, rightCol].Value = "PROFORMA INVOICE: " + piNumber;
         ws.Cells[gridRow, rightCol].Style.Font.Bold = true;
-        ws.Cells[gridRow + 1, rightCol].Value = "FECHA:";
+        ws.Cells[gridRow + 1, rightCol].Value = t("DATE", lang);
         ws.Cells[gridRow + 1, rightCol + 1].Value = dateObj.ToString("dd/MM/yyyy");
-        ws.Cells[gridRow + 2, rightCol].Value = "PEDIDO FECHA:";
+        ws.Cells[gridRow + 2, rightCol].Value = t("ORDER_DATE", lang);
         ws.Cells[gridRow + 2, rightCol + 1].Value = pi.DataPi.ToString("dd/MM/yyyy");
-        ws.Cells[gridRow + 3, rightCol].Value = "PUNTO DE EMBARQUE:";
+        ws.Cells[gridRow + 3, rightCol].Value = t("SHIPMENT_POINT", lang);
         ws.Cells[gridRow + 3, rightCol + 1].Value = pi.Configuracoes?.PortoEmbarque ?? "PARANAGUA";
-        ws.Cells[gridRow + 4, rightCol].Value = "PUNTO DE DESTINO:";
+        ws.Cells[gridRow + 4, rightCol].Value = t("DESTINATION_POINT", lang);
         ws.Cells[gridRow + 4, rightCol + 1].Value = pi.Cliente?.PortoDestino;
-        ws.Cells[gridRow + 5, rightCol].Value = "TIEMPO DE ENTREGA:";
-        ws.Cells[gridRow + 5, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "50 dias despues del primer pago";
-        ws.Cells[gridRow + 6, rightCol].Value = "INCOTERM:";
+        ws.Cells[gridRow + 5, rightCol].Value = t("DELIVERY_TIME", lang);
+        ws.Cells[gridRow + 5, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : (lang == "ES" ? "50 dias despues del primer pago" : (lang == "EN" ? "50 days after first payment" : "50 dias após o primeiro pagamento"));
+        ws.Cells[gridRow + 6, rightCol].Value = t("INCOTERM", lang);
         ws.Cells[gridRow + 6, rightCol + 1].Value = $"{pi.Frete?.Nome} {pi.Configuracoes?.PortoEmbarque ?? ""}";
-        ws.Cells[gridRow + 7, rightCol].Value = "CONDICIÓN DE PAGO:";
+        ws.Cells[gridRow + 7, rightCol].Value = t("PAYMENT_CONDITION", lang);
         ws.Cells[gridRow + 7, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "T/T");
         ws.Cells[gridRow, 1, gridRow + 8, 15].Style.Font.Size = 8;
 
         // ═══════════════ TABLE HEADER ═══════════════
         int startRow = 15;
-        ws.Cells[startRow, 1, startRow + 1, 1].Merge = true; ws.Cells[startRow, 1].Value = "FOTO";
-        ws.Cells[startRow, 2, startRow + 1, 2].Merge = true; ws.Cells[startRow, 2].Value = "NOMBRE";
-        ws.Cells[startRow, 3, startRow + 1, 3].Merge = true; ws.Cells[startRow, 3].Value = "DESCRIPCIÓN";
-        ws.Cells[startRow, 4, startRow, 6].Merge = true; ws.Cells[startRow, 4].Value = "DIMENSIONES (m)";
-        ws.Cells[startRow + 1, 4].Value = "LARG.";
-        ws.Cells[startRow + 1, 5].Value = "Prof.";
-        ws.Cells[startRow + 1, 6].Value = "ALT.";
-        ws.Cells[startRow, 7, startRow + 1, 7].Merge = true; ws.Cells[startRow, 7].Value = "CANT UNID";
-        ws.Cells[startRow, 8, startRow + 1, 8].Merge = true; ws.Cells[startRow, 8].Value = "CANT SOFA";
-        ws.Cells[startRow, 9, startRow + 1, 9].Merge = true; ws.Cells[startRow, 9].Value = "TOTAL VOLUMEN M³";
-        ws.Cells[startRow, 10, startRow + 1, 10].Merge = true; ws.Cells[startRow, 10].Value = "TELA";
-        ws.Cells[startRow, 11, startRow + 1, 11].Merge = true; ws.Cells[startRow, 11].Value = "PIES";
-        ws.Cells[startRow, 12, startRow + 1, 12].Merge = true; ws.Cells[startRow, 12].Value = "ACABADO";
-        ws.Cells[startRow, 13, startRow + 1, 13].Merge = true; ws.Cells[startRow, 13].Value = "OBSERVACIÓN";
+        ws.Cells[startRow, 1, startRow + 1, 1].Merge = true; ws.Cells[startRow, 1].Value = t("PHOTO", lang);
+        ws.Cells[startRow, 2, startRow + 1, 2].Merge = true; ws.Cells[startRow, 2].Value = t("NAME", lang);
+        ws.Cells[startRow, 3, startRow + 1, 3].Merge = true; ws.Cells[startRow, 3].Value = t("DESCRIPTION", lang);
+        ws.Cells[startRow, 4, startRow, 6].Merge = true; ws.Cells[startRow, 4].Value = t("DIMENSIONS", lang);
+        ws.Cells[startRow + 1, 4].Value = t("WIDTH", lang);
+        ws.Cells[startRow + 1, 5].Value = t("DEPTH", lang);
+        ws.Cells[startRow + 1, 6].Value = t("HEIGHT", lang);
+        ws.Cells[startRow, 7, startRow + 1, 7].Merge = true; ws.Cells[startRow, 7].Value = t("QTY_UNIT", lang);
+        ws.Cells[startRow, 8, startRow + 1, 8].Merge = true; ws.Cells[startRow, 8].Value = t("QTY_SOFA", lang);
+        ws.Cells[startRow, 9, startRow + 1, 9].Merge = true; ws.Cells[startRow, 9].Value = t("TOTAL_VOLUME", lang);
+        ws.Cells[startRow, 10, startRow + 1, 10].Merge = true; ws.Cells[startRow, 10].Value = t("FABRIC", lang);
+        ws.Cells[startRow, 11, startRow + 1, 11].Merge = true; ws.Cells[startRow, 11].Value = t("FEET", lang);
+        ws.Cells[startRow, 12, startRow + 1, 12].Merge = true; ws.Cells[startRow, 12].Value = t("FINISHING", lang);
+        ws.Cells[startRow, 13, startRow + 1, 13].Merge = true; ws.Cells[startRow, 13].Value = t("OBSERVATION", lang);
 
         int colIndividualEXW = 14;
         int colIndividualFreight = 15;
@@ -253,10 +301,10 @@ public class PiExportService
         ws.Cells[startRow, colIndividualEXW].Value = currency == "BRL" ? "R$" : "USD";
         
         ws.Cells[startRow, colIndividualFreight, startRow + 1, colIndividualFreight].Merge = true; 
-        ws.Cells[startRow, colIndividualFreight].Value = "FRETE";
+        ws.Cells[startRow, colIndividualFreight].Value = t("FRETE", lang);
         
         ws.Cells[startRow, colGroupUnit, startRow + 1, colGroupUnit].Merge = true; 
-        ws.Cells[startRow, colGroupUnit].Value = currency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
+        ws.Cells[startRow, colGroupUnit].Value = currency == "BRL" ? $"UNIT R$ ({t("UNIT", lang)})" : $"UNIT DOLAR ({t("UNIT", lang)})";
         
         ws.Cells[startRow, colGroupTotal, startRow + 1, colGroupTotal].Merge = true; 
         ws.Cells[startRow, colGroupTotal].Value = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
@@ -490,7 +538,7 @@ public class PiExportService
 
         // Summary Row Generic
         ws.Cells[currentRow, 1, currentRow, 6].Merge = true;
-        ws.Cells[currentRow, 1].Value = "TOTAL";
+        ws.Cells[currentRow, 1].Value = t("TOTAL", lang);
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
         ws.Cells[currentRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
         ws.Cells[currentRow, 7].Value = totalQty;
@@ -509,46 +557,46 @@ public class PiExportService
         // ═══════════════ FOOTER ═══════════════
         currentRow += 1;
         ws.Cells[currentRow, 1, currentRow + 10, 7].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        ws.Cells[currentRow, 1].Value = "DETALLES BANCARIOS: " + (metadata.Bank.Intermediary != null ? "BANCO INTERMEDIARIO" : "BANCO BENEFICIARIO");
+        ws.Cells[currentRow, 1].Value = t("BANK_DETAILS", lang) + " " + (metadata.Bank.Intermediary != null ? t("INTERMEDIARY_BANK", lang) : t("BENEFICIARY_BANK", lang));
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
         
         int offset = 1;
         if (metadata.Bank.Intermediary != null)
         {
-            ws.Cells[currentRow + offset, 1].Value = $"{metadata.Bank.Intermediary} | DIRECCIÓN: {metadata.Bank.IntermediaryAddress} | SWIFT: {metadata.Bank.IntermediarySwift}";
-            ws.Cells[currentRow + offset + 1, 1].Value = $"CUENTA: {metadata.Bank.IntermediaryAccount}";
+            ws.Cells[currentRow + offset, 1].Value = $"{metadata.Bank.Intermediary} | {t("ADDRESS", lang)} {metadata.Bank.IntermediaryAddress} | SWIFT: {metadata.Bank.IntermediarySwift}";
+            ws.Cells[currentRow + offset + 1, 1].Value = $"CUENTA/ACCOUNT: {metadata.Bank.IntermediaryAccount}";
             offset += 3;
-            ws.Cells[currentRow + offset, 1].Value = "BANCO BENEFICIARIO: " + metadata.Bank.Beneficiary;
+            ws.Cells[currentRow + offset, 1].Value = t("BENEFICIARY_BANK", lang) + " " + metadata.Bank.Beneficiary;
             ws.Cells[currentRow + offset, 1].Style.Font.Bold = true;
             offset += 1;
         }
         else
         {
-            ws.Cells[currentRow + offset, 1].Value = "BANCO BENEFICIARIO: " + metadata.Bank.Beneficiary;
+            ws.Cells[currentRow + offset, 1].Value = t("BENEFICIARY_BANK", lang) + " " + metadata.Bank.Beneficiary;
             ws.Cells[currentRow + offset, 1].Style.Font.Bold = true;
             offset += 1;
         }
         
-        ws.Cells[currentRow + offset, 1].Value = $"DIRECCIÓN: {metadata.Bank.BeneficiaryAddress} | SWIFT: {metadata.Bank.BeneficiarySwift}";
-        ws.Cells[currentRow + offset + 1, 1].Value = $"IBAN: {metadata.Bank.BeneficiaryIban} | CUENTA: {metadata.Bank.BeneficiaryAccount}";
-        ws.Cells[currentRow + offset + 2, 1].Value = "NOMBRE: " + metadata.Bank.BeneficiaryName;
+        ws.Cells[currentRow + offset, 1].Value = $"{t("ADDRESS", lang)} {metadata.Bank.BeneficiaryAddress} | SWIFT: {metadata.Bank.BeneficiarySwift}";
+        ws.Cells[currentRow + offset + 1, 1].Value = $"IBAN: {metadata.Bank.BeneficiaryIban} | CUENTA/ACCOUNT: {metadata.Bank.BeneficiaryAccount}";
+        ws.Cells[currentRow + offset + 2, 1].Value = t("NAME", lang) + ": " + metadata.Bank.BeneficiaryName;
         ws.Cells[currentRow, 1, currentRow + 10, 7].Style.Font.Size = 8;
 
         ws.Cells[currentRow, 8, currentRow + 10, totalCol].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        ws.Cells[currentRow, 8].Value = "DATOS GENERALES DEL PRODUCTO";
+        ws.Cells[currentRow, 8].Value = t("PRODUCT_DATA", lang);
         ws.Cells[currentRow, 8].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, 8].Value = "Marca: " + metadata.Brand;
+        ws.Cells[currentRow + 1, 8].Value = t("BRAND", lang) + ": " + metadata.Brand;
         ws.Cells[currentRow + 2, 8].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 3, 8].Value = "Producto: " + totalQty;
+        ws.Cells[currentRow + 3, 8].Value = lang == "EN" ? "Product: " + totalQty : "Producto: " + totalQty;
         ws.Cells[currentRow + 4, 8].Value = "CBM M³: " + totalM3.ToString("N3");
         ws.Cells[currentRow + 5, 8].Value = "P.N. TOTAL:";
         ws.Cells[currentRow + 6, 8].Value = "P.B. TOTAL:";
-        ws.Cells[currentRow + 7, 8].Value = "VOLUMEN TOTAL: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 8, 8].Value = "Productos originales de fabrica";
-        ws.Cells[currentRow + 9, 8].Value = "Hecho en Brasil";
+        ws.Cells[currentRow + 7, 8].Value = lang == "EN" ? "TOTAL VOLUME: " + totalM3.ToString("N3") : "VOLUMEN TOTAL: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 8, 8].Value = lang == "PT" ? "Produtos originais de fabrica" : (lang == "EN" ? "Original factory products" : "Productos originales de fabrica");
+        ws.Cells[currentRow + 9, 8].Value = t("ORIGIN", lang);
         
         ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
-        ws.Cells[currentRow + 11, 1].Value = $"* Esta proforma es válida por {validity} días a partir de la fecha de emisión.";
+        ws.Cells[currentRow + 11, 1].Value = string.Format(t("VALIDITY_NOTE", lang), validity);
         ws.Cells[currentRow + 11, 1].Style.Font.Italic = true;
         ws.Cells[currentRow + 11, 1].Style.Font.Size = 8;
 
@@ -572,45 +620,49 @@ public class PiExportService
         ws.Cells["A1"].Style.Font.Bold = true;
         ws.Cells["A1"].Style.Font.Size = 13;
         
-        ws.Cells["A2"].Value = "CNPJ: " + metadata.Cnpj;
-        ws.Cells["A3"].Value = "DIRECCIÓN: " + metadata.Address;
-        ws.Cells["A5"].Value = "CÓDIGO POSTAL: " + metadata.Zip + " - " + metadata.City + " - " + metadata.State;
-        ws.Cells["A6"].Value = "PAÍS: " + metadata.Country;
-        ws.Cells["A7"].Value = "TIEMPO DE ENTREGA: " + (!string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "60 dias");
-        ws.Cells["A8"].Value = "INCOTERM: " + pi.Frete?.Nome + " - ARAPONGAS PR";
-        ws.Cells["A9"].Value = "CONDICIÓN DE PAGO: " + (!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA"));
+        ws.Cells["A2"].Value = t("NIT", lang) + " " + metadata.Cnpj;
+        ws.Cells["A3"].Value = t("ADDRESS", lang) + " " + metadata.Address;
+        ws.Cells["A5"].Value = (lang == "ES" ? "CÓDIGO POSTAL: " : (lang == "EN" ? "ZIP CODE: " : "CEP: ")) + metadata.Zip + " - " + metadata.City + " - " + metadata.State;
+        ws.Cells["A6"].Value = t("COUNTRY", lang) + " " + metadata.Country;
+        ws.Cells["A7"].Value = t("DELIVERY_TIME", lang) + " " + (!string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "60 dias");
+        ws.Cells["A8"].Value = t("INCOTERM", lang) + " " + pi.Frete?.Nome + " - ARAPONGAS PR";
+        ws.Cells["A9"].Value = t("PAYMENT_CONDITION", lang) + " " + (!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA"));
         ws.Cells["A10"].Value = "";
 
 
         ws.Cells["H1:N9"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
         ws.Cells["H1"].Value = "PROFORMA INVOICE: " + piNumber;
         ws.Cells["H1"].Style.Font.Bold = true;
-        ws.Cells["H2"].Value = "FECHA: " + dateObj.ToString("dd/MM/yyyy");
-        ws.Cells["H3"].Value = "PEDIDO FECHA: " + dateObj.ToString("dd/MM/yyyy");
-        ws.Cells["H4"].Value = "IMPORTADOR:";
+        ws.Cells["H2"].Value = t("DATE", lang) + " " + dateObj.ToString("dd/MM/yyyy");
+        ws.Cells["H3"].Value = t("ORDER_DATE", lang) + " " + dateObj.ToString("dd/MM/yyyy");
+        ws.Cells["H4"].Value = t("IMPORTER", lang);
         ws.Cells["H4"].Style.Font.Bold = true;
         ws.Cells["H5"].Value = pi.Cliente?.Nome;
-        ws.Cells["H6"].Value = "DIRECCIÓN: " + pi.Cliente?.Endereco + (string.IsNullOrEmpty(pi.Cliente?.Cidade) ? "" : ", " + pi.Cliente.Cidade);
-        ws.Cells["H7"].Value = "CÓDIGO POSTAL: " + pi.Cliente?.Cep;
-        ws.Cells["H8"].Value = "NIT: " + pi.Cliente?.Nit;
-        ws.Cells["H9"].Value = "RESPONSABLE: " + (pi.Cliente?.PessoaContato ?? "..");
+        ws.Cells["H6"].Value = t("ADDRESS", lang) + " " + pi.Cliente?.Endereco + (string.IsNullOrEmpty(pi.Cliente?.Cidade) ? "" : ", " + pi.Cliente.Cidade);
+        ws.Cells["H7"].Value = (lang == "ES" ? "CÓDIGO POSTAL: " : (lang == "EN" ? "ZIP CODE: " : "CEP: ")) + pi.Cliente?.Cep;
+        ws.Cells["H8"].Value = t("NIT", lang) + " " + pi.Cliente?.Nit;
+        ws.Cells["H9"].Value = t("RESPONSIBLE", lang) + " " + (pi.Cliente?.PessoaContato ?? "..");
         ws.Cells[1, 1, 10, 14].Style.Font.Size = 8;
 
         // ═══════════════ TABLE ═══════════════
         int startRow = 10;
         string currentCurrency = currency?.Trim().ToUpper() ?? "EXW";
-        string unitLabel = currentCurrency == "BRL" ? "UNIT R$" : "UNIT DOLAR";
-        string totalLabel = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
+        string unitLabel = currentCurrency == "BRL" ? $"UNIT R$ ({t("UNIT", lang)})" : $"UNIT DOLAR ({t("UNIT", lang)})";
+        string totalLabel = currentCurrency == "BRL" ? "TOTAL R$" : "TOTAL USD";
         
         bool showFreight = true; // Always show in Excel as requested
         int unitCol = 13;
         int totalCol = 14;
 
-        List<string> headerList = new List<string> { "FOTO", "REFERENCIA", "DESCRIPCIÓN", "MARCA", "LARG.", "ALT.", "PROF.", "CANT.", "TOTAL M3", "FABRIC", "TELA N", "OBSERVACIÓN" };
+        List<string> headerList = new List<string> { 
+            t("PHOTO", lang), t("REFERENCIA", lang), t("DESCRIPTION", lang), t("BRAND", lang), 
+            t("WIDTH", lang), t("HEIGHT", lang), t("DEPTH", lang), t("QTY_UNIT", lang).Replace(" UNID", ""), 
+            t("TOTAL_VOLUME", lang), t("FABRIC", lang), t("FABRIC_N", lang), t("OBSERVATION", lang) 
+        };
         
         if (showFreight)
         {
-            headerList.Add("FRETE");
+            headerList.Add(t("FRETE", lang));
             unitCol = 14;
             totalCol = 15;
         }
@@ -715,7 +767,7 @@ public class PiExportService
 
         // Summary Row Ferguile
         ws.Cells[currentRow, 1, currentRow, 7].Merge = true;
-        ws.Cells[currentRow, 1].Value = "TOTAL";
+        ws.Cells[currentRow, 1].Value = t("TOTAL", lang);
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
         ws.Cells[currentRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
         ws.Cells[currentRow, 8].Value = totalQty;
@@ -739,33 +791,33 @@ public class PiExportService
         footerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
         
         // Accounting Details (Left)
-        ws.Cells[currentRow, 1].Value = "DETALLES BANCARIOS:";
+        ws.Cells[currentRow, 1].Value = t("BANK_DETAILS", lang);
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, 1].Value = "Beneficiario: " + metadata.Bank.BeneficiaryName;
-        ws.Cells[currentRow + 2, 1].Value = "CNPJ: " + metadata.Cnpj;
-        ws.Cells[currentRow + 3, 1].Value = "BANCO: " + metadata.Bank.Beneficiary;
-        ws.Cells[currentRow + 4, 1].Value = "CUENTA BENEFICIARIA: " + metadata.Bank.BeneficiaryAccount;
-        ws.Cells[currentRow + 5, 1].Value = "CÓDIGO IBAN: " + metadata.Bank.BeneficiaryIban;
-        ws.Cells[currentRow + 6, 1].Value = "CÓDIGO SWIFT: " + metadata.Bank.BeneficiarySwift;
+        ws.Cells[currentRow + 1, 1].Value = t("NAME", lang) + ": " + metadata.Bank.BeneficiaryName;
+        ws.Cells[currentRow + 2, 1].Value = t("NIT", lang) + " " + metadata.Cnpj;
+        ws.Cells[currentRow + 3, 1].Value = (lang == "EN" ? "BANK: " : "BANCO: ") + metadata.Bank.Beneficiary;
+        ws.Cells[currentRow + 4, 1].Value = (lang == "EN" ? "BENEFICIARY ACCOUNT: " : "CUENTA BENEFICIARIA: ") + metadata.Bank.BeneficiaryAccount;
+        ws.Cells[currentRow + 5, 1].Value = "IBAN: " + metadata.Bank.BeneficiaryIban;
+        ws.Cells[currentRow + 6, 1].Value = "SWIFT: " + metadata.Bank.BeneficiarySwift;
 
 
         // Product Data (Right)
         int rightCol = 8;
 
-        ws.Cells[currentRow, rightCol].Value = "DATOS GENERALES DEL PRODUCTO";
+        ws.Cells[currentRow, rightCol].Value = t("PRODUCT_DATA", lang);
         ws.Cells[currentRow, rightCol].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, rightCol].Value = "Marca: " + metadata.Brand;
+        ws.Cells[currentRow + 1, rightCol].Value = t("BRAND", lang) + ": " + metadata.Brand;
         ws.Cells[currentRow + 2, rightCol].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 3, rightCol].Value = "Producto: " + totalQty;
+        ws.Cells[currentRow + 3, rightCol].Value = lang == "EN" ? "Product: " + totalQty : "Producto: " + totalQty;
         ws.Cells[currentRow + 4, rightCol].Value = "CBM M³: " + totalM3.ToString("N3");
         ws.Cells[currentRow + 5, rightCol].Value = "P.N. TOTAL:";
         ws.Cells[currentRow + 6, rightCol].Value = "P.B. TOTAL:";
-        ws.Cells[currentRow + 7, rightCol].Value = "VOLUMEN TOTAL: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 8, rightCol].Value = "Productos originales de fabrica";
-        ws.Cells[currentRow + 9, rightCol].Value = "Hecho en Brasil";
+        ws.Cells[currentRow + 7, rightCol].Value = lang == "EN" ? "TOTAL VOLUME: " + totalM3.ToString("N3") : "VOLUMEN TOTAL: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 8, rightCol].Value = lang == "PT" ? "Produtos originais de fabrica" : (lang == "EN" ? "Original factory products" : "Productos originales de fabrica");
+        ws.Cells[currentRow + 9, rightCol].Value = t("ORIGIN", lang);
 
         ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
-        ws.Cells[currentRow + 11, 1].Value = $"* Esta proforma es válida por {validity} días a partir de la fecha de emisión.";
+        ws.Cells[currentRow + 11, 1].Value = string.Format(t("VALIDITY_NOTE", lang), validity);
         ws.Cells[currentRow + 11, 1].Style.Font.Italic = true;
         ws.Cells[currentRow + 11, 1].Style.Font.Size = 8;
         

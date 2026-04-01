@@ -31,10 +31,10 @@ export async function deletePi(id: number) {
   return apiDelete(`/api/pis/${id}`);
 }
 
-export async function exportPiExcel(id: number, currency = "EXW", validity = 30) {
-  const res = await fetch(`${API_BASE}/api/pis/${id}/excel?currency=${currency}&validity=${validity}`, {
+export async function exportPiExcel(id: number, currency = "EXW", validity = 30, lang = "PT") {
+  const res = await fetch(`${API_BASE}/api/pis/${id}/excel?currency=${currency}&validity=${validity}&lang=${lang}`, {
     headers: {
-        // Add auth if needed, but current api.ts seems to use simple fetch wrappers
+        // Add auth if needed
     }
   });
   if (!res.ok) throw new Error("Falha ao exportar Excel");

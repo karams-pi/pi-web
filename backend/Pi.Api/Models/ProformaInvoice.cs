@@ -64,6 +64,10 @@ public class ProformaInvoice
     [MaxLength(100)]
     public string? CondicaoPagamento { get; set; }
 
+    [Column("idioma")]
+    [MaxLength(10)]
+    public string? Idioma { get; set; } = "PT";
+
     // Navigation
     [Column("id_fornecedor")]
     public long? IdFornecedor { get; set; }

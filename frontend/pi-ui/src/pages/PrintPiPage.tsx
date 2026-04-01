@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
 import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
@@ -19,6 +19,40 @@ export default function PrintPiPage() {
     return new URLSearchParams(searchPart || window.location.search);
   }, []);
   const currency = (urlParams.get("currency") as "BRL" | "EXW") || "EXW";
+  const lang = (urlParams.get("lang") || "PT").toUpperCase();
+
+  const t = useCallback((key: string) => {
+    const dicts: Record<string, Record<string, string>> = {
+      PT: {
+        IMPORTER: "IMPORTADOR:", ADDRESS: "ENDEREÇO:", CITY: "CIDADE:", COUNTRY: "PAÍS:", NIT: "CNPJ:", PHONE: "TELEFONE:", RESPONSIBLE: "RESPONSÁVEL:", EMAIL: "EMAIL:",
+        DATE: "DATA:", ORDER_DATE: "DATA PEDIDO:", SHIPMENT_POINT: "PONTO DE EMBARQUE:", DESTINATION_POINT: "PONTO DE DESTINO:", DELIVERY_TIME: "TEMPO DE ENTREGA:",
+        INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "CONDIÇÃO DE PAGAMENTO:", PHOTO: "FOTO", NAME: "NOME", DESCRIPTION: "DESCRIÇÃO", DIMENSIONS: "DIMENSÕES (m)",
+        WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "QTD UNID", QTY_SOFA: "QTD SOFÁ", TOTAL_VOLUME: "VOL. TOTAL M³", FABRIC: "TECIDO", FEET: "PÉS",
+        FINISHING: "ACABAMENTO", OBSERVATION: "OBSERVAÇÃO", TOTAL: "TOTAL", BANK_DETAILS: "DADOS BANCÁRIOS:", INTERMEDIARY_BANK: "BANCO INTERMEDIÁRIO",
+        BENEFICIARY_BANK: "BANCO BENEFICIÁRIO", PRODUCT_DATA: "DADOS GERAIS DO PRODUTO", VALIDITY_NOTE: "* Esta proforma é válida por {0} dias a partir da data de emissão.",
+        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Produto", LOADING: "Carregando documento..."
+      },
+      ES: {
+        IMPORTER: "IMPORTADOR:", ADDRESS: "DIRECCIÓN:", CITY: "CIUDAD:", COUNTRY: "PAÍS:", NIT: "NIT:", PHONE: "TELÉFONO:", RESPONSIBLE: "RESPONSABLE:", EMAIL: "EMAIL:",
+        DATE: "FECHA:", ORDER_DATE: "PEDIDO FECHA:", SHIPMENT_POINT: "PUNTO DE EMBARQUE:", DESTINATION_POINT: "PUNTO DE DESTINO:", DELIVERY_TIME: "TIEMPO DE ENTREGA:",
+        INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "CONDICIÓN DE PAGO:", PHOTO: "FOTO", NAME: "NOMBRE", DESCRIPTION: "DESCRIPCIÓN", DIMENSIONS: "DIMENSIONES (m)",
+        WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "CANT UNID", QTY_SOFA: "CANT SOFA", TOTAL_VOLUME: "TOTAL VOLUMEN M³", FABRIC: "TELA", FEET: "PIES",
+        FINISHING: "ACABADO", OBSERVATION: "OBSERVACIÓN", TOTAL: "TOTAL", BANK_DETAILS: "DETALLES BANCARIOS:", INTERMEDIARY_BANK: "BANCO INTERMEDIARIO",
+        BENEFICIARY_BANK: "BANCO BENEFICIARIO", PRODUCT_DATA: "DATOS GENERALES DEL PRODUCTO", VALIDITY_NOTE: "* Esta proforma es válida por {0} días a partir de la fecha de emisión.",
+        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Producto", LOADING: "Cargando documento..."
+      },
+      EN: {
+        IMPORTER: "IMPORTER:", ADDRESS: "ADDRESS:", CITY: "CITY:", COUNTRY: "COUNTRY:", NIT: "TAX ID / VAT:", PHONE: "PHONE:", RESPONSIBLE: "RESPONSIBLE:", EMAIL: "EMAIL:",
+        DATE: "DATE:", ORDER_DATE: "ORDER DATE:", SHIPMENT_POINT: "SHIPMENT POINT:", DESTINATION_POINT: "DESTINATION POINT:", DELIVERY_TIME: "DELIVERY TIME:",
+        INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "PAYMENT CONDITION:", PHOTO: "PHOTO", NAME: "NAME", DESCRIPTION: "DESCRIPTION", DIMENSIONS: "DIMENSIONS (m)",
+        WIDTH: "WIDTH", DEPTH: "DEPTH", HEIGHT: "HEIGHT", QTY_UNIT: "QTY UNIT", QTY_SOFA: "QTY PIECE", TOTAL_VOLUME: "TOTAL VOLUME M³", FABRIC: "FABRIC", FEET: "FEET",
+        FINISHING: "FINISHING", OBSERVATION: "OBSERVATION", TOTAL: "TOTAL", BANK_DETAILS: "BANKING DETAILS:", INTERMEDIARY_BANK: "INTERMEDIARY BANK",
+        BENEFICIARY_BANK: "BENEFICIARY BANK", PRODUCT_DATA: "GENERAL PRODUCT DATA", VALIDITY_NOTE: "* This proforma is valid for {0} days from the date of issue.",
+        ORIGIN: "Made in Brazil", BRAND: "Brand", PRODUCT: "Product", LOADING: "Loading document..."
+      }
+    };
+    return dicts[lang]?.[key] || key;
+  }, [lang]);
 
   useEffect(() => {
     async function load() {
@@ -221,8 +255,8 @@ export default function PrintPiPage() {
     return base;
   }, [pi, dateObj]);
 
-  if (loading) return <div style={{ padding: 20 }}>Cargando documento...</div>;
-  if (!pi) return <div style={{ padding: 20 }}>Documento no encontrado.</div>;
+  if (loading) return <div style={{ padding: 20 }}>{t("LOADING")}</div>;
+  if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
   return (
     <div className="print-container" style={{ padding: 40, fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", maxWidth: "1100px", margin: "0 auto" }}>
@@ -312,35 +346,35 @@ export default function PrintPiPage() {
       <div className="print-header-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "20px" }}>
           {/* Left: Importer */}
           <div style={{ paddingRight: "10px", fontSize: "11px", lineHeight: "1.4em" }}>
-              <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>IMPORTADOR:</div>
+              <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>{t("IMPORTER")}</div>
               <div style={{ textTransform: "uppercase" }}>{displayClient?.nome || (pi as any).cliente?.nome}</div>
               
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>DIRECCIÓN:</span>
+                  <span style={{ width: "80px" }}>{t("ADDRESS")}</span>
                   <span>{displayClient?.endereco || (pi as any).cliente?.endereco}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>CIUDAD:</span>
+                  <span style={{ width: "80px" }}>{t("CITY")}</span>
                   <span>{displayClient?.cidade || (pi as any).cliente?.cidade}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>PAÍS:</span>
-                  <span>{displayClient?.pais || (pi as any).cliente?.pais}</span>
+                  <span style={{ width: "80px" }}>{t("COUNTRY")}</span>
+                  <span>{displayClient?.pais || (pi as any).cliente?.pais || "BRASIL"}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>NIT:</span>
+                  <span style={{ width: "80px" }}>{t("NIT")}</span>
                   <span>{displayClient?.nit || (pi as any).cliente?.nit || ""}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>TELÉFONO:</span>
+                  <span style={{ width: "80px" }}>{t("PHONE")}</span>
                   <span>{displayClient?.telefone || (pi as any).cliente?.telefone}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>RESPONSABLE:</span>
+                  <span style={{ width: "80px" }}>{t("RESPONSIBLE")}</span>
                   <span>{displayClient?.pessoaContato || (pi as any).cliente?.pessoaContato || ".."}</span>
               </div>
               <div style={{ display: "flex" }}>
-                  <span style={{ width: "70px" }}>EMAIL:</span>
+                  <span style={{ width: "80px" }}>{t("EMAIL")}</span>
                   <span>{displayClient?.email || (pi as any).cliente?.email}</span>
               </div>
           </div>
@@ -350,7 +384,7 @@ export default function PrintPiPage() {
                <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>PROFORMA INVOICE: {formattedPiNumber}</div>
                
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>FECHA:</span>
+                   <span>{t("DATE")}</span>
                    <span>{dateObj.toLocaleDateString("pt-BR")}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -358,27 +392,27 @@ export default function PrintPiPage() {
                    <span>{formattedPiNumber}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>PEDIDO FECHA:</span>
+                   <span>{t("ORDER_DATE")}</span>
                    <span>{new Date(pi.dataPi).toLocaleDateString("pt-BR")}</span> 
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>PUNTO DE EMBARQUE:</span>
+                   <span style={{ width: "130px" }}>{t("SHIPMENT_POINT")}</span>
                    <span>{pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || "PARANAGUA"}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>PUNTO DE DESTINO:</span>
+                   <span style={{ width: "130px" }}>{t("DESTINATION_POINT")}</span>
                    <span>{displayClient?.portoDestino || pi.cliente?.portoDestino || ""}</span>
                </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>TIEMPO DE ENTREGA:</span>
-                   <span>{pi.tempoEntrega || "50 dias despues del primer pago"}</span>
+                   <span style={{ width: "130px" }}>{t("DELIVERY_TIME")}</span>
+                   <span>{pi.tempoEntrega || (lang === "ES" ? "50 dias despues del primer pago" : (lang === "EN" ? "50 days after first payment" : "50 dias após o primeiro pagamento"))}</span>
                </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ width: "130px" }}>INCOTERM:</span>
+                    <span style={{ width: "130px" }}>{t("INCOTERM")}</span>
                     <span>{incoterm} {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || ""}</span>
                 </div>
                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>CONDICIÓN DE PAGO:</span>
+                   <span style={{ width: "130px" }}>{t("PAYMENT_CONDITION")}</span>
                    <span>{pi.condicaoPagamento || pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
                </div>
           </div>
@@ -394,25 +428,25 @@ export default function PrintPiPage() {
         <table className="print-table" style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", fontSize: "10px" }}>
           <thead style={{ background: "#1a2e44", color: "white", textTransform: "uppercase" }}>
             <tr>
-              <th rowSpan={2} style={{ width: "10%" }}>FOTO</th>
-              <th rowSpan={2} style={{ width: "10%" }}>NOMBRE</th>
-              <th rowSpan={2} style={{ width: "25%" }}>DESCRIPCIÓN</th>
-              <th colSpan={3}>DIMENSIONES (m)</th>
-              <th rowSpan={2} style={{ width: "5%" }}>CANT UNID</th>
-              <th rowSpan={2} style={{ width: "5%" }}>CANT SOFA</th>
-              <th rowSpan={2} style={{ width: "5%" }}>TOTAL VOLUME M³</th>
-              <th rowSpan={2} style={{ width: "10%" }}>TELA</th>
-              <th rowSpan={2} style={{ width: "10%" }}>PIES</th>
-               <th rowSpan={2} style={{ width: "10%" }}>ACABADO</th>
-               <th rowSpan={2} style={{ width: "10%" }}>OBSERVACIÓN</th>
+              <th rowSpan={2} style={{ width: "10%" }}>{t("PHOTO")}</th>
+              <th rowSpan={2} style={{ width: "10%" }}>{t("NAME")}</th>
+              <th rowSpan={2} style={{ width: "25%" }}>{t("DESCRIPTION")}</th>
+              <th colSpan={3}>{t("DIMENSIONS")}</th>
+              <th rowSpan={2} style={{ width: "5%" }}>{t("QTY_UNIT")}</th>
+              <th rowSpan={2} style={{ width: "5%" }}>{t("QTY_SOFA")}</th>
+              <th rowSpan={2} style={{ width: "5%" }}>{t("TOTAL_VOLUME")}</th>
+              <th rowSpan={2} style={{ width: "10%" }}>{t("FABRIC")}</th>
+              <th rowSpan={2} style={{ width: "10%" }}>{t("FEET")}</th>
+               <th rowSpan={2} style={{ width: "10%" }}>{t("FINISHING")}</th>
+               <th rowSpan={2} style={{ width: "10%" }}>{t("OBSERVATION")}</th>
                <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "R$" : "USD"}</th>
                <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "UNIT R$" : "UNIT DOLAR"}</th>
                <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
             </tr>
             <tr>
-               <th style={{ width: "5%" }}>LARG.</th>
-               <th style={{ width: "5%" }}>PROF.</th>
-               <th style={{ width: "5%" }}>ALT.</th>
+               <th style={{ width: "5%" }}>{t("WIDTH")}</th>
+               <th style={{ width: "5%" }}>{t("DEPTH")}</th>
+               <th style={{ width: "5%" }}>{t("HEIGHT")}</th>
             </tr>
           </thead>
           <tbody>
@@ -567,11 +601,11 @@ export default function PrintPiPage() {
           </tbody>
           <tfoot>
             <tr style={{ fontWeight: "bold", background: "#f8fafc" }}>
-              <td colSpan={6} style={{ border: "1px solid #000", textAlign: "right", padding: "4px 8px" }}>TOTAL</td>
+              <td colSpan={6} style={{ border: "1px solid #000", textAlign: "right", padding: "4px 8px" }}>{t("TOTAL")}</td>
               <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalQty}</td>
               <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalSofaQty}</td>
               <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3(processedData.totalM3)}</td>
-              <td colSpan={5} style={{ border: "1px solid #000" }}></td>
+              <td colSpan={4} style={{ border: "1px solid #000" }}></td>
               <td style={{ border: "1px solid #000", textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2", fontWeight: "bold" }}>
                 {currency === "BRL" ? "R$" : "$"} {fmt(processedData.totalValue)}
               </td>
@@ -580,47 +614,42 @@ export default function PrintPiPage() {
         </table>
       </div>
 
-
-
-
-
       <div className="footer-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid #000", marginTop: 20 }}>
           <div className="footer-col bank-details" style={{ padding: 10, borderRight: "1px solid #000" }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DETALLES BANCARIOS: {supplierMetadata.bankDetails.intermediary ? "BANCO INTERMEDIARIO" : "BANCO BENEFICIARIO"}</h3>
+              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>{t("BANK_DETAILS")} {supplierMetadata.bankDetails.intermediary ? t("INTERMEDIARY_BANK") : t("BENEFICIARY_BANK")}</h3>
               {supplierMetadata.bankDetails.intermediary && (
                 <>
                   <p>{supplierMetadata.bankDetails.intermediary}</p>
-                  <p>DIRECCIÓN: {supplierMetadata.bankDetails.intermediaryAddress}</p>
+                  <p>{t("ADDRESS")} {supplierMetadata.bankDetails.intermediaryAddress}</p>
                   <p>SWIFT CODE: {supplierMetadata.bankDetails.intermediarySwift}</p>
-                  <p>CUENTA: {supplierMetadata.bankDetails.intermediaryAccount}</p>
-                  <p style={{ marginTop: 10 }}><strong>BANCO BENEFICIARIO:</strong></p>
+                  <p>CUENTA/ACCOUNT: {supplierMetadata.bankDetails.intermediaryAccount}</p>
+                  <p style={{ marginTop: 10 }}><strong>{t("BENEFICIARY_BANK")}:</strong></p>
                 </>
               )}
               <p>{supplierMetadata.bankDetails.beneficiary}</p>
-              {supplierMetadata.bankDetails.beneficiaryAddress && <p>DIRECCIÓN: {supplierMetadata.bankDetails.beneficiaryAddress}</p>}
+              {supplierMetadata.bankDetails.beneficiaryAddress && <p>{t("ADDRESS")} {supplierMetadata.bankDetails.beneficiaryAddress}</p>}
               <p>SWIFT CODE: {supplierMetadata.bankDetails.beneficiarySwift}</p>
               {supplierMetadata.bankDetails.beneficiaryIban && <p>IBAN: {supplierMetadata.bankDetails.beneficiaryIban}</p>}
-              <p>CUENTA: {supplierMetadata.bankDetails.beneficiaryAccount}</p>
-              <p>NOMBRE: {supplierMetadata.bankDetails.beneficiaryName}</p>
+              <p>CUENTA/ACCOUNT: {supplierMetadata.bankDetails.beneficiaryAccount}</p>
+              <p>{t("NAME")}: {supplierMetadata.bankDetails.beneficiaryName}</p>
           </div>
           <div className="footer-col" style={{ padding: 10 }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>DATOS GENERALES DEL PRODUCTO</h3>
-              <p><strong>Marca:</strong> {supplierMetadata.details.brand}</p>
+              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>{t("PRODUCT_DATA")}</h3>
+              <p><strong>{t("BRAND")}:</strong> {supplierMetadata.details.brand}</p>
               <p><strong>NCM:</strong> {supplierMetadata.details.ncm || "94016100"}</p>
-              <p><strong>Producto:</strong> {fmt(processedData.totalQty, 0)}</p>
+              <p><strong>{t("PRODUCT")}:</strong> {fmt(processedData.totalQty, 0)}</p>
               <p><strong>CBM M³:</strong> {fmt3(processedData.totalM3)}</p>
               <p><strong>P.N. TOTAL:</strong></p>
               <p><strong>P.B. TOTAL:</strong></p>
-              <p><strong>VOLUMEN TOTAL:</strong> {fmt3(processedData.totalM3)}</p>
-              <p><strong>Productos originales de fabrica</strong></p>
-              <p><strong>Hecho en Brasil</strong></p>
+              <p><strong>{lang === "EN" ? "TOTAL VOLUME:" : "VOLUMEN TOTAL:"}</strong> {fmt3(processedData.totalM3)}</p>
+              <p><strong>{lang === "PT" ? "Produtos originais de fabrica" : (lang === "EN" ? "Original factory products" : "Productos originales de fabrica")}</strong></p>
+              <p><strong>{t("ORIGIN")}</strong></p>
               <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>
-                * Esta proforma es válida por {urlParams.get("validity") || 30} días a partir de la fecha de emisión.
+                {t("VALIDITY_NOTE").replace("{0}", urlParams.get("validity") || "30")}
               </p>
           </div>
       </div>
 
-    
       <div style={{ marginTop: 40, borderTop: "1px solid #000", paddingTop: 10, textAlign: "center", fontSize: 10 }} className="no-print">
         Visualização de Impressão - Sistema PI Web
       </div>
