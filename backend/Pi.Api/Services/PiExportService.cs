@@ -478,22 +478,17 @@ public class PiExportService
                 // Individual Values per row
                 decimal freightUnit = (currency == "BRL" ? itemFreightBRL[item.Id] : itemFreightUSD[item.Id]);
 
-                decimal rowUnitEXW = item.ValorEXW;
-                if (currency == "BRL") rowUnitEXW *= (decimal)pi.CotacaoRisco;
+                decimal unitPriceBase = item.ValorEXW;
+                if (currency == "BRL") unitPriceBase *= (decimal)pi.CotacaoRisco;
                 
-                decimal rowFreight = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                    ? freightUnit * item.Quantidade 
-                    : freightUnit;
-                
-                rowUnitEXW += rowFreight;
+                decimal rowFreight = freightUnit * item.Quantidade;
+                decimal rowUnitEXW = (unitPriceBase + rowFreight) * item.Quantidade;
                 
                 ws.Cells[currentRow, colIndividualEXW].Value = rowUnitEXW;
                 ws.Cells[currentRow, colIndividualEXW].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 ws.Cells[currentRow, colIndividualEXW].Style.Numberformat.Format = "#,##0.00";
 
-                ws.Cells[currentRow, colIndividualFreight].Value = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                    ? freightUnit * item.Quantidade 
-                    : freightUnit;
+                ws.Cells[currentRow, colIndividualFreight].Value = freightUnit * item.Quantidade;
                 ws.Cells[currentRow, colIndividualFreight].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 ws.Cells[currentRow, colIndividualFreight].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 ws.Cells[currentRow, colIndividualFreight].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(254, 252, 232));
@@ -516,9 +511,7 @@ public class PiExportService
                         fabricGroupUnit += mUnitEXW;
 
                         decimal mFreight = (currency == "BRL" ? itemFreightBRL[m.Id] : itemFreightUSD[m.Id]);
-                        decimal mRowFreight = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                            ? mFreight * m.Quantidade 
-                            : mFreight;
+                        decimal mRowFreight = mFreight * m.Quantidade;
 
                         fabricGroupTotalValue += (mUnitEXW * m.Quantidade) + mRowFreight;
                     }
@@ -582,9 +575,7 @@ public class PiExportService
             ws.Cells[currentRow, 1].Style.Font.Bold = true;
             ws.Cells[currentRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
             
-            ws.Cells[currentRow, 14].Value = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                ? (decimal)pi.ValorTotalFreteBRL / (currency == "BRL" ? 1 : (decimal)pi.CotacaoRisco)
-                : (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
+            ws.Cells[currentRow, 14].Value = (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
 
             ws.Cells[currentRow, 17].Value = totalValue;
             ws.Cells[currentRow, 14, currentRow, 17].Style.Font.Bold = true;
@@ -853,9 +844,7 @@ public class PiExportService
 
                 if (showFreight)
                 {
-                    ws.Cells[currentRow, 13].Value = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                        ? freightUnit * item.Quantidade 
-                        : freightUnit;
+                    ws.Cells[currentRow, 13].Value = freightUnit * item.Quantidade;
                     ws.Cells[currentRow, 13].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
@@ -863,12 +852,10 @@ public class PiExportService
                     ? item.ValorEXW * (decimal)pi.CotacaoRisco
                     : item.ValorEXW;
                 
-                decimal rowFreight = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                    ? freightUnit * item.Quantidade 
-                    : freightUnit;
+                decimal rowFreight = freightUnit * item.Quantidade;
 
-                decimal unitPriceDisplay = unitPriceBase + rowFreight;
-                decimal totalPrice = (unitPriceBase * item.Quantidade) + rowFreight;
+                decimal unitPriceDisplay = (unitPriceBase + rowFreight) * item.Quantidade;
+                decimal totalPrice = unitPriceDisplay;
 
                 ws.Cells[currentRow, unitCol].Value = unitPriceDisplay;
                 ws.Cells[currentRow, totalCol].Value = totalPrice;
@@ -910,9 +897,7 @@ public class PiExportService
         
         if (showFreight)
         {
-            ws.Cells[currentRow, 13].Value = string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase) 
-                ? (decimal)pi.ValorTotalFreteBRL / (currency == "BRL" ? 1 : (decimal)pi.CotacaoRisco)
-                : (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
+            ws.Cells[currentRow, 13].Value = (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
         }
 
         ws.Cells[currentRow, totalCol].Value = totalValue;

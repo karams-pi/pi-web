@@ -139,31 +139,25 @@ export default function ProformaInvoiceV2Page() {
 
       case "exwUnit": {
         if (!item) return "";
-        const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
-        const valTec = mt?.valorTecido || 0;
-        return `Cálculo EXW: (${valTec.toFixed(2)} / ${risk.toFixed(2)}) + ${com}% (Comissão) + ${gor}% (Margem) = ${item.ValorEXW.toFixed(2)}`;
+        const uEXW = item.ValorEXW;
+        const rowFre = item.ValorFreteRateadoUSD * item.quantidade;
+        return `Cálculo: (Unit EXW: ${uEXW.toFixed(2)} + Frete Linha: ${rowFre.toFixed(2)}) * Qtd: ${item.quantidade} = ${((uEXW + rowFre) * item.quantidade).toFixed(2)}`;
       }
 
       case "freteUnit": {
         if (!item) return "";
+        const rowF = item.ValorFreteRateadoUSD * item.quantidade;
         if (form.tipoRateio === "IGUAL") {
-          const rowShare = form.valorTotalFreteUSD / itens.length;
-          return `Cálculo Rateio (POR IGUAL): Total USD $ ${form.valorTotalFreteUSD.toFixed(2)} / ${itens.length} módulos = $ ${rowShare.toFixed(2)} por módulo.`;
+          return `Cálculo Rateio (POR IGUAL): Total USD $ ${form.valorTotalFreteUSD.toFixed(2)} / ${itens.length} módulos = $ ${rowF.toFixed(2)} por módulo.`;
         }
-        return `Cálculo Rateio (POR VOLUME): (Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) * M³ Item ${item.m3.toFixed(3)} = ${item.ValorFreteRateadoUSD.toFixed(2)}`;
+        return `Cálculo Rateio (POR VOLUME): (Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) * M³ Modulo ${ (item.m3 * item.quantidade).toFixed(3)} = ${rowF.toFixed(2)} por módulo.`;
       }
 
       case "usdUnit": {
-        if (group && !isFerguile) {
-          const lines = group.items.map((it: ItemGrid) => {
-            const rowF = form.tipoRateio === "IGUAL" ? (it.ValorFreteRateadoUSD * it.quantidade) : it.ValorFreteRateadoUSD;
-            return `$ ${(it.ValorEXW + rowF).toFixed(2)}`;
-          }).join(" + ");
-          return `Soma do Grupo: ${lines} = $ ${group.totalUsdUnit.toFixed(2)}`;
-        }
         if (!item) return "";
-        const fValue = form.tipoRateio === "IGUAL" ? (item.ValorFreteRateadoUSD * item.quantidade) : item.ValorFreteRateadoUSD;
-        return `Cálculo Unit USD: EXW ($ ${item.ValorEXW.toFixed(2)}) + Frete (${form.tipoRateio === "IGUAL" ? "Rateio Cheio" : "Unit."}) ($ ${fValue.toFixed(2)}) = ${(item.ValorEXW + fValue).toFixed(2)}`;
+        const uEXW = item.ValorEXW;
+        const rowFre = item.ValorFreteRateadoUSD * item.quantidade;
+        return `Fórmula Usuário: (Unit EXW: $ ${uEXW.toFixed(2)} + Frete Linha: $ ${rowFre.toFixed(2)}) * Qtd: ${item.quantidade} = ${((uEXW + rowFre) * item.quantidade).toFixed(2)}`;
       }
 
       case "totalUsd": {
@@ -276,7 +270,7 @@ export default function ProformaInvoiceV2Page() {
           profundidade: it.profundidade,
           altura: it.altura,
           pa: it.pa,
-          m3: it.m3 || (it.largura * it.profundidade * it.altura),
+          m3: it.m3 || ((it.largura * it.profundidade * it.altura) / 1000000),
           ValorEXW: it.valorEXW,
           ValorFreteRateadoBRL: it.valorFreteRateadoBRL,
           ValorFreteRateadoUSD: it.valorFreteRateadoUSD,
@@ -543,13 +537,13 @@ export default function ProformaInvoiceV2Page() {
         groupKey = mt?.tecido?.nome || "Sem Tecido";
       }
 
-      const rowFreight = form.tipoRateio === "IGUAL" ? (item.ValorFreteRateadoUSD * item.quantidade) : item.ValorFreteRateadoUSD;
-      const unitPrice = Number((item.ValorEXW + rowFreight).toFixed(2));
-      const totalUsd = Number(((item.ValorEXW * item.quantidade) + rowFreight).toFixed(2));
+      const rowFreightShare = item.ValorFreteRateadoUSD * item.quantidade;
+      const rowUnitPrice = Number(((item.ValorEXW + rowFreightShare) * item.quantidade).toFixed(2));
+      const totalUsd = rowUnitPrice;
       
       if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
         currentGroup = { 
-          fabricName: groupKey, // For Karams compatibility
+          fabricName: groupKey, 
           brandName: isFerguile ? groupKey : (mt?.modulo?.marca?.nome || "Sem Marca"),
           items: [], 
           span: 0, 
@@ -560,7 +554,7 @@ export default function ProformaInvoiceV2Page() {
       }
       currentGroup.items.push(item);
       currentGroup.span++;
-      currentGroup.totalUsdUnit += unitPrice;
+      currentGroup.totalUsdUnit += rowUnitPrice;
       currentGroup.totalUsdGroup += totalUsd;
     });
 
@@ -663,7 +657,12 @@ export default function ProformaInvoiceV2Page() {
     if (!mt) return;
 
     const risk = Number(form.cotacaoRisco) || 1;
-    const exw = calculateEXW(mt.valorTecido, risk, config?.percentualComissao || 0, config?.percentualGordura || 0);
+    const exw = calculateEXW(
+      mt.valorTecido, 
+      risk, 
+      config?.percentualComissao || 0, 
+      config?.percentualGordura || 0
+    );
     
     const newItem: ItemGrid = {
       tempId: Math.random(),
@@ -673,7 +672,7 @@ export default function ProformaInvoiceV2Page() {
       profundidade: mt.modulo?.profundidade || 0,
       altura: mt.modulo?.altura || 0,
       pa: 0,
-      m3: (mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0),
+      m3: ((mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0)) / 1000000,
       ValorEXW: exw,
       ValorFreteRateadoBRL: 0,
       ValorFreteRateadoUSD: 0,
@@ -703,8 +702,13 @@ export default function ProformaInvoiceV2Page() {
             updated.largura = mt.modulo?.largura || 0;
             updated.profundidade = mt.modulo?.profundidade || 0;
             updated.altura = mt.modulo?.altura || 0;
-            updated.m3 = updated.largura * updated.profundidade * updated.altura;
-            updated.ValorEXW = calculateEXW(mt.valorTecido, Number(form.cotacaoRisco), config?.percentualComissao || 0, config?.percentualGordura || 0);
+            updated.m3 = (updated.largura * updated.profundidade * updated.altura) / 1000000;
+            updated.ValorEXW = calculateEXW(
+              mt.valorTecido, 
+              Number(form.cotacaoRisco), 
+              config?.percentualComissao || 0, 
+              config?.percentualGordura || 0
+            );
           }
         }
         return updated;
@@ -1060,7 +1064,7 @@ export default function ProformaInvoiceV2Page() {
                                        title={mtInfo?.modulo?.descricao || "Selecione um módulo"}
                                      >
                                        <option value="0">Selecione um módulo...</option>
-                                       {modulosTecidos.map(mt => (
+                                       {modulosTecidos.filter(mt => mt.idTecido === mtInfo?.idTecido && mt.modulo?.marca?.id === mtInfo?.modulo?.marca?.id).map(mt => (
                                           <option key={mt.id} value={mt.id} style={{ background: "#1e293b" }}>{mt.modulo?.descricao} ({mt.tecido?.nome})</option>
                                        ))}
                                      </select>
@@ -1162,17 +1166,17 @@ export default function ProformaInvoiceV2Page() {
                                  {!isFerguile && (
                                     <>
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>
-                                        $ {fmt(form.tipoRateio === "IGUAL" ? (item.ValorFreteRateadoUSD * item.quantidade) : item.ValorFreteRateadoUSD)}
+                                        $ {fmt(item.ValorFreteRateadoUSD * item.quantidade)}
                                       </td>
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
-                                        $ {fmt(item.ValorEXW + (form.tipoRateio === "IGUAL" ? item.ValorFreteRateadoUSD * item.quantidade : item.ValorFreteRateadoUSD))}
+                                        $ {fmt((item.ValorEXW + (item.ValorFreteRateadoUSD * item.quantidade)) * item.quantidade)}
                                       </td>
                                     </>
                                   )}
                                  
                                  {isFerguile ? (
                                    <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }} title={getCalculationHint("usdUnit", item)}>
-                                     $ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}
+                                     $ {fmt(item.ValorEXW + (item.ValorFreteRateadoUSD * item.quantidade))}
                                    </td>
                                  ) : (
                                    isFirst && (
@@ -1209,7 +1213,7 @@ export default function ProformaInvoiceV2Page() {
                                   ) : (
                                     isFerguile && (
                                       <td style={{ ...tdStyle, textAlign: "right", fontWeight: "700", color: "#fca5a5" }} title={getCalculationHint("totalUsd", item)}>
-                                        $ {fmt((item.ValorEXW + item.ValorFreteRateadoUSD) * item.quantidade)}
+                                        $ {fmt((item.ValorEXW * item.quantidade) + (item.ValorFreteRateadoUSD * item.quantidade))}
                                       </td>
                                     )
                                   )}
@@ -1240,7 +1244,7 @@ export default function ProformaInvoiceV2Page() {
                             $ {fmt(itens.reduce((sum, i) => sum + (i.ValorFreteRateadoUSD * i.quantidade), 0))}
                           </td>
                           <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
-                            $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW + (form.tipoRateio === "IGUAL" ? i.ValorFreteRateadoUSD * i.quantidade : i.ValorFreteRateadoUSD)), 0))}
+                            $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW + (i.ValorFreteRateadoUSD * i.quantidade)), 0))}
                           </td>
                         </>
                       )}
