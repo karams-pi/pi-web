@@ -129,20 +129,6 @@ export default function SobrePage() {
             </>
           )}
 
-          {/* Credits */}
-          <div style={{
-            marginTop: '28px',
-            paddingTop: '16px',
-            borderTop: '1px solid var(--line)',
-            textAlign: 'center',
-          }}>
-            <p style={{ margin: '0 0 2px 0', color: 'var(--text)', fontWeight: 600, fontSize: '13px' }}>
-              Desenvolvido por Paulo Roberto Schmitz Takeda
-            </p>
-            <p style={{ margin: 0, color: 'var(--muted)', fontSize: '12px' }}>
-              📧 paulo.takeda@gmail.com &nbsp;|&nbsp; 📱 (43) 9 9974-1880
-            </p>
-          </div>
         </div>
       )}
     </div>

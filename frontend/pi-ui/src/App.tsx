@@ -11,6 +11,7 @@ import PrintPiPage from "./pages/PrintPiPage";
 import ImportacaoPage from "./pages/ImportacaoPage";
 import SobrePage from "./pages/SobrePage";
 import PrintPiFerguilePage from "./pages/PrintPiFerguilePage";
+import ProformaInvoiceV2Page from "./pages/ProformaInvoiceV2Page";
 
 
 // function ProdutosPage() {
@@ -70,6 +71,8 @@ export default function App() {
             <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
             <Route path="/print-pi/:id" element={<PrintPiPage />} />
             <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
+            <Route path="/proforma-invoice-v2" element={<ProformaInvoiceV2Page />} />
+            <Route path="/proforma-invoice-v2/:id" element={<ProformaInvoiceV2Page />} />
 
             <Route path="/importacao" element={<ImportacaoPage />} />
             <Route path="/config" element={<ConfiguracoesPage />} />
@@ -79,21 +82,7 @@ export default function App() {
           </Routes>
         </div>
       </main>
-
-      <Footer />
     </div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="footer">
-      <div className="container">
-        <p>
-          Desenvolvido por Paulo Roberto Schmitz Takeda • Contato: paulo.takeda@gmail.com - (43) 9 9974-1880
-        </p>
-      </div>
-    </footer>
   );
 }
 
@@ -146,6 +135,10 @@ function NavLinks() {
       <NavLink to="/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <FileText size={18} />
         <span>Proforma</span>
+      </NavLink>
+      <NavLink to="/proforma-invoice-v2" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <FileText size={18} />
+        <span style={{ fontWeight: "bold", color: "#4f9eff" }}>Proforma V2</span>
       </NavLink>
 
       <NavLink to="/importacao" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
