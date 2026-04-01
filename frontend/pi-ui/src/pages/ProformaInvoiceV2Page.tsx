@@ -124,6 +124,7 @@ export default function ProformaInvoiceV2Page() {
 
   useEffect(() => {
     loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function loadInitialData() {
@@ -332,6 +333,7 @@ export default function ProformaInvoiceV2Page() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.idFornecedor, form.cotacaoAtualUSD, form.dataPi, fornecedores]);
 
   useEffect(() => {
@@ -897,31 +899,28 @@ export default function ProformaInvoiceV2Page() {
                                  {/* Vol Total M3 */}
                                  <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa" }}>{fmt3(item.m3 * item.quantidade)}</td>
                                  
-                                 {/* Fabric Column (Merged for Karams, single for Ferguile) */}
-                                 {(!isFerguile || true) && (
-                                    (!isFerguile && isFirst) ? (
-                                      <td rowSpan={group.span} style={{ 
-                                        verticalAlign: "middle", 
-                                        background: "rgba(59, 130, 246, 0.1)", 
-                                        backdropFilter: "blur(4px)",
-                                        borderLeft: "1px solid rgba(255, 255, 255, 0.05)", 
-                                        borderRight: "1px solid rgba(255, 255, 255, 0.05)",
-                                        color: "#93c5fd", 
-                                        fontWeight: "700", 
-                                        textAlign: "center",
-                                        fontSize: "14px",
-                                        letterSpacing: "0.5px"
-                                      }}>
-                                         {group.fabricName}
+                                 {(!isFerguile && isFirst) ? (
+                                    <td rowSpan={group.span} style={{ 
+                                      verticalAlign: "middle", 
+                                      background: "rgba(59, 130, 246, 0.1)", 
+                                      backdropFilter: "blur(4px)",
+                                      borderLeft: "1px solid rgba(255, 255, 255, 0.05)", 
+                                      borderRight: "1px solid rgba(255, 255, 255, 0.05)",
+                                      color: "#93c5fd", 
+                                      fontWeight: "700", 
+                                      textAlign: "center",
+                                      fontSize: "14px",
+                                      letterSpacing: "0.5px"
+                                    }}>
+                                       {group.fabricName}
+                                    </td>
+                                  ) : (
+                                    isFerguile && (
+                                      <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
+                                        {mtInfo?.tecido?.nome || "-"}
                                       </td>
-                                    ) : (
-                                      isFerguile && (
-                                        <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
-                                          {mtInfo?.tecido?.nome || "-"}
-                                        </td>
-                                      )
                                     )
-                                 )}
+                                  )}
 
                                  {/* Pés / Tela N */}
                                  <td style={tdStyle}>
