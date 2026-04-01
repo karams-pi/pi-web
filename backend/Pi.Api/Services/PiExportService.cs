@@ -291,8 +291,8 @@ public class PiExportService
         ws.Cells[startRow, 12, startRow + 1, 12].Merge = true; ws.Cells[startRow, 12].Value = t("FINISHING", lang);
         ws.Cells[startRow, 13, startRow + 1, 13].Merge = true; ws.Cells[startRow, 13].Value = t("OBSERVATION", lang);
 
-        int colIndividualEXW = 14;
-        int colIndividualFreight = 15;
+        int colIndividualEXW = 15;
+        int colIndividualFreight = 14;
         int colGroupUnit = 16;
         int colGroupTotal = 17;
         int totalCol = colGroupTotal; // For footer compatibility
@@ -553,6 +553,11 @@ public class PiExportService
 
         ws.Cells[startRow + 2, 14, currentRow - 1, totalCol].Style.Numberformat.Format = currency == "BRL" ? "_-R$* #,##0.00_-" : "_-$* #,##0.00_-";
         ws.Cells[startRow + 2, 4, currentRow - 1, 9].Style.Numberformat.Format = "#,##0.00";
+
+        // Centralização do conteúdo (Karams/Koyo)
+        var dataRange = ws.Cells[startRow + 2, 1, currentRow - 1, totalCol];
+        dataRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        dataRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
         // ═══════════════ FOOTER ═══════════════
         currentRow += 1;

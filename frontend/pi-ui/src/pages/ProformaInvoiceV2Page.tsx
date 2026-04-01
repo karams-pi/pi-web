@@ -889,8 +889,8 @@ export default function ProformaInvoiceV2Page() {
                         <th style={{ ...thStyle, width: "100px" }}>Pés</th>
                         <th style={{ ...thStyle, width: "120px" }}>Acabamento</th>
                         <th style={{ ...thStyle, width: "140px" }}>Observação</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>Frete</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>USD Unit</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL USD</th>
                       </>
@@ -1066,8 +1066,8 @@ export default function ProformaInvoiceV2Page() {
 
                                  {!isFerguile && (
                                    <>
-                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>$ {fmt(item.ValorEXW)}</td>
                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
+                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>$ {fmt(item.ValorEXW)}</td>
                                    </>
                                  )}
                                  

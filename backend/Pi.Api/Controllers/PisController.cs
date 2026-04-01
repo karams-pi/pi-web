@@ -58,6 +58,7 @@ public class PisController : ControllerBase
                 x.CotacaoRisco,
                 x.TempoEntrega,
                 x.CondicaoPagamento,
+                x.Idioma,
 
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
                 Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome, x.Fornecedor.Cnpj } : null,
@@ -88,6 +89,7 @@ public class PisController : ControllerBase
                 x.CotacaoRisco,
                 x.TempoEntrega,
                 x.CondicaoPagamento,
+                x.Idioma,
 
                 x.IdFornecedor,
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
@@ -198,6 +200,7 @@ public class PisController : ControllerBase
             pi.IdFornecedor,
             pi.TempoEntrega,
             pi.CondicaoPagamento,
+            pi.Idioma,
             PiItens = pi.PiItens?.Select(i => new
             {
                 i.Id,
@@ -246,6 +249,7 @@ public class PisController : ControllerBase
         existingPi.CotacaoRisco = pi.CotacaoRisco;
         existingPi.TempoEntrega = pi.TempoEntrega;
         existingPi.CondicaoPagamento = pi.CondicaoPagamento;
+        existingPi.Idioma = pi.Idioma;
 
         // Handle Items
         // 1. Identification
