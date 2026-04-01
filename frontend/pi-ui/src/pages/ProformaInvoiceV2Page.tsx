@@ -10,7 +10,8 @@ import {
   getCotacaoUSD, 
   createPi, 
   updatePi, 
-  getPi 
+  getPi,
+  exportPiExcel 
 } from "../api/pis";
 import { getTotalFrete } from "../api/configuracoesFreteItem";
 import { calculateCotacaoRisco, calculateEXW, calculateFreteRateio } from "../utils/calculations";
@@ -20,11 +21,14 @@ import { listClientes } from "../api/clientes";
 import { listFornecedores } from "../api/fornecedores";
 import { listModelos } from "../api/modelos";
 import { listMarcas } from "../api/marcas";
-import type { ModuloTecido, Configuracao, ProformaInvoice, PiItem, Fornecedor, Frete, Modelo, Cliente, Marca } from "../api/types";
+import { listCategorias } from "../api/categorias";
+import { listTecidos } from "../api/tecidos";
+import type { ModuloTecido, Configuracao, ProformaInvoice, PiItem, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido } from "../api/types";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
-import { Save, Plus, Trash2, Search, FileText } from "lucide-react";
+import { PiCurrencyModal } from "../components/PiCurrencyModal";
+import { Save, Plus, Trash2, Search, FileText, Printer, FileSpreadsheet } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import "./ClientesPage.css"; // Reuse existing system classes
 
@@ -102,10 +106,14 @@ export default function ProformaInvoiceV2Page() {
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [modulosTecidos, setModulosTecidos] = useState<ModuloTecido[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [tecidos, setTecidos] = useState<Tecido[]>([]);
   const [config, setConfig] = useState<Configuracao | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
+  const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
+  const [currencyModalType, setCurrencyModalType] = useState<"print" | "excel">("print");
 
   // Filters for Item Selection Modal
   const [filterFornecedor, setFilterFornecedor] = useState("");
@@ -124,7 +132,7 @@ export default function ProformaInvoiceV2Page() {
     try {
       setLoading(true);
       (window as any)._isInitialLoad = true;
-      const [ fList, cData, mtData, cfgData, seq, cot, fData, piData, modData, marcasData ] = await Promise.all([
+      const [ fList, cData, mtData, cfgData, seq, cot, fData, piData, modData, marcasData, catData, tecData ] = await Promise.all([
         listFretes(),
         listClientes({ pageSize: 1000 }),
         listModulosTecidos(),
@@ -134,7 +142,9 @@ export default function ProformaInvoiceV2Page() {
         listFornecedores(),
         id ? getPi(Number(id)).catch(() => null) : Promise.resolve(null),
         listModelos().catch(() => []),
-        listMarcas().catch(() => [])
+        listMarcas().catch(() => []),
+        listCategorias().catch(() => []),
+        listTecidos().catch(() => [])
       ]);
 
       setFretes(fList);
@@ -144,8 +154,8 @@ export default function ProformaInvoiceV2Page() {
       setFornecedores(fData);
       setModelos(modData);
       setMarcas(marcasData);
-      
-      // Removed fixed maxHeight and overflow from grid container to eliminate scroll
+      setCategorias(catData || []);
+      setTecidos(tecData || []);
       
       const risk = Number((cot - (cfgData?.valorReducaoDolar || 0)).toFixed(2));
       
@@ -211,14 +221,12 @@ export default function ProformaInvoiceV2Page() {
     
     let rawImg = "";
 
-    // 1. Try finding image in Modelo state (highest priority)
     const idModelo = m.idModelo || (mt as any).idModelo;
     if (idModelo) {
       const dbModelo = modelos.find(md => md.id === idModelo);
       if (dbModelo?.urlImagem) rawImg = dbModelo.urlImagem;
     }
 
-    // 2. Try finding image in Marca state (fallback if no model image)
     if (!rawImg) {
       const idMarca = m.marca?.id || m.idMarca || (mt as any).idMarca;
       if (idMarca) {
@@ -227,12 +235,9 @@ export default function ProformaInvoiceV2Page() {
       }
     }
     
-    // 3. Last fallback: try the object's nested image
     if (!rawImg) rawImg = m.marca?.imagem || "";
-    
     if (!rawImg) return null;
 
-    // Handle formats
     if (rawImg.startsWith("data:") || rawImg.startsWith("http")) return rawImg;
     if (rawImg.length > 100) return `data:image/png;base64,${rawImg}`;
     
@@ -390,6 +395,65 @@ export default function ProformaInvoiceV2Page() {
     setShowItemModal(true);
   };
 
+  const novaPi = () => {
+    if (id) {
+      navigate("/proforma-invoice-v2");
+    } else {
+      setItens([]);
+      loadInitialData();
+    }
+  };
+
+  const abrirModalImpressao = () => {
+    if (!form.id) {
+      alert("Salve a PI antes de imprimir.");
+      return;
+    }
+    setCurrencyModalType("print");
+    setCurrencyModalOpen(true);
+  };
+
+  const abrirModalExcel = () => {
+    if (!form.id) {
+      alert("Salve a PI antes de exportar.");
+      return;
+    }
+    setCurrencyModalType("excel");
+    setCurrencyModalOpen(true);
+  };
+
+  const handleConfirmCurrency = (currency: string, validity: number) => {
+    setCurrencyModalOpen(false);
+    if (currencyModalType === "print") {
+      const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
+      const sName = (supplier?.nome || "").toLowerCase();
+      const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
+      const route = isFerguile ? "print-pi-ferguile" : "print-pi";
+      window.open(`#/${route}/${form.id}?currency=${currency}&validity=${validity}`, "_blank");
+    } else {
+      (async () => {
+        if (!form.id) return;
+        try {
+          setLoading(true);
+          const blob = await exportPiExcel(form.id, currency, validity);
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `PI_${form.prefixo}-${form.piSequencia}_${currency}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        } catch (error) {
+          console.error("Erro ao exportar Excel:", error);
+          alert("Erro ao exportar Excel.");
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  };
+
   const adicionarItem = () => {
     if (!selModuloTecido || selModuloTecido === "0") {
       alert("Selecione um módulo");
@@ -421,7 +485,6 @@ export default function ProformaInvoiceV2Page() {
 
     setItens([...itens, newItem]);
     setShowItemModal(false);
-    // Optional: reset selection but keep filters
     setSelModuloTecido("");
     setCodigoModuloTecido("");
     setQuantidade(1);
@@ -554,7 +617,10 @@ export default function ProformaInvoiceV2Page() {
         </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", padding: "0 10px 15px" }}>
+          <button className="btn btn-secondary" onClick={novaPi}><Plus size={18}/> Nova PI</button>
           <button className="btn btn-secondary" onClick={() => setShowSearchModal(true)}><Search size={18}/> Buscar PI</button>
+          <button className="btn btn-secondary" onClick={abrirModalImpressao} disabled={!form.id}><Printer size={18}/> Imprimir</button>
+          <button className="btn btn-secondary" onClick={abrirModalExcel} disabled={!form.id}><FileSpreadsheet size={18}/> Excel</button>
           <button className="btn btn-primary" onClick={salvar} disabled={saving}>
             <Save size={18}/> {saving ? "Salvando..." : "Salvar PI"}
           </button>
@@ -759,7 +825,7 @@ export default function ProformaInvoiceV2Page() {
                                      />
                                   </td>
 
-                 <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorEXW)}</td>
+                                 <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorEXW)}</td>
                                  <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
                                  
                                  {isFirst && (
@@ -807,8 +873,10 @@ export default function ProformaInvoiceV2Page() {
                 </tbody>
               </table>
             </div>
-            <div style={{ padding: "15px 25px", background: "rgba(255, 255, 255, 0.03)", borderTop: "1px solid var(--border)" }}>
+            <div style={{ padding: "15px 25px", background: "rgba(255, 255, 255, 0.03)", borderTop: "1px solid var(--border)", display: "flex", gap: "10px" }}>
                <button className="btn btn-secondary" onClick={addItem} style={{ borderRadius: "8px" }}><Plus size={20}/> Adicionar Módulo</button>
+               <button className="btn btn-secondary" onClick={abrirModalImpressao} disabled={!form.id} style={{ borderRadius: "8px" }}><Printer size={20}/> Imprimir</button>
+               <button className="btn btn-secondary" onClick={abrirModalExcel} disabled={!form.id} style={{ borderRadius: "8px" }}><FileSpreadsheet size={20}/> Excel</button>
             </div>
           </div>
         </div>
@@ -833,19 +901,7 @@ export default function ProformaInvoiceV2Page() {
                 <button onClick={() => setShowItemModal(false)} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "24px" }}>×</button>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "20px" }}>
-                <div className="field">
-                  <label className="label">Categoria</label>
-                  <SearchableSelect
-                    value={filterCategoria}
-                    onChange={setFilterCategoria}
-                    placeholder="Todas"
-                    options={[{ value: "", label: "Todas" }, ...Array.from(new Set(modulosTecidos.map(mt => mt.modulo?.categoria?.id))).filter(Boolean).map(id => {
-                      const mt = modulosTecidos.find(m => m.modulo?.categoria?.id === id);
-                      return { value: String(id), label: mt?.modulo?.categoria?.nome || `Cat ${id}` };
-                    })]}
-                  />
-                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "25px", marginBottom: "30px" }}>
                 <div className="field">
                   <label className="label" style={{ color: "#94a3b8" }}>Fornecedor</label>
                   <SearchableSelect 
@@ -856,48 +912,39 @@ export default function ProformaInvoiceV2Page() {
                   />
                 </div>
                 <div className="field">
-                  <label className="label">Modelo</label>
-                  <SearchableSelect
-                    value={filterMarca}
-                    onChange={setFilterMarca}
-                    placeholder="Todos"
-                    options={[{ value: "", label: "Todos" }, ...marcas.map(m => ({ value: String(m.id), label: m.nome }))]}
+                  <label className="label" style={{ color: "#94a3b8" }}>Categoria</label>
+                  <SearchableSelect 
+                    value={filterCategoria}
+                    onChange={setFilterCategoria}
+                    placeholder="Todas"
+                    options={[{ value: "", label: "Todas" }, ...categorias.map(c => ({ value: String(c.id), label: c.nome }))]}
                   />
                 </div>
                 <div className="field">
-                  <label className="label">Tecido</label>
-                  <SearchableSelect
+                  <label className="label" style={{ color: "#94a3b8" }}>Marca</label>
+                  <SearchableSelect 
+                    value={filterMarca}
+                    onChange={setFilterMarca}
+                    placeholder="Todas"
+                    options={[{ value: "", label: "Todas" }, ...marcas.map(m => ({ value: String(m.id), label: m.nome }))]}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label" style={{ color: "#94a3b8" }}>Tecido</label>
+                  <SearchableSelect 
                     value={filterTecido}
                     onChange={setFilterTecido}
                     placeholder="Todos"
-                    options={[{ value: "", label: "Todos" }, ...Array.from(new Set(modulosTecidos.map(mt => mt.tecido?.id))).filter(Boolean).map(id => {
-                      const mt = modulosTecidos.find(m => m.tecido?.id === id);
-                      return { value: String(id), label: mt?.tecido?.nome || `Tec ${id}` };
-                    })]}
+                    options={[{ value: "", label: "Todos" }, ...tecidos.map(t => ({ value: String(t.id), label: t.nome }))]}
                   />
-                </div>
-                <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: "2px" }}>
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={() => {
-                        setFilterFornecedor("");
-                        setFilterCategoria("");
-                        setFilterMarca("");
-                        setFilterTecido("");
-                    }}
-                    style={{ height: "38px", width: "45px", padding: 0 }}
-                    title="Limpar Filtros"
-                  >
-                    🧹
-                  </button>
                 </div>
               </div>
 
-              <div className="field" style={{ marginBottom: "20px" }}>
-                <label className="label" style={{ color: "#94a3b8" }}>Módulo-Tecido</label>
-                <ModuloTecidoSelect
+              <div className="field" style={{ marginBottom: "25px" }}>
+                <label className="label" style={{ color: "#94a3b8" }}>Módulo</label>
+                <ModuloTecidoSelect 
                   value={selModuloTecido}
-                  onChange={(val) => setSelModuloTecido(val)}
+                  onChange={setSelModuloTecido}
                   options={modulosTecidos.filter(mt => {
                     const matchForn = !filterFornecedor || String(mt.modulo?.fornecedor?.id) === filterFornecedor;
                     const matchCat = !filterCategoria || String(mt.modulo?.categoria?.id) === filterCategoria;
@@ -909,39 +956,29 @@ export default function ProformaInvoiceV2Page() {
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "30px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "25px", marginBottom: "35px" }}>
                 <div className="field">
-                  <label className="label">Código</label>
-                  <input
-                    className="cl-input"
-                    value={codigoModuloTecido}
-                    onChange={(e) => setCodigoModuloTecido(e.target.value.substring(0, 10))}
-                    placeholder="Código (opcional)"
-                  />
+                  <label className="label" style={{ color: "#94a3b8" }}>Quantidade</label>
+                  <input type="number" className="cl-input" value={quantidade} onChange={e => setQuantidade(e.target.value)} style={{ padding: "12px", fontSize: "16px" }} />
                 </div>
                 <div className="field">
-                  <label className="label">Quantidade</label>
-                  <input
-                    className="cl-input"
-                    type="number"
-                    value={quantidade}
-                    onChange={(e) => setQuantidade(e.target.value)}
-                  />
+                  <label className="label" style={{ color: "#94a3b8" }}>Código Personalizado</label>
+                  <input type="text" className="cl-input" value={codigoModuloTecido} onChange={e => setCodigoModuloTecido(e.target.value)} placeholder="Opcional" style={{ padding: "12px", fontSize: "16px" }} />
                 </div>
               </div>
 
               <div style={{ display: "flex", gap: "15px" }}>
                 <button 
                   className="btn btn-primary" 
-                  style={{ flex: 2, padding: "12px", fontSize: "16px", fontWeight: "700" }}
-                  onClick={adicionarItem}
+                  onClick={adicionarItem} 
+                  style={{ flex: 2, padding: "15px", fontSize: "16px", fontWeight: "700", borderRadius: "10px", boxShadow: "0 10px 20px -5px rgba(59,130,246,0.3)" }}
                 >
-                  <Plus size={20} style={{ marginRight: "10px" }} /> ADICIONAR AO PEDIDO
+                  ADICIONAR À GRID
                 </button>
                 <button 
                   className="btn btn-secondary" 
-                  style={{ flex: 1, padding: "12px" }}
                   onClick={() => setShowItemModal(false)}
+                  style={{ flex: 1, padding: "15px", borderRadius: "10px" }}
                 >
                   CANCELAR
                 </button>
@@ -949,6 +986,13 @@ export default function ProformaInvoiceV2Page() {
             </div>
           </div>
         )}
+
+        <PiCurrencyModal
+          isOpen={currencyModalOpen}
+          onClose={() => setCurrencyModalOpen(false)}
+          onConfirm={handleConfirmCurrency}
+          title={currencyModalType === "print" ? "Moneda para Impresión" : "Moneda para Excel"}
+        />
 
         <style>{`
           .table-row-v2:hover { background: rgba(255, 255, 255, 0.03); }
