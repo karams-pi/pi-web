@@ -475,7 +475,7 @@ export default function ProformaInvoiceV2Page() {
       if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
         currentGroup = { 
           fabricName: groupKey, // For Karams compatibility
-          brandName: groupKey,  // For Ferguile compatibility
+          brandName: isFerguile ? groupKey : (mt?.modulo?.marca?.nome || "Sem Marca"),
           items: [], 
           span: 0, 
           totalUsdUnit: 0, 
