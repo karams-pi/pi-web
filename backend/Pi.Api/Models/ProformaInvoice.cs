@@ -68,6 +68,10 @@ public class ProformaInvoice
     [MaxLength(10)]
     public string? Idioma { get; set; } = "PT";
 
+    [Column("tipo_rateio")]
+    [MaxLength(10)]
+    public string TipoRateio { get; set; } = "VOLUME";
+
     // Navigation
     [Column("id_fornecedor")]
     public long? IdFornecedor { get; set; }

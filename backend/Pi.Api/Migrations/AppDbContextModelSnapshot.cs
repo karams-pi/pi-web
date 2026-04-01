@@ -788,6 +788,12 @@ namespace Pi.Api.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tempo_entrega");
 
+                    b.Property<string>("TipoRateio")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("tipo_rateio");
+
                     b.Property<decimal>("ValorTecido")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("valor_tecido");

@@ -37,9 +37,16 @@ export function calculateEXW(
 export function calculateFreteRateio(
   totalFrete: number,
   totalM3: number,
-  itemM3: number
+  itemM3: number,
+  totalQty: number,
+  tipoRateio: string = "VOLUME"
 ): number {
-  if (totalM3 <= 0) return 0;
-  const custoPorM3 = totalFrete / totalM3;
-  return custoPorM3 * itemM3;
+  if (tipoRateio === "IGUAL") {
+    if (totalQty <= 0) return 0;
+    return totalFrete / totalQty;
+  } else {
+    if (totalM3 <= 0) return 0;
+    const custoPorM3 = totalFrete / totalM3;
+    return custoPorM3 * itemM3;
+  }
 }

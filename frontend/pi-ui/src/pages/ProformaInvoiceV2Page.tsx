@@ -47,6 +47,7 @@ type FormState = {
   tempoEntrega?: string;
   condicaoPagamento?: string;
   idioma?: string;
+  tipoRateio: string;
 };
 
 type ItemGrid = {
@@ -89,6 +90,7 @@ export default function ProformaInvoiceV2Page() {
     cotacaoRisco: 0,
     valorTotalFreteBRL: 0,
     valorTotalFreteUSD: 0,
+    tipoRateio: "VOLUME"
   });
 
   const [itens, setItens] = useState<ItemGrid[]>([]);
@@ -251,7 +253,9 @@ export default function ProformaInvoiceV2Page() {
           valorTotalFreteBRL: piData.valorTotalFreteBRL,
           valorTotalFreteUSD: piData.valorTotalFreteUSD,
           tempoEntrega: piData.tempoEntrega,
-          condicaoPagamento: piData.condicaoPagamento
+          condicaoPagamento: piData.condicaoPagamento,
+          idioma: piData.idioma,
+          tipoRateio: piData.tipoRateio || "VOLUME"
         });
 
         const itapi = piData.piItens || [];
@@ -327,10 +331,11 @@ export default function ProformaInvoiceV2Page() {
     setItens(prevItens => {
       if (prevItens.length === 0) return prevItens;
       const totalM3 = prevItens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
+      const totalQty = prevItens.reduce((sum, item) => sum + item.quantidade, 0);
       
       const novosItens = prevItens.map(item => {
-        const freteUnitarioBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3);
-        const freteUnitarioUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3);
+        const freteUnitarioBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3, totalQty, form.tipoRateio);
+        const freteUnitarioUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3, totalQty, form.tipoRateio);
         const valorBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
 
         return {
@@ -345,7 +350,7 @@ export default function ProformaInvoiceV2Page() {
       if (JSON.stringify(novosItens) === JSON.stringify(prevItens)) return prevItens;
       return novosItens;
     });
-  }, [form.valorTotalFreteBRL, form.valorTotalFreteUSD, form.cotacaoRisco]);
+  }, [form.valorTotalFreteBRL, form.valorTotalFreteUSD, form.cotacaoRisco, form.tipoRateio]);
 
   const recalculateAllItems = (risk: number, freightUSD: number, freightBRL: number, currentConfig: Configuracao | null) => {
     setItens(prev => prev.map(item => {
@@ -354,8 +359,9 @@ export default function ProformaInvoiceV2Page() {
 
       const newEXW = calculateEXW(mt.valorTecido, risk, currentConfig?.percentualComissao || 0, currentConfig?.percentualGordura || 0);
       const totalM3 = prev.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
-      const fUnitBRL = calculateFreteRateio(freightBRL, totalM3, item.m3);
-      const fUnitUSD = calculateFreteRateio(freightUSD, totalM3, item.m3);
+      const totalQty = prev.reduce((sum, i) => sum + i.quantidade, 0);
+      const fUnitBRL = calculateFreteRateio(freightBRL, totalM3, item.m3, totalQty, form.tipoRateio);
+      const fUnitUSD = calculateFreteRateio(freightUSD, totalM3, item.m3, totalQty, form.tipoRateio);
       const vBaseBRL = newEXW * risk;
 
       return {
@@ -666,6 +672,7 @@ export default function ProformaInvoiceV2Page() {
       if (!form.idCliente) { alert("Selecione um cliente"); return; }
       setSaving(true);
       const totalM3 = itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
+      const totalQty = itens.reduce((sum, i) => sum + i.quantidade, 0);
       const valorTecido = itens.reduce((sum, item) => sum + (item.ValorEXW * item.quantidade), 0);
       
       const piData: Omit<ProformaInvoice, "id"> = {
@@ -684,9 +691,10 @@ export default function ProformaInvoiceV2Page() {
         tempoEntrega: form.tempoEntrega || "",
         condicaoPagamento: form.condicaoPagamento || "",
         idioma: form.idioma || "PT",
+        tipoRateio: form.tipoRateio,
         piItens: itens.map(item => {
-          const freteUnitBRL = totalM3 > 0 ? (form.valorTotalFreteBRL / totalM3) * item.m3 : 0;
-          const freteUnitUSD = totalM3 > 0 ? (form.valorTotalFreteUSD / totalM3) * item.m3 : 0;
+          const freteUnitBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3, totalQty, form.tipoRateio);
+          const freteUnitUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3, totalQty, form.tipoRateio);
           const valorBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
 
           return {
@@ -864,6 +872,18 @@ export default function ProformaInvoiceV2Page() {
                     ]}
                     value={form.idioma || "PT"}
                     onChange={(val) => setForm(prev => ({ ...prev, idioma: val }))}
+                  />
+                </div>
+
+                <div className="field" style={{ flex: 1 }}>
+                  <label className="cl-label">Tipo de Rateio</label>
+                  <SearchableSelect
+                    options={[
+                      { value: "VOLUME", label: "POR VOLUME" },
+                      { value: "IGUAL", label: "POR IGUAL" }
+                    ]}
+                    value={form.tipoRateio || "VOLUME"}
+                    onChange={(val) => setForm(prev => ({ ...prev, tipoRateio: val }))}
                   />
                 </div>
             </div>
@@ -1067,7 +1087,7 @@ export default function ProformaInvoiceV2Page() {
                                  {!isFerguile && (
                                    <>
                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
-                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>$ {fmt(item.ValorEXW)}</td>
+                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>$ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}</td>
                                    </>
                                  )}
                                  

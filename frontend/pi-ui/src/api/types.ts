@@ -143,6 +143,7 @@ export type ProformaInvoice = {
   tempoEntrega?: string;
   condicaoPagamento?: string;
   idioma?: string;
+  tipoRateio: string;
   piItens?: PiItem[];
   cliente?: Cliente;
   configuracoes?: Configuracao;

@@ -323,6 +323,7 @@ public class PiExportService
             .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
             .ToList();
 
+        decimal piTotalQty = pi.PiItens.Sum(i => (decimal)i.Quantidade);
         decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
@@ -425,16 +426,28 @@ public class PiExportService
                 ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                 // Individual Values per row
+                decimal freightUnit = 0;
+                if (pi.TipoRateio == "IGUAL")
+                {
+                    freightUnit = piTotalQty > 0
+                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalQty
+                        : 0;
+                }
+                else
+                {
+                    freightUnit = piTotalM3 > 0
+                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                        : 0;
+                }
+
                 decimal rowUnitEXW = item.ValorEXW;
                 if (currency == "BRL") rowUnitEXW *= (decimal)pi.CotacaoRisco;
+                rowUnitEXW += freightUnit;
                 
                 ws.Cells[currentRow, colIndividualEXW].Value = rowUnitEXW;
                 ws.Cells[currentRow, colIndividualEXW].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 ws.Cells[currentRow, colIndividualEXW].Style.Numberformat.Format = "#,##0.00";
 
-                decimal freightUnit = piTotalM3 > 0
-                    ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
-                    : 0;
                 ws.Cells[currentRow, colIndividualFreight].Value = freightUnit;
                 ws.Cells[currentRow, colIndividualFreight].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 ws.Cells[currentRow, colIndividualFreight].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -689,6 +702,7 @@ public class PiExportService
         }
 
         // Recalculate freight exactly as the screen does
+        decimal piTotalQty = pi.PiItens.Sum(i => (decimal)i.Quantidade);
         decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
@@ -720,19 +734,36 @@ public class PiExportService
 
                 if (showFreight)
                 {
-                    // Recalculate like the screen: totalFrete / totalM3 * itemM3
-                    decimal freightUnit = piTotalM3 > 0
-                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
-                        : 0;
+                    decimal freightUnit = 0;
+                    if (pi.TipoRateio == "IGUAL")
+                    {
+                        freightUnit = piTotalQty > 0
+                            ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalQty
+                            : 0;
+                    }
+                    else
+                    {
+                        freightUnit = piTotalM3 > 0
+                            ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                            : 0;
+                    }
                     ws.Cells[currentRow, 13].Value = freightUnit;
                     ws.Cells[currentRow, 13].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
-                // UNIT = EXW (unit price, same as original working code)
-                // TOTAL = (EXW + freight) * qty, to match screen's ValorFinalItemUSDRisco logic
-                decimal freightUnitForTotal = piTotalM3 > 0
-                    ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
-                    : 0;
+                decimal freightUnitForTotal = 0;
+                if (pi.TipoRateio == "IGUAL")
+                {
+                    freightUnitForTotal = piTotalQty > 0
+                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalQty
+                        : 0;
+                }
+                else
+                {
+                    freightUnitForTotal = piTotalM3 > 0
+                        ? (currency == "BRL" ? piTotalFreteBRL : piTotalFreteUSD) / piTotalM3 * item.M3
+                        : 0;
+                }
                 decimal unitPrice = currency == "BRL"
                     ? item.ValorEXW * (decimal)pi.CotacaoRisco
                     : item.ValorEXW;
