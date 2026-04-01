@@ -220,9 +220,9 @@ export default function ProformaInvoiceV2Page() {
 
     // 2. Try finding image in Marca state (fallback if no model image)
     if (!rawImg) {
-      const idMarca = m.idMarca || (mt as any).idMarca;
+      const idMarca = m.marca?.id || m.idMarca || (mt as any).idMarca;
       if (idMarca) {
-        const dbMarca = marcas.find(ma => ma.id === idMarca);
+        const dbMarca = marcas.find(ma => ma.id === Number(idMarca));
         if (dbMarca?.imagem) rawImg = dbMarca.imagem;
       }
     }
