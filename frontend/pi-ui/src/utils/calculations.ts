@@ -38,12 +38,13 @@ export function calculateFreteRateio(
   totalFrete: number,
   totalM3: number,
   itemM3: number,
-  totalQty: number,
-  tipoRateio: string = "VOLUME"
+  moduleCount: number,
+  tipoRateio: string = "VOLUME",
+  itemQty: number = 1
 ): number {
   if (tipoRateio === "IGUAL") {
-    if (totalQty <= 0) return 0;
-    return totalFrete / totalQty;
+    if (moduleCount <= 0 || itemQty <= 0) return 0;
+    return (totalFrete / moduleCount) / itemQty;
   } else {
     if (totalM3 <= 0) return 0;
     const custoPorM3 = totalFrete / totalM3;

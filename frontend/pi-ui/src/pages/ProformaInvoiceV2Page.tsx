@@ -146,16 +146,24 @@ export default function ProformaInvoiceV2Page() {
 
       case "freteUnit": {
         if (!item) return "";
-        return `Cálculo Rateio: (Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) * M³ Item ${item.m3.toFixed(3)} = ${item.ValorFreteRateadoUSD.toFixed(2)}`;
+        if (form.tipoRateio === "IGUAL") {
+          const rowShare = form.valorTotalFreteUSD / itens.length;
+          return `Cálculo Rateio (POR IGUAL): Total USD $ ${form.valorTotalFreteUSD.toFixed(2)} / ${itens.length} módulos = $ ${rowShare.toFixed(2)} por módulo.`;
+        }
+        return `Cálculo Rateio (POR VOLUME): (Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) * M³ Item ${item.m3.toFixed(3)} = ${item.ValorFreteRateadoUSD.toFixed(2)}`;
       }
 
       case "usdUnit": {
         if (group && !isFerguile) {
-          const lines = group.items.map((it: ItemGrid) => `$ ${(it.ValorEXW + it.ValorFreteRateadoUSD).toFixed(2)}`).join(" + ");
+          const lines = group.items.map((it: ItemGrid) => {
+            const rowF = form.tipoRateio === "IGUAL" ? (it.ValorFreteRateadoUSD * it.quantidade) : it.ValorFreteRateadoUSD;
+            return `$ ${(it.ValorEXW + rowF).toFixed(2)}`;
+          }).join(" + ");
           return `Soma do Grupo: ${lines} = $ ${group.totalUsdUnit.toFixed(2)}`;
         }
         if (!item) return "";
-        return `Cálculo Unit USD: EXW ($ ${item.ValorEXW.toFixed(2)}) + Frete ($ ${item.ValorFreteRateadoUSD.toFixed(2)}) = ${(item.ValorEXW + item.ValorFreteRateadoUSD).toFixed(2)}`;
+        const fValue = form.tipoRateio === "IGUAL" ? (item.ValorFreteRateadoUSD * item.quantidade) : item.ValorFreteRateadoUSD;
+        return `Cálculo Unit USD: EXW ($ ${item.ValorEXW.toFixed(2)}) + Frete (${form.tipoRateio === "IGUAL" ? "Rateio Cheio" : "Unit."}) ($ ${fValue.toFixed(2)}) = ${(item.ValorEXW + fValue).toFixed(2)}`;
       }
 
       case "totalUsd": {
@@ -331,19 +339,38 @@ export default function ProformaInvoiceV2Page() {
     setItens(prevItens => {
       if (prevItens.length === 0) return prevItens;
       const totalM3 = prevItens.reduce((sum, item) => sum + (item.m3 * item.quantidade), 0);
-      const totalQty = prevItens.reduce((sum, item) => sum + item.quantidade, 0);
       
-      const novosItens = prevItens.map(item => {
-        const freteUnitarioBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3, totalQty, form.tipoRateio);
-        const freteUnitarioUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3, totalQty, form.tipoRateio);
+      const targetBRL = form.valorTotalFreteBRL;
+      const targetUSD = form.valorTotalFreteUSD;
+      
+      let remainingBRL = targetBRL;
+      let remainingUSD = targetUSD;
+
+      const novosItens = prevItens.map((item, index) => {
+        const isLast = index === prevItens.length - 1;
+        
+        let freteUnitBRL = 0;
+        let freteUnitUSD = 0;
+
+        if (isLast) {
+          freteUnitBRL = item.quantidade > 0 ? remainingBRL / item.quantidade : 0;
+          freteUnitUSD = item.quantidade > 0 ? remainingUSD / item.quantidade : 0;
+        } else {
+          freteUnitBRL = calculateFreteRateio(targetBRL, totalM3, item.m3, prevItens.length, form.tipoRateio, item.quantidade);
+          freteUnitUSD = calculateFreteRateio(targetUSD, totalM3, item.m3, prevItens.length, form.tipoRateio, item.quantidade);
+          
+          remainingBRL -= (freteUnitBRL * item.quantidade);
+          remainingUSD -= (freteUnitUSD * item.quantidade);
+        }
+
         const valorBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
 
         return {
           ...item,
-          ValorFreteRateadoBRL: freteUnitarioBRL,
-          ValorFreteRateadoUSD: freteUnitarioUSD,
-          ValorFinalItemBRL: (valorBaseBRL + freteUnitarioBRL) * item.quantidade,
-          ValorFinalItemUSDRisco: (item.ValorEXW + freteUnitarioUSD) * item.quantidade,
+          ValorFreteRateadoBRL: freteUnitBRL,
+          ValorFreteRateadoUSD: freteUnitUSD,
+          ValorFinalItemBRL: (valorBaseBRL + freteUnitBRL) * item.quantidade,
+          ValorFinalItemUSDRisco: (item.ValorEXW + freteUnitUSD) * item.quantidade,
         };
       });
 
@@ -353,26 +380,44 @@ export default function ProformaInvoiceV2Page() {
   }, [form.valorTotalFreteBRL, form.valorTotalFreteUSD, form.cotacaoRisco, form.tipoRateio]);
 
   const recalculateAllItems = (risk: number, freightUSD: number, freightBRL: number, currentConfig: Configuracao | null) => {
-    setItens(prev => prev.map(item => {
-      const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
-      if (!mt) return item;
-
-      const newEXW = calculateEXW(mt.valorTecido, risk, currentConfig?.percentualComissao || 0, currentConfig?.percentualGordura || 0);
+    setItens(prev => {
       const totalM3 = prev.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
-      const totalQty = prev.reduce((sum, i) => sum + i.quantidade, 0);
-      const fUnitBRL = calculateFreteRateio(freightBRL, totalM3, item.m3, totalQty, form.tipoRateio);
-      const fUnitUSD = calculateFreteRateio(freightUSD, totalM3, item.m3, totalQty, form.tipoRateio);
-      const vBaseBRL = newEXW * risk;
+      
+      let remainingBRL = freightBRL;
+      let remainingUSD = freightUSD;
 
-      return {
-        ...item,
-        ValorEXW: newEXW,
-        ValorFreteRateadoBRL: fUnitBRL,
-        ValorFreteRateadoUSD: fUnitUSD,
-        ValorFinalItemBRL: (vBaseBRL + fUnitBRL) * item.quantidade,
-        ValorFinalItemUSDRisco: (newEXW + fUnitUSD) * item.quantidade
-      };
-    }));
+      return prev.map((item, index) => {
+        const isLast = index === prev.length - 1;
+        const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+        if (!mt) return item;
+
+        const newEXW = calculateEXW(mt.valorTecido, risk, currentConfig?.percentualComissao || 0, currentConfig?.percentualGordura || 0);
+        
+        let fUnitBRL = 0;
+        let fUnitUSD = 0;
+
+        if (isLast) {
+          fUnitBRL = item.quantidade > 0 ? remainingBRL / item.quantidade : 0;
+          fUnitUSD = item.quantidade > 0 ? remainingUSD / item.quantidade : 0;
+        } else {
+          fUnitBRL = calculateFreteRateio(freightBRL, totalM3, item.m3, prev.length, form.tipoRateio, item.quantidade);
+          fUnitUSD = calculateFreteRateio(freightUSD, totalM3, item.m3, prev.length, form.tipoRateio, item.quantidade);
+          remainingBRL -= (fUnitBRL * item.quantidade);
+          remainingUSD -= (fUnitUSD * item.quantidade);
+        }
+
+        const vBaseBRL = newEXW * risk;
+
+        return {
+          ...item,
+          ValorEXW: newEXW,
+          ValorFreteRateadoBRL: fUnitBRL,
+          ValorFreteRateadoUSD: fUnitUSD,
+          ValorFinalItemBRL: (vBaseBRL + fUnitBRL) * item.quantidade,
+          ValorFinalItemUSDRisco: (newEXW + fUnitUSD) * item.quantidade
+        };
+      });
+    });
   };
 
   const loadFreteTotals = useCallback(async () => {
@@ -498,8 +543,9 @@ export default function ProformaInvoiceV2Page() {
         groupKey = mt?.tecido?.nome || "Sem Tecido";
       }
 
-      const unitPrice = Number((item.ValorEXW + item.ValorFreteRateadoUSD).toFixed(2));
-      const totalUsd = Number((unitPrice * item.quantidade).toFixed(2));
+      const rowFreight = form.tipoRateio === "IGUAL" ? (item.ValorFreteRateadoUSD * item.quantidade) : item.ValorFreteRateadoUSD;
+      const unitPrice = Number((item.ValorEXW + rowFreight).toFixed(2));
+      const totalUsd = Number(((item.ValorEXW * item.quantidade) + rowFreight).toFixed(2));
       
       if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
         currentGroup = { 
@@ -672,7 +718,6 @@ export default function ProformaInvoiceV2Page() {
       if (!form.idCliente) { alert("Selecione um cliente"); return; }
       setSaving(true);
       const totalM3 = itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
-      const totalQty = itens.reduce((sum, i) => sum + i.quantidade, 0);
       const valorTecido = itens.reduce((sum, item) => sum + (item.ValorEXW * item.quantidade), 0);
       
       const piData: Omit<ProformaInvoice, "id"> = {
@@ -692,33 +737,49 @@ export default function ProformaInvoiceV2Page() {
         condicaoPagamento: form.condicaoPagamento || "",
         idioma: form.idioma || "PT",
         tipoRateio: form.tipoRateio,
-        piItens: itens.map(item => {
-          const freteUnitBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3, totalQty, form.tipoRateio);
-          const freteUnitUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3, totalQty, form.tipoRateio);
-          const valorBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
+        piItens: (function() {
+          let remBRL = form.valorTotalFreteBRL;
+          let remUSD = form.valorTotalFreteUSD;
+          return itens.map((item, index) => {
+            const isLast = index === itens.length - 1;
+            let fUnitBRL = 0;
+            let fUnitUSD = 0;
 
-          return {
-            id: item.id || 0,
-            idPi: form.id || 0,
-            idModuloTecido: item.idModuloTecido,
-            quantidade: item.quantidade,
-            largura: item.largura,
-            profundidade: item.profundidade,
-            altura: item.altura,
-            pa: item.pa,
-            m3: item.m3,
-            rateioFrete: freteUnitUSD,
-            valorEXW: item.ValorEXW,
-            valorFreteRateadoBRL: freteUnitBRL,
-            valorFreteRateadoUSD: freteUnitUSD,
-            valorFinalItemBRL: (valorBaseBRL + freteUnitBRL) * item.quantidade,
-            valorFinalItemUSDRisco: (item.ValorEXW + freteUnitUSD) * item.quantidade,
-            observacao: item.observacao || "",
-            tempCodigoModuloTecido: item.codigoModuloTecido || "",
-            feet: item.feet || "",
-            finishing: item.finishing || ""
-          } as PiItem;
-        })
+            if (isLast) {
+              fUnitBRL = item.quantidade > 0 ? remBRL / item.quantidade : 0;
+              fUnitUSD = item.quantidade > 0 ? remUSD / item.quantidade : 0;
+            } else {
+              fUnitBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3, itens.length, form.tipoRateio, item.quantidade);
+              fUnitUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3, itens.length, form.tipoRateio, item.quantidade);
+              remBRL -= (fUnitBRL * item.quantidade);
+              remUSD -= (fUnitUSD * item.quantidade);
+            }
+
+            const vBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
+
+            return {
+              id: item.id || 0,
+              idPi: form.id || 0,
+              idModuloTecido: item.idModuloTecido,
+              quantidade: item.quantidade,
+              largura: item.largura,
+              profundidade: item.profundidade,
+              altura: item.altura,
+              pa: item.pa,
+              m3: item.m3,
+              rateioFrete: fUnitUSD,
+              valorEXW: item.ValorEXW,
+              valorFreteRateadoBRL: fUnitBRL,
+              valorFreteRateadoUSD: fUnitUSD,
+              valorFinalItemBRL: (vBaseBRL + fUnitBRL) * item.quantidade,
+              valorFinalItemUSDRisco: (item.ValorEXW + fUnitUSD) * item.quantidade,
+              observacao: item.observacao || "",
+              tempCodigoModuloTecido: item.codigoModuloTecido || "",
+              feet: item.feet || "",
+              finishing: item.finishing || ""
+            } as PiItem;
+          });
+        })()
       };
 
       if (form.id) {
@@ -821,7 +882,10 @@ export default function ProformaInvoiceV2Page() {
                    step="0.01" 
                    className="cl-input" 
                    value={form.cotacaoRisco} 
-                   onChange={e => setForm({...form, cotacaoRisco: e.target.value})} 
+                   onChange={e => {
+                     const risk = parseFloat(e.target.value) || 1;
+                     setForm({...form, cotacaoRisco: e.target.value, valorTotalFreteUSD: form.valorTotalFreteBRL / risk});
+                   }} 
                    title={getCalculationHint("cotacaoRisco")}
                  />
                </div>
@@ -835,20 +899,31 @@ export default function ProformaInvoiceV2Page() {
                  />
                </div>
                <div className="field">
-                 <label className="label">Frete Total (R$)</label>
-                 <input 
-                   type="number" 
-                   step="0.01" 
-                   className="cl-input" 
-                   value={form.valorTotalFreteBRL} 
-                   onChange={e => {
-                     const brl = parseFloat(e.target.value) || 0;
-                     const risk = Number(form.cotacaoRisco) || 1;
-                     setForm({...form, valorTotalFreteBRL: brl, valorTotalFreteUSD: brl / risk});
-                   }} 
-                   title={getCalculationHint("freteTotalUSD")}
-                 />
-               </div>
+                  <label className="label">Frete Total (R$)</label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input 
+                      type="number" 
+                      step="0.01" 
+                      className="cl-input" 
+                      value={form.valorTotalFreteBRL} 
+                      onChange={e => {
+                        const brl = parseFloat(e.target.value) || 0;
+                        const risk = Number(form.cotacaoRisco) || 1;
+                        setForm({...form, valorTotalFreteBRL: brl, valorTotalFreteUSD: brl / risk});
+                      }} 
+                      title={getCalculationHint("freteTotalUSD")}
+                    />
+                    <div className="field" style={{ margin: 0, minWidth: "100px" }}>
+                      <input 
+                        type="text" 
+                        disabled 
+                        className="cl-input" 
+                        style={{ backgroundColor: "#1e293b", color: "#94a3b8" }}
+                        value={`$ ${fmt(form.valorTotalFreteUSD)}`} 
+                      />
+                    </div>
+                  </div>
+                </div>
                <div className="field">
                  <label className="label">Tempo Entrega</label>
                  <input type="text" className="cl-input" value={form.tempoEntrega || ""} onChange={e => setForm({...form, tempoEntrega: e.target.value})} placeholder="Ex: 30 dias" />
@@ -1085,11 +1160,15 @@ export default function ProformaInvoiceV2Page() {
                                   </td>
 
                                  {!isFerguile && (
-                                   <>
-                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
-                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>$ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}</td>
-                                   </>
-                                 )}
+                                    <>
+                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>
+                                        $ {fmt(form.tipoRateio === "IGUAL" ? (item.ValorFreteRateadoUSD * item.quantidade) : item.ValorFreteRateadoUSD)}
+                                      </td>
+                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
+                                        $ {fmt(item.ValorEXW + (form.tipoRateio === "IGUAL" ? item.ValorFreteRateadoUSD * item.quantidade : item.ValorFreteRateadoUSD))}
+                                      </td>
+                                    </>
+                                  )}
                                  
                                  {isFerguile ? (
                                    <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }} title={getCalculationHint("usdUnit", item)}>
@@ -1151,6 +1230,30 @@ export default function ProformaInvoiceV2Page() {
                      </tr>
                   )}
                 </tbody>
+                {itens.length > 0 && (
+                  <tfoot style={{ background: "rgba(15, 23, 42, 0.8)", fontWeight: "700" }}>
+                    <tr>
+                      <td colSpan={isFerguile ? 12 : 13} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)" }}>TOTAIS:</td>
+                      {!isFerguile && (
+                        <>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
+                            $ {fmt(itens.reduce((sum, i) => sum + (i.ValorFreteRateadoUSD * i.quantidade), 0))}
+                          </td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
+                            $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW + (form.tipoRateio === "IGUAL" ? i.ValorFreteRateadoUSD * i.quantidade : i.ValorFreteRateadoUSD)), 0))}
+                          </td>
+                        </>
+                      )}
+                      <td style={{ ...tdStyle, textAlign: "right", color: "#fff" }}>
+                        $ {fmt(processedData.groups.reduce((sum, g) => sum + g.totalUsdUnit, 0))}
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "16px" }}>
+                        $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW * i.quantidade) + (i.ValorFreteRateadoUSD * i.quantidade), 0))}
+                      </td>
+                      <td style={tdStyle}></td>
+                    </tr>
+                  </tfoot>
+                )}
               </table>
             </div>
             <div style={{ padding: "15px 25px", background: "rgba(255, 255, 255, 0.03)", borderTop: "1px solid var(--border)", display: "flex", gap: "10px" }}>
