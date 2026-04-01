@@ -55,6 +55,9 @@ type ItemGrid = {
   exwTooltip?: string;
   freteBrlTooltip?: string;
   freteUsdTooltip?: string;
+  m3Tooltip?: string;
+  totalBrlTooltip?: string;
+  totalUsdTooltip?: string;
   observacao?: string;
   feet?: string;
   finishing?: string;
@@ -312,6 +315,10 @@ export default function ProformaInvoicePage() {
           `Total Frete $ ${fmt(totalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(totalM3 > 0 ? totalFreteUSD / totalM3 : 0)}/m³\n` +
           `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
 
+        const totalBrlTooltip = `(Unit EXW $ ${fmt(currentValorEXW)} * Risco ${fmt(cotacaoRisco)} + Frete R$ ${fmt(freteUnitarioBRL)}) * Qtd ${item.quantidade} = R$ ${fmt(valorFinalBRL)}`;
+        const totalUsdTooltip = `(Unit EXW $ ${fmt(currentValorEXW)} + Frete $ ${fmt(freteUnitarioUSD)}) * Qtd ${item.quantidade} = $ ${fmt(valorFinalUSD)}`;
+        const m3Tooltip = `(L:${item.largura} * P:${item.profundidade} * A:${item.altura}) * Qtd:${item.quantidade} / 1.000.000 = ${fmt(item.m3 * item.quantidade, 3)} m³`;
+
         return {
           ...item,
           ValorEXW: currentValorEXW,
@@ -321,7 +328,10 @@ export default function ProformaInvoicePage() {
           ValorFinalItemUSDRisco: valorFinalUSD,
           exwTooltip: currentExwTooltip,
           freteBrlTooltip,
-          freteUsdTooltip
+          freteUsdTooltip,
+          m3Tooltip,
+          totalBrlTooltip,
+          totalUsdTooltip
         };
       });
     });
@@ -368,6 +378,10 @@ export default function ProformaInvoicePage() {
           `Total Frete $ ${fmt(form.valorTotalFreteUSD)} / Total M³ ${fmt(totalM3)} = $ ${fmt(custoPorM3USD)}/m³\n` +
           `x Item M³ ${fmt(item.m3)} = $ ${fmt(freteUnitarioUSD)}`;
 
+        const totalBrlTooltip = `(Unit EXW $ ${fmt(item.ValorEXW)} * Risco ${fmt(Number(form.cotacaoRisco) || 0)} + Frete R$ ${fmt(freteUnitarioBRL)}) * Qtd ${item.quantidade} = R$ ${fmt(valorFinalBRL)}`;
+        const totalUsdTooltip = `(Unit EXW $ ${fmt(item.ValorEXW)} + Frete $ ${fmt(freteUnitarioUSD)}) * Qtd ${item.quantidade} = $ ${fmt(valorFinalUSD)}`;
+        const m3Tooltip = `(L:${item.largura} * P:${item.profundidade} * A:${item.altura}) * Qtd:${item.quantidade} / 1.000.000 = ${fmt(item.m3 * item.quantidade, 3)} m³`;
+
         return {
           ...item,
           ValorFreteRateadoBRL: freteUnitarioBRL,
@@ -375,7 +389,10 @@ export default function ProformaInvoicePage() {
           ValorFinalItemBRL: valorFinalBRL,
           ValorFinalItemUSDRisco: valorFinalUSD,
           freteBrlTooltip,
-          freteUsdTooltip
+          freteUsdTooltip,
+          m3Tooltip,
+          totalBrlTooltip,
+          totalUsdTooltip
         };
       });
 
@@ -932,6 +949,12 @@ export default function ProformaInvoicePage() {
                       handleCotacaoRiscoChange(Number(form.cotacaoRisco).toFixed(2));
                   }
               }}
+              title={(() => {
+                const s = fornecedores.find(f => String(f.id) === form.idFornecedor);
+                const isF = (s?.nome || "").toLowerCase().includes("ferguile") || (s?.nome || "").toLowerCase().includes("livintus");
+                if (isF) return `Cálculo: Fixo Configuração = ${fmt(config?.valorReducaoDolar)}`;
+                return `Cálculo: Atual (${fmt(form.cotacaoAtualUSD)}) - Redução (${fmt(config?.valorReducaoDolar)}) = ${fmt(Number(form.cotacaoAtualUSD) - (config?.valorReducaoDolar || 0))}`;
+              })()}
             />
           </div>
           <div className="field">
@@ -947,6 +970,7 @@ export default function ProformaInvoicePage() {
                       handleTotalFreteBRLChange(Number(form.valorTotalFreteBRL).toFixed(2));
                   }
               }}
+              title={`Cálculo USD: Total R$ ${fmt(form.valorTotalFreteBRL)} / Risco ${fmt(Number(form.cotacaoRisco) || 1)} = $ ${fmt(form.valorTotalFreteUSD)}`}
             />
           </div>
           <div className="field">
@@ -1149,7 +1173,7 @@ export default function ProformaInvoicePage() {
                   <td style={td}>{fmt(item.profundidade)}</td>
                   <td style={td}>{fmt(item.altura)}</td>
                   <td style={td}>{fmt(item.pa)}</td>
-                  <td style={td}>{fmt(item.m3, 3)}</td>
+                  <td style={td} title={item.m3Tooltip}>{fmt(item.m3 * item.quantidade, 3)}</td>
                   <td style={{...td, textAlign:"right"}} title={item.exwTooltip}>
                       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
                           $ {fmt(item.ValorEXW)}
@@ -1172,8 +1196,8 @@ export default function ProformaInvoicePage() {
                         </td>
                       </>
                    )}
-                  <td style={{...td, textAlign:"right"}}>R$ {fmt(item.ValorFinalItemBRL)}</td>
-                  <td style={{...td, textAlign:"right"}}>$ {fmt(item.ValorFinalItemUSDRisco)}</td>
+                   <td style={{...td, textAlign:"right"}} title={item.totalBrlTooltip}>R$ {fmt(item.ValorFinalItemBRL)}</td>
+                  <td style={{...td, textAlign:"right"}} title={item.totalUsdTooltip}>$ {fmt(item.ValorFinalItemUSDRisco)}</td>
                 </tr>
               ))}
               {itens.length === 0 && (

@@ -113,6 +113,62 @@ export default function ProformaInvoiceV2Page() {
     return name.includes("ferguile") || name.includes("livintus");
   }, [fornecedores, form.idFornecedor]);
 
+  const totalM3Pi = useMemo(() => itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0), [itens]);
+
+  const getCalculationHint = useCallback((type: string, item?: ItemGrid, group?: any) => {
+    const cot = Number(form.cotacaoAtualUSD);
+    const red = config?.valorReducaoDolar || 0;
+    const risk = Number(form.cotacaoRisco) || 1;
+    const com = config?.percentualComissao || 0;
+    const gor = config?.percentualGordura || 0;
+
+    switch (type) {
+      case "cotacaoRisco":
+        if (isFerguile) return `Cálculo: Fixo Configuração = ${red.toFixed(2)}`;
+        return `Cálculo: Atual (${cot.toFixed(2)}) - Redução (${red.toFixed(2)}) = ${(cot - red).toFixed(2)}`;
+      
+      case "freteTotalUSD":
+        return `Cálculo: Total R$ (${form.valorTotalFreteBRL.toFixed(2)}) / Risco (${risk.toFixed(2)}) = ${(form.valorTotalFreteBRL / risk).toFixed(2)}`;
+
+      case "m3Total":
+        if (!item) return "";
+        return `Cálculo: (L:${item.largura} * P:${item.profundidade} * A:${item.altura}) * Qtd:${item.quantidade} / 1.000.000 = ${(item.m3 * item.quantidade).toFixed(3)} m³`;
+
+      case "exwUnit": {
+        if (!item) return "";
+        const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+        const valTec = mt?.valorTecido || 0;
+        return `Cálculo EXW: (${valTec.toFixed(2)} / ${risk.toFixed(2)}) + ${com}% (Comissão) + ${gor}% (Margem) = ${item.ValorEXW.toFixed(2)}`;
+      }
+
+      case "freteUnit": {
+        if (!item) return "";
+        return `Cálculo Rateio: (Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) * M³ Item ${item.m3.toFixed(3)} = ${item.ValorFreteRateadoUSD.toFixed(2)}`;
+      }
+
+      case "usdUnit": {
+        if (group && !isFerguile) {
+          const lines = group.items.map((it: ItemGrid) => `$ ${(it.ValorEXW + it.ValorFreteRateadoUSD).toFixed(2)}`).join(" + ");
+          return `Soma do Grupo: ${lines} = $ ${group.totalUsdUnit.toFixed(2)}`;
+        }
+        if (!item) return "";
+        return `Cálculo Unit USD: EXW ($ ${item.ValorEXW.toFixed(2)}) + Frete ($ ${item.ValorFreteRateadoUSD.toFixed(2)}) = ${(item.ValorEXW + item.ValorFreteRateadoUSD).toFixed(2)}`;
+      }
+
+      case "totalUsd": {
+        if (group && !isFerguile) {
+          const lines = group.items.map((it: ItemGrid) => `$ ${((it.ValorEXW + it.ValorFreteRateadoUSD) * it.quantidade).toFixed(2)}`).join(" + ");
+          return `Soma do Grupo: ${lines} = $ ${group.totalUsdGroup.toFixed(2)}`;
+        }
+        if (!item) return "";
+        const unit = item.ValorEXW + item.ValorFreteRateadoUSD;
+        return `Cálculo Total: Unit ($ ${unit.toFixed(2)}) * Qtd (${item.quantidade}) = ${(unit * item.quantidade).toFixed(2)}`;
+      }
+
+      default: return "";
+    }
+  }, [form.cotacaoAtualUSD, form.cotacaoRisco, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config, isFerguile, modulosTecidos, totalM3Pi]);
+
   // Filters for Item Selection Modal
   const [filterFornecedor, setFilterFornecedor] = useState("");
   const [filterCategoria, setFilterCategoria] = useState("");
@@ -727,7 +783,14 @@ export default function ProformaInvoiceV2Page() {
                </div>
                <div className="field">
                  <label className="label">Cotação Risco</label>
-                 <input type="number" step="0.01" className="cl-input" value={form.cotacaoRisco} onChange={e => setForm({...form, cotacaoRisco: e.target.value})} />
+                 <input 
+                   type="number" 
+                   step="0.01" 
+                   className="cl-input" 
+                   value={form.cotacaoRisco} 
+                   onChange={e => setForm({...form, cotacaoRisco: e.target.value})} 
+                   title={getCalculationHint("cotacaoRisco")}
+                 />
                </div>
                <div className="field">
                  <label className="label">Frete</label>
@@ -740,11 +803,18 @@ export default function ProformaInvoiceV2Page() {
                </div>
                <div className="field">
                  <label className="label">Frete Total (R$)</label>
-                 <input type="number" step="0.01" className="cl-input" value={form.valorTotalFreteBRL} onChange={e => {
-                    const brl = parseFloat(e.target.value) || 0;
-                    const risk = Number(form.cotacaoRisco) || 1;
-                    setForm({...form, valorTotalFreteBRL: brl, valorTotalFreteUSD: brl / risk});
-                 }} />
+                 <input 
+                   type="number" 
+                   step="0.01" 
+                   className="cl-input" 
+                   value={form.valorTotalFreteBRL} 
+                   onChange={e => {
+                     const brl = parseFloat(e.target.value) || 0;
+                     const risk = Number(form.cotacaoRisco) || 1;
+                     setForm({...form, valorTotalFreteBRL: brl, valorTotalFreteUSD: brl / risk});
+                   }} 
+                   title={getCalculationHint("freteTotalUSD")}
+                 />
                </div>
                <div className="field">
                  <label className="label">Tempo Entrega</label>
@@ -897,7 +967,9 @@ export default function ProformaInvoiceV2Page() {
                                  </td>
                                  
                                  {/* Vol Total M3 */}
-                                 <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa" }}>{fmt3(item.m3 * item.quantidade)}</td>
+                                 <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa" }} title={getCalculationHint("m3Total", item)}>
+                                   {fmt3(item.m3 * item.quantidade)}
+                                 </td>
                                  
                                  {(!isFerguile && isFirst) ? (
                                     <td rowSpan={group.span} style={{ 
@@ -957,13 +1029,13 @@ export default function ProformaInvoiceV2Page() {
 
                                  {!isFerguile && (
                                    <>
-                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorEXW)}</td>
-                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
+                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>$ {fmt(item.ValorEXW)}</td>
+                                     <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>$ {fmt(item.ValorFreteRateadoUSD)}</td>
                                    </>
                                  )}
                                  
                                  {isFerguile ? (
-                                   <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }}>
+                                   <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }} title={getCalculationHint("usdUnit", item)}>
                                      $ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}
                                    </td>
                                  ) : (
@@ -976,7 +1048,9 @@ export default function ProformaInvoiceV2Page() {
                                         background: "rgba(255, 255, 255, 0.02)",
                                         fontSize: "15px",
                                         fontWeight: "600"
-                                      }}>
+                                      }}
+                                      title={getCalculationHint("usdUnit", item, group)}
+                                      >
                                          $ {fmt(group.totalUsdUnit)}
                                      </td>
                                    )
@@ -991,12 +1065,14 @@ export default function ProformaInvoiceV2Page() {
                                        fontWeight: "800", 
                                        fontSize: "16px",
                                        paddingRight: "15px"
-                                     }}>
+                                     }}
+                                     title={getCalculationHint("totalUsd", item, group)}
+                                     >
                                         $ {fmt(group.totalUsdGroup)}
                                     </td>
                                   ) : (
                                     isFerguile && (
-                                      <td style={{ ...tdStyle, textAlign: "right", fontWeight: "700", color: "#fca5a5" }}>
+                                      <td style={{ ...tdStyle, textAlign: "right", fontWeight: "700", color: "#fca5a5" }} title={getCalculationHint("totalUsd", item)}>
                                         $ {fmt((item.ValorEXW + item.ValorFreteRateadoUSD) * item.quantidade)}
                                       </td>
                                     )
