@@ -608,7 +608,7 @@ public class PiExportService
         ws.Column(10).Width = 20;
     }
 
-    private void BuildFerguileLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata)
+    private void BuildFerguileLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata, string lang)
     {
         string piNumber = GetFormattedPiNumber(pi);
         var dateObj = pi.DataPi.DateTime;
