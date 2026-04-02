@@ -96,7 +96,7 @@ export default function PrintPiPage() {
   }, [pi]);
 
   const processedData = useMemo(() => {
-    if (!pi) return { brandGroups: [], totalSofaQty: 0, totalQty: 0, totalM3: 0, totalValue: 0 };
+    if (!pi) return { brandGroups: [], totalSofaQty: 0, totalQty: 0, totalM3: 0, totalValue: 0, risk: 1 };
     const allItems: any[] = [];
     let totalSofaQty = 0;
     const risk = Number(pi.cotacaoRisco) || 1;
@@ -117,7 +117,7 @@ export default function PrintPiPage() {
         });
     }
 
-    if (allItems.length === 0) return { brandGroups: [], totalSofaQty, totalQty: 0, totalM3: 0, totalValue: 0 };
+    if (allItems.length === 0) return { brandGroups: [], totalSofaQty, totalQty: 0, totalM3: 0, totalValue: 0, risk: 1 };
 
     const itemsByMarca: { [key: string]: { item: any, mt: ModuloTecido | undefined }[] } = {};
     allItems.forEach(i => {
