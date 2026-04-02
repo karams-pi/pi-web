@@ -124,6 +124,23 @@ export default function PrintPiPage() {
     allItems.forEach(i => {
         const item = i;
         const mt = item.moduloTecido || (item as any).ModuloTecido;
+        
+        // Recover dimensions from master module if blank in line item
+        if (!item.largura && mt?.modulo?.largura) item.largura = mt.modulo.largura;
+        if (!item.profundidade && mt?.modulo?.profundidade) item.profundidade = mt.modulo.profundidade;
+        if (!item.altura && mt?.modulo?.altura) item.altura = mt.modulo.altura;
+
+        // Force volume calculation if missing or 0
+        if (!item.m3 || item.m3 === 0) {
+            const lVal = Number(String(item.largura || 0).replace(',', '.'));
+            const pVal = Number(String(item.profundidade || 0).replace(',', '.'));
+            const aVal = Number(String(item.altura || 0).replace(',', '.'));
+            const calcM3 = lVal * pVal * aVal;
+            // Same unit threshold as in the main page
+            if (calcM3 > 500) item.m3 = calcM3 / 1000000;
+            else if (calcM3 > 0) item.m3 = calcM3;
+        }
+
         const marca = mt?.modulo?.marca?.nome || "Outros";
         if (!itemsByMarca[marca]) itemsByMarca[marca] = [];
         itemsByMarca[marca].push({ item, mt });
@@ -303,15 +320,15 @@ export default function PrintPiPage() {
                             const risk = processedData.risk;
                             const isBRL = currency === "BRL";
                             
-                            const lineExwUnitUSD = (Number(item.valorEXW || 0)) + (Number(item.valorFreteRateadoUSD || 0));
-                            const itemUnitFinalDisp = lineExwUnitUSD * (Number(item.quantidade || 0)) * (isBRL ? risk : 1);
+                            const lineExwUnitUSD = (Number(item?.valorEXW || 0)) + (Number(item?.valorFreteRateadoUSD || 0));
+                            const itemUnitFinalDisp = lineExwUnitUSD * (Number(item?.quantidade || 0)) * (isBRL ? risk : 1);
 
                             let pieceTotalUnitUSD = 0;
                             if (spans['totalExw'][index] > 0) {
                                 const span = spans['totalExw'][index];
                                 sortedItems.slice(index, index + span).forEach(g => {
-                                    const gExw = (Number(g.item.valorEXW || 0)) + (Number(g.item.valorFreteRateadoUSD || 0));
-                                    pieceTotalUnitUSD += gExw * (Number(g.item.quantidade || 0)) * (isBRL ? risk : 1);
+                                    const gExw = (Number(g?.item?.valorEXW || 0)) + (Number(g?.item?.valorFreteRateadoUSD || 0));
+                                    pieceTotalUnitUSD += gExw * (Number(g?.item?.quantidade || 0)) * (isBRL ? risk : 1);
                                 });
                             }
 
@@ -320,7 +337,17 @@ export default function PrintPiPage() {
                                 return <td rowSpan={span} style={{ border: "1px solid #000", verticalAlign: "middle", ...extra }}>{content}</td>;
                             };
                             
-                            const fabricContent = (entry.mt?.tecido?.nome || "Sem Tecido") + (item.codigoModuloTecido ? ` - ${item.codigoModuloTecido}` : "");
+                            let fabricContent = entry.mt?.tecido?.nome || "Sem Tecido";
+                            const fSpan = spans['fabric'][index];
+                            if (fSpan > 0) {
+                                const groupEntries = sortedItems.slice(index, index + fSpan);
+                                const codes = Array.from(new Set(groupEntries.map(ge => {
+                                    const m = ge.mt;
+                                    const it = ge.item;
+                                    return (it.tempCodigoModuloTecido || m?.codigoModuloTecido || it.codigoModuloTecido || "").trim();
+                                }).filter(c => c !== "")));
+                                if (codes.length === 1) fabricContent += ` - ${codes[0]}`;
+                            }
 
                             return (
                                 <tr key={item.id || index}>
