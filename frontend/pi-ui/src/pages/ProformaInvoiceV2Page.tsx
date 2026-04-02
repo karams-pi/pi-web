@@ -76,7 +76,6 @@ type ItemGrid = {
 };
 
 const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-const fmt3 = (n: number | undefined) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
 export default function ProformaInvoiceV2Page() {
   const { id } = useParams();
@@ -609,7 +608,15 @@ export default function ProformaInvoiceV2Page() {
     return { groups };
   }, [itens, modulosTecidos, isFerguile, form.moedaExibicao, form.cotacaoRisco]);
 
-  const totalM3Pi = useMemo(() => itens.reduce((sum, i) => sum + (Number(i.m3 || 0) * (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1)))), 0), [itens]);
+  const totalM3Pi = useMemo(() => {
+    const rawSum = itens.reduce((sum, i) => {
+      const vol = Number(i.m3 || 0);
+      const roundedVol = Math.round(vol * 100) / 100;
+      const subTotal = roundedVol * (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1)));
+      return sum + subTotal;
+    }, 0);
+    return Math.round(rawSum * 100) / 100;
+  }, [itens]);
   const totalValuePi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.totalGroup || 0), 0), [processedData.groups]);
   const totalPiecesPi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.qtyPeca || 0), 0), [processedData.groups]);
   const totalQtyModuloPi = useMemo(() => itens.reduce((sum, i) => sum + (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1))), 0), [itens]);
@@ -1268,7 +1275,7 @@ export default function ProformaInvoiceV2Page() {
                                  
                                  {/* Vol Total M3 */}
                                  <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa" }} title={getCalculationHint("m3Total", item)}>
-                                   {fmt3(item.m3 * item.quantidade)}
+                                   {fmt(item.m3 * item.quantidade)}
                                  </td>
                                  
                                  {(!isFerguile && isFirst) ? (

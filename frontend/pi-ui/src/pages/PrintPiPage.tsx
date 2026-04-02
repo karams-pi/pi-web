@@ -79,7 +79,6 @@ export default function PrintPiPage() {
   }, [id]);
 
   const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-  const fmt3 = (n: number | undefined) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   
   const safeDate = (dateStr: string | undefined) => {
       if (!dateStr) return new Date();
@@ -200,19 +199,26 @@ export default function PrintPiPage() {
 
     brandGroups.forEach(bg => {
         let pieceTotalUnitUSD = 0;
+        let pieceTotalM3 = 0;
         const qPeca = Number(bg.sortedItems[0].item.quantidadePeca || 1);
         bg.sortedItems.forEach(entry => {
             const item = entry.item;
             const qtyMod = Number(item.quantidade || 0);
             totalQty += (qtyMod * qPeca);
-            totalM3 += (Number(item.m3 || 0)) * (qtyMod * qPeca);
+            
+            // Round line m3 to 2 decimals as requested
+            const lineM3 = (Number(item.m3 || 0)) * qtyMod;
+            pieceTotalM3 += Math.round(lineM3 * 100) / 100;
             
             const lineExwUnitUSD = (Number(item.valorEXW || 0)) + (Number(item.valorFreteRateadoUSD || 0));
             const itemUnitFinalUSD = lineExwUnitUSD * qtyMod * (currency === "BRL" ? risk : 1);
             pieceTotalUnitUSD += itemUnitFinalUSD;
         });
+        totalM3 += Math.round(pieceTotalM3 * qPeca * 100) / 100;
         totalValue += pieceTotalUnitUSD * qPeca;
     });
+    
+    totalM3 = Math.round(totalM3 * 100) / 100;
 
     return { brandGroups, totalSofaQty, totalQty, totalM3, totalValue, risk };
   }, [pi, currency, showFreight]);
@@ -363,7 +369,7 @@ export default function PrintPiPage() {
                                     <td style={{ textAlign: "center" }}>{fmt(item.altura)}</td>
                                     <td style={{ textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
                                     {renderMerged('qtySofa', fmt(item.quantidadePeca, 0), { textAlign: "center", fontWeight: "bold" })}
-                                    <td style={{ textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
+                                    <td style={{ textAlign: "center" }}>{fmt((item.m3 || 0) * (item.quantidade || 0))}</td>
                                     {renderMerged('fabric', fabricContent, { textAlign: "center", background: "#f0fdf4", fontWeight: "bold" })}
                                     {renderMerged('feet', item.feet || item.Feet || "", { textAlign: "center" })}
                                     {renderMerged('finishing', item.finishing || item.Finishing || "", { textAlign: "center" })}
@@ -383,7 +389,7 @@ export default function PrintPiPage() {
               <td colSpan={6} style={{ textAlign: "right", padding: "4px 8px" }}>{t("TOTAL")}</td>
               <td style={{ textAlign: "center" }}>{processedData.totalQty}</td>
               <td style={{ textAlign: "center" }}>{processedData.totalSofaQty}</td>
-              <td style={{ textAlign: "center" }}>{fmt3(processedData.totalM3)}</td>
+              <td style={{ textAlign: "center" }}>{fmt(processedData.totalM3)}</td>
               <td colSpan={6} style={{ border: "1px solid #000" }}></td>
               <td style={{ textAlign: "right", background: "#fff1f2", fontWeight: "bold" }}>{currency === "BRL" ? "R$" : "$"} {fmt(processedData.totalValue)}</td>
             </tr>
@@ -402,7 +408,7 @@ export default function PrintPiPage() {
               <h3 style={{ margin: "0 0 5px 0", fontSize: 13 }}>{t("PRODUCT_DATA")}</h3>
               <p>BRAND: {supplierMetadata.details.brand}</p>
               <p>NCM: {supplierMetadata.details.ncm || "94016100"}</p>
-              <p>VOLUME M³: {fmt3(processedData.totalM3)}</p>
+              <p>VOLUME M³: {fmt(processedData.totalM3)}</p>
               <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>{t("VALIDITY_NOTE").replace("{0}", urlParams.get("validity") || "30")}</p>
           </div>
       </div>

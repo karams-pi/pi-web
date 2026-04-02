@@ -178,7 +178,7 @@ public class PiExportService
                 ["DELIVERY_TIME"] = "TEMPO DE ENTREGA:", ["INCOTERM"] = "INCOTERM:", ["PAYMENT_CONDITION"] = "CONDIÇÃO DE PAGAMENTO:",
                 ["PHOTO"] = "FOTO", ["NAME"] = "NOME", ["DESCRIPTION"] = "DESCRIÇÃO", ["DIMENSIONS"] = "DIMENSÕES (m)",
                 ["WIDTH"] = "LARG.", ["DEPTH"] = "PROF.", ["HEIGHT"] = "ALT.", ["QTY_UNIT"] = "QTD UNID", ["QTY_SOFA"] = "QTD SOFÁ",
-                ["TOTAL_VOLUME"] = "VOL. TOTAL M³", ["FABRIC"] = "TECIDO", ["FEET"] = "PÉS", ["FINISHING"] = "ACABAMENTO", ["OBSERVATION"] = "OBSERVAÇÃO",
+                ["TOTAL_VOLUME"] = "VOL. TOTAL M³", ["FABRIC"] = "TECIDO", ["FEET"] = "PÉS", ["FINISHING"] = "ACABAMENTO", ["OBSERVATION"] = "OBSERVAÇÃO", ["FRETE"] = "FRETE",
                 ["TOTAL"] = "TOTAL", ["BANK_DETAILS"] = "DADOS BANCÁRIOS:", ["INTERMEDIARY_BANK"] = "BANCO INTERMEDIÁRIO:", ["BENEFICIARY_BANK"] = "BANCO BENEFICIÁRIO:",
                 ["PRODUCT_DATA"] = "DADOS GERAIS DO PRODUTO", ["VALIDITY_NOTE"] = "* Esta proforma é válida por {0} dias a partir da data de emissão.",
                 ["ORIGIN"] = "Hecho en Brasil", ["BRAND"] = "MARCA", ["REFERENCIA"] = "REFERÊNCIA", ["UNIT"] = "UNITÁRIO", ["FABRIC_N"] = "TELA N"
@@ -190,7 +190,7 @@ public class PiExportService
                 ["DELIVERY_TIME"] = "TIEMPO DE ENTREGA:", ["INCOTERM"] = "INCOTERM:", ["PAYMENT_CONDITION"] = "CONDICIÓN DE PAGO:",
                 ["PHOTO"] = "FOTO", ["NAME"] = "NOMBRE", ["DESCRIPTION"] = "DESCRIPCIÓN", ["DIMENSIONS"] = "DIMENSIONES (m)",
                 ["WIDTH"] = "LARG.", ["DEPTH"] = "Prof.", ["HEIGHT"] = "ALT.", ["QTY_UNIT"] = "CANT UNID", ["QTY_SOFA"] = "CANT SOFA",
-                ["TOTAL_VOLUME"] = "TOTAL VOLUMEN M³", ["FABRIC"] = "TELA", ["FEET"] = "PIES", ["FINISHING"] = "ACABADO", ["OBSERVATION"] = "OBSERVACIÓN",
+                ["TOTAL_VOLUME"] = "TOTAL VOLUMEN M³", ["FABRIC"] = "TELA", ["FEET"] = "PIES", ["FINISHING"] = "ACABADO", ["OBSERVATION"] = "OBSERVACIÓN", ["FRETE"] = "FLETE",
                 ["TOTAL"] = "TOTAL", ["BANK_DETAILS"] = "DETALLES BANCARIOS:", ["INTERMEDIARY_BANK"] = "BANCO INTERMEDIARIO:", ["BENEFICIARY_BANK"] = "BANCO BENEFICIARIO:",
                 ["PRODUCT_DATA"] = "DATOS GENERALES DEL PRODUCTO", ["VALIDITY_NOTE"] = "* Esta proforma es válida por {0} días a partir de la fecha de emisión.",
                 ["ORIGIN"] = "Hecho en Brasil", ["BRAND"] = "MARCA", ["REFERENCIA"] = "REFERENCIA", ["UNIT"] = "UNIT", ["FABRIC_N"] = "TELA N"
@@ -202,7 +202,7 @@ public class PiExportService
                 ["DELIVERY_TIME"] = "DELIVERY TIME:", ["INCOTERM"] = "INCOTERM:", ["PAYMENT_CONDITION"] = "PAYMENT CONDITION:",
                 ["PHOTO"] = "PHOTO", ["NAME"] = "NAME", ["DESCRIPTION"] = "DESCRIPTION", ["DIMENSIONS"] = "DIMENSIONS (m)",
                 ["WIDTH"] = "WIDTH", ["DEPTH"] = "DEPTH", ["HEIGHT"] = "HEIGHT", ["QTY_UNIT"] = "QTY UNIT", ["QTY_SOFA"] = "QTY PIECE",
-                ["TOTAL_VOLUME"] = "TOTAL M³", ["FABRIC"] = "FABRIC", ["FEET"] = "FEET", ["FINISHING"] = "FINISHING", ["OBSERVATION"] = "OBSERVATION",
+                ["TOTAL_VOLUME"] = "TOTAL M³", ["FABRIC"] = "FABRIC", ["FEET"] = "FEET", ["FINISHING"] = "FINISHING", ["OBSERVATION"] = "OBSERVATION", ["FRETE"] = "FREIGHT",
                 ["TOTAL"] = "TOTAL", ["BANK_DETAILS"] = "BANKING DETAILS:", ["INTERMEDIARY_BANK"] = "INTERMEDIARY BANK:", ["BENEFICIARY_BANK"] = "BENEFICIARY BANK:",
                 ["PRODUCT_DATA"] = "GENERAL PRODUCT DATA", ["VALIDITY_NOTE"] = "* This proforma is valid for {0} days from the date of issue.",
                 ["ORIGIN"] = "Made in Brazil", ["BRAND"] = "BRAND", ["REFERENCIA"] = "REFERENCE", ["UNIT"] = "UNIT", ["FABRIC_N"] = "FABRIC N"
@@ -221,28 +221,35 @@ public class PiExportService
         var dateObj = pi.DataPi.DateTime;
 
         // ═══════════════ TOP BAR ═══════════════
-        ws.Cells["A1:O1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-        ws.Cells["A1:O1"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(0, 51, 102));
+        ws.Cells["A1:Q1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+        ws.Cells["A1:Q1"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(0, 51, 102));
 
         // ═══════════════ HEADER ═══════════════
-        ws.Cells["A2:O2"].Merge = true;
+        ws.Cells["A2:Q2"].Merge = true;
         ws.Cells["A2"].Value = metadata.Name;
         ws.Cells["A2"].Style.Font.Bold = true;
         ws.Cells["A2"].Style.Font.Size = 13;
         ws.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-        ws.Cells["A3:O3"].Merge = true;
+        ws.Cells["A3:Q3"].Merge = true;
         ws.Cells["A3"].Value = $"CNPJ {metadata.Cnpj} | {metadata.Address} {metadata.Zip} {metadata.City} - {metadata.State}";
         ws.Cells["A3"].Style.Font.Size = 8;
         ws.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         
-        ws.Cells["A4:O4"].Merge = true;
+        ws.Cells["A4:Q4"].Merge = true;
         ws.Cells["A4"].Value = $"{metadata.Email} - {metadata.Website} | {metadata.Phone}";
         ws.Cells["A4"].Style.Font.Size = 8;
         ws.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
 
-        ws.Cells["A5:O5"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        ws.Cells["A5:Q5"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        
+        ws.Row(1).Height = 5;
+        ws.Row(2).Height = 25;
+        ws.Row(3).Height = 15;
+        ws.Row(4).Height = 15;
+        ws.Row(5).Height = 10;
+        for (int r = 6; r <= 13; r++) ws.Row(r).Height = 18;
 
         // ═══════════════ IMPORTER & PI DETAILS GRID ═══════════════
         int gridRow = 6;
@@ -255,8 +262,7 @@ public class PiExportService
         ws.Cells[gridRow + 4, 1].Value = t("COUNTRY", lang) + " " + (pi.Cliente?.Pais ?? "BRASIL");
         ws.Cells[gridRow + 5, 1].Value = t("NIT", lang) + " " + pi.Cliente?.Nit;
         ws.Cells[gridRow + 6, 1].Value = t("PHONE", lang) + " " + pi.Cliente?.Telefone;
-        ws.Cells[gridRow + 7, 1].Value = t("RESPONSIBLE", lang) + " " + (pi.Cliente?.PessoaContato ?? "..");
-        ws.Cells[gridRow + 8, 1].Value = t("EMAIL", lang) + " " + pi.Cliente?.Email;
+        ws.Cells[gridRow + 7, 1].Value = t("RESPONSIBLE", lang) + " " + (pi.Cliente?.PessoaContato ?? "..") + " | " + t("EMAIL", lang) + " " + pi.Cliente?.Email;
 
         // PI Details Column (Right)
         int rightCol = 8;
@@ -276,10 +282,10 @@ public class PiExportService
         ws.Cells[gridRow + 6, rightCol + 1].Value = $"{pi.Frete?.Nome} {pi.Configuracoes?.PortoEmbarque ?? ""}";
         ws.Cells[gridRow + 7, rightCol].Value = t("PAYMENT_CONDITION", lang);
         ws.Cells[gridRow + 7, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "T/T");
-        ws.Cells[gridRow, 1, gridRow + 8, 15].Style.Font.Size = 8;
+        ws.Cells[gridRow, 1, gridRow + 7, 17].Style.Font.Size = 8;
 
         // ═══════════════ TABLE HEADER ═══════════════
-        int startRow = 15;
+        int startRow = 14;
         ws.Cells[startRow, 1, startRow + 1, 1].Merge = true; ws.Cells[startRow, 1].Value = t("PHOTO", lang);
         ws.Cells[startRow, 2, startRow + 1, 2].Merge = true; ws.Cells[startRow, 2].Value = t("NAME", lang);
         ws.Cells[startRow, 3, startRow + 1, 3].Merge = true; ws.Cells[startRow, 3].Value = t("DESCRIPTION", lang);
@@ -308,7 +314,7 @@ public class PiExportService
         ws.Cells[startRow, colIndividualFreight].Value = t("FRETE", lang);
         
         ws.Cells[startRow, colGroupUnit, startRow + 1, colGroupUnit].Merge = true; 
-        ws.Cells[startRow, colGroupUnit].Value = currency == "BRL" ? $"UNIT R$ ({t("UNIT", lang)})" : $"UNIT DOLAR ({t("UNIT", lang)})";
+        ws.Cells[startRow, colGroupUnit].Value = currency == "BRL" ? $"UNIT R$ ({t("UNIT", lang)})" : "USD UNIT";
         
         ws.Cells[startRow, colGroupTotal, startRow + 1, colGroupTotal].Merge = true; 
         ws.Cells[startRow, colGroupTotal].Value = currency == "BRL" ? "TOTAL R$" : "TOTAL USD";
@@ -341,9 +347,25 @@ public class PiExportService
             brandItemsMap[brand?.Id ?? 0L] = sortedItems;
         }
 
-        // ═══════════════ PRE-CALCULATE FREIGHTS ═══════════════
+        // ═══════════════ PRE-CALCULATE FREIGHTS & REPAIR VOLUMES ═══════════════
+        foreach (var item in brandRenderedItems)
+        {
+            // Recover dimensions from master module if blank in line item
+            if (item.Largura == 0 && item.ModuloTecido?.Modulo?.Largura > 0) item.Largura = item.ModuloTecido.Modulo.Largura;
+            if (item.Profundidade == 0 && item.ModuloTecido?.Modulo?.Profundidade > 0) item.Profundidade = item.ModuloTecido.Modulo.Profundidade;
+            if (item.Altura == 0 && item.ModuloTecido?.Modulo?.Altura > 0) item.Altura = item.ModuloTecido.Modulo.Altura;
+
+            // Force volume calculation if missing or 0 (Meters vs CM logic)
+            if (item.M3 == 0)
+            {
+                decimal calcM3 = (decimal)item.Largura * (decimal)item.Profundidade * (decimal)item.Altura;
+                if (calcM3 > 500) item.M3 = calcM3 / 1000000;
+                else if (calcM3 > 0) item.M3 = calcM3;
+            }
+        }
+
         decimal piTotalQty = pi.PiItens.Sum(i => (decimal)i.Quantidade);
-        decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
+        decimal piTotalM3 = pi.PiItens.Sum(i => Math.Round(i.M3 * (decimal)i.Quantidade, 2));
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
 
@@ -453,8 +475,15 @@ public class PiExportService
                     rangeQtySofa.Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                     string fName = item.ModuloTecido?.Tecido?.Nome ?? "Sem Tecido";
-                    string fCode = item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
-                    string fText = string.IsNullOrEmpty(fCode) ? fName : $"{fName} - {fCode}";
+                    var codesInGroup = groupItems
+                        .Select(gi => (gi.TempCodigoModuloTecido ?? gi.ModuloTecido?.CodigoModuloTecido ?? "").Trim())
+                        .Where(c => !string.IsNullOrEmpty(c))
+                        .Distinct()
+                        .ToList();
+                    
+                    string fText = fName;
+                    if (codesInGroup.Count == 1) fText += $" - {codesInGroup[0]}";
+
                     var rangeFabric = ws.Cells[currentRow, 10, toRow, 10];
                     rangeFabric.Merge = true;
                     rangeFabric.Value = fText;
@@ -476,7 +505,8 @@ public class PiExportService
                 ws.Cells[currentRow, 6].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 ws.Cells[currentRow, 7].Value = item.Quantidade;
                 ws.Cells[currentRow, 7].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-                ws.Cells[currentRow, 9].Value = item.M3 * item.Quantidade;
+                decimal itemRowM3 = Math.Round(item.M3 * (decimal)item.Quantidade, 2);
+                ws.Cells[currentRow, 9].Value = itemRowM3;
                 ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                 // Individual Values per row
@@ -509,24 +539,25 @@ public class PiExportService
                     foreach (var m in groupItems)
                     {
                         decimal mQty = m.Quantidade > 0 ? (decimal)m.Quantidade : 1m;
-                        decimal mPecaQty = m.PiItemPeca?.Quantidade ?? 1m;
-                        decimal mQtyPerPeca = mPecaQty > 0 ? mQty / mPecaQty : 0;
+                        
+                        // Use saved freight if available (strictly matching frontend)
+                        decimal mFreight = m.ValorFreteRateadoUSD;
+                        if (currency == "BRL") mFreight *= (decimal)pi.CotacaoRisco;
 
                         decimal mUnitEXW = m.ValorEXW;
                         if (currency == "BRL") mUnitEXW *= (decimal)pi.CotacaoRisco;
                         
-                        decimal mFreight = (currency == "BRL" ? itemFreightBRL[m.Id] : itemFreightUSD[m.Id]);
-                        
-                        // Piece context: (Unit EXW + Unit Freight) * (Modules per Piece)
-                        fabricGroupUnit += (mUnitEXW + mFreight) * mQtyPerPeca;
-
-                        fabricGroupTotalValue += (mUnitEXW * m.Quantidade) + (mFreight * m.Quantidade);
+                        // To match the screen's 'UNIT' column for Karams: (EXW + Freight) * TOTAL PI Modules
+                        fabricGroupUnit += (mUnitEXW + mFreight) * mQty;
                     }
+                    fabricGroupTotalValue = fabricGroupUnit * (item.PiItemPeca?.Quantidade ?? 1);
 
                     var rangeGroupUnit = ws.Cells[currentRow, colGroupUnit, endRowGrp, colGroupUnit];
                     rangeGroupUnit.Merge = true;
                     rangeGroupUnit.Value = fabricGroupUnit;
                     rangeGroupUnit.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    rangeGroupUnit.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    rangeGroupUnit.Style.Font.Bold = true;
                     rangeGroupUnit.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     rangeGroupUnit.Style.Numberformat.Format = "#,##0.00";
 
@@ -537,17 +568,20 @@ public class PiExportService
                     rangeGroupTotal.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     rangeGroupTotal.Style.Font.Bold = true;
                     rangeGroupTotal.Style.Numberformat.Format = "#,##0.00";
+
+                    // Align global total with the sum of displayed piece groups to match the screen exactly
+                    totalValue += fabricGroupTotalValue;
                 }
 
                 totalQty += item.Quantidade;
-                totalM3 += (item.M3 * item.Quantidade);
-                // The total value calculates per item in the global scope using consistent freight
-                decimal itemFinalPrice = currency == "BRL" 
-                    ? (item.ValorEXW * (decimal)pi.CotacaoRisco + itemFreightBRL[item.Id]) * item.Quantidade
-                    : (item.ValorEXW + itemFreightUSD[item.Id]) * item.Quantidade;
-                // totalValue was previously incremented in the isFirstOfGroup block as fabricGroupTotalValue, 
-                // which resulted in double counting. We'll use the item-by-item sum here and remove it from there.
-                totalValue += itemFinalPrice;
+                totalM3 += itemRowM3;
+                if (spanFabric[i] == 0 && item.IdPiItemPeca == null)
+                {
+                    // Single item fallback
+                    decimal unitPriceRaw = item.ValorEXW + (item.ValorFreteRateadoUSD > 0 ? item.ValorFreteRateadoUSD : itemFreightUSD[item.Id]);
+                    if (currency == "BRL") unitPriceRaw *= (decimal)pi.CotacaoRisco;
+                    totalValue += unitPriceRaw * item.Quantidade;
+                }
 
                 if (spanFeet[i] > 0) {
                     int toRow = currentRow + spanFeet[i] - 1;
@@ -576,20 +610,6 @@ public class PiExportService
                 currentRow++;
             }
 
-            // Totals Row (Generic)
-            ws.Cells[currentRow, 1, currentRow, 13].Merge = true;
-            ws.Cells[currentRow, 1].Value = "TOTAL GERAL:";
-            ws.Cells[currentRow, 1].Style.Font.Bold = true;
-            ws.Cells[currentRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-            
-            ws.Cells[currentRow, 14].Value = (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
-
-            ws.Cells[currentRow, 17].Value = totalValue;
-            ws.Cells[currentRow, 14, currentRow, 17].Style.Font.Bold = true;
-            ws.Cells[currentRow, 14, currentRow, 17].Style.Numberformat.Format = "#,##0.00";
-            for (int i = 1; i <= 17; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            currentRow++;
-
             // Merge Brand Name & Photo
             ws.Cells[groupStartRow, 2, currentRow - 1, 2].Merge = true;
             ws.Cells[groupStartRow, 2].Value = brand?.Nome ?? "Outros";
@@ -616,7 +636,7 @@ public class PiExportService
 
         // Summary Row Generic
         ws.Cells[currentRow, 1, currentRow, 6].Merge = true;
-        ws.Cells[currentRow, 1].Value = t("TOTAL", lang);
+        ws.Cells[currentRow, 1].Value = "TOTAL:";
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
         ws.Cells[currentRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
         ws.Cells[currentRow, 7].Value = totalQty;
@@ -671,10 +691,10 @@ public class PiExportService
         ws.Cells[currentRow + 1, 8].Value = t("BRAND", lang) + ": " + metadata.Brand;
         ws.Cells[currentRow + 2, 8].Value = "NCM: 94016100";
         ws.Cells[currentRow + 3, 8].Value = lang == "EN" ? "Product: " + totalQty : "Producto: " + totalQty;
-        ws.Cells[currentRow + 4, 8].Value = "CBM M³: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 4, 8].Value = "CBM M³: " + totalM3.ToString("N2");
         ws.Cells[currentRow + 5, 8].Value = "P.N. TOTAL:";
         ws.Cells[currentRow + 6, 8].Value = "P.B. TOTAL:";
-        ws.Cells[currentRow + 7, 8].Value = lang == "EN" ? "TOTAL VOLUME: " + totalM3.ToString("N3") : "VOLUMEN TOTAL: " + totalM3.ToString("N3");
+        ws.Cells[currentRow + 7, 8].Value = lang == "EN" ? "TOTAL VOLUME: " + totalM3.ToString("N2") : "VOLUMEN TOTAL: " + totalM3.ToString("N2");
         ws.Cells[currentRow + 8, 8].Value = lang == "PT" ? "Produtos originais de fabrica" : (lang == "EN" ? "Original factory products" : "Productos originales de fabrica");
         ws.Cells[currentRow + 9, 8].Value = t("ORIGIN", lang);
         
