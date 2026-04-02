@@ -248,7 +248,7 @@ export default function ProformaInvoiceV2Page() {
                   ValorFinalItemBRL: item.valorFinalItemBRL,
                   ValorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
                   idPiItemPeca: peca.id,
-                  codigoModuloTecido: item.moduloTecido?.codigoModuloTecido,
+                  codigoModuloTecido: item.tempCodigoModuloTecido || item.moduloTecido?.codigoModuloTecido || item.codigoModuloTecido || "",
                   observacao: item.observacao,
                   feet: item.feet,
                   finishing: item.finishing,
@@ -276,13 +276,34 @@ export default function ProformaInvoiceV2Page() {
               ValorFinalItemBRL: i.valorFinalItemBRL,
               ValorFinalItemUSDRisco: i.valorFinalItemUSDRisco,
               idPiItemPeca: i.idPiItemPeca,
-              codigoModuloTecido: i.moduloTecido?.codigoModuloTecido,
+              codigoModuloTecido: i.tempCodigoModuloTecido || i.moduloTecido?.codigoModuloTecido || i.codigoModuloTecido || "",
               observacao: i.observacao,
               feet: i.feet,
               finishing: i.finishing,
             });
           });
         }
+        // Unit-Aware dimensions recovery
+        flatItens.forEach(it => {
+          const mt = mtData.find(m => m.id === it.idModuloTecido);
+          const nestedMod = it.moduloTecido?.modulo || mt?.modulo;
+          
+          if (nestedMod) {
+             if (!it.largura) it.largura = nestedMod.largura || 0;
+             if (!it.profundidade) it.profundidade = nestedMod.profundidade || 0;
+             if (!it.altura) it.altura = nestedMod.altura || 0;
+          }
+
+          if (!it.m3 || it.m3 === 0) {
+             const l = Number(String(it.largura || 0).replace(',', '.'));
+             const p = Number(String(it.profundidade || 0).replace(',', '.'));
+             const a = Number(String(it.altura || 0).replace(',', '.'));
+             const calcM3 = l * p * a;
+             if (calcM3 > 500) it.m3 = calcM3 / 1000000;
+             else it.m3 = calcM3;
+          }
+        });
+
         setItens(flatItens);
       } else {
         setForm(prev => ({
@@ -505,6 +526,7 @@ export default function ProformaInvoiceV2Page() {
   }, [fornecedores, form.idFornecedor]);
   const processedData = useMemo(() => {
     if (itens.length === 0 || !modulosTecidos) return { groups: [] };
+    
     const sorted = [...itens].sort((a, b) => {
        const mtA = (modulosTecidos || []).find(m => m.id === a.idModuloTecido);
        const mtB = (modulosTecidos || []).find(m => m.id === b.idModuloTecido);
@@ -520,11 +542,13 @@ export default function ProformaInvoiceV2Page() {
        const fB = mtB?.tecido?.nome || "";
        return fA.localeCompare(fB);
     });
+
     const groups: any[] = [];
     let currentGroup: any = null;
+
     sorted.forEach(item => {
       const mt = (modulosTecidos || []).find(m => m.id === item.idModuloTecido);
-      let groupKey = isFerguile ? (mt?.modulo?.marca?.nome || "Sem Marca") : (mt?.tecido?.nome || "Sem Tecido");
+      const groupKey = isFerguile ? (mt?.modulo?.marca?.nome || "Sem Marca") : (mt?.tecido?.nome || "Sem Tecido");
       const isBRLMod = form.moedaExibicao === "BRL";
       const riskVal = Number(form.cotacaoRisco) || 1;
       const lineExwUnitUSD = (item.ValorEXW || 0) + (item.ValorFreteRateadoUSD || 0);
@@ -532,11 +556,17 @@ export default function ProformaInvoiceV2Page() {
       const lineUnitFinalUSD = lineExwUnitUSD * qTotal;
       const exwUnitDisp = isBRLMod ? lineExwUnitUSD * riskVal : lineExwUnitUSD;
       const unitFinalDisp = isBRLMod ? lineUnitFinalUSD * riskVal : lineUnitFinalUSD;
-      if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
+
+      const rawGroupKey = groupKey;
+      const currentRawGroup = isFerguile ? currentGroup?._rawBrandName : currentGroup?._rawFabricName;
+      
+      if (!currentGroup || currentRawGroup !== rawGroupKey) {
         currentGroup = { 
           fabricName: groupKey, 
           brandName: isFerguile ? groupKey : (mt?.modulo?.marca?.nome || "Sem Marca"),
           groupName: groupKey,
+          _rawFabricName: rawGroupKey,
+          _rawBrandName: isFerguile ? rawGroupKey : (mt?.modulo?.marca?.nome || "Sem Marca"),
           items: [], 
           span: 0, 
           totalUnit: 0, 
@@ -545,14 +575,37 @@ export default function ProformaInvoiceV2Page() {
         };
         groups.push(currentGroup);
       }
+
       currentGroup.items.push(item);
       currentGroup.span++;
       currentGroup.totalUnit += unitFinalDisp; 
+
       (item as any)._exwUnitDisp = exwUnitDisp;
       (item as any)._unitFinalDisp = unitFinalDisp;
       (item as any)._rowTotalDisp = unitFinalDisp;
+
+      // Volume unit logic: Dimensions in Meters (small values like 1.1) vs Dimensions in CM (large values like 110)
+      const lNum = Number(String(item.largura || 0).replace(',', '.'));
+      const pNum = Number(String(item.profundidade || 0).replace(',', '.'));
+      const aNum = Number(String(item.altura || 0).replace(',', '.'));
+      const calcM3Value = lNum * pNum * aNum;
+
+      if (!item.m3 || item.m3 === 0) {
+        if (calcM3Value > 500) item.m3 = calcM3Value / 1000000;
+        else if (calcM3Value > 0) item.m3 = calcM3Value;
+      }
     });
-    groups.forEach(g => { g.totalGroup = g.totalUnit * g.qtyPeca; });
+
+    // Decorate groups with cloth codes if there is consensus in the group
+    groups.forEach(g => { 
+      g.totalGroup = g.totalUnit * g.qtyPeca; 
+      const uniqueCodes = Array.from(new Set(g.items.map((it: any) => (it.codigoModuloTecido || "").trim()).filter((c: string) => c !== "")));
+      if (uniqueCodes.length === 1 && !isFerguile) {
+         g.fabricName = `${g.fabricName} - ${uniqueCodes[0]}`;
+         g.groupName = g.fabricName;
+      }
+    });
+    
     return { groups };
   }, [itens, modulosTecidos, isFerguile, form.moedaExibicao, form.cotacaoRisco]);
 
@@ -709,15 +762,22 @@ export default function ProformaInvoiceV2Page() {
       // MODE: EDIT
       setItens(prev => prev.map(it => {
         if (it.tempId === editingItemTempId) {
+          const newLargura = mt.modulo?.largura ?? it.largura;
+          const newProfundidade = mt.modulo?.profundidade ?? it.profundidade;
+          const newAltura = mt.modulo?.altura ?? it.altura;
+          const cM3 = newLargura * newProfundidade * newAltura;
+          const newM3 = cM3 > 100 ? cM3 / 1000000 : cM3;
+
           return {
             ...it,
             idModuloTecido: mt.id,
             quantidade: Number(quantidade) || 1,
-            quantidadePeca: Number(quantidade) || 1, 
-            largura: mt.modulo?.largura || 0,
-            profundidade: mt.modulo?.profundidade || 0,
-            altura: mt.modulo?.altura || 0,
-            m3: ((mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0)) / 1000000,
+            // Preserve Piece quantity from original item to avoid breaking piece-based calculations.
+            quantidadePeca: it.quantidadePeca, 
+            largura: newLargura,
+            profundidade: newProfundidade,
+            altura: newAltura,
+            m3: newM3 > 0 ? newM3 : it.m3,
             ValorEXW: exw,
             codigoModuloTecido: codigoModuloTecido
           };
@@ -726,16 +786,22 @@ export default function ProformaInvoiceV2Page() {
       }));
     } else {
       // MODE: ADD NEW
+      const larg = mt.modulo?.largura || 0;
+      const prof = mt.modulo?.profundidade || 0;
+      const alt = mt.modulo?.altura || 0;
+      const cM3 = larg * prof * alt;
+      const newM3 = cM3 > 100 ? cM3 / 1000000 : cM3;
+
       const newItem: ItemGrid = {
         tempId: Math.random(),
         idModuloTecido: mt.id,
         quantidade: Number(quantidade) || 1,
         quantidadePeca: Number(quantidade) || 1,
-        largura: mt.modulo?.largura || 0,
-        profundidade: mt.modulo?.profundidade || 0,
-        altura: mt.modulo?.altura || 0,
+        largura: larg,
+        profundidade: prof,
+        altura: alt,
         pa: 0,
-        m3: ((mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0)) / 1000000,
+        m3: newM3,
         ValorEXW: exw,
         ValorFreteRateadoBRL: 0,
         ValorFreteRateadoUSD: 0,
@@ -1223,7 +1289,7 @@ export default function ProformaInvoiceV2Page() {
                                   ) : (
                                     isFerguile && (
                                       <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
-                                        {mtInfo?.tecido?.nome || "-"}
+                                        {mtInfo?.tecido?.nome ? (group.commonCode ? `${mtInfo.tecido.nome} - ${group.commonCode}` : mtInfo.tecido.nome) : "-"}
                                       </td>
                                     )
                                   )}
