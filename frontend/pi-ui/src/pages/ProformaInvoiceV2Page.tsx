@@ -127,25 +127,33 @@ export default function ProformaInvoiceV2Page() {
 
   const translate = useCallback((key: string) => {
     const lang = form.idioma || "PT";
+    const isBRLMod = form.moedaExibicao === "BRL";
+    
     const dicts: Record<string, Record<string, string>> = {
       PT: {
-        FOTO: "FOTO", REF: "REF", MARCA: "MARCA", DESC: "MÓDULO / DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "QTD", QTD_PECA: "QTD PEÇA", M3: "M³ TOTAL", 
-        TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", UNIT_FINAL: "UNIT FINAL", UNIT: "USD UNIT", TOTAL: "TOTAL USD",
+        FOTO: "FOTO", REF: "REF", MARCA: "NOME", DESC: "DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", 
+        QTD: "QTD UNID", QTD_PECA: "QTD SOFÁ", M3: "TOTAL VOLUME M³", 
+        TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", 
+        UNIT_FINAL: "PREÇO UNIT. MÓDULO", UNIT: `UNIT ${isBRLMod ? "REAIS" : "DOLAR"}`, TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condição de Pagamento"
       },
       ES: {
-        FOTO: "FOTO", REF: "REF", MARCA: "MARCA", DESC: "MODULO / DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "CANT", QTD_PECA: "CANT PZA", M3: "M³ TOTAL", 
-        TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", UNIT_FINAL: "UNIT FINAL", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
+        FOTO: "FOTO", REF: "REF", MARCA: "NOMBRE", DESC: "DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", 
+        QTD: "CANT UNID", QTD_PECA: "CANT SOFÁ", M3: "TOTAL VOLUMEN M³", 
+        TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", 
+        UNIT_FINAL: "PRECIO UNIT. MODULO", UNIT: `UNIT ${isBRLMod ? "REAIS" : "DOLAR"}`, TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condición de Pago"
       },
       EN: {
-        FOTO: "PHOTO", REF: "REF", MARCA: "BRAND", DESC: "MODULE / DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", QTD: "QTY", QTD_PECA: "PIECE QTY", M3: "TOTAL M³", 
-        TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", UNIT_FINAL: "TOTAL UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
+        FOTO: "PHOTO", REF: "REF", MARCA: "NAME", DESC: "DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", 
+        QTD: "UNIT QTY", QTD_PECA: "SOFA QTY", M3: "TOTAL VOLUME M³", 
+        TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", 
+        UNIT_FINAL: "UNIT PRICE MODULE", UNIT: `${isBRLMod ? "REAL" : "USD"} UNIT`, TOTAL: "TOTAL USD",
         IDIOMA: "Language", COND_PAG: "Payment Condition"
       }
     };
     return dicts[lang]?.[key] || key;
-  }, [form.idioma]);
+  }, [form.idioma, form.moedaExibicao]);
 
   // Filters for Item Selection Modal
   const [filterFornecedor, setFilterFornecedor] = useState("");
