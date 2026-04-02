@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
-import type { ProformaInvoice, ModuloTecido, PiItem } from "../api/types";
+import type { ProformaInvoice, ModuloTecido } from "../api/types";
 import { getCliente, type Cliente } from "../api/clientes";
 import { getSupplierMetadata } from "../utils/supplierDefaults";
 
@@ -28,27 +28,27 @@ export default function PrintPiPage() {
         DATE: "DATA:", ORDER_DATE: "DATA PEDIDO:", SHIPMENT_POINT: "PONTO DE EMBARQUE:", DESTINATION_POINT: "PONTO DE DESTINO:", DELIVERY_TIME: "TEMPO DE ENTREGA:",
         INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "CONDIÇÃO DE PAGAMENTO:", PHOTO: "FOTO", NAME: "NOME", DESCRIPTION: "DESCRIÇÃO", DIMENSIONS: "DIMENSÕES (m)",
         WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "QTD UNID", QTY_SOFA: "QTD SOFÁ", TOTAL_VOLUME: "VOL. TOTAL M³", FABRIC: "TECIDO", FEET: "PÉS",
-        FINISHING: "ACABAMENTO", OBSERVATION: "OBSERVAÇÃO", TOTAL: "TOTAL", BANK_DETAILS: "DADOS BANCÁRIOS:", INTERMEDIARY_BANK: "BANCO INTERMEDIÁRIO",
+        FINISHING: "ACABAMENTO", OBSERVATION: "OBSERVAÇÃO", UNIT_FINAL: "PREÇO UNIT. MÓDULO", TOTAL: "TOTAL", BANK_DETAILS: "DADOS BANCÁRIOS:", INTERMEDIARY_BANK: "BANCO INTERMEDIÁRIO",
         BENEFICIARY_BANK: "BANCO BENEFICIÁRIO", PRODUCT_DATA: "DADOS GERAIS DO PRODUTO", VALIDITY_NOTE: "* Esta proforma é válida por {0} dias a partir da data de emissão.",
-        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Produto", LOADING: "Carregando documento..."
+        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Produto", LOADING: "Carregando documento...", UNIT: "UNIT DOLAR"
       },
       ES: {
         IMPORTER: "IMPORTADOR:", ADDRESS: "DIRECCIÓN:", CITY: "CIUDAD:", COUNTRY: "PAÍS:", NIT: "NIT:", PHONE: "TELÉFONO:", RESPONSIBLE: "RESPONSABLE:", EMAIL: "EMAIL:",
         DATE: "FECHA:", ORDER_DATE: "PEDIDO FECHA:", SHIPMENT_POINT: "PUNTO DE EMBARQUE:", DESTINATION_POINT: "PUNTO DE DESTINO:", DELIVERY_TIME: "TIEMPO DE ENTREGA:",
         INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "CONDICIÓN DE PAGO:", PHOTO: "FOTO", NAME: "NOMBRE", DESCRIPTION: "DESCRIPCIÓN", DIMENSIONS: "DIMENSIONES (m)",
-        WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "CANT UNID", QTY_SOFA: "CANT SOFA", TOTAL_VOLUME: "TOTAL VOLUMEN M³", FABRIC: "TELA", FEET: "PIES",
-        FINISHING: "ACABADO", OBSERVATION: "OBSERVACIÓN", TOTAL: "TOTAL", BANK_DETAILS: "DETALLES BANCARIOS:", INTERMEDIARY_BANK: "BANCO INTERMEDIARIO",
-        BENEFICIARY_BANK: "BANCO BENEFICIARIO", PRODUCT_DATA: "DATOS GENERALES DEL PRODUCTO", VALIDITY_NOTE: "* Esta proforma es válida por {0} días a partir de la fecha de emisión.",
-        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Producto", LOADING: "Cargando documento..."
+        WIDTH: "LARG.", DEPTH: "PROF.", HEIGHT: "ALT.", QTY_UNIT: "CANT UNID", QTY_SOFA: "CANT SOFÁ", TOTAL_VOLUME: "TOTAL VOLUMEN M³", FABRIC: "TELA", FEET: "PIES",
+        FINISHING: "ACABADO", OBSERVATION: "OBSERVACIÓN", UNIT_FINAL: "PRECIO UNIT. MODULO", TOTAL: "TOTAL", BANK_DETAILS: "DETALLES BANCARIOS:", INTERMEDIARY_BANK: "BANCO INTERMEDIARIO",
+        BENEFICIARY_BANK: "BANCO BENEFICIARIO", PRODUCT_DATA: "DATOS GENERALES DEL PRODUCTO", VALIDITY_NOTE: "* Esta proforma é válida por {0} dias a partir de la data de emissão.",
+        ORIGIN: "Hecho en Brasil", BRAND: "Marca", PRODUCT: "Produto", LOADING: "Cargando documento...", UNIT: "UNIT DOLAR"
       },
       EN: {
         IMPORTER: "IMPORTER:", ADDRESS: "ADDRESS:", CITY: "CITY:", COUNTRY: "COUNTRY:", NIT: "TAX ID / VAT:", PHONE: "PHONE:", RESPONSIBLE: "RESPONSIBLE:", EMAIL: "EMAIL:",
         DATE: "DATE:", ORDER_DATE: "ORDER DATE:", SHIPMENT_POINT: "SHIPMENT POINT:", DESTINATION_POINT: "DESTINATION POINT:", DELIVERY_TIME: "DELIVERY TIME:",
         INCOTERM: "INCOTERM:", PAYMENT_CONDITION: "PAYMENT CONDITION:", PHOTO: "PHOTO", NAME: "NAME", DESCRIPTION: "DESCRIPTION", DIMENSIONS: "DIMENSIONS (m)",
-        WIDTH: "WIDTH", DEPTH: "DEPTH", HEIGHT: "HEIGHT", QTY_UNIT: "QTY UNIT", QTY_SOFA: "QTY PIECE", TOTAL_VOLUME: "TOTAL VOLUME M³", FABRIC: "FABRIC", FEET: "FEET",
-        FINISHING: "FINISHING", OBSERVATION: "OBSERVATION", TOTAL: "TOTAL", BANK_DETAILS: "BANKING DETAILS:", INTERMEDIARY_BANK: "INTERMEDIARY BANK",
-        BENEFICIARY_BANK: "BENEFICIARY BANK", PRODUCT_DATA: "GENERAL PRODUCT DATA", VALIDITY_NOTE: "* This proforma is valid for {0} days from the date of issue.",
-        ORIGIN: "Made in Brazil", BRAND: "Brand", PRODUCT: "Product", LOADING: "Loading document..."
+        WIDTH: "WIDTH", DEPTH: "DEPTH", HEIGHT: "HEIGHT", QTY_UNIT: "UNIT QTY", QTY_SOFA: "SOFA QTY", TOTAL_VOLUME: "TOTAL VOLUME M³", FABRIC: "FABRIC", FEET: "FEET",
+        FINISHING: "FINISHING", OBSERVATION: "OBSERVATION", UNIT_FINAL: "UNIT PRICE MODULE", TOTAL: "TOTAL", BANK_DETAILS: "BANKING DETAILS:", INTERMEDIARY_BANK: "INTERMEDIARY BANK",
+        BENEFICIARY_BANK: "BANK BENEFICIARY", PRODUCT_DATA: "GENERAL PRODUCT DATA", VALIDITY_NOTE: "* This proforma is valid for {0} days from the date of issue.",
+        ORIGIN: "Made in Brazil", BRAND: "Brand", PRODUCT: "Product", LOADING: "Loading document...", UNIT: "UNIT DOLAR"
       }
     };
     return dicts[lang]?.[key] || key;
@@ -58,11 +58,8 @@ export default function PrintPiPage() {
     async function load() {
       if (!id) return;
       try {
-        // 1. Fetch PI first
         const piData = await getPi(Number(id));
         setPi(piData);
-
-        // 2. Fetch client if exists
         if (piData.idCliente) {
             try {
                 const clientData = await getCliente(String(piData.idCliente));
@@ -84,14 +81,12 @@ export default function PrintPiPage() {
   const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   const fmt3 = (n: number | undefined) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   
-  // Safe Date Handling
   const safeDate = (dateStr: string | undefined) => {
       if (!dateStr) return new Date();
       const d = new Date(dateStr);
       return isNaN(d.getTime()) ? new Date() : d;
   };
   const dateObj = safeDate(pi?.dataPi);
-
   const displayClient = cliente || (pi as any)?.cliente;
   const incoterm = pi?.frete?.nome || (pi as any)?.Frete?.Nome || "EXW";
   const showFreight = ["FOB", "FCA (FRONTEIRA)", "CIF", "FCA (FÁBRICA)"].includes(incoterm.toUpperCase());
@@ -101,199 +96,120 @@ export default function PrintPiPage() {
     return getSupplierMetadata(sName);
   }, [pi]);
 
-  
   const processedData = useMemo(() => {
-    if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0, totalQty: 0, totalM3: 0, totalValue: 0 };
+    if (!pi) return { brandGroups: [], totalSofaQty: 0, totalQty: 0, totalM3: 0, totalValue: 0 };
+    const allItems: any[] = [];
+    let totalSofaQty = 0;
+    const risk = Number(pi.cotacaoRisco) || 1;
 
-    // 1. Pre-calculate Freights (Consistent with Excel logic)
-    const piItems = pi.piItens || [];
-    const piTotalM3Val = piItems.reduce((s, i) => s + (Number(i.m3 || (i as any).M3 || 0) * (i.quantidade || 0)), 0);
-    const piTotalFreteUSD = Number(pi.valorTotalFreteUSD || 0);
-    const piTotalFreteBRL = Number(pi.valorTotalFreteBRL || 0);
-    const tipoRateio = (pi as any).tipoRateio || "IGUAL";
-
-    const itemFreightBRL: Record<number, number> = {};
-    const itemFreightUSD: Record<number, number> = {};
-    let remBRL = piTotalFreteBRL;
-    let remUSD = piTotalFreteUSD;
-
-    const allItems = [...piItems];
-    allItems.forEach((i, idx) => {
-        const isLast = idx === allItems.length - 1;
-        let fUnitBRL = 0;
-        let fUnitUSD = 0;
-
-        if (isLast) {
-            fUnitBRL = (i.quantidade || 0) > 0 ? remBRL / (i.quantidade || 0) : 0;
-            fUnitUSD = (i.quantidade || 0) > 0 ? remUSD / (i.quantidade || 0) : 0;
-        } else {
-            if (tipoRateio === "IGUAL") {
-                const rowShareBRL = allItems.length > 0 ? piTotalFreteBRL / allItems.length : 0;
-                const rowShareUSD = allItems.length > 0 ? piTotalFreteUSD / allItems.length : 0;
-                fUnitBRL = (i.quantidade || 0) > 0 ? rowShareBRL / (i.quantidade || 0) : 0;
-                fUnitUSD = (i.quantidade || 0) > 0 ? rowShareUSD / (i.quantidade || 0) : 0;
-            } else {
-                const m3Item = Number(i.m3 || (i as any).M3 || 0);
-                fUnitBRL = piTotalM3Val > 0 ? (piTotalFreteBRL / piTotalM3Val * m3Item) : 0;
-                fUnitUSD = piTotalM3Val > 0 ? (piTotalFreteUSD / piTotalM3Val * m3Item) : 0;
+    if (pi.piItensPecas && pi.piItensPecas.length > 0) {
+        pi.piItensPecas.forEach((peca: any) => {
+            totalSofaQty += (peca.quantidade || 0);
+            if (peca.piItens) {
+                peca.piItens.forEach((item: any) => {
+                    allItems.push({ ...item, quantidadePeca: peca.quantidade, idPiItemPeca: peca.id });
+                });
             }
-            remBRL -= (fUnitBRL * (i.quantidade || 0));
-            remUSD -= (fUnitUSD * (i.quantidade || 0));
-        }
-        itemFreightBRL[i.id] = fUnitBRL;
-        itemFreightUSD[i.id] = fUnitUSD;
-    });
+        });
+    } else if (pi.piItens) {
+        pi.piItens.forEach((i: any) => {
+            allItems.push({ ...i, quantidadePeca: i.quantidadePeca || 1 });
+            totalSofaQty += (i.quantidadePeca || 1);
+        });
+    }
 
-    const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
-    piItems.forEach(i => {
-        const item = i as any;
-        const mt = item.moduloTecido;
+    if (allItems.length === 0) return { brandGroups: [], totalSofaQty, totalQty: 0, totalM3: 0, totalValue: 0 };
+
+    const itemsByMarca: { [key: string]: { item: any, mt: ModuloTecido | undefined }[] } = {};
+    allItems.forEach(i => {
+        const item = i;
+        const mt = item.moduloTecido || (item as any).ModuloTecido;
         const marca = mt?.modulo?.marca?.nome || "Outros";
         if (!itemsByMarca[marca]) itemsByMarca[marca] = [];
         itemsByMarca[marca].push({ item, mt });
     });
 
-    let totalSofaQty = 0;
-    
-    // Process each brand group
     const brandGroups = Object.entries(itemsByMarca).map(([_, brandItems]) => {
-         // Sort Logic
          const sortedItems = [...brandItems].sort((a, b) => {
              const fabKeyA = (a.mt?.tecido?.nome || "ZZBase").toLowerCase();
              const fabKeyB = (b.mt?.tecido?.nome || "ZZBase").toLowerCase();
              if (fabKeyA !== fabKeyB) return fabKeyA.localeCompare(fabKeyB);
-             
-             const descA = a.mt?.modulo?.descricao || "";
-             const descB = b.mt?.modulo?.descricao || "";
-             return descA.localeCompare(descB);
+             return (a.mt?.modulo?.descricao || "").localeCompare(b.mt?.modulo?.descricao || "");
          });
 
-         // Calculate Spans
-         const spans: any = {
-             description: new Array(sortedItems.length).fill(0),
-             fabric: new Array(sortedItems.length).fill(0),
-             feet: new Array(sortedItems.length).fill(0),
-             finishing: new Array(sortedItems.length).fill(0),
-             observation: new Array(sortedItems.length).fill(0),
-             qtySofa: new Array(sortedItems.length).fill(0),
-             totalExw: new Array(sortedItems.length).fill(0)
-         };
-
+         const spans: any = { description: new Array(sortedItems.length).fill(0), fabric: new Array(sortedItems.length).fill(0), feet: new Array(sortedItems.length).fill(0), finishing: new Array(sortedItems.length).fill(0), observation: new Array(sortedItems.length).fill(0), qtySofa: new Array(sortedItems.length).fill(0), totalExw: new Array(sortedItems.length).fill(0) };
          const getMergeVal = (idx: number, type: string) => {
              const entry = sortedItems[idx];
-             if (type === 'fabric_group') { 
-                  return entry.mt?.tecido?.nome || "Sem Tecido";
-             }
-             if (type === 'feet') return entry.item.feet || (entry.item as any).Feet || "";
-             if (type === 'finishing') return entry.item.finishing || (entry.item as any).Finishing || "";
+             if (type === 'feet') return entry.item.feet || entry.item.Feet || "";
+             if (type === 'finishing') return entry.item.finishing || entry.item.Finishing || "";
              if (type === 'observation') return entry.item.observacao || "";
+             if (type === 'piece_group') return String(entry.item.idPiItemPeca || entry.item.id || idx);
              return "";
          };
 
-         // Calculate spans
          ['feet', 'finishing', 'observation'].forEach(field => {
              for (let i = 0; i < sortedItems.length; i++) {
                  if (spans[field][i] === -1) continue; 
                  let span = 1;
                  const val = getMergeVal(i, field);
                  for (let j = i + 1; j < sortedItems.length; j++) {
-                     if (getMergeVal(j, field) === val) {
-                         span++;
-                         spans[field][j] = -1;
-                     } else { break; }
+                     if (getMergeVal(j, field) === val) { span++; spans[field][j] = -1; } else { break; }
                  }
                  spans[field][i] = span;
              }
          });
-         
-         // Fabric & Description & Qty Sofa & Total EXW (Group by Fabric Name)
          for (let i = 0; i < sortedItems.length; i++) {
              if (spans['fabric'][i] === -1) continue;
-             
              let span = 1;
-             const val = getMergeVal(i, 'fabric_group');
+             const val = getMergeVal(i, 'piece_group');
              for (let j = i + 1; j < sortedItems.length; j++) {
-                 if (getMergeVal(j, 'fabric_group') === val) {
-                     span++;
-                     spans['fabric'][j] = -1; 
-                 } else { break; }
+                 if (getMergeVal(j, 'piece_group') === val) { span++; spans['fabric'][j] = -1; } else { break; }
              }
-             
-             spans['fabric'][i] = span;
-             spans['description'][i] = span; // Sync
-             spans['qtySofa'][i] = span;     // Sync
-             spans['totalExw'][i] = span;    // Sync
-             
-             // Add Qty of the main item of the group to the Total Sofa Count
-             totalSofaQty += sortedItems[i].item.quantidade;
+             spans['fabric'][i] = span; spans['description'][i] = span; spans['qtySofa'][i] = span; spans['totalExw'][i] = span;    
          }
+         for (let i = 0; i < sortedItems.length; i++) { if (spans['fabric'][i] === -1) { spans['description'][i] = -1; spans['qtySofa'][i] = -1; spans['totalExw'][i] = -1; } }
 
-         // Copy -1s for synced columns
-         for (let i = 0; i < sortedItems.length; i++) {
-              if (spans['fabric'][i] === -1) {
-                  spans['description'][i] = -1;
-                  spans['qtySofa'][i] = -1;
-                  spans['totalExw'][i] = -1;
-              }
-         }
-
-         const firstBrandItem = brandItems[0];
+         const firstBrandItem = sortedItems[0];
          let photoUrl = firstBrandItem.mt?.modulo?.marca?.imagem || "";
-         if (photoUrl && !photoUrl.startsWith("http") && !photoUrl.startsWith("data:")) {
-             photoUrl = `data:image/png;base64,${photoUrl}`;
-         }
+         if (photoUrl && !photoUrl.startsWith("http") && !photoUrl.startsWith("data:")) photoUrl = `data:image/png;base64,${photoUrl}`;
          const brandName = firstBrandItem.mt?.modulo?.marca?.nome || "";
          
-         return {
-             sortedItems,
-             spans,
-             totalBrandRows: sortedItems.length,
-             photoUrl,
-             brandName,
-             itemFreightBRL,
-             itemFreightUSD
-         };
+         return { sortedItems, spans, totalBrandRows: sortedItems.length, photoUrl, brandName };
     });
 
     let totalValue = 0;
     let totalM3 = 0;
     let totalQty = 0;
 
-    piItems.forEach(i => {
-        const item = i as any;
-        const qty = Number(item.quantidade ?? item.Quantidade) || 0;
-        totalQty += qty;
-        totalM3 += (Number(item.m3 ?? item.M3) || 0) * qty;
-        
-        if (currency === "BRL") {
-            totalValue += (Number(item.valorFinalItemBRL ?? item.ValorFinalItemBRL) || 0);
-        } else {
-            const exw = (Number(item.valorEXW ?? item.ValorEXW) || 0) * qty;
-            const freight = (Number(item.valorFreteRateadoUSD ?? item.ValorFreteRateadoUSD) || 0) * qty;
-            totalValue += exw + (showFreight ? freight : 0);
-        }
+    brandGroups.forEach(bg => {
+        let pieceTotalUnitUSD = 0;
+        const qPeca = Number(bg.sortedItems[0].item.quantidadePeca || 1);
+        bg.sortedItems.forEach(entry => {
+            const item = entry.item;
+            const qtyMod = Number(item.quantidade || 0);
+            totalQty += (qtyMod * qPeca);
+            totalM3 += (Number(item.m3 || 0)) * (qtyMod * qPeca);
+            
+            const lineExwUnitUSD = (Number(item.valorEXW || 0)) + (Number(item.valorFreteRateadoUSD || 0));
+            const itemUnitFinalUSD = lineExwUnitUSD * qtyMod * (currency === "BRL" ? risk : 1);
+            pieceTotalUnitUSD += itemUnitFinalUSD;
+        });
+        totalValue += pieceTotalUnitUSD * qPeca;
     });
 
-    return { brandGroups, totalSofaQty, totalQty, totalM3, totalValue };
+    return { brandGroups, totalSofaQty, totalQty, totalM3, totalValue, risk };
   }, [pi, currency, showFreight]);
 
   const formattedPiNumber = useMemo(() => {
     if (!pi) return "";
     const base = `${pi.prefixo}-${pi.piSequencia}`;
-    
-    // Check if supplier is Karams or Koyo
-    const piItems = pi.piItens || [];
-    const firstItem = piItems[0];
-    if (firstItem) {
-        const mt = (firstItem as any).moduloTecido;
+    if (pi.piItens && pi.piItens[0]) {
+        const mt = (pi.piItens[0] as any).moduloTecido || (pi.piItens[0] as any).ModuloTecido;
         const supplierName = (mt?.modulo?.fornecedor?.nome || "").toLowerCase();
         if (supplierName.includes("karams") || supplierName.includes("koyo")) {
-            const year = dateObj.getFullYear();
-            const yearShort = String(year).slice(-2);
-            return `${base}/${yearShort}`;
+            const yearShort = String(dateObj.getFullYear()).slice(-2); return `${base}/${yearShort}`;
         }
     }
-    
     return base;
   }, [pi, dateObj]);
 
@@ -301,76 +217,31 @@ export default function PrintPiPage() {
   if (!pi) return <div style={{ padding: 20 }}>Documento não encontrado.</div>;
 
   return (
-    <div className="print-container" style={{ padding: 40, fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", maxWidth: "1100px", margin: "0 auto" }}>
+    <div className="print-container" style={{ padding: 40, fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", maxWidth: "1200px", margin: "0 auto" }}>
       <style>{`
         @media print {
             @page { margin: 0.5cm; size: landscape; }
             html, body { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact; }
-            
-            /* Hide App Header/Footer and other non-print elements */
             .topbar, .footer, .no-print { display: none !important; }
-            
-            /* Reset Main Layout Constraints */
-            .app, .main, .container { 
-                padding: 0 !important; 
-                margin: 0 !important; 
-                width: 100% !important; 
-                max-width: none !important; 
-                border: none !important;
-                box-shadow: none !important;
-                overflow: visible !important;
-                height: auto !important;
-                display: block !important;
-            }
-
+            .app, .main, .container { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: none !important; border: none !important; overflow: visible !important; height: auto !important; display: block !important; }
             .print-container { padding: 0 !important; max-width: none !important; margin: 0 !important; display: block !important; }
         }
-        
-        .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+        .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }
         .print-table th, .print-table td { border: 1px solid #000; padding: 4px 6px; text-align: left; }
         .print-table th { background: #2c3e50 !important; color: #fff !important; font-weight: bold; text-align: center; -webkit-print-color-adjust: exact; }
-        
-        /* Print Pagination Control */
         thead { display: table-header-group; }
         tfoot { display: table-footer-group; }
         tr { break-inside: avoid; page-break-inside: avoid; }
-        
         .print-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 20px; }
         .print-header-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 20px; }
-        .print-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; font-size: 13px; }
-        
-        .totals-section { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .print-totals { width: 300px; border: 1px solid #000; padding: 10px; font-size: 13px; }
-
-        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; font-size: 12px; }
-        .footer-col h3 { border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; }
-        .footer-col p { margin: 2px 0; }
-        
-        .btn-print {
-            position: fixed; top: 20px; right: 20px; 
-            padding: 10px 20px; background: #2563eb; color: white; 
-            border: none; border-radius: 8px; cursor: pointer; 
-            font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-        .btn-print:hover { background: #1d4ed8; }
+        .btn-print { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; z-index: 1000; }
       `}</style>
       
-      <button className="btn-print no-print" onClick={() => window.print()}>
-        🖨️ Imprimir
-      </button>
+      <button className="btn-print no-print" onClick={() => window.print()}>🖨️ Imprimir</button>
 
-      {/* Blue Top Bar */}
-      <div style={{ height: "4px", background: "#003366", marginBottom: "10px" }} className="no-print-border"></div>
-
-      <div className="print-header" style={{ display: "flex", alignItems: "center", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "0px" }}>
-        {/* Left: Logo */}
-        <div style={{ width: "150px" }}>
-             <img src={supplierMetadata.logo} alt={`${supplierMetadata.details.brand} Logo`} style={{ maxWidth: "100%", height: "auto" }} />
-             {/* Date removed from here as per new layout */}
-        </div>
-
-        {/* Center: Company Info */}
+      <div style={{ height: "4px", background: "#003366", marginBottom: "10px" }}></div>
+      <div className="print-header" style={{ display: "flex", alignItems: "center", borderBottom: "1px solid #000", paddingBottom: "10px" }}>
+        <div style={{ width: "150px" }}><img src={supplierMetadata.logo} alt="Logo" style={{ maxWidth: "100%" }} /></div>
         <div style={{ flex: 1, textAlign: "center" }}>
            <h1 style={{ margin: "0 0 2px 0", fontSize: 13, fontWeight: "bold", textTransform: "uppercase" }}>{supplierMetadata.name}</h1>
            <div style={{ fontSize: 10, lineHeight: "1.2em", fontWeight: "bold" }}>
@@ -379,270 +250,100 @@ export default function PrintPiPage() {
                <div>{supplierMetadata.email} - {supplierMetadata.website} | {supplierMetadata.phone}</div>
            </div>
         </div>
-        
-        {/* Right Spacer to balance Logo for centering */}
         <div style={{ width: "150px" }}></div>
       </div>
 
-
-      <div className="print-header-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000", paddingBottom: "10px", marginBottom: "20px" }}>
-          {/* Left: Importer */}
-          <div style={{ paddingRight: "10px", fontSize: "11px", lineHeight: "1.4em" }}>
+      <div className="print-header-grid" style={{ fontSize: "11px", borderBottom: "1px solid #000", paddingBottom: "10px" }}>
+          <div>
               <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>{t("IMPORTER")}</div>
-              <div style={{ textTransform: "uppercase" }}>{displayClient?.nome || (pi as any).cliente?.nome}</div>
-              
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("ADDRESS")}</span>
-                  <span>{displayClient?.endereco || (pi as any).cliente?.endereco}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("CITY")}</span>
-                  <span>{displayClient?.cidade || (pi as any).cliente?.cidade}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("COUNTRY")}</span>
-                  <span>{displayClient?.pais || (pi as any).cliente?.pais || "BRASIL"}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("NIT")}</span>
-                  <span>{displayClient?.nit || (pi as any).cliente?.nit || ""}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("PHONE")}</span>
-                  <span>{displayClient?.telefone || (pi as any).cliente?.telefone}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("RESPONSIBLE")}</span>
-                  <span>{displayClient?.pessoaContato || (pi as any).cliente?.pessoaContato || ".."}</span>
-              </div>
-              <div style={{ display: "flex" }}>
-                  <span style={{ width: "80px" }}>{t("EMAIL")}</span>
-                  <span>{displayClient?.email || (pi as any).cliente?.email}</span>
-              </div>
+              <div>{displayClient?.nome || ""}</div>
+              <div>{t("ADDRESS")} {displayClient?.endereco || ""}</div>
+              <div>{t("NIT")} {displayClient?.nit || ""}</div>
+              <div>{t("EMAIL")} {displayClient?.email || ""}</div>
           </div>
-
-          {/* Right: PI Details */}
-          <div style={{ paddingLeft: "10px", fontSize: "11px", lineHeight: "1.4em", borderLeft: "1px solid #000" }}>
-               <div style={{ fontWeight: "bold", textTransform: "uppercase", marginBottom: "5px" }}>PROFORMA INVOICE: {formattedPiNumber}</div>
-               
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>{t("DATE")}</span>
-                   <span>{dateObj.toLocaleDateString("pt-BR")}</span>
-               </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>PROFORMA INVOICE:</span>
-                   <span>{formattedPiNumber}</span>
-               </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span>{t("ORDER_DATE")}</span>
-                   <span>{new Date(pi.dataPi).toLocaleDateString("pt-BR")}</span> 
-               </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>{t("SHIPMENT_POINT")}</span>
-                   <span>{pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || "PARANAGUA"}</span>
-               </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>{t("DESTINATION_POINT")}</span>
-                   <span>{displayClient?.portoDestino || pi.cliente?.portoDestino || ""}</span>
-               </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>{t("DELIVERY_TIME")}</span>
-                   <span>{pi.tempoEntrega || (lang === "ES" ? "50 dias despues del primer pago" : (lang === "EN" ? "50 days after first payment" : "50 dias após o primeiro pagamento"))}</span>
-               </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ width: "130px" }}>{t("INCOTERM")}</span>
-                    <span>{incoterm} {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || ""}</span>
-                </div>
-               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                   <span style={{ width: "130px" }}>{t("PAYMENT_CONDITION")}</span>
-                   <span>{pi.condicaoPagamento || pi.configuracoes?.condicoesPagamento || (pi as any).condicoesPagamento || "T/T"}</span>
-               </div>
+          <div style={{ paddingLeft: "10px", borderLeft: "1px solid #000" }}>
+               <div style={{ fontWeight: "bold", textTransform: "uppercase" }}>PROFORMA INVOICE: {formattedPiNumber}</div>
+               <div>{t("DATE")} {dateObj.toLocaleDateString("pt-BR")}</div>
+               <div>{t("SHIPMENT_POINT")} {pi.configuracoes?.portoEmbarque || (pi as any).portoEmbarque || "PARANAGUA"}</div>
+               <div>{t("INCOTERM")} {incoterm}</div>
+               <div>{t("PAYMENT_CONDITION")} {pi.condicaoPagamento || "T/T"}</div>
           </div>
       </div>
 
-      {/* Group items by "Model" (Brand) then "Fabric" (Tecido)?? 
-          Actually the request says: 
-          "A coluna Photo vai buscar a imagem do Modelo 'Marca'"
-          "A coluna Name vai trazer o nome do Modelo 'Marca'"
-          So we should group by Marca.
-      */}
-      <div className="print-table-container">
-        <table className="print-table" style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #000", fontSize: "10px" }}>
-          <thead style={{ background: "#1a2e44", color: "white", textTransform: "uppercase" }}>
+      <table className="print-table">
+          <thead>
             <tr>
-              <th rowSpan={2} style={{ width: "10%" }}>{t("PHOTO")}</th>
-              <th rowSpan={2} style={{ width: "10%" }}>{t("NAME")}</th>
-              <th rowSpan={2} style={{ width: "25%" }}>{t("DESCRIPTION")}</th>
-              <th colSpan={3}>{t("DIMENSIONS")}</th>
+              <th rowSpan={2} style={{ width: "6%" }}>{t("PHOTO")}</th>
+              <th rowSpan={2} style={{ width: "8%" }}>{t("NAME")}</th>
+              <th rowSpan={2} style={{ width: "15%" }}>{t("DESCRIPTION")}</th>
+              <th colSpan={3} style={{ width: "9%" }}>{t("DIMENSIONS")}</th>
               <th rowSpan={2} style={{ width: "5%" }}>{t("QTY_UNIT")}</th>
               <th rowSpan={2} style={{ width: "5%" }}>{t("QTY_SOFA")}</th>
               <th rowSpan={2} style={{ width: "5%" }}>{t("TOTAL_VOLUME")}</th>
-              <th rowSpan={2} style={{ width: "10%" }}>{t("FABRIC")}</th>
-              <th rowSpan={2} style={{ width: "10%" }}>{t("FEET")}</th>
-               <th rowSpan={2} style={{ width: "10%" }}>{t("FINISHING")}</th>
-               <th rowSpan={2} style={{ width: "10%" }}>{t("OBSERVATION")}</th>
-               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "R$" : "USD"}</th>
-               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "UNIT R$" : "UNIT DOLAR"}</th>
-               <th rowSpan={2} style={{ width: "10%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
+              <th rowSpan={2} style={{ width: "8%" }}>{t("FABRIC")}</th>
+              <th rowSpan={2} style={{ width: "6%" }}>{t("FEET")}</th>
+              <th rowSpan={2} style={{ width: "6%" }}>{t("FINISHING")}</th>
+              <th rowSpan={2} style={{ width: "8%" }}>{t("OBSERVATION")}</th>
+              <th rowSpan={2} style={{ width: "8%" }}>{t("UNIT_FINAL")}</th>
+              <th rowSpan={2} style={{ width: "8%" }}>{currency === "BRL" ? "UNIT R$" : "UNIT DOLAR"}</th>
+              <th rowSpan={2} style={{ width: "8%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
             </tr>
             <tr>
-               <th style={{ width: "5%" }}>{t("WIDTH")}</th>
-               <th style={{ width: "5%" }}>{t("DEPTH")}</th>
-               <th style={{ width: "5%" }}>{t("HEIGHT")}</th>
+               <th>{t("WIDTH")}</th><th>{t("DEPTH")}</th><th>{t("HEIGHT")}</th>
             </tr>
           </thead>
           <tbody>
-            {processedData.brandGroups.map(({ sortedItems, spans, totalBrandRows, photoUrl, brandName, itemFreightBRL, itemFreightUSD }, brandIndex) => {
-                
-                const renderGroupListCell = (field: 'description' | 'fabric', index: number) => {
-                    const span = spans[field][index];
-                    if (span === -1) return null;
-                    
-                    const groupItems = sortedItems.slice(index, index + span);
-                    
-                    const cellStyle: React.CSSProperties = {
-                        border: "1px solid #000", 
-                        padding: "2px 5px", 
-                        verticalAlign: "middle", 
-                        textAlign: "center",
-                        background: field === 'fabric' ? '#f0fdf4' : 'inherit',
-                        color: field === 'fabric' ? '#166534' : 'inherit',
-                        fontWeight: field === 'fabric' ? 'bold' : 'normal'
-                    };
-
-                    if (field === 'fabric') {
-                        const firstItem = groupItems[0];
-                        const fName = firstItem.mt?.tecido?.nome || "Sem Tecido";
-                        const fCode = firstItem.item.tempCodigoModuloTecido || firstItem.mt?.codigoModuloTecido || "";
-                        const text = fCode ? `${fName} - ${fCode}` : fName;
-                        return (
-                            <td rowSpan={span} style={cellStyle}>
-                                {text}
-                            </td>
-                        );
-                    }
-
-                    return (
-                        <td rowSpan={span} style={cellStyle}>
-                            {groupItems.map((g, i) => {
-                                const text = (g.item.quantidade > 1 ? `${g.item.quantidade} ` : "") + (g.mt?.modulo?.descricao || `Modulo #${g.item.idModuloTecido}`);
-                                return (
-                                    <div key={i} style={{ marginBottom: 4 }}>
-                                        {text}
-                                    </div>
-                                );
-                            })}
-                        </td>
-                    );
-                };
-
+            {processedData.brandGroups.map((bg, bgIdx) => {
+                const { sortedItems, spans, totalBrandRows, photoUrl, brandName } = bg;
                 return (
-                    <React.Fragment key={brandIndex}>
+                    <React.Fragment key={bgIdx}>
                         {sortedItems.map((entry, index) => {
                             const { item } = entry;
                             const isFirstInBrand = index === 0;
+                            const risk = processedData.risk;
+                            const isBRL = currency === "BRL";
+                            
+                            const lineExwUnitUSD = (Number(item.valorEXW || 0)) + (Number(item.valorFreteRateadoUSD || 0));
+                            const itemUnitFinalDisp = lineExwUnitUSD * (Number(item.quantidade || 0)) * (isBRL ? risk : 1);
 
-                            // Calculate Fabric Group Totals
-                            let fabricGroupUnitUSD = 0;
-                            let fabricGroupUnitBRL = 0;
-                            let fabricGroupTotalUSD = 0;
-                            let fabricGroupTotalBRL = 0;
-
+                            let pieceTotalUnitUSD = 0;
                             if (spans['totalExw'][index] > 0) {
                                 const span = spans['totalExw'][index];
-                                const groupRange = sortedItems.slice(index, index + span);
-                                groupRange.forEach((g) => {
-                                    const mQty = (Number(g.item.quantidade ?? (g.item as any).Quantidade) || 1);
-                                    const mPecaQty = (g.item as any).piItemPeca?.quantidade || 1;
-                                    const mQtyPerPeca = mPecaQty > 0 ? mQty / mPecaQty : 0;
-                                    
-                                    const risk = (Number(pi.cotacaoRisco) || 1);
-                                    const mUnitEXWUSD = (Number(g.item.valorEXW || 0));
-                                    const mUnitEXWBRL = mUnitEXWUSD * risk;
-
-                                    const mFreightUSD = (itemFreightUSD as any)[g.item.id] || 0;
-                                    const mFreightBRL = (itemFreightBRL as any)[g.item.id] || 0;
-
-                                    const piecePartBRL = (mUnitEXWBRL + mFreightBRL) * mQtyPerPeca;
-                                    const piecePartUSD = (mUnitEXWUSD + (showFreight ? mFreightUSD : 0)) * mQtyPerPeca;
-
-                                    fabricGroupUnitBRL += piecePartBRL;
-                                    fabricGroupTotalBRL += (mUnitEXWBRL + mFreightBRL) * mQty;
-                                    
-                                    fabricGroupUnitUSD += piecePartUSD;
-                                    fabricGroupTotalUSD += (mUnitEXWUSD + (showFreight ? mFreightUSD : 0)) * mQty;
+                                sortedItems.slice(index, index + span).forEach(g => {
+                                    const gExw = (Number(g.item.valorEXW || 0)) + (Number(g.item.valorFreteRateadoUSD || 0));
+                                    pieceTotalUnitUSD += gExw * (Number(g.item.quantidade || 0)) * (isBRL ? risk : 1);
                                 });
                             }
 
-                            const renderMergedCellForCurrentRow = (field: string, content: React.ReactNode, extraStyle: React.CSSProperties = {}) => {
-                                const span = spans[field][index];
-                                if (span === -1) return null;
-                                return (
-                                    <td rowSpan={span} style={{ border: "1px solid #000", verticalAlign: "middle", ...extraStyle }}>
-                                        {content}
-                                    </td>
-                                );
+                            const renderMerged = (field: string, content: React.ReactNode, extra: React.CSSProperties = {}) => {
+                                const span = spans[field][index]; if (span === -1) return null;
+                                return <td rowSpan={span} style={{ border: "1px solid #000", verticalAlign: "middle", ...extra }}>{content}</td>;
                             };
                             
+                            const fabricContent = (entry.mt?.tecido?.nome || "Sem Tecido") + (item.codigoModuloTecido ? ` - ${item.codigoModuloTecido}` : "");
+
                             return (
-                                <tr key={item.id || Math.random()} style={{ borderBottom: "1px solid #ccc" }}>
-                                    {/* Photo & Name */}
+                                <tr key={item.id || index}>
                                     {isFirstInBrand && (
-                                        <React.Fragment>
-                                            <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", padding: 5, verticalAlign: "middle" }}>
-                                                {photoUrl && <img src={photoUrl} alt={brandName} style={{ maxWidth: "80px", maxHeight: "80px" }} />}
-                                            </td>
-                                            <td rowSpan={totalBrandRows} style={{ border: "1px solid #000", textAlign: "center", fontWeight: "bold", verticalAlign: "middle", background: "#eff6ff" }}>
-                                                {brandName}
-                                            </td>
-                                        </React.Fragment>
+                                        <>
+                                            <td rowSpan={totalBrandRows} style={{ textAlign: "center" }}>{photoUrl && <img src={photoUrl} alt="Marca" style={{ maxWidth: "50px" }} />}</td>
+                                            <td rowSpan={totalBrandRows} style={{ fontWeight: "bold", background: "#eff6ff", textAlign: "center" }}>{brandName}</td>
+                                        </>
                                     )}
-                                    
-                                    {/* Description */}
-                                    {renderGroupListCell('description', index)}
-
-                                    {/* Dimensions: Per Item */}
-                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.largura)}</td>
-                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.profundidade)}</td>
-                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.altura)}</td>
-                                    <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
-                                    
-                                    {/* Qty Sofa: Mapped to Fabric Group. User says "distinct das quantidades... sempre iguais" -> item.quantidade */}
-                                    {renderMergedCellForCurrentRow('qtySofa', fmt(item.quantidade, 0), { textAlign: "center", fontWeight: "bold" })}
-
-                                    <td className="col-m3" style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
-                                    
-                                    {/* Fabric */}
-                                    {renderGroupListCell('fabric', index)}
-                                    
-                                    {/* Feet */}
-                                    {renderMergedCellForCurrentRow('feet', item.feet || (item as any).Feet || "", { textAlign: "center" })}
-
-                                    {/* Finishing */}
-                                    {renderMergedCellForCurrentRow('finishing', item.finishing || (item as any).Finishing || "", { textAlign: "center" })}
-                                    
-                                    {/* Observation */}
-                                    {renderMergedCellForCurrentRow('observation', item.observacao || "", { })}
-                                    
-                                    {/* Individual EXW */}
-                                    <td style={{ border: "1px solid #000", textAlign: "right" }}>
-                                        {currency === "BRL" ? 
-                                            `R$ ${fmt(Number(item.valorEXW || 0) * (Number(pi.cotacaoRisco) || 1))}` : 
-                                            `$ ${fmt(Number(item.valorEXW || 0))}`}
-                                    </td>
-
-                                    {/* Unit Group Sum EXW */}
-                                    {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupUnitBRL)}` : `$ ${fmt(fabricGroupUnitUSD)}`, { 
-                                        textAlign: "right", 
-                                        background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" 
-                                    })}
-                                    
-                                    {/* Total Group EXW * Qty */}
-                                    {renderMergedCellForCurrentRow('totalExw', currency === "BRL" ? `R$ ${fmt(fabricGroupTotalBRL)}` : `$ ${fmt(fabricGroupTotalUSD)}`, { 
-                                        textAlign: "right", 
-                                        fontWeight: "bold", 
-                                        background: currency === "BRL" ? "#f0f9ff" : "#fff1f2" 
-                                    })}
+                                    <td style={{ border: "1px solid #000" }}>{item.moduloTecido?.modulo?.descricao || ""}</td>
+                                    <td style={{ textAlign: "center" }}>{fmt(item.largura)}</td>
+                                    <td style={{ textAlign: "center" }}>{fmt(item.profundidade)}</td>
+                                    <td style={{ textAlign: "center" }}>{fmt(item.altura)}</td>
+                                    <td style={{ textAlign: "center" }}>{fmt(item.quantidade, 0)}</td>
+                                    {renderMerged('qtySofa', fmt(item.quantidadePeca, 0), { textAlign: "center", fontWeight: "bold" })}
+                                    <td style={{ textAlign: "center" }}>{fmt3((item.m3 || 0) * (item.quantidade || 0))}</td>
+                                    {renderMerged('fabric', fabricContent, { textAlign: "center", background: "#f0fdf4", fontWeight: "bold" })}
+                                    {renderMerged('feet', item.feet || item.Feet || "", { textAlign: "center" })}
+                                    {renderMerged('finishing', item.finishing || item.Finishing || "", { textAlign: "center" })}
+                                    {renderMerged('observation', item.observacao || "")}
+                                    <td style={{ textAlign: "right" }}>{isBRL ? "R$" : "$"} {fmt(itemUnitFinalDisp)}</td>
+                                    {renderMerged('totalExw', `${isBRL ? "R$" : "$"} ${fmt(pieceTotalUnitUSD)}`, { textAlign: "right", color: "#2563eb" })}
+                                    {renderMerged('totalExw', `${isBRL ? "R$" : "$"} ${fmt(pieceTotalUnitUSD * (item.quantidadePeca || 1))}`, { textAlign: "right", fontWeight: "bold" })}
                                 </tr>
                             );
                         })}
@@ -652,57 +353,31 @@ export default function PrintPiPage() {
           </tbody>
           <tfoot>
             <tr style={{ fontWeight: "bold", background: "#f8fafc" }}>
-              <td colSpan={6} style={{ border: "1px solid #000", textAlign: "right", padding: "4px 8px" }}>{t("TOTAL")}</td>
-              <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalQty}</td>
-              <td style={{ border: "1px solid #000", textAlign: "center" }}>{processedData.totalSofaQty}</td>
-              <td style={{ border: "1px solid #000", textAlign: "center" }}>{fmt3(processedData.totalM3)}</td>
-              <td colSpan={4} style={{ border: "1px solid #000" }}></td>
-              <td style={{ border: "1px solid #000", textAlign: "right", background: currency === "BRL" ? "#f0f9ff" : "#fff1f2", fontWeight: "bold" }}>
-                {currency === "BRL" ? "R$" : "$"} {fmt(processedData.totalValue)}
-              </td>
+              <td colSpan={6} style={{ textAlign: "right", padding: "4px 8px" }}>{t("TOTAL")}</td>
+              <td style={{ textAlign: "center" }}>{processedData.totalQty}</td>
+              <td style={{ textAlign: "center" }}>{processedData.totalSofaQty}</td>
+              <td style={{ textAlign: "center" }}>{fmt3(processedData.totalM3)}</td>
+              <td colSpan={6} style={{ border: "1px solid #000" }}></td>
+              <td style={{ textAlign: "right", background: "#fff1f2", fontWeight: "bold" }}>{currency === "BRL" ? "R$" : "$"} {fmt(processedData.totalValue)}</td>
             </tr>
           </tfoot>
-        </table>
-      </div>
+      </table>
 
-      <div className="footer-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid #000", marginTop: 20 }}>
-          <div className="footer-col bank-details" style={{ padding: 10, borderRight: "1px solid #000" }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>{t("BANK_DETAILS")} {supplierMetadata.bankDetails.intermediary ? t("INTERMEDIARY_BANK") : t("BENEFICIARY_BANK")}</h3>
-              {supplierMetadata.bankDetails.intermediary && (
-                <>
-                  <p>{supplierMetadata.bankDetails.intermediary}</p>
-                  <p>{t("ADDRESS")} {supplierMetadata.bankDetails.intermediaryAddress}</p>
-                  <p>SWIFT CODE: {supplierMetadata.bankDetails.intermediarySwift}</p>
-                  <p>CUENTA/ACCOUNT: {supplierMetadata.bankDetails.intermediaryAccount}</p>
-                  <p style={{ marginTop: 10 }}><strong>{t("BENEFICIARY_BANK")}:</strong></p>
-                </>
-              )}
-              <p>{supplierMetadata.bankDetails.beneficiary}</p>
-              {supplierMetadata.bankDetails.beneficiaryAddress && <p>{t("ADDRESS")} {supplierMetadata.bankDetails.beneficiaryAddress}</p>}
-              <p>SWIFT CODE: {supplierMetadata.bankDetails.beneficiarySwift}</p>
-              {supplierMetadata.bankDetails.beneficiaryIban && <p>IBAN: {supplierMetadata.bankDetails.beneficiaryIban}</p>}
-              <p>CUENTA/ACCOUNT: {supplierMetadata.bankDetails.beneficiaryAccount}</p>
-              <p>{t("NAME")}: {supplierMetadata.bankDetails.beneficiaryName}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", border: "1px solid #000", marginTop: 20, fontSize: "11px" }}>
+          <div style={{ padding: 10, borderRight: "1px solid #000" }}>
+              <h3 style={{ margin: "0 0 5px 0", fontSize: 13 }}>{t("BANK_DETAILS")}</h3>
+              <p>NAME: {supplierMetadata.bankDetails.beneficiaryName}</p>
+              <p>BANK: {supplierMetadata.bankDetails.beneficiary}</p>
+              <p>SWIFT: {supplierMetadata.bankDetails.beneficiarySwift}</p>
+              <p>ACCOUNT: {supplierMetadata.bankDetails.beneficiaryAccount}</p>
           </div>
-          <div className="footer-col" style={{ padding: 10 }}>
-              <h3 style={{ borderBottom: "none", marginBottom: 5 }}>{t("PRODUCT_DATA")}</h3>
-              <p><strong>{t("BRAND")}:</strong> {supplierMetadata.details.brand}</p>
-              <p><strong>NCM:</strong> {supplierMetadata.details.ncm || "94016100"}</p>
-              <p><strong>{t("PRODUCT")}:</strong> {fmt(processedData.totalQty, 0)}</p>
-              <p><strong>CBM M³:</strong> {fmt3(processedData.totalM3)}</p>
-              <p><strong>P.N. TOTAL:</strong></p>
-              <p><strong>P.B. TOTAL:</strong></p>
-              <p><strong>{lang === "EN" ? "TOTAL VOLUME:" : "VOLUMEN TOTAL:"}</strong> {fmt3(processedData.totalM3)}</p>
-              <p><strong>{lang === "PT" ? "Produtos originais de fabrica" : (lang === "EN" ? "Original factory products" : "Productos originales de fabrica")}</strong></p>
-              <p><strong>{t("ORIGIN")}</strong></p>
-              <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>
-                {t("VALIDITY_NOTE").replace("{0}", urlParams.get("validity") || "30")}
-              </p>
+          <div style={{ padding: 10 }}>
+              <h3 style={{ margin: "0 0 5px 0", fontSize: 13 }}>{t("PRODUCT_DATA")}</h3>
+              <p>BRAND: {supplierMetadata.details.brand}</p>
+              <p>NCM: {supplierMetadata.details.ncm || "94016100"}</p>
+              <p>VOLUME M³: {fmt3(processedData.totalM3)}</p>
+              <p style={{ marginTop: 15, fontSize: 10, fontStyle: "italic" }}>{t("VALIDITY_NOTE").replace("{0}", urlParams.get("validity") || "30")}</p>
           </div>
-      </div>
-
-      <div style={{ marginTop: 40, borderTop: "1px solid #000", paddingTop: 10, textAlign: "center", fontSize: 10 }} className="no-print">
-        Visualização de Impressão - Sistema PI Web
       </div>
     </div>
   );

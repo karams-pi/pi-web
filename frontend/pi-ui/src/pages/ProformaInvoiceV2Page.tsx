@@ -563,7 +563,8 @@ export default function ProformaInvoiceV2Page() {
   const totalFretePi = useMemo(() => {
     const isBRLMod = form.moedaExibicao === "BRL";
     const riskVal = Number(form.cotacaoRisco) || 1;
-    const base = itens.reduce((sum, i) => sum + (Number(i.ValorFreteRateadoUSD || 0) * (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1)))), 0);
+    // The user wants the sum of the freight values shown in the rows
+    const base = itens.reduce((sum, i) => sum + (Number(i.ValorFreteRateadoUSD || 0) * (Number(i.quantidade || 0))), 0);
     return isBRLMod ? base * riskVal : base;
   }, [itens, form.moedaExibicao, form.cotacaoRisco]);
 
