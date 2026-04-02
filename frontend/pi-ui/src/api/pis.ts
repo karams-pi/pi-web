@@ -9,8 +9,8 @@ export async function getPi(id: number) {
   return apiGet<ProformaInvoice>(`/api/pis/${id}`);
 }
 
-export async function getProximaSequencia() {
-  const res = await apiGet<{ sequencia: string }>("/api/pis/proxima-sequencia");
+export async function getProximaSequencia(simulacao: boolean = false, prefixo: string = "SW") {
+  const res = await apiGet<{ sequencia: string }>(`/api/pis/proxima-sequencia?simulacao=${simulacao}&prefixo=${prefixo}`);
   return res.sequencia;
 }
 

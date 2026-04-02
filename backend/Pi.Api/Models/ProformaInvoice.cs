@@ -79,6 +79,9 @@ public class ProformaInvoice
     [Column("validade_dias")]
     public int ValidadeDias { get; set; } = 30;
 
+    [Column("fl_simulacao")]
+    public bool FlSimulacao { get; set; } = false;
+
     // Navigation
     [Column("id_fornecedor")]
     public long? IdFornecedor { get; set; }

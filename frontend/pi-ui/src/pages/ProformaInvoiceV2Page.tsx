@@ -49,6 +49,7 @@ type FormState = {
   tipoRateio: string;
   moedaExibicao: "BRL" | "USD";
   validadeDias: number;
+  flSimulacao: boolean;
 };
 
 type ItemGrid = {
@@ -95,7 +96,8 @@ export default function ProformaInvoiceV2Page() {
     valorTotalFreteUSD: 0,
     tipoRateio: "IGUAL",
     moedaExibicao: "USD",
-    validadeDias: 30
+    validadeDias: 30,
+    flSimulacao: false
   });
 
   const [itens, setItens] = useState<ItemGrid[]>([]);
@@ -219,7 +221,8 @@ export default function ProformaInvoiceV2Page() {
           tipoRateio: piData.tipoRateio || "IGUAL",
           idConfiguracoes: piData.idConfiguracoes,
           moedaExibicao: piData.moedaExibicao || "USD",
-          validadeDias: piData.validadeDias || 30
+          validadeDias: piData.validadeDias || 30,
+          flSimulacao: piData.flSimulacao || false
         });
 
         const flatItens: ItemGrid[] = [];
@@ -313,7 +316,8 @@ export default function ProformaInvoiceV2Page() {
           idFrete: prev.idFrete || (fList.length > 0 ? fList[0].id : 1),
           idConfiguracoes: cfgData?.id || 0,
           moedaExibicao: "USD",
-          validadeDias: 30
+          validadeDias: 30,
+          flSimulacao: false
         }));
       }
     } catch (e) {
@@ -466,25 +470,25 @@ export default function ProformaInvoiceV2Page() {
       }
     }).catch(console.error);
 
-    // Dynamic Prefix for Ferguile
+    // Dynamic Prefix
     if (idForn) {
       const supplier = fornecedores.find(f => f.id === idForn);
       if (supplier) {
         const name = supplier.nome.toLowerCase();
+        let newPrefix = form.flSimulacao ? "SSW" : "SW";
+
         if (name.includes("ferguile") || name.includes("livintus")) {
           const year = new Date(form.dataPi).getFullYear();
-          const newPrefix = `FRG${year}-PO`;
-          if (form.prefixo !== newPrefix) {
-            setForm(prev => ({ ...prev, prefixo: newPrefix }));
-          }
-        } else if (form.prefixo.startsWith("FRG")) {
-           // Reset prefix if switching away from Ferguile
-           setForm(prev => ({ ...prev, prefixo: "SW" }));
+          newPrefix = form.flSimulacao ? `SFRG${year}-PO` : `FRG${year}-PO`;
+        }
+
+        if (form.prefixo !== newPrefix) {
+          setForm(prev => ({ ...prev, prefixo: newPrefix }));
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.idFornecedor, form.cotacaoAtualUSD, form.dataPi, fornecedores]);
+  }, [form.idFornecedor, form.cotacaoAtualUSD, form.dataPi, fornecedores, form.flSimulacao]);
 
   useEffect(() => {
     if (form.idFrete) loadFreteTotals();
@@ -929,6 +933,77 @@ export default function ProformaInvoiceV2Page() {
       setSaving(false);
     }
   }
+  const handleOficializar = async () => {
+    if (!window.confirm("Deseja realmente oficializar esta simulação? O número da PI será recriado no sequencial oficial.")) return;
+    try {
+      setSaving(true);
+      
+      let officialPrefix = "SW";
+      const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
+      if (supplier) {
+        const name = supplier.nome.toLowerCase();
+        if (name.includes("ferguile") || name.includes("livintus")) {
+          const year = new Date(form.dataPi || new Date()).getFullYear();
+          officialPrefix = `FRG${year}-PO`;
+        }
+      }
+      
+      const newSeq = await getProximaSequencia(false, officialPrefix);
+      const updatedForm = { ...form, flSimulacao: false, prefixo: officialPrefix, piSequencia: newSeq };
+      
+      const groupedItems = processedData.groups;
+      const piItensPecas: PiItemPeca[] = groupedItems.map(g => ({
+        id: g.items[0].idPiItemPeca || 0,
+        idPi: Number(id) || 0,
+        descricao: g.groupName,
+        quantidade: g.qtyPeca,
+        piItens: g.items.map((item: any) => ({
+          id: item.id || 0,
+          idPi: Number(id) || 0,
+          idModuloTecido: item.idModuloTecido,
+          largura: item.largura,
+          profundidade: item.profundidade,
+          altura: item.altura,
+          pa: item.pa,
+          m3: item.m3,
+          valorEXW: item.ValorEXW,
+          valorFreteRateadoBRL: item.ValorFreteRateadoBRL,
+          valorFreteRateadoUSD: item.ValorFreteRateadoUSD,
+          valorFinalItemBRL: item.ValorFinalItemBRL,
+          valorFinalItemUSDRisco: item.ValorFinalItemUSDRisco,
+          tempCodigoModuloTecido: item.codigoModuloTecido,
+          observacao: item.observacao,
+          feet: item.feet,
+          finishing: item.finishing || "",
+          idPiItemPeca: item.idPiItemPeca,
+          rateioFrete: 0,
+        }))
+      }));
+
+      const payload: Partial<ProformaInvoice> = {
+        ...updatedForm,
+        id: Number(id) || 0,
+        idFornecedor: form.idFornecedor ? Number(form.idFornecedor) : null,
+        idConfiguracoes: Number(form.idConfiguracoes),
+        idFrete: Number(form.idFrete),
+        valorTecido: itens.reduce((sum, item) => sum + (item.ValorEXW * item.quantidade), 0),
+        valorTotalFreteBRL: Number(form.valorTotalFreteBRL),
+        valorTotalFreteUSD: Number(form.valorTotalFreteUSD),
+        cotacaoAtualUSD: Number(form.cotacaoAtualUSD),
+        cotacaoRisco: Number(form.cotacaoRisco),
+        piItensPecas: piItensPecas,
+        piItens: [],
+      };
+
+      await updatePi(form.id!, payload as ProformaInvoice);
+      alert("PI Oficializada com sucesso!");
+      setForm(updatedForm); // Update UI
+    } catch(e) {
+      alert("Erro ao oficializar PI");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <>
@@ -973,6 +1048,11 @@ export default function ProformaInvoiceV2Page() {
           <button className="btn btn-primary" onClick={salvar} disabled={saving}>
             <Save size={18}/> {saving ? "Salvando..." : "Salvar PI"}
           </button>
+          {form.id && form.flSimulacao && (
+             <button className="btn btn-warning" onClick={handleOficializar} disabled={saving} style={{ backgroundColor: "#f59e0b", borderColor: "#f59e0b", color: "white" }}>
+                Oficializar Proforma
+             </button>
+          )}
         </div>
 
         <div style={{ padding: "0 10px" }}>
@@ -998,9 +1078,9 @@ export default function ProformaInvoiceV2Page() {
                </div>
                <div className="field" style={{ minWidth: "120px" }}>
                  <label className="label">Sequência</label>
-                 <div style={{ display: "flex", gap: "4px" }}>
-                    <input type="text" className="cl-input" style={{ width: "50px" }} value={form.prefixo} onChange={e => setForm({...form, prefixo: e.target.value})} />
-                    <input type="text" className="cl-input" value={form.piSequencia} onChange={e => setForm({...form, piSequencia: e.target.value})} />
+                 <div style={{ display: "flex", gap: "5px" }}>
+                    <input type="text" className="cl-input" style={{ width: "130px", flexShrink: 0 }} value={form.prefixo} onChange={e => setForm({...form, prefixo: e.target.value})} />
+                    <input type="text" className="cl-input" style={{ flex: 1 }} value={form.piSequencia} onChange={e => setForm({...form, piSequencia: e.target.value})} />
                  </div>
                </div>
                <div className="field">
@@ -1108,12 +1188,43 @@ export default function ProformaInvoiceV2Page() {
 
                 <div className="field" style={{ flex: 1 }}>
                   <label className="cl-label">Validade (Dias)</label>
-                  <input 
-                    type="number" 
-                    className="cl-input" 
-                    value={form.validadeDias || 30} 
-                    onChange={e => setForm({...form, validadeDias: parseInt(e.target.value) || 0})}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <input 
+                      type="number" 
+                      className="cl-input" 
+                      value={form.validadeDias || 30} 
+                      onChange={e => setForm({...form, validadeDias: parseInt(e.target.value) || 0})}
+                      style={{ width: "100%" }}
+                    />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#94a3b8', fontSize: '13px', whiteSpace: 'nowrap' }}>
+                      <input 
+                        type="checkbox"
+                        checked={form.flSimulacao || false}
+                        onChange={async (e) => {
+                          const isSim = e.target.checked;
+                          
+                          let nextPrefix = "SW";
+                          const supplier = fornecedores.find(f => String(f.id) === form.idFornecedor);
+                          if (supplier) {
+                            const name = supplier.nome.toLowerCase();
+                            if (name.includes("ferguile") || name.includes("livintus")) {
+                              const year = new Date(form.dataPi).getFullYear();
+                              nextPrefix = isSim ? `SFRG${year}-PO` : `FRG${year}-PO`;
+                            } else {
+                              nextPrefix = isSim ? "SSW" : "SW";
+                            }
+                          } else {
+                            nextPrefix = isSim ? "SSW" : "SW";
+                          }
+
+                          const newSeq = await getProximaSequencia(isSim, nextPrefix);
+                          setForm({...form, flSimulacao: isSim, prefixo: nextPrefix, piSequencia: newSeq});
+                        }}
+                        style={{ transform: "scale(1.3)", cursor: "pointer", margin: 0 }}
+                      />
+                      Simulação
+                    </label>
+                  </div>
                 </div>
             </div>
           </div>

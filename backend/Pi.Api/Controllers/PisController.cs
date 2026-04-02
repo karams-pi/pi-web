@@ -62,6 +62,7 @@ public class PisController : ControllerBase
                 x.TipoRateio,
                 x.MoedaExibicao,
                 x.ValidadeDias,
+                x.FlSimulacao,
 
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
                 Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome, x.Fornecedor.Cnpj } : null,
@@ -97,6 +98,7 @@ public class PisController : ControllerBase
                 x.TipoRateio,
                 x.MoedaExibicao,
                 x.ValidadeDias,
+                x.FlSimulacao,
 
                 x.IdFornecedor,
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
@@ -192,15 +194,26 @@ public class PisController : ControllerBase
     }
 
     [HttpGet("proxima-sequencia")]
-    public async Task<ActionResult<object>> GetProximaSequencia()
+    public async Task<ActionResult<object>> GetProximaSequencia([FromQuery] bool simulacao = false, [FromQuery] string prefixo = "SW")
     {
-        string sequencia = await GenerateNextSequenceString();
+        string sequencia = await GenerateNextSequenceString(simulacao, prefixo);
         return Ok(new { sequencia });
     }
 
-    private async Task<string> GenerateNextSequenceString()
+    private async Task<string> GenerateNextSequenceString(bool isSimulacao, string prefixo)
     {
-        var ultimaPi = await _db.Pis
+        IQueryable<Models.ProformaInvoice> query = _db.Pis;
+
+        if (isSimulacao)
+        {
+            query = query.Where(x => x.FlSimulacao && x.Prefixo == prefixo);
+        }
+        else
+        {
+            query = query.Where(x => !x.FlSimulacao);
+        }
+
+        var ultimaPi = await query
             .OrderByDescending(x => x.Id)
             .FirstOrDefaultAsync();
 
@@ -224,7 +237,7 @@ public class PisController : ControllerBase
     public async Task<ActionResult<object>> Create(ProformaInvoice pi)
     {
         // Sempre gera a próxima sequência para garantir integridade em concorrência
-        pi.PiSequencia = await GenerateNextSequenceString();
+        pi.PiSequencia = await GenerateNextSequenceString(pi.FlSimulacao, pi.Prefixo);
         
         // Convert to UTC for PostgreSQL
         pi.DataPi = pi.DataPi.ToUniversalTime();
@@ -256,6 +269,7 @@ public class PisController : ControllerBase
             pi.TipoRateio,
             pi.MoedaExibicao,
             pi.ValidadeDias,
+            pi.FlSimulacao,
             PiItens = pi.PiItens?.Select(i => new
             {
                 i.Id,
@@ -292,8 +306,6 @@ public class PisController : ControllerBase
         if (existingPi == null) return NotFound();
 
         // Update parent properties
-        existingPi.Prefixo = pi.Prefixo;
-        existingPi.PiSequencia = pi.PiSequencia;
         existingPi.DataPi = pi.DataPi.ToUniversalTime();
         existingPi.IdCliente = pi.IdCliente;
         existingPi.IdFornecedor = pi.IdFornecedor;
@@ -310,6 +322,22 @@ public class PisController : ControllerBase
         existingPi.TipoRateio = pi.TipoRateio;
         existingPi.MoedaExibicao = pi.MoedaExibicao;
         existingPi.ValidadeDias = pi.ValidadeDias;
+
+        bool wasSimulacao = existingPi.FlSimulacao;
+        bool isSimulacao = pi.FlSimulacao;
+        existingPi.FlSimulacao = pi.FlSimulacao;
+
+        if (wasSimulacao && !isSimulacao)
+        {
+            // Transition to official! Generate a new sequence
+            existingPi.PiSequencia = await GenerateNextSequenceString(false, pi.Prefixo);
+            existingPi.Prefixo = pi.Prefixo;
+        }
+        else
+        {
+            existingPi.Prefixo = pi.Prefixo;
+            existingPi.PiSequencia = pi.PiSequencia;
+        }
 
         // 1. Sync Pieces (metadata only)
         var incomingPieceIds = pi.PiItensPecas.Where(p => p.Id > 0).Select(p => p.Id).ToList();
