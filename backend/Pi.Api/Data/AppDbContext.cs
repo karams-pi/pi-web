@@ -28,6 +28,7 @@ public class AppDbContext : DbContext
     public DbSet<FreteItem> FreteItens => Set<FreteItem>();
     public DbSet<ConfiguracoesFreteItem> ConfiguracoesFreteItens => Set<ConfiguracoesFreteItem>();
     public DbSet<ProformaInvoice> Pis => Set<ProformaInvoice>();
+    public DbSet<PiItemPeca> PiItensPecas => Set<PiItemPeca>();
     public DbSet<PiItem> PiItens => Set<PiItem>();
 
     // Versionamento
@@ -303,6 +304,7 @@ public class AppDbContext : DbContext
             entity.HasKey(x => x.Id);
             entity.Property(x => x.Id).HasColumnName("id");
             entity.Property(x => x.IdPi).HasColumnName("id_pi").IsRequired();
+            entity.Property(x => x.IdPiItemPeca).HasColumnName("id_pi_item_peca");
             entity.Property(x => x.IdModuloTecido).HasColumnName("id_modulo_tecido").IsRequired();
             entity.Property(x => x.Largura).HasColumnName("largura").HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(x => x.Profundidade).HasColumnName("profundidade").HasColumnType("numeric(18,2)").IsRequired();
@@ -329,6 +331,27 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.IdModuloTecido)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.PiItemPeca)
+                .WithMany(x => x.PiItens)
+                .HasForeignKey(x => x.IdPiItemPeca)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // PiItemPeca
+        modelBuilder.Entity<PiItemPeca>(entity =>
+        {
+            entity.ToTable("pi_item_peca");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.IdPi).HasColumnName("id_pi").IsRequired();
+            entity.Property(x => x.Descricao).HasColumnName("descricao").HasMaxLength(200);
+            entity.Property(x => x.Quantidade).HasColumnName("quantidade").HasColumnType("numeric(18,2)").IsRequired();
+
+            entity.HasOne(x => x.Pi)
+                .WithMany(x => x.PiItensPecas)
+                .HasForeignKey(x => x.IdPi)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ===== IMPORTANTE: removi tudo que era do MODELO ANTIGO =====

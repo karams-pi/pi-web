@@ -81,5 +81,6 @@ public class ProformaInvoice
     public Cliente? Cliente { get; set; }
     public Configuracao? Configuracoes { get; set; }
     public Frete? Frete { get; set; }
+    public ICollection<PiItemPeca> PiItensPecas { get; set; } = new List<PiItemPeca>();
     public ICollection<PiItem> PiItens { get; set; } = new List<PiItem>();
 }

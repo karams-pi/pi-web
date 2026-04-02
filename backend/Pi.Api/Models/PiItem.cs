@@ -46,6 +46,12 @@ public class PiItem
     [Column("quantidade")]
     public decimal Quantidade { get; set; }
 
+    [Column("id_pi_item_peca")]
+    public long? IdPiItemPeca { get; set; }
+
+    [ForeignKey(nameof(IdPiItemPeca))]
+    public PiItemPeca? PiItemPeca { get; set; }
+
     [Required]
     [Column("valor_exw")]
     public decimal ValorEXW { get; set; }
@@ -82,4 +88,7 @@ public class PiItem
 
     [NotMapped]
     public string? TempCodigoModuloTecido { get; set; }
+
+    [NotMapped]
+    public PiItemPeca? TempPieceMarker { get; set; }
 }

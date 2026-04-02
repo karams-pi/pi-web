@@ -144,6 +144,7 @@ export type ProformaInvoice = {
   condicaoPagamento?: string;
   idioma?: string;
   tipoRateio: string;
+  piItensPecas?: PiItemPeca[];
   piItens?: PiItem[];
   cliente?: Cliente;
   configuracoes?: Configuracao;
@@ -171,9 +172,19 @@ export type PiItem = {
   valorFreteRateadoUSD: number;
   valorFinalItemBRL: number;
   valorFinalItemUSDRisco: number;
+  idPiItemPeca?: number;
+  piItemPeca?: PiItemPeca;
   feet?: string;
   finishing?: string;
   observacao?: string;
   tempCodigoModuloTecido?: string;
+};
+
+export type PiItemPeca = {
+  id: number;
+  idPi: number;
+  descricao?: string;
+  quantidade: number;
+  piItens?: PiItem[];
 };
 

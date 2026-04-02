@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import PasswordGuard from "../components/PasswordGuard";
 import { 
   listFretes
 } from "../api/fretes";
@@ -23,7 +22,7 @@ import { listModelos } from "../api/modelos";
 import { listMarcas } from "../api/marcas";
 import { listCategorias } from "../api/categorias";
 import { listTecidos } from "../api/tecidos";
-import type { ModuloTecido, Configuracao, ProformaInvoice, PiItem, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido } from "../api/types";
+import type { ModuloTecido, Configuracao, ProformaInvoice, PiItemPeca, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido } from "../api/types";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
@@ -39,6 +38,7 @@ type FormState = {
   dataPi: string;
   idCliente: string;
   idFornecedor: string;
+  idConfiguracoes: number;
   idFrete: number;
   cotacaoAtualUSD: number;
   cotacaoRisco: number | string;
@@ -56,6 +56,7 @@ type ItemGrid = {
   idModuloTecido: number;
   moduloTecido?: ModuloTecido;
   quantidade: number;
+  quantidadePeca: number;
   largura: number;
   profundidade: number;
   altura: number;
@@ -66,6 +67,7 @@ type ItemGrid = {
   ValorFreteRateadoUSD: number;
   ValorFinalItemBRL: number;
   ValorFinalItemUSDRisco: number;
+  idPiItemPeca?: number;
   codigoModuloTecido?: string;
   observacao?: string;
   feet?: string;
@@ -85,6 +87,7 @@ export default function ProformaInvoiceV2Page() {
     dataPi: new Date().toISOString().split('T')[0],
     idCliente: "",
     idFornecedor: "",
+    idConfiguracoes: 0,
     idFrete: 1,
     cotacaoAtualUSD: 0,
     cotacaoRisco: 0,
@@ -141,52 +144,65 @@ export default function ProformaInvoiceV2Page() {
         if (!item) return "";
         const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
         const vTecido = mt?.valorTecido || 0;
-        const risk = Number(form.cotacaoRisco) || 1;
-        const com = config?.percentualComissao || 0;
-        const gor = config?.percentualGordura || 0;
         
         const valorBase = risk > 0 ? vTecido / risk : 0;
         const vCom = valorBase * (com / 100);
         const vGor = valorBase * (gor / 100);
         
         const uEXW = item.ValorEXW;
-        const uFrete = item.ValorFreteRateadoUSD;
-        const lineTotal = (uEXW + uFrete) * item.quantidade;
+        const rowFrete = item.ValorFreteRateadoUSD * item.quantidade;
         
-        return `Cálculo EXW:
-(V. Tecido: ${vTecido.toFixed(2)} / Risco: ${risk.toFixed(2)}) = ${valorBase.toFixed(2)}
-+ Comiss: ${com}% (${vCom.toFixed(2)})
-+ Gord: ${gor}% (${vGor.toFixed(2)})
-= Unit EXW: $ ${uEXW.toFixed(2)}
+        return `Cálculo Unit EXW:
+(V. Tecido: ${vTecido.toFixed(2)} / Risco: ${risk.toFixed(2)}) = $ ${valorBase.toFixed(2)}
++ Comiss: ${com}% ($ ${vCom.toFixed(2)})
++ Gord: ${gor}% ($ ${vGor.toFixed(2)})
+= Base EXW: $ ${uEXW.toFixed(2)}
 
-Cálculo Linha:
-(Unit EXW: ${uEXW.toFixed(2)} + Unit Frete: ${uFrete.toFixed(2)}) * Qtd: ${item.quantidade} = $ ${lineTotal.toFixed(2)}`;
+Acréscimo Frete Linha:
+$ ${uEXW.toFixed(2)} + $ ${rowFrete.toFixed(2)} (Frete) = $ ${(uEXW + rowFrete).toFixed(2)}`;
       }
 
       case "freteUnit": {
         if (!item) return "";
-        const rowTotalFreight = item.ValorFreteRateadoUSD * item.quantidade;
+        const uFrete = item.ValorFreteRateadoUSD;
+        const rowShare = uFrete * item.quantidade;
         if (form.tipoRateio === "IGUAL") {
-          return `Cálculo Rateio (POR IGUAL): Total USD $ ${form.valorTotalFreteUSD.toFixed(2)} / ${itens.length} módulos = $ ${rowTotalFreight.toFixed(2)} por módulo.`;
+          return `Cálculo Frete (POR IGUAL):
+Total Frete $ ${form.valorTotalFreteUSD.toFixed(2)} / ${itens.length} linhas = $ ${rowShare.toFixed(2)} por linha.
+Unitário: $ ${rowShare.toFixed(2)} / Qtd: ${item.quantidade} = $ ${uFrete.toFixed(2)} por módulo.`;
         }
-        return `Cálculo Rateio (POR VOLUME): (Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) * M³ Modulo ${ (item.m3 * item.quantidade).toFixed(3)} = $ ${rowTotalFreight.toFixed(2)} por módulo.`;
+        return `Cálculo Frete (POR VOLUME):
+(Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) = $ ${(form.valorTotalFreteUSD / totalM3Pi).toFixed(2)} por m³
+* M³ Item: ${item.m3.toFixed(3)} = Unit Frete: $ ${uFrete.toFixed(2)}`;
       }
 
       case "usdUnit": {
         if (!item) return "";
         const uEXW = item.ValorEXW;
         const uFrete = item.ValorFreteRateadoUSD;
-        return `Fórmula Usuário: (Unit EXW: $ ${uEXW.toFixed(2)} + Unit Frete: $ ${uFrete.toFixed(2)}) * Qtd: ${item.quantidade} = $ ${((uEXW + uFrete) * item.quantidade).toFixed(2)}`;
+        return `Cálculo USD Unit (Com Frete):
+Unit EXW: $ ${uEXW.toFixed(2)} + Unit Frete: $ ${uFrete.toFixed(2)} = $ ${(uEXW + uFrete).toFixed(2)}`;
       }
 
       case "totalUsd": {
-        if (group && !isFerguile) {
-          const lines = group.items.map((it: ItemGrid) => `$ ${((it.ValorEXW + it.ValorFreteRateadoUSD) * it.quantidade).toFixed(2)}`).join(" + ");
-          return `Soma do Grupo: ${lines} = $ ${group.totalUsdGroup.toFixed(2)}`;
-        }
         if (!item) return "";
-        const unit = item.ValorEXW + item.ValorFreteRateadoUSD;
-        return `Cálculo Total: Unit ($ ${unit.toFixed(2)}) * Qtd (${item.quantidade}) = ${(unit * item.quantidade).toFixed(2)}`;
+        const unit = isFerguile ? (item.ValorEXW + item.ValorFreteRateadoUSD) : (group?.totalUsdUnit || 0);
+        const qty = isFerguile ? item.quantidade : (item.quantidadePeca || 0);
+        
+        return `Cálculo TOTAL USD (KARAMS/KOYO):
+USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).toFixed(2)}`;
+      }
+
+      case "unitFinal": {
+        if (!item) return "";
+        const uEXW = item.ValorEXW;
+        const rowFrete = item.ValorFreteRateadoUSD * item.quantidade;
+        const subTotalEXW = uEXW * item.quantidade;
+        
+        return `Cálculo UNIT FINAL:
+(Unit EXW: $ ${uEXW.toFixed(2)} * Qtd: ${item.quantidade}) = $ ${subTotalEXW.toFixed(2)}
++ Frete Linha: $ ${rowFrete.toFixed(2)}
+= Total Linha (UNIT FINAL): $ ${(subTotalEXW + rowFrete).toFixed(2)}`;
       }
 
       default: return "";
@@ -197,17 +213,17 @@ Cálculo Linha:
     const lang = form.idioma || "PT";
     const dicts: Record<string, Record<string, string>> = {
       PT: {
-        FOTO: "FOTO", MARCA: "MARCA", DESC: "MÓDULO / DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "QTD", M3: "M³ TOTAL", 
+        FOTO: "FOTO", MARCA: "MARCA", DESC: "MÓDULO / DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "QTD", QTD_PECA: "QTD PEÇA", M3: "M³ TOTAL", 
         TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", UNIT: "USD UNIT", TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condição de Pagamento"
       },
       ES: {
-        FOTO: "FOTO", MARCA: "MARCA", DESC: "MODULO / DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "CANT", M3: "M³ TOTAL", 
+        FOTO: "FOTO", MARCA: "MARCA", DESC: "MODULO / DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "CANT", QTD_PECA: "CANT PZA", M3: "M³ TOTAL", 
         TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condición de Pago"
       },
       EN: {
-        FOTO: "PHOTO", MARCA: "BRAND", DESC: "MODULE / DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", QTD: "QTY", M3: "TOTAL M³", 
+        FOTO: "PHOTO", MARCA: "BRAND", DESC: "MODULE / DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", QTD: "QTY", QTD_PECA: "PIECE QTY", M3: "TOTAL M³", 
         TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
         IDIOMA: "Language", COND_PAG: "Payment Condition"
       }
@@ -276,37 +292,79 @@ Cálculo Linha:
           tempoEntrega: piData.tempoEntrega,
           condicaoPagamento: piData.condicaoPagamento,
           idioma: piData.idioma,
-          tipoRateio: piData.tipoRateio || "VOLUME"
+          tipoRateio: piData.tipoRateio || "VOLUME",
+          idConfiguracoes: piData.idConfiguracoes
         });
 
-        const itapi = piData.piItens || [];
-        setItens(itapi.map((it: any) => ({
-          id: it.id,
-          tempId: Math.random(),
-          idModuloTecido: it.idModuloTecido,
-          quantidade: it.quantidade,
-          largura: it.largura,
-          profundidade: it.profundidade,
-          altura: it.altura,
-          pa: it.pa,
-          m3: it.m3 || ((it.largura * it.profundidade * it.altura) / 1000000),
-          ValorEXW: it.valorEXW,
-          ValorFreteRateadoBRL: it.valorFreteRateadoBRL,
-          ValorFreteRateadoUSD: it.valorFreteRateadoUSD,
-          ValorFinalItemBRL: it.valorFinalItemBRL,
-          ValorFinalItemUSDRisco: it.valorFinalItemUSDRisco,
-          codigoModuloTecido: it.tempCodigoModuloTecido,
-          observacao: it.observacao,
-          feet: it.feet,
-          finishing: it.finishing
-        })));
+        const flatItens: ItemGrid[] = [];
+        let counter = 1;
+
+        if (piData.piItensPecas && piData.piItensPecas.length > 0) {
+          piData.piItensPecas.forEach((peca: any) => {
+            if (peca.piItens) {
+              peca.piItens.forEach((item: any) => {
+                flatItens.push({
+                  id: item.id,
+                  tempId: counter++,
+                  idModuloTecido: item.idModuloTecido,
+                  moduloTecido: item.moduloTecido,
+                  quantidade: item.quantidade,
+                  quantidadePeca: peca.quantidade,
+                  largura: item.largura,
+                  profundidade: item.profundidade,
+                  altura: item.altura,
+                  pa: item.pa,
+                  m3: item.m3,
+                  ValorEXW: item.valorEXW,
+                  ValorFreteRateadoBRL: item.valorFreteRateadoBRL,
+                  ValorFreteRateadoUSD: item.valorFreteRateadoUSD,
+                  ValorFinalItemBRL: item.valorFinalItemBRL,
+                  ValorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
+                  idPiItemPeca: peca.id,
+                  codigoModuloTecido: item.moduloTecido?.codigoModuloTecido,
+                  observacao: item.observacao,
+                  feet: item.feet,
+                  finishing: item.finishing,
+                });
+              });
+            }
+          });
+        } else if (piData.piItens) {
+          piData.piItens.forEach((i: any) => {
+            flatItens.push({
+              id: i.id,
+              tempId: counter++,
+              idModuloTecido: i.idModuloTecido,
+              moduloTecido: i.moduloTecido,
+              quantidade: i.quantidade,
+              quantidadePeca: i.quantidadePeca || 1,
+              largura: i.largura,
+              profundidade: i.profundidade,
+              altura: i.altura,
+              pa: i.pa,
+              m3: i.m3,
+              ValorEXW: i.valorEXW,
+              ValorFreteRateadoBRL: i.valorFreteRateadoBRL,
+              ValorFreteRateadoUSD: i.valorFreteRateadoUSD,
+              ValorFinalItemBRL: i.valorFinalItemBRL,
+              ValorFinalItemUSDRisco: i.valorFinalItemUSDRisco,
+              idPiItemPeca: i.idPiItemPeca,
+              codigoModuloTecido: i.moduloTecido?.codigoModuloTecido,
+              observacao: i.observacao,
+              feet: i.feet,
+              finishing: i.finishing,
+            });
+          });
+        }
+        setItens(flatItens);
       } else {
         setForm(prev => ({
           ...prev,
           piSequencia: seq,
           cotacaoAtualUSD: cot,
           cotacaoRisco: risk,
-          idFrete: prev.idFrete || (fList.length > 0 ? fList[0].id : 1)
+          idFrete: prev.idFrete || (fList.length > 0 ? fList[0].id : 1),
+          idConfiguracoes: cfgData?.id || 0
         }));
       }
     } catch (e) {
@@ -369,8 +427,8 @@ Cálculo Linha:
           freteUnitBRL = item.quantidade > 0 ? remainingBRL / item.quantidade : 0;
           freteUnitUSD = item.quantidade > 0 ? remainingUSD / item.quantidade : 0;
         } else {
-          freteUnitBRL = calculateFreteRateio(targetBRL, totalM3, item.m3, prevItens.length, form.tipoRateio, item.quantidade);
-          freteUnitUSD = calculateFreteRateio(targetUSD, totalM3, item.m3, prevItens.length, form.tipoRateio, item.quantidade);
+          freteUnitBRL = calculateFreteRateio(targetBRL, totalM3, item.m3, prevItens.length, item.quantidade, form.tipoRateio);
+          freteUnitUSD = calculateFreteRateio(targetUSD, totalM3, item.m3, prevItens.length, item.quantidade, form.tipoRateio);
           
           remainingBRL -= (freteUnitBRL * item.quantidade);
           remainingUSD -= (freteUnitUSD * item.quantidade);
@@ -413,8 +471,8 @@ Cálculo Linha:
           fUnitBRL = item.quantidade > 0 ? remainingBRL / item.quantidade : 0;
           fUnitUSD = item.quantidade > 0 ? remainingUSD / item.quantidade : 0;
         } else {
-          fUnitBRL = calculateFreteRateio(freightBRL, totalM3, item.m3, prev.length, form.tipoRateio, item.quantidade);
-          fUnitUSD = calculateFreteRateio(freightUSD, totalM3, item.m3, prev.length, form.tipoRateio, item.quantidade);
+          fUnitBRL = calculateFreteRateio(freightBRL, totalM3, item.m3, prev.length, item.quantidade, form.tipoRateio);
+          fUnitUSD = calculateFreteRateio(freightUSD, totalM3, item.m3, prev.length, item.quantidade, form.tipoRateio);
           remainingBRL -= (fUnitBRL * item.quantidade);
           remainingUSD -= (fUnitUSD * item.quantidade);
         }
@@ -557,13 +615,16 @@ Cálculo Linha:
       }
 
       const rowFreightShare = item.ValorFreteRateadoUSD;
-      const rowUnitPrice = Number(((item.ValorEXW + rowFreightShare) * item.quantidade).toFixed(2));
-      const totalUsd = rowUnitPrice;
+      // Piece unit price sum: (Unit EXW + Unit Freight)
+      const moduleUnitCost = Number((item.ValorEXW + rowFreightShare).toFixed(2));
+      // Row total (for the PI): moduleUnitCost * moduleQuantity
+      const rowTotal = Number((moduleUnitCost * item.quantidade).toFixed(2));
       
       if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
         currentGroup = { 
           fabricName: groupKey, 
           brandName: isFerguile ? groupKey : (mt?.modulo?.marca?.nome || "Sem Marca"),
+          groupName: groupKey,
           items: [], 
           span: 0, 
           totalUsdUnit: 0, 
@@ -573,8 +634,15 @@ Cálculo Linha:
       }
       currentGroup.items.push(item);
       currentGroup.span++;
-      currentGroup.totalUsdUnit += rowUnitPrice;
-      currentGroup.totalUsdGroup += totalUsd;
+      
+      // UNIT FINAL logic: (EXW * Qty) + Total Frete for the row
+      const rowUnitFinal = (item.ValorEXW * item.quantidade) + (item.ValorFreteRateadoUSD * item.quantidade);
+      
+      // USD Unit merged cell now brings the sum of UNIT FINAL from its pieces
+      currentGroup.totalUsdUnit += rowUnitFinal; 
+      
+      // For now, keeping totalUsdGroup as the overall total
+      currentGroup.totalUsdGroup += rowTotal;
     });
 
     // 3. If Ferguile, calculate sub-spans for Descriptions within each brand group
@@ -687,6 +755,7 @@ Cálculo Linha:
       tempId: Math.random(),
       idModuloTecido: mt.id,
       quantidade: Number(quantidade) || 1,
+      quantidadePeca: Number(quantidade) || 1,
       largura: mt.modulo?.largura || 0,
       profundidade: mt.modulo?.profundidade || 0,
       altura: mt.modulo?.altura || 0,
@@ -710,7 +779,6 @@ Cálculo Linha:
   const removeItem = (tempId: number) => {
     setItens(itens.filter(i => i.tempId !== tempId));
   };
-
   const updateItem = (tempId: number, field: keyof ItemGrid, value: any) => {
     setItens(itens.map(it => {
       if (it.tempId === tempId) {
@@ -736,81 +804,72 @@ Cálculo Linha:
     }));
   };
 
+  const updateGroupPecaQuantity = (groupItems: ItemGrid[], value: number) => {
+    const tempIds = groupItems.map(it => it.tempId);
+    setItens(prev => prev.map(it => {
+      if (tempIds.includes(it.tempId)) {
+        return { ...it, quantidadePeca: value, quantidade: value };
+      }
+      return it;
+    }));
+  };
+
   async function salvar() {
     try {
       if (!form.idCliente) { alert("Selecione um cliente"); return; }
       setSaving(true);
-      const totalM3 = itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
-      const valorTecido = itens.reduce((sum, item) => sum + (item.ValorEXW * item.quantidade), 0);
       
-      const piData: Omit<ProformaInvoice, "id"> = {
-        prefixo: form.prefixo,
-        piSequencia: form.piSequencia,
-        dataPi: new Date(form.dataPi).toISOString(),
-        idCliente: form.idCliente,
+      const groupedItems = processedData.groups;
+      const piItensPecas: PiItemPeca[] = groupedItems.map(g => ({
+        id: g.items[0].idPiItemPeca || 0,
+        idPi: Number(id) || 0,
+        descricao: g.groupName,
+        quantidade: g.items[0].quantidadePeca || 1,
+        piItens: g.items.map((item: ItemGrid) => ({
+          id: item.id || 0,
+          idPi: Number(id) || 0,
+          idModuloTecido: item.idModuloTecido,
+          quantidade: item.quantidade,
+          largura: item.largura,
+          profundidade: item.profundidade,
+          altura: item.altura,
+          pa: item.pa,
+          m3: item.m3,
+          valorEXW: item.ValorEXW,
+          valorFreteRateadoBRL: item.ValorFreteRateadoBRL,
+          valorFreteRateadoUSD: item.ValorFreteRateadoUSD,
+          valorFinalItemBRL: item.ValorFinalItemBRL,
+          valorFinalItemUSDRisco: item.ValorFinalItemUSDRisco,
+          tempCodigoModuloTecido: item.codigoModuloTecido,
+          observacao: item.observacao,
+          feet: item.feet,
+          finishing: item.finishing || "",
+          idPiItemPeca: item.idPiItemPeca,
+          rateioFrete: 0,
+        }))
+      }));
+
+      const payload: Partial<ProformaInvoice> = {
+        ...form,
+        id: Number(id) || 0,
         idFornecedor: form.idFornecedor ? Number(form.idFornecedor) : null,
-        idConfiguracoes: config?.id || 0,
-        idFrete: form.idFrete,
-        valorTecido,
-        valorTotalFreteBRL: form.valorTotalFreteBRL,
-        valorTotalFreteUSD: form.valorTotalFreteUSD,
-        cotacaoAtualUSD: form.cotacaoAtualUSD,
+        idConfiguracoes: Number(form.idConfiguracoes),
+        idFrete: Number(form.idFrete),
+        valorTecido: itens.reduce((sum, item) => sum + (item.ValorEXW * item.quantidade), 0),
+        valorTotalFreteBRL: Number(form.valorTotalFreteBRL),
+        valorTotalFreteUSD: Number(form.valorTotalFreteUSD),
+        cotacaoAtualUSD: Number(form.cotacaoAtualUSD),
         cotacaoRisco: Number(form.cotacaoRisco),
-        tempoEntrega: form.tempoEntrega || "",
-        condicaoPagamento: form.condicaoPagamento || "",
-        idioma: form.idioma || "PT",
-        tipoRateio: form.tipoRateio,
-        piItens: (function() {
-          let remBRL = form.valorTotalFreteBRL;
-          let remUSD = form.valorTotalFreteUSD;
-          return itens.map((item, index) => {
-            const isLast = index === itens.length - 1;
-            let fUnitBRL = 0;
-            let fUnitUSD = 0;
-
-            if (isLast) {
-              fUnitBRL = item.quantidade > 0 ? remBRL / item.quantidade : 0;
-              fUnitUSD = item.quantidade > 0 ? remUSD / item.quantidade : 0;
-            } else {
-              fUnitBRL = calculateFreteRateio(form.valorTotalFreteBRL, totalM3, item.m3, itens.length, form.tipoRateio, item.quantidade);
-              fUnitUSD = calculateFreteRateio(form.valorTotalFreteUSD, totalM3, item.m3, itens.length, form.tipoRateio, item.quantidade);
-              remBRL -= (fUnitBRL * item.quantidade);
-              remUSD -= (fUnitUSD * item.quantidade);
-            }
-
-            const vBaseBRL = item.ValorEXW * (Number(form.cotacaoRisco) || 0);
-
-            return {
-              id: item.id || 0,
-              idPi: form.id || 0,
-              idModuloTecido: item.idModuloTecido,
-              quantidade: item.quantidade,
-              largura: item.largura,
-              profundidade: item.profundidade,
-              altura: item.altura,
-              pa: item.pa,
-              m3: item.m3,
-              rateioFrete: fUnitUSD,
-              valorEXW: item.ValorEXW,
-              valorFreteRateadoBRL: fUnitBRL,
-              valorFreteRateadoUSD: fUnitUSD,
-              valorFinalItemBRL: (vBaseBRL + fUnitBRL) * item.quantidade,
-              valorFinalItemUSDRisco: (item.ValorEXW + fUnitUSD) * item.quantidade,
-              observacao: item.observacao || "",
-              tempCodigoModuloTecido: item.codigoModuloTecido || "",
-              feet: item.feet || "",
-              finishing: item.finishing || ""
-            } as PiItem;
-          });
-        })()
+        piItensPecas: piItensPecas,
+        piItens: [],
       };
 
       if (form.id) {
-        await updatePi(form.id, piData as any);
+        await updatePi(form.id, payload as ProformaInvoice);
       } else {
-        const newPi = await createPi(piData as any);
-        setForm(prev => ({ ...prev, id: newPi.id }));
-        navigate(`/proforma-invoice-v2/${newPi.id}`);
+        const res = await createPi(payload as ProformaInvoice);
+        setForm(prev => ({ ...prev, id: res.id, piSequencia: res.piSequencia }));
+        navigate(`/pis/${res.id}`, { replace: true });
       }
       alert("PI Salva com sucesso!");
     } catch (e) {
@@ -822,7 +881,7 @@ Cálculo Linha:
   }
 
   return (
-    <PasswordGuard>
+    <>
       {loading && (
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -1002,6 +1061,7 @@ Cálculo Linha:
                         <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>P</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>A</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>Qtd</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "80px" }}>{translate("QTD_PECA")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>M³ Total</th>
                         <th style={{ ...thStyle, width: "140px", textAlign: "center" }}>Tecido</th>
                         <th style={{ ...thStyle, width: "100px" }}>Pés</th>
@@ -1009,6 +1069,7 @@ Cálculo Linha:
                         <th style={{ ...thStyle, width: "140px" }}>Observação</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>Frete</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>UNIT FINAL</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>USD Unit</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL USD</th>
                       </>
@@ -1022,6 +1083,7 @@ Cálculo Linha:
                         <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>ALT.</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>PROF.</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>CANT.</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "80px" }}>{translate("QTD_PECA")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>VOL M³</th>
                         <th style={{ ...thStyle, width: "120px" }}>FABRIC</th>
                         <th style={{ ...thStyle, width: "100px" }}>TELA N</th>
@@ -1117,9 +1179,28 @@ Cálculo Linha:
                                       className="cl-input" 
                                       style={{ width: "55px", textAlign: "center", height: "28px", padding: "0" }} 
                                       value={item.quantidade} 
-                                      onChange={e => updateItem(item.tempId, "quantidade", parseInt(e.target.value) || 1)}
+                                      onChange={e => {
+                                        const val = parseInt(e.target.value) || 1;
+                                        updateItem(item.tempId, "quantidade", val);
+                                        // If it's a single module piece, user might want to sync. 
+                                        // But here we'll let user decide or provide a toggle later.
+                                        // For now, only default on add.
+                                      }}
                                     />
                                  </td>
+                                 
+                                 {/* Piece Quantity (One per group) */}
+                                 {isFirst && (
+                                   <td rowSpan={group.span} style={{ ...tdStyle, textAlign: "center", verticalAlign: "middle", background: "rgba(255,255,255,0.02)" }}>
+                                      <input 
+                                        type="number" 
+                                        className="cl-input" 
+                                        style={{ width: "55px", textAlign: "center", height: "30px", padding: "0", fontSize: "14px", fontWeight: "700" }} 
+                                        value={item.quantidadePeca} 
+                                        onChange={e => updateGroupPecaQuantity(group.items, parseInt(e.target.value) || 0)}
+                                      />
+                                   </td>
+                                 )}
                                  
                                  {/* Vol Total M3 */}
                                  <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa" }} title={getCalculationHint("m3Total", item)}>
@@ -1188,14 +1269,17 @@ Cálculo Linha:
                                         $ {fmt(item.ValorFreteRateadoUSD * item.quantidade)}
                                       </td>
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
-                                        $ {fmt((item.ValorEXW + item.ValorFreteRateadoUSD) * item.quantidade)}
+                                        $ {fmt(item.ValorEXW + (item.ValorFreteRateadoUSD * item.quantidade))}
+                                      </td>
+                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("unitFinal", item)}>
+                                        $ {fmt((item.ValorEXW * item.quantidade) + (item.ValorFreteRateadoUSD * item.quantidade))}
                                       </td>
                                     </>
                                   )}
                                  
                                  {isFerguile ? (
                                    <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }} title={getCalculationHint("usdUnit", item)}>
-                                     $ {fmt(item.ValorEXW + (item.ValorFreteRateadoUSD * item.quantidade))}
+                                     $ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}
                                    </td>
                                  ) : (
                                    isFirst && (
@@ -1227,7 +1311,7 @@ Cálculo Linha:
                                      }}
                                      title={getCalculationHint("totalUsd", item, group)}
                                      >
-                                        $ {fmt(group.totalUsdGroup)}
+                                         $ {fmt(group.totalUsdUnit * item.quantidadePeca)}
                                     </td>
                                   ) : (
                                     isFerguile && (
@@ -1256,7 +1340,7 @@ Cálculo Linha:
                 {itens.length > 0 && (
                   <tfoot style={{ background: "rgba(15, 23, 42, 0.8)", fontWeight: "700" }}>
                     <tr>
-                      <td colSpan={isFerguile ? 12 : 13} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)" }}>TOTAIS:</td>
+                      <td colSpan={isFerguile ? 13 : 14} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)" }}>TOTAIS:</td>
                       {!isFerguile && (
                         <>
                           <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
@@ -1265,13 +1349,16 @@ Cálculo Linha:
                           <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
                             $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW + (i.ValorFreteRateadoUSD * i.quantidade)), 0))}
                           </td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
+                            $ {fmt(itens.reduce((sum, i) => sum + ((i.ValorEXW * i.quantidade) + (i.ValorFreteRateadoUSD * i.quantidade)), 0))}
+                          </td>
                         </>
                       )}
                       <td style={{ ...tdStyle, textAlign: "right", color: "#fff" }}>
                         $ {fmt(processedData.groups.reduce((sum, g) => sum + g.totalUsdUnit, 0))}
                       </td>
                       <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "16px" }}>
-                        $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW + i.ValorFreteRateadoUSD) * i.quantidade, 0))}
+                        $ {fmt(processedData.groups.reduce((sum, g) => sum + (g.totalUsdUnit * g.items[0].quantidadePeca), 0))}
                       </td>
                       <td style={tdStyle}></td>
                     </tr>
@@ -1406,7 +1493,7 @@ Cálculo Linha:
           .table-row-v2 td { transition: background 0.2s; }
         `}</style>
       </div>
-    </PasswordGuard>
+    </>
   );
 }
 

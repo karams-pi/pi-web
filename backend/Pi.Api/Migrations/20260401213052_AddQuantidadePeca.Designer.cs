@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pi.Api.Data;
@@ -11,9 +12,11 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401213052_AddQuantidadePeca")]
+    partial class AddQuantidadePeca
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -664,10 +667,6 @@ namespace Pi.Api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_pi");
 
-                    b.Property<long?>("IdPiItemPeca")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_pi_item_peca");
-
                     b.Property<decimal>("Largura")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("largura");
@@ -692,6 +691,10 @@ namespace Pi.Api.Migrations
                     b.Property<decimal>("Quantidade")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("quantidade");
+
+                    b.Property<decimal>("QuantidadePeca")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("quantidade_peca");
 
                     b.Property<decimal>("RateioFrete")
                         .HasColumnType("numeric(18,2)")
@@ -725,38 +728,7 @@ namespace Pi.Api.Migrations
                     b.HasIndex("IdPi")
                         .HasDatabaseName("ix_pi_item_id_pi");
 
-                    b.HasIndex("IdPiItemPeca");
-
                     b.ToTable("pi_item", (string)null);
-                });
-
-            modelBuilder.Entity("Pi.Api.Models.PiItemPeca", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("descricao");
-
-                    b.Property<long>("IdPi")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id_pi");
-
-                    b.Property<decimal>("Quantidade")
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("quantidade");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdPi");
-
-                    b.ToTable("pi_item_peca", (string)null);
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ProformaInvoice", b =>
@@ -1028,25 +1000,7 @@ namespace Pi.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Pi.Api.Models.PiItemPeca", "PiItemPeca")
-                        .WithMany("PiItens")
-                        .HasForeignKey("IdPiItemPeca")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("ModuloTecido");
-
-                    b.Navigation("Pi");
-
-                    b.Navigation("PiItemPeca");
-                });
-
-            modelBuilder.Entity("Pi.Api.Models.PiItemPeca", b =>
-                {
-                    b.HasOne("Pi.Api.Models.ProformaInvoice", "Pi")
-                        .WithMany("PiItensPecas")
-                        .HasForeignKey("IdPi")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Pi");
                 });
@@ -1121,16 +1075,9 @@ namespace Pi.Api.Migrations
                     b.Navigation("ModulosTecidos");
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.PiItemPeca", b =>
-                {
-                    b.Navigation("PiItens");
-                });
-
             modelBuilder.Entity("Pi.Api.Models.ProformaInvoice", b =>
                 {
                     b.Navigation("PiItens");
-
-                    b.Navigation("PiItensPecas");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>

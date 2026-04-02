@@ -39,8 +39,8 @@ export function calculateFreteRateio(
   totalM3: number,
   itemM3: number,
   moduleCount: number,
-  tipoRateio: string = "VOLUME",
-  itemQty: number = 1
+  itemQty: number,
+  tipoRateio: string = "VOLUME"
 ): number {
   if (tipoRateio === "IGUAL") {
     if (moduleCount <= 0 || itemQty <= 0) return 0;

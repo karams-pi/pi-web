@@ -118,6 +118,8 @@ public class PiExportService
             .Include(p => p.Fornecedor)
             .Include(p => p.Frete)
             .Include(p => p.Configuracoes)
+            .Include(p => p.PiItensPecas)
+                .ThenInclude(p => p.PiItens)
             .Include(p => p.PiItens)
                 .ThenInclude(i => i.ModuloTecido!)
                     .ThenInclude(mt => mt.Modulo!)
@@ -133,6 +135,8 @@ public class PiExportService
             .Include(p => p.PiItens)
                 .ThenInclude(i => i.ModuloTecido!)
                     .ThenInclude(mt => mt.Tecido!)
+            .Include(p => p.PiItens)
+                .ThenInclude(i => i.PiItemPeca)
             .FirstOrDefaultAsync(p => p.Id == piId);
 
         if (pi == null) throw new Exception("PI not found");
@@ -442,7 +446,7 @@ public class PiExportService
 
                     var rangeQtySofa = ws.Cells[currentRow, 8, toRow, 8];
                     rangeQtySofa.Merge = true;
-                    rangeQtySofa.Value = item.Quantidade;
+                    rangeQtySofa.Value = item.PiItemPeca?.Quantidade ?? 1;
                     rangeQtySofa.Style.Font.Bold = true;
                     rangeQtySofa.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     rangeQtySofa.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
