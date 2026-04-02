@@ -47,6 +47,16 @@ a {
   grid-template-columns: 1fr;
 }
 
+.app.print-mode {
+  display: block !important;
+  background: white !important;
+}
+
+.app.print-mode main {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 /* Sidebar and Desktop Layout */
 .sidebar {
   display: none;

@@ -49,17 +49,22 @@ function NotFound() {
 
 export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const location = useLocation();
+
+  const isPrintRoute = location.pathname.startsWith("/print-pi");
 
   return (
-    <div className="app">
-      <Sidebar 
-        isCollapsed={isSidebarCollapsed} 
-        setIsCollapsed={setIsSidebarCollapsed} 
-      />
-      <Header />
+    <div className={`app ${isPrintRoute ? "print-mode" : ""}`}>
+      {!isPrintRoute && (
+        <Sidebar 
+          isCollapsed={isSidebarCollapsed} 
+          setIsCollapsed={setIsSidebarCollapsed} 
+        />
+      )}
+      {!isPrintRoute && <Header />}
 
-      <main className="main">
-        <div className="container">
+      <main className={isPrintRoute ? "" : "main"}>
+        <div className={isPrintRoute ? "" : "container"}>
           <Routes>
             <Route path="/" element={<HomeMenu />} />
             <Route path="/clientes" element={<ClientesPage />} />

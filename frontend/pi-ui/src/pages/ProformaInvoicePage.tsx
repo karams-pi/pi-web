@@ -594,6 +594,7 @@ export default function ProformaInvoicePage() {
         cotacaoRisco: Number(form.cotacaoRisco),
         tempoEntrega: form.tempoEntrega,
         condicaoPagamento: form.condicaoPagamento,
+        tipoRateio: "VOLUME",
         piItens: itens.map(item => {
           const totalM3 = itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0);
           const freteUnitBRL = totalM3 > 0 ? (form.valorTotalFreteBRL / totalM3) * item.m3 : 0;
@@ -1236,7 +1237,7 @@ export default function ProformaInvoicePage() {
                 const sName = (supplier?.nome || "").toLowerCase();
                 const isFerguile = sName.includes("ferguile") || sName.includes("livintus");
                 const route = isFerguile ? "print-pi-ferguile" : "print-pi";
-                window.open(`#/${route}/${form.id}?currency=${currency}&validity=${validity}`, "_blank");
+                window.open(`/#/${route}/${form.id}?currency=${currency}&validity=${validity}`, "_blank");
             } else {
                 (async () => {
                     if (!form.id) return;

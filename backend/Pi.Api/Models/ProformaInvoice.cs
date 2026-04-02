@@ -70,7 +70,7 @@ public class ProformaInvoice
 
     [Column("tipo_rateio")]
     [MaxLength(10)]
-    public string TipoRateio { get; set; } = "VOLUME";
+    public string TipoRateio { get; set; } = "IGUAL";
 
     // Navigation
     [Column("id_fornecedor")]

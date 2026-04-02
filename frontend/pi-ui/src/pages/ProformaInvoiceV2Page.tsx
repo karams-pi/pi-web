@@ -93,7 +93,7 @@ export default function ProformaInvoiceV2Page() {
     cotacaoRisco: 0,
     valorTotalFreteBRL: 0,
     valorTotalFreteUSD: 0,
-    tipoRateio: "VOLUME"
+    tipoRateio: "IGUAL"
   });
 
   const [itens, setItens] = useState<ItemGrid[]>([]);
@@ -292,7 +292,7 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
           tempoEntrega: piData.tempoEntrega,
           condicaoPagamento: piData.condicaoPagamento,
           idioma: piData.idioma,
-          tipoRateio: piData.tipoRateio || "VOLUME",
+          tipoRateio: piData.tipoRateio || "IGUAL",
           idConfiguracoes: piData.idConfiguracoes
         });
 
@@ -709,7 +709,7 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
     if (!form.id) return;
 
     if (currencyModalType === "print") {
-      const url = isFerguile ? `/print-pi-ferguile/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}` : `/print-pi/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}`;
+      const url = isFerguile ? `/#/print-pi-ferguile/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}` : `/#/print-pi/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}`;
       window.open(url, "_blank");
     } else {
       (async () => {
