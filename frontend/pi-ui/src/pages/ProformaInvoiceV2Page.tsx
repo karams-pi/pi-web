@@ -22,7 +22,7 @@ import { listMarcas } from "../api/marcas";
 import { listCategorias } from "../api/categorias";
 import { listTecidos } from "../api/tecidos";
 import type { ModuloTecido, Configuracao, ProformaInvoice, PiItemPeca, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido } from "../api/types";
-import { Save, Plus, Trash2, Search, Printer, FileSpreadsheet, FileText } from "lucide-react";
+import { Save, Plus, Trash2, Search, Printer, FileSpreadsheet, FileText, Pencil } from "lucide-react";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
@@ -113,6 +113,7 @@ export default function ProformaInvoiceV2Page() {
   const [loading, setLoading] = useState(true);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
+  const [editingItemTempId, setEditingItemTempId] = useState<number | null>(null);
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
   const [currencyModalType] = useState<"print" | "excel">("print");
 
@@ -601,7 +602,34 @@ export default function ProformaInvoiceV2Page() {
     }
   }, [form.cotacaoRisco, isFerguile, totalM3Pi, form.moedaExibicao]);
 
-  const addItem = () => { setShowItemModal(true); };
+  const addItem = () => { 
+    setEditingItemTempId(null);
+    setSelModuloTecido("");
+    setCodigoModuloTecido("");
+    setQuantidade(1);
+    setShowItemModal(true); 
+  };
+
+  const editItem = (tempId: number) => {
+    const item = itens.find(it => it.tempId === tempId);
+    if (!item) return;
+
+    setEditingItemTempId(tempId);
+    setSelModuloTecido(String(item.idModuloTecido));
+    setQuantidade(item.quantidade);
+    setCodigoModuloTecido(item.codigoModuloTecido || "");
+    
+    // Auto-filter based on selected module's supplier/brand/etc
+    const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
+    if (mt) {
+      setFilterFornecedor(String(mt.modulo?.fornecedor?.id || ""));
+      setFilterCategoria(String(mt.modulo?.categoria?.id || ""));
+      setFilterMarca(String(mt.modulo?.marca?.id || ""));
+      setFilterTecido(String(mt.tecido?.id || ""));
+    }
+
+    setShowItemModal(true);
+  };
 
 
   const novaPi = () => {
@@ -677,26 +705,49 @@ export default function ProformaInvoiceV2Page() {
       config?.percentualGordura || 0
     );
     
-    const newItem: ItemGrid = {
-      tempId: Math.random(),
-      idModuloTecido: mt.id,
-      quantidade: Number(quantidade) || 1,
-      quantidadePeca: Number(quantidade) || 1,
-      largura: mt.modulo?.largura || 0,
-      profundidade: mt.modulo?.profundidade || 0,
-      altura: mt.modulo?.altura || 0,
-      pa: 0,
-      m3: ((mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0)) / 1000000,
-      ValorEXW: exw,
-      ValorFreteRateadoBRL: 0,
-      ValorFreteRateadoUSD: 0,
-      ValorFinalItemBRL: 0,
-      ValorFinalItemUSDRisco: 0,
-      codigoModuloTecido: codigoModuloTecido
-    };
+    if (editingItemTempId !== null) {
+      // MODE: EDIT
+      setItens(prev => prev.map(it => {
+        if (it.tempId === editingItemTempId) {
+          return {
+            ...it,
+            idModuloTecido: mt.id,
+            quantidade: Number(quantidade) || 1,
+            quantidadePeca: Number(quantidade) || 1, 
+            largura: mt.modulo?.largura || 0,
+            profundidade: mt.modulo?.profundidade || 0,
+            altura: mt.modulo?.altura || 0,
+            m3: ((mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0)) / 1000000,
+            ValorEXW: exw,
+            codigoModuloTecido: codigoModuloTecido
+          };
+        }
+        return it;
+      }));
+    } else {
+      // MODE: ADD NEW
+      const newItem: ItemGrid = {
+        tempId: Math.random(),
+        idModuloTecido: mt.id,
+        quantidade: Number(quantidade) || 1,
+        quantidadePeca: Number(quantidade) || 1,
+        largura: mt.modulo?.largura || 0,
+        profundidade: mt.modulo?.profundidade || 0,
+        altura: mt.modulo?.altura || 0,
+        pa: 0,
+        m3: ((mt.modulo?.largura || 0) * (mt.modulo?.profundidade || 0) * (mt.modulo?.altura || 0)) / 1000000,
+        ValorEXW: exw,
+        ValorFreteRateadoBRL: 0,
+        ValorFreteRateadoUSD: 0,
+        ValorFinalItemBRL: 0,
+        ValorFinalItemUSDRisco: 0,
+        codigoModuloTecido: codigoModuloTecido
+      };
+      setItens([...itens, newItem]);
+    }
 
-    setItens([...itens, newItem]);
     setShowItemModal(false);
+    setEditingItemTempId(null);
     setSelModuloTecido("");
     setCodigoModuloTecido("");
     setQuantidade(1);
@@ -1269,7 +1320,7 @@ export default function ProformaInvoiceV2Page() {
                                   )}
 
                                  <td style={{ ...tdStyle, textAlign: "center" }}>
-                                     <button onClick={() => removeItem(item.tempId)} className="btn btn-sm" style={{ border: "none", color: "var(--danger)", padding: 0, background: "none" }}><Trash2 size={16}/></button>
+                                     <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}><button onClick={() => editItem(item.tempId)} className="btn btn-sm" style={{ border: "none", color: "var(--primary)", padding: 0, background: "none" }} title="Editar"><Pencil size={16}/></button><button onClick={() => removeItem(item.tempId)} className="btn btn-sm" style={{ border: "none", color: "var(--danger)", padding: 0, background: "none" }} title="Remover"><Trash2 size={16}/></button></div>
                                   </td>
                                </tr>
                            );
@@ -1348,8 +1399,10 @@ export default function ProformaInvoiceV2Page() {
           }}>
             <div className="cl-card" style={{ width: "100%", maxWidth: "800px", padding: "30px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
-                <h2 style={{ margin: 0, fontSize: "24px", color: "var(--primary)", fontWeight: "800", letterSpacing: "1px" }}>NOVO ITEM</h2>
-                <button onClick={() => setShowItemModal(false)} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "24px" }}>×</button>
+                <h2 style={{ margin: 0, fontSize: "24px", color: "var(--primary)", fontWeight: "800", letterSpacing: "1px" }}>
+                  {editingItemTempId !== null ? "EDITAR ITEM" : "NOVO ITEM"}
+                </h2>
+                <button onClick={() => { setShowItemModal(false); setEditingItemTempId(null); }} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "24px" }}>×</button>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "25px", marginBottom: "30px" }}>
@@ -1424,11 +1477,11 @@ export default function ProformaInvoiceV2Page() {
                   onClick={adicionarItem} 
                   style={{ flex: 2, padding: "15px", fontSize: "16px", fontWeight: "700", borderRadius: "10px", boxShadow: "0 10px 20px -5px rgba(59,130,246,0.3)" }}
                 >
-                  ADICIONAR À GRID
+                  {editingItemTempId !== null ? "SALVAR ALTERAÇÕES" : "ADICIONAR À GRID"}
                 </button>
                 <button 
                   className="btn btn-secondary" 
-                  onClick={() => setShowItemModal(false)}
+                  onClick={() => { setShowItemModal(false); setEditingItemTempId(null); }}
                   style={{ flex: 1, padding: "15px", borderRadius: "10px" }}
                 >
                   CANCELAR
