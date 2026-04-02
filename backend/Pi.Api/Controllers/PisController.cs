@@ -60,6 +60,8 @@ public class PisController : ControllerBase
                 x.CondicaoPagamento,
                 x.Idioma,
                 x.TipoRateio,
+                x.MoedaExibicao,
+                x.ValidadeDias,
 
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
                 Fornecedor = x.Fornecedor != null ? new { x.Fornecedor.Id, x.Fornecedor.Nome, x.Fornecedor.Cnpj } : null,
@@ -93,6 +95,8 @@ public class PisController : ControllerBase
                 x.CondicaoPagamento,
                 x.Idioma,
                 x.TipoRateio,
+                x.MoedaExibicao,
+                x.ValidadeDias,
 
                 x.IdFornecedor,
                 Frete = x.Frete != null ? new { x.Frete.Id, x.Frete.Nome } : null,
@@ -250,6 +254,8 @@ public class PisController : ControllerBase
             pi.CondicaoPagamento,
             pi.Idioma,
             pi.TipoRateio,
+            pi.MoedaExibicao,
+            pi.ValidadeDias,
             PiItens = pi.PiItens?.Select(i => new
             {
                 i.Id,
@@ -302,6 +308,8 @@ public class PisController : ControllerBase
         existingPi.CondicaoPagamento = pi.CondicaoPagamento;
         existingPi.Idioma = pi.Idioma;
         existingPi.TipoRateio = pi.TipoRateio;
+        existingPi.MoedaExibicao = pi.MoedaExibicao;
+        existingPi.ValidadeDias = pi.ValidadeDias;
 
         // 1. Sync Pieces (metadata only)
         var incomingPieceIds = pi.PiItensPecas.Where(p => p.Id > 0).Select(p => p.Id).ToList();

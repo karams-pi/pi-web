@@ -509,15 +509,18 @@ public class PiExportService
                     foreach (var m in groupItems)
                     {
                         decimal mQty = m.Quantidade > 0 ? (decimal)m.Quantidade : 1m;
+                        decimal mPecaQty = m.PiItemPeca?.Quantidade ?? 1m;
+                        decimal mQtyPerPeca = mPecaQty > 0 ? mQty / mPecaQty : 0;
+
                         decimal mUnitEXW = m.ValorEXW;
                         if (currency == "BRL") mUnitEXW *= (decimal)pi.CotacaoRisco;
                         
-                        fabricGroupUnit += mUnitEXW;
-
                         decimal mFreight = (currency == "BRL" ? itemFreightBRL[m.Id] : itemFreightUSD[m.Id]);
-                        decimal mRowFreight = mFreight * m.Quantidade;
+                        
+                        // Piece context: (Unit EXW + Unit Freight) * (Modules per Piece)
+                        fabricGroupUnit += (mUnitEXW + mFreight) * mQtyPerPeca;
 
-                        fabricGroupTotalValue += (mUnitEXW * m.Quantidade) + mRowFreight;
+                        fabricGroupTotalValue += (mUnitEXW * m.Quantidade) + (mFreight * m.Quantidade);
                     }
 
                     var rangeGroupUnit = ws.Cells[currentRow, colGroupUnit, endRowGrp, colGroupUnit];
@@ -731,7 +734,6 @@ public class PiExportService
         string totalLabel = currentCurrency == "BRL" ? "TOTAL R$" : "TOTAL USD";
         
         bool showFreight = true; // Always show in Excel as requested
-        int unitCol = 13;
         int totalCol = 14;
 
         List<string> headerList = new List<string> { 
@@ -743,12 +745,12 @@ public class PiExportService
         if (showFreight)
         {
             headerList.Add(t("FRETE", lang));
-            unitCol = 14;
-            totalCol = 15;
+            headerList.Add("EXW UNIT");
+            headerList.Add("UNIT FINAL");
         }
 
-        headerList.Add(unitLabel);
-        headerList.Add(totalLabel);
+        headerList.Add(unitLabel); // This will be USD UNIT (Custo Peça)
+        headerList.Add(totalLabel); // This will be TOTAL USD (Custo Grupo)
 
         string[] headers = headerList.ToArray();
         for (int i = 0; i < headers.Length; i++)
@@ -823,12 +825,15 @@ public class PiExportService
 
         decimal totalQty = 0;
         decimal totalM3 = 0;
-        decimal totalValue = 0;
+
+        decimal totalFinalPI = 0;
 
         foreach (var group in groups)
         {
             var brand = group.Key;
             int groupStartRow = currentRow;
+            decimal groupPieceCostDisp = 0;
+            decimal groupTotalValueDisp = 0;
             foreach (var item in group)
             {
                 ws.Cells[currentRow, 2].Value = brand?.Nome;
@@ -852,29 +857,61 @@ public class PiExportService
                     ws.Cells[currentRow, 13].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
-                decimal unitPriceBase = currency == "BRL"
-                    ? item.ValorEXW * (decimal)pi.CotacaoRisco
-                    : item.ValorEXW;
+                decimal risk = pi.CotacaoRisco;
+                bool isBRL = currency == "BRL";
+
+                // Step 1: EXW UNIT (EXW + unit freight)
+                decimal exwUnitUSD = item.ValorEXW + freightUnit;
+                decimal exwUnitDisp = isBRL ? exwUnitUSD * risk : exwUnitUSD;
+
+                // Step 2: UNIT FINAL (EXW UNIT * mod per piece)
+                decimal pQty = item.PiItemPeca?.Quantidade ?? 1m;
+                decimal modPerPeca = pQty > 0 ? (decimal)item.Quantidade / pQty : 0;
+                decimal unitFinalUSD = exwUnitUSD * modPerPeca;
+                decimal unitFinalDisp = isBRL ? unitFinalUSD * risk : unitFinalUSD;
+
+                // Step 3/4 accumulator
+                // We'll write step 1 and 2 per row
+                ws.Cells[currentRow, 14].Value = exwUnitDisp;
+                ws.Cells[currentRow, 15].Value = unitFinalDisp;
+
+                decimal rowTotalValueUSD = exwUnitUSD * (decimal)item.Quantidade;
+                decimal rowTotalValueDisp = isBRL ? rowTotalValueUSD * risk : rowTotalValueUSD;
+
+                groupPieceCostDisp += unitFinalDisp;
+                groupTotalValueDisp += rowTotalValueDisp;
+
+                totalQty += (decimal)item.Quantidade;
+                totalM3 += ((decimal)item.M3 * (decimal)item.Quantidade);
                 
-                decimal rowFreight = freightUnit * item.Quantidade;
-
-                decimal unitPriceDisplay = (unitPriceBase + rowFreight) * item.Quantidade;
-                decimal totalPrice = unitPriceDisplay;
-
-                ws.Cells[currentRow, unitCol].Value = unitPriceDisplay;
-                ws.Cells[currentRow, totalCol].Value = totalPrice;
-
-                totalQty += item.Quantidade;
-                totalM3 += (item.M3 * item.Quantidade);
-                totalValue += totalPrice;
-
                 ws.Row(currentRow).Height = 25;
-                for (int i = 3; i <= totalCol; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                for (int i = 3; i <= 15; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 currentRow++;
             }
-            ws.Cells[groupStartRow, 1, currentRow - 1, 1].Merge = true;
+
+            // Write merged group values (Step 3 and 4)
+            int groupEndRow = currentRow - 1;
+            
+            // USD UNIT (Cost per Piece)
+            ws.Cells[groupStartRow, 16, groupEndRow, 16].Merge = true;
+            ws.Cells[groupStartRow, 16].Value = groupPieceCostDisp;
+            ws.Cells[groupStartRow, 16].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            ws.Cells[groupStartRow, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+            ws.Cells[groupStartRow, 16].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+            // TOTAL USD (Cost of the group)
+            ws.Cells[groupStartRow, 17, groupEndRow, 17].Merge = true;
+            ws.Cells[groupStartRow, 17].Value = groupTotalValueDisp;
+            ws.Cells[groupStartRow, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            ws.Cells[groupStartRow, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+            ws.Cells[groupStartRow, 17].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            ws.Cells[groupStartRow, 17].Style.Font.Bold = true;
+
+            totalFinalPI += groupTotalValueDisp;
+
+            ws.Cells[groupStartRow, 1, groupEndRow, 1].Merge = true;
             ws.Cells[groupStartRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            ws.Cells[groupStartRow, 2, currentRow - 1, 2].Merge = true;
+            ws.Cells[groupStartRow, 2, groupEndRow, 2].Merge = true;
             ws.Cells[groupStartRow, 2].Style.Border.BorderAround(ExcelBorderStyle.Thin);
             ws.Cells[groupStartRow, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
             ws.Cells[groupStartRow, 2].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(239, 246, 255));
@@ -904,14 +941,14 @@ public class PiExportService
             ws.Cells[currentRow, 13].Value = (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
         }
 
-        ws.Cells[currentRow, totalCol].Value = totalValue;
-        ws.Cells[currentRow, 8, currentRow, totalCol].Style.Font.Bold = true;
-        for (int i = 1; i <= totalCol; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        ws.Cells[currentRow, 1, currentRow, totalCol].Style.Fill.PatternType = ExcelFillStyle.Solid;
-        ws.Cells[currentRow, 1, currentRow, totalCol].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(248, 250, 252));
+        ws.Cells[currentRow, 17].Value = totalFinalPI;
+        ws.Cells[currentRow, 8, currentRow, 17].Style.Font.Bold = true;
+        for (int i = 1; i <= 17; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        ws.Cells[currentRow, 1, currentRow, 17].Style.Fill.PatternType = ExcelFillStyle.Solid;
+        ws.Cells[currentRow, 1, currentRow, 17].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(248, 250, 252));
         currentRow++;
 
-        ws.Cells[startRow + 1, 13, currentRow - 1, totalCol].Style.Numberformat.Format = currency == "BRL" ? "_-R$* #,##0.00_-" : "_-$* #,##0.00_-";
+        ws.Cells[startRow + 1, 13, currentRow - 1, 17].Style.Numberformat.Format = currency == "BRL" ? "_-R$* #,##0.00_-" : "_-$* #,##0.00_-";
         ws.Cells[startRow + 1, 5, currentRow - 1, 9].Style.Numberformat.Format = "#,##0.00";
 
         ws.Column(3).Width = 35;

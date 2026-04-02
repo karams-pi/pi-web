@@ -23,11 +23,11 @@ import { listMarcas } from "../api/marcas";
 import { listCategorias } from "../api/categorias";
 import { listTecidos } from "../api/tecidos";
 import type { ModuloTecido, Configuracao, ProformaInvoice, PiItemPeca, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido } from "../api/types";
+import { Save, Plus, Trash2, Search, Printer, FileSpreadsheet, FileText } from "lucide-react";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
 import { ModuloTecidoSelect } from "../components/ModuloTecidoSelect";
 import { PiCurrencyModal } from "../components/PiCurrencyModal";
-import { Save, Plus, Trash2, Search, FileText, Printer, FileSpreadsheet } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import "./ClientesPage.css"; // Reuse existing system classes
 
@@ -48,6 +48,8 @@ type FormState = {
   condicaoPagamento?: string;
   idioma?: string;
   tipoRateio: string;
+  moedaExibicao: "BRL" | "USD";
+  validadeDias: number;
 };
 
 type ItemGrid = {
@@ -93,7 +95,9 @@ export default function ProformaInvoiceV2Page() {
     cotacaoRisco: 0,
     valorTotalFreteBRL: 0,
     valorTotalFreteUSD: 0,
-    tipoRateio: "IGUAL"
+    tipoRateio: "IGUAL",
+    moedaExibicao: "USD",
+    validadeDias: 30
   });
 
   const [itens, setItens] = useState<ItemGrid[]>([]);
@@ -111,7 +115,7 @@ export default function ProformaInvoiceV2Page() {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
   const [currencyModalOpen, setCurrencyModalOpen] = useState(false);
-  const [currencyModalType, setCurrencyModalType] = useState<"print" | "excel">("print");
+  const [currencyModalType] = useState<"print" | "excel">("print");
 
   const isFerguile = useMemo(() => {
     const s = fornecedores.find(f => String(f.id) === form.idFornecedor);
@@ -119,95 +123,8 @@ export default function ProformaInvoiceV2Page() {
     return name.includes("ferguile") || name.includes("livintus");
   }, [fornecedores, form.idFornecedor]);
 
-  const totalM3Pi = useMemo(() => itens.reduce((sum, i) => sum + (i.m3 * i.quantidade), 0), [itens]);
 
-  const getCalculationHint = useCallback((type: string, item?: ItemGrid, group?: any) => {
-    const cot = Number(form.cotacaoAtualUSD);
-    const red = config?.valorReducaoDolar || 0;
-    const risk = Number(form.cotacaoRisco) || 1;
-    const com = config?.percentualComissao || 0;
-    const gor = config?.percentualGordura || 0;
 
-    switch (type) {
-      case "cotacaoRisco":
-        if (isFerguile) return `Cálculo: Fixo Configuração = ${red.toFixed(2)}`;
-        return `Cálculo: Atual (${cot.toFixed(2)}) - Redução (${red.toFixed(2)}) = ${(cot - red).toFixed(2)}`;
-      
-      case "freteTotalUSD":
-        return `Cálculo: Total R$ (${form.valorTotalFreteBRL.toFixed(2)}) / Risco (${risk.toFixed(2)}) = ${(form.valorTotalFreteBRL / risk).toFixed(2)}`;
-
-      case "m3Total":
-        if (!item) return "";
-        return `Cálculo: (L:${item.largura} * P:${item.profundidade} * A:${item.altura}) * Qtd:${item.quantidade} / 1.000.000 = ${(item.m3 * item.quantidade).toFixed(3)} m³`;
-
-      case "exwUnit": {
-        if (!item) return "";
-        const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
-        const vTecido = mt?.valorTecido || 0;
-        
-        const valorBase = risk > 0 ? vTecido / risk : 0;
-        const vCom = valorBase * (com / 100);
-        const vGor = valorBase * (gor / 100);
-        
-        const uEXW = item.ValorEXW;
-        const rowFrete = item.ValorFreteRateadoUSD * item.quantidade;
-        
-        return `Cálculo Unit EXW:
-(V. Tecido: ${vTecido.toFixed(2)} / Risco: ${risk.toFixed(2)}) = $ ${valorBase.toFixed(2)}
-+ Comiss: ${com}% ($ ${vCom.toFixed(2)})
-+ Gord: ${gor}% ($ ${vGor.toFixed(2)})
-= Base EXW: $ ${uEXW.toFixed(2)}
-
-Acréscimo Frete Linha:
-$ ${uEXW.toFixed(2)} + $ ${rowFrete.toFixed(2)} (Frete) = $ ${(uEXW + rowFrete).toFixed(2)}`;
-      }
-
-      case "freteUnit": {
-        if (!item) return "";
-        const uFrete = item.ValorFreteRateadoUSD;
-        const rowShare = uFrete * item.quantidade;
-        if (form.tipoRateio === "IGUAL") {
-          return `Cálculo Frete (POR IGUAL):
-Total Frete $ ${form.valorTotalFreteUSD.toFixed(2)} / ${itens.length} linhas = $ ${rowShare.toFixed(2)} por linha.
-Unitário: $ ${rowShare.toFixed(2)} / Qtd: ${item.quantidade} = $ ${uFrete.toFixed(2)} por módulo.`;
-        }
-        return `Cálculo Frete (POR VOLUME):
-(Frete Total $ ${form.valorTotalFreteUSD.toFixed(2)} / M³ Total ${totalM3Pi.toFixed(3)}) = $ ${(form.valorTotalFreteUSD / totalM3Pi).toFixed(2)} por m³
-* M³ Item: ${item.m3.toFixed(3)} = Unit Frete: $ ${uFrete.toFixed(2)}`;
-      }
-
-      case "usdUnit": {
-        if (!item) return "";
-        const uEXW = item.ValorEXW;
-        const uFrete = item.ValorFreteRateadoUSD;
-        return `Cálculo USD Unit (Com Frete):
-Unit EXW: $ ${uEXW.toFixed(2)} + Unit Frete: $ ${uFrete.toFixed(2)} = $ ${(uEXW + uFrete).toFixed(2)}`;
-      }
-
-      case "totalUsd": {
-        if (!item) return "";
-        const unit = isFerguile ? (item.ValorEXW + item.ValorFreteRateadoUSD) : (group?.totalUsdUnit || 0);
-        const qty = isFerguile ? item.quantidade : (item.quantidadePeca || 0);
-        
-        return `Cálculo TOTAL USD (KARAMS/KOYO):
-USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).toFixed(2)}`;
-      }
-
-      case "unitFinal": {
-        if (!item) return "";
-        const uEXW = item.ValorEXW;
-        const rowFrete = item.ValorFreteRateadoUSD * item.quantidade;
-        const subTotalEXW = uEXW * item.quantidade;
-        
-        return `Cálculo UNIT FINAL:
-(Unit EXW: $ ${uEXW.toFixed(2)} * Qtd: ${item.quantidade}) = $ ${subTotalEXW.toFixed(2)}
-+ Frete Linha: $ ${rowFrete.toFixed(2)}
-= Total Linha (UNIT FINAL): $ ${(subTotalEXW + rowFrete).toFixed(2)}`;
-      }
-
-      default: return "";
-    }
-  }, [form.cotacaoAtualUSD, form.cotacaoRisco, form.valorTotalFreteBRL, form.valorTotalFreteUSD, config, isFerguile, modulosTecidos, totalM3Pi]);
 
   const translate = useCallback((key: string) => {
     const lang = form.idioma || "PT";
@@ -293,7 +210,9 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
           condicaoPagamento: piData.condicaoPagamento,
           idioma: piData.idioma,
           tipoRateio: piData.tipoRateio || "IGUAL",
-          idConfiguracoes: piData.idConfiguracoes
+          idConfiguracoes: piData.idConfiguracoes,
+          moedaExibicao: piData.moedaExibicao || "USD",
+          validadeDias: piData.validadeDias || 30
         });
 
         const flatItens: ItemGrid[] = [];
@@ -364,7 +283,9 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
           cotacaoAtualUSD: cot,
           cotacaoRisco: risk,
           idFrete: prev.idFrete || (fList.length > 0 ? fList[0].id : 1),
-          idConfiguracoes: cfgData?.id || 0
+          idConfiguracoes: cfgData?.id || 0,
+          moedaExibicao: "USD",
+          validadeDias: 30
         }));
       }
     } catch (e) {
@@ -545,7 +466,6 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
     recalcularRateio();
   }, [recalcularRateio]);
 
-
   const fornecedorOptions = useMemo(() => fornecedores.map(f => ({ value: String(f.id), label: f.nome })), [fornecedores]);
   const clienteOptions = useMemo(() => clientes.map(c => ({ value: String(c.id), label: c.empresa ? `${c.nome} - ${c.empresa}` : c.nome })), [clientes]);
   const freteOptions = useMemo(() => fretes.map(f => ({ value: String(f.id), label: f.nome })), [fretes]);
@@ -575,51 +495,35 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
 
     return [{ value: "", label: "Todos" }, ...filtered.map(f => ({ value: String(f.id), label: f.nome }))];
   }, [fornecedores, form.idFornecedor]);
-
   const processedData = useMemo(() => {
     if (itens.length === 0 || !modulosTecidos) return { groups: [] };
-
-    // 1. Sort the items
     const sorted = [...itens].sort((a, b) => {
        const mtA = (modulosTecidos || []).find(m => m.id === a.idModuloTecido);
        const mtB = (modulosTecidos || []).find(m => m.id === b.idModuloTecido);
-       
        if (isFerguile) {
-         // Sort by Brand (Referencia) -> Description -> Fabric
          const bA = mtA?.modulo?.marca?.nome || "";
          const bB = mtB?.modulo?.marca?.nome || "";
          if (bA !== bB) return bA.localeCompare(bB);
-         
          const dA = mtA?.modulo?.descricao || "";
          const dB = mtB?.modulo?.descricao || "";
          if (dA !== dB) return dA.localeCompare(dB);
        }
-       
        const fA = mtA?.tecido?.nome || "";
        const fB = mtB?.tecido?.nome || "";
        return fA.localeCompare(fB);
     });
-
-    // 2. Group them
     const groups: any[] = [];
     let currentGroup: any = null;
-
     sorted.forEach(item => {
       const mt = (modulosTecidos || []).find(m => m.id === item.idModuloTecido);
-      
-      let groupKey = "";
-      if (isFerguile) {
-        groupKey = mt?.modulo?.marca?.nome || "Sem Marca";
-      } else {
-        groupKey = mt?.tecido?.nome || "Sem Tecido";
-      }
-
-      const rowFreightShare = item.ValorFreteRateadoUSD;
-      // Piece unit price sum: (Unit EXW + Unit Freight)
-      const moduleUnitCost = Number((item.ValorEXW + rowFreightShare).toFixed(2));
-      // Row total (for the PI): moduleUnitCost * moduleQuantity
-      const rowTotal = Number((moduleUnitCost * item.quantidade).toFixed(2));
-      
+      let groupKey = isFerguile ? (mt?.modulo?.marca?.nome || "Sem Marca") : (mt?.tecido?.nome || "Sem Tecido");
+      const isBRLMod = form.moedaExibicao === "BRL";
+      const riskVal = Number(form.cotacaoRisco) || 1;
+      const lineExwUnitUSD = (item.ValorEXW || 0) + (item.ValorFreteRateadoUSD || 0);
+      const qTotal = Number(item.quantidade || 0);
+      const lineUnitFinalUSD = lineExwUnitUSD * qTotal;
+      const exwUnitDisp = isBRLMod ? lineExwUnitUSD * riskVal : lineExwUnitUSD;
+      const unitFinalDisp = isBRLMod ? lineUnitFinalUSD * riskVal : lineUnitFinalUSD;
       if (!currentGroup || (isFerguile ? currentGroup.brandName !== groupKey : currentGroup.fabricName !== groupKey)) {
         currentGroup = { 
           fabricName: groupKey, 
@@ -627,55 +531,44 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
           groupName: groupKey,
           items: [], 
           span: 0, 
-          totalUsdUnit: 0, 
-          totalUsdGroup: 0 
+          totalUnit: 0, 
+          totalGroup: 0,
+          qtyPeca: Number(item.quantidadePeca || 1)
         };
         groups.push(currentGroup);
       }
       currentGroup.items.push(item);
       currentGroup.span++;
-      
-      // UNIT FINAL logic: (EXW * Qty) + Total Frete for the row
-      const rowUnitFinal = (item.ValorEXW * item.quantidade) + (item.ValorFreteRateadoUSD * item.quantidade);
-      
-      // USD Unit merged cell now brings the sum of UNIT FINAL from its pieces
-      currentGroup.totalUsdUnit += rowUnitFinal; 
-      
-      // For now, keeping totalUsdGroup as the overall total
-      currentGroup.totalUsdGroup += rowTotal;
+      currentGroup.totalUnit += unitFinalDisp; 
+      (item as any)._exwUnitDisp = exwUnitDisp;
+      (item as any)._unitFinalDisp = unitFinalDisp;
+      (item as any)._rowTotalDisp = unitFinalDisp;
     });
-
-    // 3. If Ferguile, calculate sub-spans for Descriptions within each brand group
-    if (isFerguile) {
-      groups.forEach(group => {
-        const descInfo: { [key: string]: number } = {};
-        group.items.forEach((item: any) => {
-          const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
-          const desc = mt?.modulo?.descricao || "";
-          descInfo[desc] = (descInfo[desc] || 0) + 1;
-        });
-        
-        // Tag items with their spans
-        let lastDesc = "";
-        group.items.forEach((item: any) => {
-          const mt = modulosTecidos.find(m => m.id === item.idModuloTecido);
-          const desc = mt?.modulo?.descricao || "";
-          if (desc !== lastDesc) {
-            item._descSpan = descInfo[desc];
-            lastDesc = desc;
-          } else {
-            item._descSpan = 0;
-          }
-        });
-      });
-    }
-
+    groups.forEach(g => { g.totalGroup = g.totalUnit * g.qtyPeca; });
     return { groups };
-  }, [itens, modulosTecidos, isFerguile]);
+  }, [itens, modulosTecidos, isFerguile, form.moedaExibicao, form.cotacaoRisco]);
 
-  const addItem = () => {
-    setShowItemModal(true);
-  };
+  const totalM3Pi = useMemo(() => itens.reduce((sum, i) => sum + (Number(i.m3 || 0) * Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1))), 0), [itens]);
+  const totalValuePi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.totalGroup || 0), 0), [processedData.groups]);
+  const totalPiecesPi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.qtyPeca || 0), 0), [processedData.groups]);
+
+  const getCalculationHint = useCallback((type: string, item?: ItemGrid, group?: any) => {
+    const riskIndicator = Number(form.cotacaoRisco) || 1;
+    const isBRLMod = form.moedaExibicao === "BRL";
+    switch (type) {
+      case "exwUnit": {
+        if (!item) return "";
+        const valUSD = (item.ValorEXW || 0) + (item.ValorFreteRateadoUSD || 0);
+        const valDisp = isBRLMod ? valUSD * riskIndicator : valUSD;
+        return `EXW: $ ${item.ValorEXW.toFixed(2)} + Frete: $ ${item.ValorFreteRateadoUSD.toFixed(2)} = $ ${valUSD.toFixed(2)}${isBRLMod ? ` * Risco: ${riskIndicator.toFixed(2)} = R$ ${valDisp.toFixed(2)}` : ""}`;
+      }
+      case "totalUsd": return `Total: ${isBRLMod ? "R$" : "$"} ${(isFerguile ? (((item?.ValorEXW || 0) + (item?.ValorFreteRateadoUSD || 0)) * (isBRLMod ? riskIndicator : 1) * Number(item?.quantidade || 0)) : (group?.totalGroup || 0)).toFixed(2)}`;
+      default: return "";
+    }
+  }, [form.cotacaoRisco, isFerguile, totalM3Pi, form.moedaExibicao]);
+
+  const addItem = () => { setShowItemModal(true); };
+
 
   const novaPi = () => {
     if (id) {
@@ -691,8 +584,7 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
       alert("Salve a PI antes de imprimir.");
       return;
     }
-    setCurrencyModalType("print");
-    setCurrencyModalOpen(true);
+    handleConfirmCurrency(form.moedaExibicao, form.validadeDias, "print");
   };
 
   const abrirModalExcel = () => {
@@ -700,15 +592,15 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
       alert("Salve a PI antes de exportar.");
       return;
     }
-    setCurrencyModalType("excel");
-    setCurrencyModalOpen(true);
+    handleConfirmCurrency(form.moedaExibicao, form.validadeDias, "excel");
   };
 
-  const handleConfirmCurrency = (currency: string, validity: number) => {
+  const handleConfirmCurrency = (currency: string, validity: number, type?: "print" | "excel") => {
     setCurrencyModalOpen(false);
     if (!form.id) return;
+    const mode = type || currencyModalType;
 
-    if (currencyModalType === "print") {
+    if (mode === "print") {
       const url = isFerguile ? `/#/print-pi-ferguile/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}` : `/#/print-pi/${form.id}?lang=${form.idioma || "PT"}&currency=${currency}&validity=${validity}`;
       window.open(url, "_blank");
     } else {
@@ -1043,6 +935,28 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                     onChange={(val) => setForm(prev => ({ ...prev, tipoRateio: val }))}
                   />
                 </div>
+
+                <div className="field" style={{ flex: 1 }}>
+                  <label className="cl-label">Moeda da Grid</label>
+                  <SearchableSelect
+                    options={[
+                      { value: "USD", label: "$ (USD)" },
+                      { value: "BRL", label: "R$ (BRL)" }
+                    ]}
+                    value={form.moedaExibicao || "USD"}
+                    onChange={(val) => setForm(prev => ({ ...prev, moedaExibicao: val as any }))}
+                  />
+                </div>
+
+                <div className="field" style={{ flex: 1 }}>
+                  <label className="cl-label">Validade (Dias)</label>
+                  <input 
+                    type="number" 
+                    className="cl-input" 
+                    value={form.validadeDias || 30} 
+                    onChange={e => setForm({...form, validadeDias: parseInt(e.target.value) || 0})}
+                  />
+                </div>
             </div>
           </div>
 
@@ -1070,8 +984,8 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                         <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>Frete</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>UNIT FINAL</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>USD Unit</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL USD</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>{form.moedaExibicao} Unit</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL {form.moedaExibicao}</th>
                       </>
                     ) : (
                       <>
@@ -1088,8 +1002,8 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                         <th style={{ ...thStyle, width: "120px" }}>FABRIC</th>
                         <th style={{ ...thStyle, width: "100px" }}>TELA N</th>
                         <th style={{ ...thStyle, width: "140px" }}>OBSERVACIÓN</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "90px" }}>UNIT</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>TOTAL</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "90px" }}>UNIT ({form.moedaExibicao})</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>TOTAL ({form.moedaExibicao})</th>
                       </>
                     )}
                     <th style={{ ...thStyle, width: "50px" }}></th>
@@ -1266,20 +1180,20 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                                  {!isFerguile && (
                                     <>
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>
-                                        $ {fmt(item.ValorFreteRateadoUSD * item.quantidade)}
+                                        {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt( (form.moedaExibicao === "BRL" ? (item.ValorFreteRateadoUSD * Number(form.cotacaoRisco)) : item.ValorFreteRateadoUSD) * item.quantidade)}
                                       </td>
-                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
-                                        $ {fmt(item.ValorEXW + (item.ValorFreteRateadoUSD * item.quantidade))}
+                                   <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
+                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._exwUnitDisp)}
                                       </td>
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("unitFinal", item)}>
-                                        $ {fmt((item.ValorEXW * item.quantidade) + (item.ValorFreteRateadoUSD * item.quantidade))}
+                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._unitFinalDisp)}
                                       </td>
                                     </>
                                   )}
                                  
                                  {isFerguile ? (
                                    <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }} title={getCalculationHint("usdUnit", item)}>
-                                     $ {fmt(item.ValorEXW + item.ValorFreteRateadoUSD)}
+                                     {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._rowTotalDisp)}
                                    </td>
                                  ) : (
                                    isFirst && (
@@ -1294,7 +1208,7 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                                       }}
                                       title={getCalculationHint("usdUnit", item, group)}
                                       >
-                                         $ {fmt(group.totalUsdUnit)}
+                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(group.totalUnit)}
                                      </td>
                                    )
                                  )}
@@ -1311,12 +1225,12 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                                      }}
                                      title={getCalculationHint("totalUsd", item, group)}
                                      >
-                                         $ {fmt(group.totalUsdUnit * item.quantidadePeca)}
+                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(group.totalGroup)}
                                     </td>
                                   ) : (
                                     isFerguile && (
                                       <td style={{ ...tdStyle, textAlign: "right", fontWeight: "700", color: "#fca5a5" }} title={getCalculationHint("totalUsd", item)}>
-                                        $ {fmt((item.ValorEXW + item.ValorFreteRateadoUSD) * item.quantidade)}
+                                        {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._rowTotalDisp)}
                                       </td>
                                     )
                                   )}
@@ -1338,29 +1252,31 @@ USD Unit ($ ${unit.toFixed(2)}) * Qtd Peça (${qty}) = Total: $ ${(unit * qty).t
                   )}
                 </tbody>
                 {itens.length > 0 && (
-                  <tfoot style={{ background: "rgba(15, 23, 42, 0.8)", fontWeight: "700" }}>
-                    <tr>
-                      <td colSpan={isFerguile ? 13 : 14} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)" }}>TOTAIS:</td>
-                      {!isFerguile && (
+                  <tfoot style={{ background: "rgba(0,0,0,0.5)", borderTop: "2px solid #334155" }}>
+                    <tr style={{ height: "45px" }}>
+                      {isFerguile ? (
                         <>
-                          <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
-                            $ {fmt(itens.reduce((sum, i) => sum + (i.ValorFreteRateadoUSD * i.quantidade), 0))}
+                          <td colSpan={8} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "bold", fontSize: "14px" }}>RESUMO PI:</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa", fontWeight: "bold", fontSize: "15px" }}>{totalPiecesPi}</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#e2e8f0", fontSize: "13px" }}>{fmt(totalM3Pi, 3)} m³</td>
+                          <td colSpan={4}></td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "18px", fontWeight: "900", paddingRight: "15px" }}>
+                            {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalValuePi)}
                           </td>
-                          <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
-                            $ {fmt(itens.reduce((sum, i) => sum + (i.ValorEXW + (i.ValorFreteRateadoUSD * i.quantidade)), 0))}
+                          <td></td>
+                        </>
+                      ) : (
+                        <>
+                          <td colSpan={8} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "bold", fontSize: "14px" }}>RESUMO PI:</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa", fontWeight: "bold", fontSize: "15px" }}>{totalPiecesPi}</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#e2e8f0", fontSize: "13px" }}>{fmt(totalM3Pi, 3)} m³</td>
+                          <td colSpan={8}></td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "18px", fontWeight: "900", paddingRight: "15px" }}>
+                            {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalValuePi)}
                           </td>
-                          <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }}>
-                            $ {fmt(itens.reduce((sum, i) => sum + ((i.ValorEXW * i.quantidade) + (i.ValorFreteRateadoUSD * i.quantidade)), 0))}
-                          </td>
+                          <td></td>
                         </>
                       )}
-                      <td style={{ ...tdStyle, textAlign: "right", color: "#fff" }}>
-                        $ {fmt(processedData.groups.reduce((sum, g) => sum + g.totalUsdUnit, 0))}
-                      </td>
-                      <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "16px" }}>
-                        $ {fmt(processedData.groups.reduce((sum, g) => sum + (g.totalUsdUnit * g.items[0].quantidadePeca), 0))}
-                      </td>
-                      <td style={tdStyle}></td>
                     </tr>
                   </tfoot>
                 )}

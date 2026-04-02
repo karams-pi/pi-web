@@ -72,6 +72,13 @@ public class ProformaInvoice
     [MaxLength(10)]
     public string TipoRateio { get; set; } = "IGUAL";
 
+    [Column("moeda_exibicao")]
+    [MaxLength(10)]
+    public string MoedaExibicao { get; set; } = "USD";
+
+    [Column("validade_dias")]
+    public int ValidadeDias { get; set; } = 30;
+
     // Navigation
     [Column("id_fornecedor")]
     public long? IdFornecedor { get; set; }

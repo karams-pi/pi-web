@@ -144,6 +144,8 @@ export type ProformaInvoice = {
   condicaoPagamento?: string;
   idioma?: string;
   tipoRateio: string;
+  moedaExibicao?: "BRL" | "USD";
+  validadeDias?: number;
   piItensPecas?: PiItemPeca[];
   piItens?: PiItem[];
   cliente?: Cliente;

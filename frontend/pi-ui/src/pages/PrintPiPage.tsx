@@ -103,10 +103,49 @@ export default function PrintPiPage() {
 
   
   const processedData = useMemo(() => {
-    if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0 };
+    if (!pi || !pi.piItens) return { brandGroups: [], totalSofaQty: 0, totalQty: 0, totalM3: 0, totalValue: 0 };
+
+    // 1. Pre-calculate Freights (Consistent with Excel logic)
+    const piItems = pi.piItens || [];
+    const piTotalM3Val = piItems.reduce((s, i) => s + (Number(i.m3 || (i as any).M3 || 0) * (i.quantidade || 0)), 0);
+    const piTotalFreteUSD = Number(pi.valorTotalFreteUSD || 0);
+    const piTotalFreteBRL = Number(pi.valorTotalFreteBRL || 0);
+    const tipoRateio = (pi as any).tipoRateio || "IGUAL";
+
+    const itemFreightBRL: Record<number, number> = {};
+    const itemFreightUSD: Record<number, number> = {};
+    let remBRL = piTotalFreteBRL;
+    let remUSD = piTotalFreteUSD;
+
+    const allItems = [...piItems];
+    allItems.forEach((i, idx) => {
+        const isLast = idx === allItems.length - 1;
+        let fUnitBRL = 0;
+        let fUnitUSD = 0;
+
+        if (isLast) {
+            fUnitBRL = (i.quantidade || 0) > 0 ? remBRL / (i.quantidade || 0) : 0;
+            fUnitUSD = (i.quantidade || 0) > 0 ? remUSD / (i.quantidade || 0) : 0;
+        } else {
+            if (tipoRateio === "IGUAL") {
+                const rowShareBRL = allItems.length > 0 ? piTotalFreteBRL / allItems.length : 0;
+                const rowShareUSD = allItems.length > 0 ? piTotalFreteUSD / allItems.length : 0;
+                fUnitBRL = (i.quantidade || 0) > 0 ? rowShareBRL / (i.quantidade || 0) : 0;
+                fUnitUSD = (i.quantidade || 0) > 0 ? rowShareUSD / (i.quantidade || 0) : 0;
+            } else {
+                const m3Item = Number(i.m3 || (i as any).M3 || 0);
+                fUnitBRL = piTotalM3Val > 0 ? (piTotalFreteBRL / piTotalM3Val * m3Item) : 0;
+                fUnitUSD = piTotalM3Val > 0 ? (piTotalFreteUSD / piTotalM3Val * m3Item) : 0;
+            }
+            remBRL -= (fUnitBRL * (i.quantidade || 0));
+            remUSD -= (fUnitUSD * (i.quantidade || 0));
+        }
+        itemFreightBRL[i.id] = fUnitBRL;
+        itemFreightUSD[i.id] = fUnitUSD;
+    });
 
     const itemsByMarca: { [key: string]: { item: PiItem, mt: ModuloTecido | undefined }[] } = {};
-    pi.piItens.forEach(i => {
+    piItems.forEach(i => {
         const item = i as any;
         const mt = item.moduloTecido;
         const marca = mt?.modulo?.marca?.nome || "Outros";
@@ -210,7 +249,9 @@ export default function PrintPiPage() {
              spans,
              totalBrandRows: sortedItems.length,
              photoUrl,
-             brandName
+             brandName,
+             itemFreightBRL,
+             itemFreightUSD
          };
     });
 
@@ -218,7 +259,7 @@ export default function PrintPiPage() {
     let totalM3 = 0;
     let totalQty = 0;
 
-    pi.piItens.forEach(i => {
+    piItems.forEach(i => {
         const item = i as any;
         const qty = Number(item.quantidade ?? item.Quantidade) || 0;
         totalQty += qty;
@@ -241,7 +282,8 @@ export default function PrintPiPage() {
     const base = `${pi.prefixo}-${pi.piSequencia}`;
     
     // Check if supplier is Karams or Koyo
-    const firstItem = pi.piItens?.[0];
+    const piItems = pi.piItens || [];
+    const firstItem = piItems[0];
     if (firstItem) {
         const mt = (firstItem as any).moduloTecido;
         const supplierName = (mt?.modulo?.fornecedor?.nome || "").toLowerCase();
@@ -450,7 +492,7 @@ export default function PrintPiPage() {
             </tr>
           </thead>
           <tbody>
-            {processedData.brandGroups.map(({ sortedItems, spans, totalBrandRows, photoUrl, brandName }, brandIndex) => {
+            {processedData.brandGroups.map(({ sortedItems, spans, totalBrandRows, photoUrl, brandName, itemFreightBRL, itemFreightUSD }, brandIndex) => {
                 
                 const renderGroupListCell = (field: 'description' | 'fabric', index: number) => {
                     const span = spans[field][index];
@@ -511,15 +553,24 @@ export default function PrintPiPage() {
                                 const groupRange = sortedItems.slice(index, index + span);
                                 groupRange.forEach((g) => {
                                     const mQty = (Number(g.item.quantidade ?? (g.item as any).Quantidade) || 1);
+                                    const mPecaQty = (g.item as any).piItemPeca?.quantidade || 1;
+                                    const mQtyPerPeca = mPecaQty > 0 ? mQty / mPecaQty : 0;
                                     
-                                    const mUnitBRL = (Number(g.item.valorEXW || 0) * (Number(pi.cotacaoRisco) || 1));
-                                    const mUnitUSD = (Number(g.item.valorEXW || 0));
+                                    const risk = (Number(pi.cotacaoRisco) || 1);
+                                    const mUnitEXWUSD = (Number(g.item.valorEXW || 0));
+                                    const mUnitEXWBRL = mUnitEXWUSD * risk;
 
-                                    fabricGroupUnitBRL += mUnitBRL;
-                                    fabricGroupTotalBRL += (mUnitBRL * mQty);
+                                    const mFreightUSD = (itemFreightUSD as any)[g.item.id] || 0;
+                                    const mFreightBRL = (itemFreightBRL as any)[g.item.id] || 0;
+
+                                    const piecePartBRL = (mUnitEXWBRL + mFreightBRL) * mQtyPerPeca;
+                                    const piecePartUSD = (mUnitEXWUSD + (showFreight ? mFreightUSD : 0)) * mQtyPerPeca;
+
+                                    fabricGroupUnitBRL += piecePartBRL;
+                                    fabricGroupTotalBRL += (mUnitEXWBRL + mFreightBRL) * mQty;
                                     
-                                    fabricGroupUnitUSD += mUnitUSD;
-                                    fabricGroupTotalUSD += (mUnitUSD * mQty);
+                                    fabricGroupUnitUSD += piecePartUSD;
+                                    fabricGroupTotalUSD += (mUnitEXWUSD + (showFreight ? mFreightUSD : 0)) * mQty;
                                 });
                             }
 
