@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
@@ -130,18 +129,18 @@ export default function ProformaInvoiceV2Page() {
     const lang = form.idioma || "PT";
     const dicts: Record<string, Record<string, string>> = {
       PT: {
-        FOTO: "FOTO", MARCA: "MARCA", DESC: "MÓDULO / DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "QTD", QTD_PECA: "QTD PEÇA", M3: "M³ TOTAL", 
-        TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", UNIT: "USD UNIT", TOTAL: "TOTAL USD",
+        FOTO: "FOTO", REF: "REF", MARCA: "MARCA", DESC: "MÓDULO / DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "QTD", QTD_PECA: "QTD PEÇA", M3: "M³ TOTAL", 
+        TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", UNIT_FINAL: "UNIT FINAL", UNIT: "USD UNIT", TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condição de Pagamento"
       },
       ES: {
-        FOTO: "FOTO", MARCA: "MARCA", DESC: "MODULO / DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "CANT", QTD_PECA: "CANT PZA", M3: "M³ TOTAL", 
-        TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
+        FOTO: "FOTO", REF: "REF", MARCA: "MARCA", DESC: "MODULO / DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", QTD: "CANT", QTD_PECA: "CANT PZA", M3: "M³ TOTAL", 
+        TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", UNIT_FINAL: "UNIT FINAL", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condición de Pago"
       },
       EN: {
-        FOTO: "PHOTO", MARCA: "BRAND", DESC: "MODULE / DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", QTD: "QTY", QTD_PECA: "PIECE QTY", M3: "TOTAL M³", 
-        TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
+        FOTO: "PHOTO", REF: "REF", MARCA: "BRAND", DESC: "MODULE / DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", QTD: "QTY", QTD_PECA: "PIECE QTY", M3: "TOTAL M³", 
+        TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", UNIT_FINAL: "TOTAL UNIT", UNIT: "UNIT USD", TOTAL: "TOTAL USD",
         IDIOMA: "Language", COND_PAG: "Payment Condition"
       }
     };
@@ -548,9 +547,34 @@ export default function ProformaInvoiceV2Page() {
     return { groups };
   }, [itens, modulosTecidos, isFerguile, form.moedaExibicao, form.cotacaoRisco]);
 
-  const totalM3Pi = useMemo(() => itens.reduce((sum, i) => sum + (Number(i.m3 || 0) * Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1))), 0), [itens]);
+  const totalM3Pi = useMemo(() => itens.reduce((sum, i) => sum + (Number(i.m3 || 0) * (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1)))), 0), [itens]);
   const totalValuePi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.totalGroup || 0), 0), [processedData.groups]);
   const totalPiecesPi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.qtyPeca || 0), 0), [processedData.groups]);
+  const totalQtyModuloPi = useMemo(() => itens.reduce((sum, i) => sum + (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1))), 0), [itens]);
+
+  const totalFretePi = useMemo(() => {
+    const isBRLMod = form.moedaExibicao === "BRL";
+    const riskVal = Number(form.cotacaoRisco) || 1;
+    const base = itens.reduce((sum, i) => sum + (Number(i.ValorFreteRateadoUSD || 0) * (Number(i.quantidade || 0) * (Number(i.quantidadePeca || 1)))), 0);
+    return isBRLMod ? base * riskVal : base;
+  }, [itens, form.moedaExibicao, form.cotacaoRisco]);
+
+  const totalExwPi = useMemo(() => {
+    const isBRLMod = form.moedaExibicao === "BRL";
+    const riskVal = Number(form.cotacaoRisco) || 1;
+    // The user wants the sum of the unit values shown in the EXW column
+    const base = itens.reduce((sum, i) => sum + (Number(i.ValorEXW || 0) + Number(i.ValorFreteRateadoUSD || 0)), 0);
+    return isBRLMod ? base * riskVal : base;
+  }, [itens, form.moedaExibicao, form.cotacaoRisco]);
+
+  const totalUnitFinalPi = useMemo(() => {
+    const isBRLMod = form.moedaExibicao === "BRL";
+    const riskVal = Number(form.cotacaoRisco) || 1;
+    const base = itens.reduce((sum, i) => sum + (Number(i.ValorFinalItemUSDRisco || 0) * (Number(i.quantidadePeca || 1))), 0);
+    return isBRLMod ? base * riskVal : base;
+  }, [itens, form.moedaExibicao, form.cotacaoRisco]);
+
+  const totalUsdUnitPi = useMemo(() => processedData.groups.reduce((sum, g) => sum + (g.totalUnit || 0), 0), [processedData.groups]);
 
   const getCalculationHint = useCallback((type: string, item?: ItemGrid, group?: any) => {
     const riskIndicator = Number(form.cotacaoRisco) || 1;
@@ -968,48 +992,47 @@ export default function ProformaInvoiceV2Page() {
                     {!isFerguile ? (
                       <>
                         <th style={{ ...thStyle, width: "40px", textAlign: "center" }}>#</th>
-                        <th style={{ ...thStyle, width: "60px", textAlign: "center" }}>Img</th>
-                        <th style={{ ...thStyle, width: "120px", textAlign: "center" }}>Marca</th>
-                        <th style={{ ...thStyle, width: "400px" }}>Módulo / Descrição</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>L</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>P</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>A</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>Qtd</th>
+                        <th style={{ ...thStyle, width: "60px", textAlign: "center" }}>{translate("FOTO")}</th>
+                        <th style={{ ...thStyle, width: "120px", textAlign: "center" }}>{translate("MARCA")}</th>
+                        <th style={{ ...thStyle, width: "400px" }}>{translate("DESC")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("LARG").replace(/\./g, "")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("PROF").replace(/\./g, "")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("ALT").replace(/\./g, "")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>{translate("QTD")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "80px" }}>{translate("QTD_PECA")}</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>M³ Total</th>
-                        <th style={{ ...thStyle, width: "140px", textAlign: "center" }}>Tecido</th>
-                        <th style={{ ...thStyle, width: "100px" }}>Pés</th>
-                        <th style={{ ...thStyle, width: "120px" }}>Acabamento</th>
-                        <th style={{ ...thStyle, width: "140px" }}>Observação</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>Frete</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>EXW Unit</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>UNIT FINAL</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>{translate("M3").replace(/ TOTAL/g, "")}</th>
+                        <th style={{ ...thStyle, width: "140px", textAlign: "center" }}>{translate("TECIDO")}</th>
+                        <th style={{ ...thStyle, width: "100px" }}>{translate("PES")}</th>
+                        <th style={{ ...thStyle, width: "120px" }}>{translate("ACAB")}</th>
+                        <th style={{ ...thStyle, width: "140px" }}>{translate("OBS").replace(/\./g, "")}</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>{translate("FRETE").replace(/ UNIT/g, "")}</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>{translate("EXW").replace(/ UNIT/g, "")}</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>{translate("UNIT_FINAL")}</th>
                         <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>{form.moedaExibicao} Unit</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>TOTAL {form.moedaExibicao}</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "130px" }}>{translate("TOTAL")} {form.moedaExibicao}</th>
                       </>
                     ) : (
                       <>
-                        <th style={{ ...thStyle, width: "60px" }}>FOTO</th>
-                        <th style={{ ...thStyle, width: "100px" }}>REFERENCIA</th>
-                        <th style={{ ...thStyle, width: "300px" }}>DESCRIPCIÓN</th>
-                        <th style={{ ...thStyle, width: "100px" }}>MARCA</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>LARG.</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>ALT.</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>PROF.</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>CANT.</th>
+                        <th style={{ ...thStyle, width: "60px" }}>{translate("FOTO")}</th>
+                        <th style={{ ...thStyle, width: "100px" }}>{translate("REF")}</th>
+                        <th style={{ ...thStyle, width: "300px" }}>{translate("DESC").replace(/MÓDULO \/ /g, "")}</th>
+                        <th style={{ ...thStyle, width: "100px" }}>{translate("MARCA")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("LARG")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("ALT")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("PROF")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>{translate("QTD")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "80px" }}>{translate("QTD_PECA")}</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>VOL M³</th>
-                        <th style={{ ...thStyle, width: "120px" }}>FABRIC</th>
-                        <th style={{ ...thStyle, width: "100px" }}>TELA N</th>
-                        <th style={{ ...thStyle, width: "140px" }}>OBSERVACIÓN</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "90px" }}>UNIT ({form.moedaExibicao})</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>TOTAL ({form.moedaExibicao})</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>{translate("M3").replace(/TOTAL/g, "")}</th>
+                        <th style={{ ...thStyle, width: "120px" }}>{translate("TECIDO")}</th>
+                        <th style={{ ...thStyle, width: "100px" }}>{translate("TELA")}</th>
+                        <th style={{ ...thStyle, width: "140px" }}>{translate("OBS")}</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "90px" }}>{translate("UNIT")} ({form.moedaExibicao})</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>{translate("TOTAL")} ({form.moedaExibicao})</th>
                       </>
                     )}
                     <th style={{ ...thStyle, width: "50px" }}></th>
                   </tr>
-                </thead>
-                <tbody style={{ background: "rgba(15, 23, 42, 0.4)" }}>
+                </thead><tbody style={{ background: "rgba(15, 23, 42, 0.4)" }}>
                   {processedData.groups.map((group: any, groupIndex: number) => (
                      <React.Fragment key={groupIndex}>
                         {group.items.map((item: any, itemIndex: number) => {
@@ -1256,22 +1279,31 @@ export default function ProformaInvoiceV2Page() {
                     <tr style={{ height: "45px" }}>
                       {isFerguile ? (
                         <>
-                          <td colSpan={8} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "bold", fontSize: "14px" }}>RESUMO PI:</td>
-                          <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa", fontWeight: "bold", fontSize: "15px" }}>{totalPiecesPi}</td>
-                          <td style={{ ...tdStyle, textAlign: "center", color: "#e2e8f0", fontSize: "13px" }}>{fmt(totalM3Pi, 3)} m³</td>
-                          <td colSpan={4}></td>
-                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "18px", fontWeight: "900", paddingRight: "15px" }}>
+                          <td colSpan={7} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "bold", fontSize: "12px" }}>TOTAL:</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "var(--primary)", fontWeight: "bold" }}>{totalQtyModuloPi}</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa", fontWeight: "bold" }}>{totalPiecesPi}</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#e2e8f0", fontSize: "11px" }}>{fmt(totalM3Pi, 2)} m³</td>
+                          <td colSpan={3}></td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "600", fontSize: "12px" }}>
+                            {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalUsdUnitPi)}
+                          </td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "15px", fontWeight: "900", paddingRight: "15px" }}>
                             {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalValuePi)}
                           </td>
                           <td></td>
                         </>
                       ) : (
                         <>
-                          <td colSpan={8} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "bold", fontSize: "14px" }}>RESUMO PI:</td>
-                          <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa", fontWeight: "bold", fontSize: "15px" }}>{totalPiecesPi}</td>
-                          <td style={{ ...tdStyle, textAlign: "center", color: "#e2e8f0", fontSize: "13px" }}>{fmt(totalM3Pi, 3)} m³</td>
-                          <td colSpan={8}></td>
-                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "18px", fontWeight: "900", paddingRight: "15px" }}>
+                          <td colSpan={7} style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "bold", fontSize: "12px" }}>TOTAL:</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "var(--primary)", fontWeight: "bold" }}>{totalQtyModuloPi}</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#60a5fa", fontWeight: "bold" }}>{totalPiecesPi}</td>
+                          <td style={{ ...tdStyle, textAlign: "center", color: "#e2e8f0", fontSize: "11px" }}>{fmt(totalM3Pi, 2)} m³</td>
+                          <td colSpan={4}></td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontSize: "11px" }}>{form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalFretePi)}</td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontSize: "11px" }}>{form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalExwPi)}</td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontSize: "11px" }}>{form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalUnitFinalPi)}</td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--muted)", fontWeight: "600", fontSize: "12px" }}>{form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalUsdUnitPi)}</td>
+                          <td style={{ ...tdStyle, textAlign: "right", color: "var(--danger)", fontSize: "15px", fontWeight: "900", paddingRight: "15px" }}>
                             {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(totalValuePi)}
                           </td>
                           <td></td>
