@@ -74,6 +74,10 @@ type ItemGrid = {
   observacao?: string;
   feet?: string;
   finishing?: string;
+  _descSpan?: number;
+  _exwUnitDisp?: number;
+  _unitFinalDisp?: number;
+  _rowTotalDisp?: number;
 };
 
 const fmt = (n: number | undefined, decimals = 2) => (n || 0).toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
@@ -583,9 +587,31 @@ export default function ProformaInvoiceV2Page() {
       currentGroup.span++;
       currentGroup.totalUnit += unitFinalDisp; 
 
-      (item as any)._exwUnitDisp = exwUnitDisp;
-      (item as any)._unitFinalDisp = unitFinalDisp;
-      (item as any)._rowTotalDisp = unitFinalDisp;
+      item._exwUnitDisp = exwUnitDisp;
+      item._unitFinalDisp = unitFinalDisp;
+      item._rowTotalDisp = unitFinalDisp;
+
+      // Span logic for Description within Ferguile brand groups
+      if (isFerguile) {
+        item._descSpan = 1;
+        const currentIdx = currentGroup.items.length - 1;
+        if (currentIdx > 0) {
+          const prevItem = currentGroup.items[currentIdx - 1];
+          const prevMt = (modulosTecidos || []).find(m => m.id === prevItem.idModuloTecido);
+          if (mt?.modulo?.descricao === prevMt?.modulo?.descricao) {
+            // Find first of this sequence to increment span
+            let firstInSeq = currentIdx - 1;
+            while (firstInSeq >= 0) {
+              if (currentGroup.items[firstInSeq]._descSpan > 0) {
+                currentGroup.items[firstInSeq]._descSpan++;
+                item._descSpan = 0;
+                break;
+              }
+              firstInSeq--;
+            }
+          }
+        }
+      }
 
       // Volume unit logic: Dimensions in Meters (small values like 1.1) vs Dimensions in CM (large values like 110)
       const lNum = Number(String(item.largura || 0).replace(',', '.'));
@@ -1035,8 +1061,8 @@ export default function ProformaInvoiceV2Page() {
 
         <div style={{ padding: "10px 10px" }}>
           <PageHeader 
-            title="Lançamento PI (V2 WYSIWYG - BETA)"
-            icon={<FileText size={24} />}
+            title={isFerguile ? "Lançamento PI - Ferguile & Livintus" : "Lançamento PI (V2 WYSIWYG - BETA)"}
+            icon={<FileText size={24} color={isFerguile ? "#3b82f6" : undefined} />}
           />
         </div>
 
@@ -1192,8 +1218,8 @@ export default function ProformaInvoiceV2Page() {
                     <input 
                       type="number" 
                       className="cl-input" 
-                      value={form.validadeDias || 30} 
-                      onChange={e => setForm({...form, validadeDias: parseInt(e.target.value) || 0})}
+                      value={form.validadeDias || ""} 
+                      onChange={e => setForm({...form, validadeDias: Number(e.target.value)})}
                       style={{ width: "100%" }}
                     />
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#94a3b8', fontSize: '13px', whiteSpace: 'nowrap' }}>
@@ -1262,17 +1288,17 @@ export default function ProformaInvoiceV2Page() {
                         <th style={{ ...thStyle, width: "100px" }}>{translate("REF")}</th>
                         <th style={{ ...thStyle, width: "300px" }}>{translate("DESC").replace(/MÓDULO \/ /g, "")}</th>
                         <th style={{ ...thStyle, width: "100px" }}>{translate("MARCA")}</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("LARG")}</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("ALT")}</th>
-                        <th style={{ ...thStyle, textAlign: "center", width: "50px" }}>{translate("PROF")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "55px" }}>{translate("LARG")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "55px" }}>{translate("ALT")}</th>
+                        <th style={{ ...thStyle, textAlign: "center", width: "55px" }}>{translate("PROF")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "60px" }}>{translate("QTD")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "80px" }}>{translate("QTD_PECA")}</th>
                         <th style={{ ...thStyle, textAlign: "center", width: "70px" }}>{translate("M3").replace(/TOTAL/g, "")}</th>
                         <th style={{ ...thStyle, width: "120px" }}>{translate("TECIDO")}</th>
                         <th style={{ ...thStyle, width: "100px" }}>{translate("TELA")}</th>
                         <th style={{ ...thStyle, width: "140px" }}>{translate("OBS")}</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "90px" }}>{translate("UNIT")} ({form.moedaExibicao})</th>
-                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>{translate("TOTAL")} ({form.moedaExibicao})</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "100px" }}>{translate("UNIT")} ({form.moedaExibicao})</th>
+                        <th style={{ ...thStyle, textAlign: "right", width: "110px" }}>{translate("TOTAL")} ({form.moedaExibicao})</th>
                       </>
                     )}
                     <th style={{ ...thStyle, width: "50px" }}></th>
@@ -1450,18 +1476,18 @@ export default function ProformaInvoiceV2Page() {
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("freteUnit", item)}>
                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt( (form.moedaExibicao === "BRL" ? (item.ValorFreteRateadoUSD * Number(form.cotacaoRisco)) : item.ValorFreteRateadoUSD) * item.quantidade)}
                                       </td>
-                                   <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
-                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._exwUnitDisp)}
+                                      <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("exwUnit", item)}>
+                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(item._exwUnitDisp)}
                                       </td>
                                       <td style={{ ...tdStyle, textAlign: "right", color: "#94a3b8" }} title={getCalculationHint("unitFinal", item)}>
-                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._unitFinalDisp)}
+                                         {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(item._unitFinalDisp)}
                                       </td>
                                     </>
                                   )}
                                  
                                  {isFerguile ? (
-                                   <td style={{ ...tdStyle, textAlign: "right", color: "#fff", fontWeight: "600" }} title={getCalculationHint("usdUnit", item)}>
-                                     {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._rowTotalDisp)}
+                                   <td style={{ ...tdStyle, textAlign: "right", color: "#60a5fa", fontWeight: "700", fontSize: "14px" }} title={getCalculationHint("usdUnit", item)}>
+                                     {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(item._rowTotalDisp)}
                                    </td>
                                  ) : (
                                    isFirst && (
@@ -1497,8 +1523,8 @@ export default function ProformaInvoiceV2Page() {
                                     </td>
                                   ) : (
                                     isFerguile && (
-                                      <td style={{ ...tdStyle, textAlign: "right", fontWeight: "700", color: "#fca5a5" }} title={getCalculationHint("totalUsd", item)}>
-                                        {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt((item as any)._rowTotalDisp)}
+                                      <td style={{ ...tdStyle, textAlign: "right", fontWeight: "800", color: "#fca5a5", fontSize: "15px" }} title={getCalculationHint("totalUsd", item)}>
+                                        {form.moedaExibicao === "BRL" ? "R$" : "$"} {fmt(item._rowTotalDisp)}
                                       </td>
                                     )
                                   )}
