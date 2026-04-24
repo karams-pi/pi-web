@@ -44,6 +44,8 @@
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   outline: none;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 .cl-input:focus {
@@ -59,10 +61,12 @@
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   outline: none;
+  font-family: inherit;
+  font-size: 14px;
 }
 
-.cl-select option {
-  background-color: var(--card);
+.cl-select option, .cl-input option {
+  background-color: #1e293b;
   color: var(--text);
 }
 

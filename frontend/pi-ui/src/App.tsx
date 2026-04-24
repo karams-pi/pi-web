@@ -12,6 +12,7 @@ import ImportacaoPage from "./pages/ImportacaoPage";
 import SobrePage from "./pages/SobrePage";
 import PrintPiFerguilePage from "./pages/PrintPiFerguilePage";
 import ProformaInvoiceV2Page from "./pages/ProformaInvoiceV2Page";
+import EmissaoListaPrecosPage from "./pages/EmissaoListaPrecosPage";
 
 
 // function ProdutosPage() {
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="/proforma-invoice-v2/:id" element={<ProformaInvoiceV2Page />} />
 
             <Route path="/importacao" element={<ImportacaoPage />} />
+            <Route path="/emissao-lista-preco" element={<EmissaoListaPrecosPage />} />
             <Route path="/config" element={<ConfiguracoesPage />} />
             <Route path="/sobre" element={<SobrePage />} />
             {/* <Route path="/precos" element={<PrecosPage />} /> */}
@@ -135,6 +137,11 @@ function NavLinks() {
       <NavLink to="/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Grid size={18} />
         <span>Modulos</span>
+      </NavLink>
+
+      <NavLink to="/emissao-lista-preco" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Download size={18} />
+        <span>Lista de Preços</span>
       </NavLink>
 
       <NavLink to="/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>

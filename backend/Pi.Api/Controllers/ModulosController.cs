@@ -68,6 +68,31 @@ public class ModulosController : ControllerBase
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "RelatorioModulos.xlsx");
     }
 
+    [HttpPost("excel-price-list")]
+    public async Task<IActionResult> ExportPriceListExcel([FromBody] PriceListExportRequest request)
+    {
+        var moduleIds = request.Items.Select(i => i.ModuloId).Distinct().ToList();
+        
+        var modules = await _db.Modulos
+            .Include(m => m.Fornecedor)
+            .Include(m => m.Categoria)
+            .Include(m => m.Marca)
+            .Include(m => m.ModulosTecidos)
+                .ThenInclude(mt => mt.Tecido)
+            .Where(m => moduleIds.Contains(m.Id))
+            .ToListAsync();
+        
+        var configs = await _db.Configuracoes
+            .OrderByDescending(c => c.DataConfig)
+            .ToListAsync();
+
+        // Create a mapping of ModuloId -> Freight
+        var freightMap = request.Items.ToDictionary(i => i.ModuloId, i => i.ValorFreteRateadoUSD);
+
+        var fileBytes = _exportService.ExportPriceListToExcel(modules, request.Currency, request.Cotacao, configs, freightMap, request.ValidityDays);
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ListaDePrecos.xlsx");
+    }
+
     public class ModuloExportRequest
     {
         public List<long>? Ids { get; set; }
@@ -80,6 +105,20 @@ public class ModulosController : ControllerBase
         public long? IdTecido { get; set; }
         public string? Status { get; set; }
         public int ValidityDays { get; set; } = 30;
+    }
+
+    public class PriceListExportRequest
+    {
+        public List<PriceListItemRequest> Items { get; set; } = new();
+        public string Currency { get; set; } = "BRL";
+        public decimal Cotacao { get; set; }
+        public int ValidityDays { get; set; } = 30;
+    }
+
+    public class PriceListItemRequest
+    {
+        public long ModuloId { get; set; }
+        public decimal ValorFreteRateadoUSD { get; set; }
     }
 
     private static decimal CalcM3(Modulo m)

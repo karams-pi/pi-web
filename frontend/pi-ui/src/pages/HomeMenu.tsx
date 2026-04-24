@@ -28,7 +28,7 @@ export default function HomeMenu() {
           <MenuButton to="/produtos" label="Cadastro de Produtos" />
           <MenuButton to="/proforma-invoice" label="Criar Proforma Invoice" />
           <MenuButton to="/config" label="Configurações" />
-          <MenuButton to="/modulos" label="Lista de Preços" />
+          <MenuButton to="/emissao-lista-preco" label="Emissão de Lista de Preços" />
         </div>
       </section>
     </div>

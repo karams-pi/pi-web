@@ -105,3 +105,19 @@ export async function exportModulosExcel(params: {
   if (!res.ok) throw new Error("Erro ao exportar Excel");
   return res.blob();
 }
+
+export async function exportPriceListExcel(params: {
+  items: Array<{ moduloId: number; valorFreteRateadoUSD: number }>;
+  currency: "BRL" | "EXW";
+  cotacao: number;
+  validityDays?: number;
+}) {
+  const res = await fetch(`${API_BASE}/api/modulos/excel-price-list`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) throw new Error("Erro ao exportar Excel da Lista de Preços");
+  return res.blob();
+}
