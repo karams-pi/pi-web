@@ -154,10 +154,9 @@ public class AppDbContext : DbContext
             entity.HasIndex(x => x.IdModulo).HasDatabaseName("ix_modulo_tecido_id_modulo");
             entity.HasIndex(x => x.IdTecido).HasDatabaseName("ix_modulo_tecido_id_tecido");
 
-            // impede duplicar o mesmo tecido no mesmo módulo
+            // Agora permite duplicar o mesmo tecido no mesmo módulo para manter histórico de preços
             entity.HasIndex(x => new { x.IdModulo, x.IdTecido })
-                .IsUnique()
-                .HasDatabaseName("uq_modulo_tecido_id_modulo_id_tecido");
+                .HasDatabaseName("ix_modulo_tecido_id_modulo_id_tecido_multi");
 
             entity.Property(x => x.ValorTecido).HasColumnType("numeric(18,3)");
 

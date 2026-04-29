@@ -22,7 +22,8 @@ public class ExcelImportService
         if (dtRevisao.HasValue) 
              dtRevisao = DateTime.SpecifyKind(dtRevisao.Value, DateTimeKind.Utc);
 
-        using var package = new ExcelPackage(fileStream);
+        using var sanitizedStream = SanitizeExcelFile(fileStream);
+        using var package = new ExcelPackage(sanitizedStream);
         var worksheet = package.Workbook.Worksheets[0]; // Assume first sheet
         var rowCount = worksheet.Dimension.Rows;
         var colCount = worksheet.Dimension.Columns;
@@ -436,43 +437,40 @@ public class ExcelImportService
                         // Also handles inverted ranges (e.g. D1260:D214 -> D214:D1260) which cause EPPlus errors
                         if (content.Contains("ref=") && (content.Contains(";") || content.Contains(":")))
                         {
-                            // Regex to capture two cell addresses separated by ; or :
-                            // Groups: 1=Col1, 2=Row1, 3=Col2, 4=Row2
-                            var pattern = "ref=\"([A-Za-z]+)([0-9]+)[;:]([A-Za-z]+)([0-9]+)\"";
-                            
+                            var pattern = "ref=\"([A-Za-z0-9;:]+)\"";
                             var newContent = Regex.Replace(content, pattern, match =>
                             {
-                                string col1 = match.Groups[1].Value;
-                                int row1 = int.Parse(match.Groups[2].Value);
-                                string col2 = match.Groups[3].Value;
-                                int row2 = int.Parse(match.Groups[4].Value);
+                                string refsStr = match.Groups[1].Value;
+                                if (!refsStr.Contains(';') && !refsStr.Contains(':')) return match.Value;
 
-                                // Determine correct order (Top-Left : Bottom-Right)
-                                bool swap = false;
+                                var parts = refsStr.Split(new[] { ';', ':' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (parts.Length < 2) return match.Value;
 
-                                // Compare Columns (Length first for A vs AA, then lexicographical)
-                                if (col1.Length > col2.Length) swap = true;
-                                else if (col1.Length < col2.Length) swap = false;
-                                else 
+                                int minRow = int.MaxValue;
+                                int maxRow = int.MinValue;
+                                string minCol = "ZZZ";
+                                string maxCol = "A";
+
+                                foreach (var p in parts)
                                 {
-                                    // Same length, compare letters
-                                    int colCompare = string.Compare(col1, col2, StringComparison.OrdinalIgnoreCase);
-                                    if (colCompare > 0) swap = true;
-                                    else if (colCompare == 0)
+                                    var m = Regex.Match(p, "^([A-Za-z]+)([0-9]+)$");
+                                    if (m.Success)
                                     {
-                                        // Same column, compare rows
-                                        if (row1 > row2) swap = true;
+                                        string c = m.Groups[1].Value.ToUpper();
+                                        int r = int.Parse(m.Groups[2].Value);
+                                        if (r < minRow) minRow = r;
+                                        if (r > maxRow) maxRow = r;
+
+                                        if (c.Length < minCol.Length || (c.Length == minCol.Length && string.Compare(c, minCol) < 0)) minCol = c;
+                                        if (c.Length > maxCol.Length || (c.Length == maxCol.Length && string.Compare(c, maxCol) > 0)) maxCol = c;
                                     }
                                 }
 
-                                if (swap)
+                                if (minRow != int.MaxValue)
                                 {
-                                    return $"ref=\"{col2}{row2}:{col1}{row1}\"";
+                                    return $"ref=\"{minCol}{minRow}:{maxCol}{maxRow}\"";
                                 }
-                                else
-                                {
-                                    return $"ref=\"{col1}{row1}:{col2}{row2}\"";
-                                }
+                                return match.Value;
                             });
 
                             if (content != newContent)
@@ -743,7 +741,8 @@ public class ExcelImportService
         {
             CultureInfo.CurrentCulture = new CultureInfo("pt-BR");
 
-            using var package = new ExcelPackage(fileStream);
+            using var sanitizedStream = SanitizeExcelFile(fileStream);
+            using var package = new ExcelPackage(sanitizedStream);
 
             // Validate Fornecedor
             var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
@@ -964,7 +963,8 @@ public class ExcelImportService
             // Reset sequences inside try
             await ResetSequencesAsync();
 
-            using var package = new ExcelPackage(fileStream);
+            using var sanitizedStream = SanitizeExcelFile(fileStream);
+            using var package = new ExcelPackage(sanitizedStream);
 
             // Validate Fornecedor
             var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
