@@ -16,6 +16,7 @@ public class ModulosTecidosController : ControllerBase
     public async Task<ActionResult<object>> GetAll()
     {
         var list = await _db.ModulosTecidos
+            .Where(x => x.FlAtivo)
             .AsNoTracking()
             .Select(x => new
             {

@@ -32,6 +32,12 @@ public class ExcelImportService
         if (fornecedor == null)
             throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
 
+        var deactivateSql = @"
+            UPDATE modulo_tecido 
+            SET fl_ativo = false 
+            WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+        await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
+
         // 2. Parse Headers to find Price Columns (starting from col 8 / 'H')
         var tecidoColumns = new Dictionary<int, long>(); // ColIndex -> TecidoId
         
@@ -112,6 +118,12 @@ public class ExcelImportService
 
             using var sanitizedStream = SanitizeExcelFile(stream);
             using var package = new ExcelPackage(sanitizedStream);
+
+            var deactivateSql = @"
+                UPDATE modulo_tecido 
+                SET fl_ativo = false 
+                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+            await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
             // Pre-carregar dados para evitar N+1 queries (Cache)
             var categorias = await _context.Categorias.ToDictionaryAsync(x => x.Nome.ToLower().Trim(), x => x.Id);
@@ -263,27 +275,16 @@ public class ExcelImportService
                         
                         if (valor > 0 && tecidos.TryGetValue(tecidoNome.ToLower(), out var idTecido))
                         {
-                            var mt = modulo.ModulosTecidos.FirstOrDefault(mt => mt.IdTecido == idTecido);
-                            if (mt != null)
+                            var novoModTecido = new ModuloTecido
                             {
-                                mt.ValorTecido = valor;
-                                if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
-                                mt.FlAtivo = true;
-                                if (mt.Id > 0) _context.Entry(mt).State = EntityState.Modified;
-                            }
-                            else
-                            {
-                                var novoModTecido = new ModuloTecido
-                                {
-                                    IdModulo = modulo.Id,
-                                    IdTecido = idTecido,
-                                    ValorTecido = valor,
-                                    DtUltimaRevisao = dtRevisao,
-                                    FlAtivo = true
-                                };
-                                modulo.ModulosTecidos.Add(novoModTecido);
-                                if (modulo.Id > 0) _context.ModulosTecidos.Add(novoModTecido);
-                            }
+                                IdModulo = modulo.Id,
+                                IdTecido = idTecido,
+                                ValorTecido = valor,
+                                DtUltimaRevisao = dtRevisao,
+                                FlAtivo = true
+                            };
+                            modulo.ModulosTecidos.Add(novoModTecido);
+                            if (modulo.Id > 0) _context.ModulosTecidos.Add(novoModTecido);
                         }
                     }
                 }
@@ -399,34 +400,18 @@ public class ExcelImportService
         return modulo;
     }
 
-    private async Task UpdateModuloTecidoAsync(long idModulo, long idTecido, decimal price, DateTime? dtRevisao = null)
+    private Task UpdateModuloTecidoAsync(long idModulo, long idTecido, decimal price, DateTime? dtRevisao = null)
     {
-        // First, check Local (tracked) entities to avoid "duplicate key" if we just added it in this transaction context
-        var mt = _context.ModulosTecidos.Local
-            .FirstOrDefault(x => x.IdModulo == idModulo && x.IdTecido == idTecido);
-
-        if (mt == null)
+        var mt = new ModuloTecido
         {
-            // If not in local, check DB
-            mt = await _context.ModulosTecidos
-                .FirstOrDefaultAsync(x => x.IdModulo == idModulo && x.IdTecido == idTecido);
-        }
-
-        if (mt == null)
-        {
-            mt = new ModuloTecido
-            {
-                IdModulo = idModulo,
-                IdTecido = idTecido,
-                FlAtivo = true,
-                DtUltimaRevisao = dtRevisao
-            };
-            _context.ModulosTecidos.Add(mt);
-        }
-
-        mt.ValorTecido = price;
-        if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
-        mt.FlAtivo = true; // Ensure active on import
+            IdModulo = idModulo,
+            IdTecido = idTecido,
+            FlAtivo = true,
+            ValorTecido = price,
+            DtUltimaRevisao = dtRevisao
+        };
+        _context.ModulosTecidos.Add(mt);
+        return Task.CompletedTask;
     }
     private Stream SanitizeExcelFile(Stream originalStream)
     {
@@ -569,6 +554,12 @@ public class ExcelImportService
             var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
             if (fornecedor == null)
                 throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
+
+            var deactivateSql = @"
+                UPDATE modulo_tecido 
+                SET fl_ativo = false 
+                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+            await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
             // === PRE-LOADING CACHES ===
             // Load all Categories and Marcas to memory to avoid N+1 queries
@@ -715,27 +706,17 @@ public class ExcelImportService
                         var price = UniversalParseDecimal(cellVal);
                         if (price > 0)
                         {
-                            var mt = modulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id);
-                            if (mt == null)
+                            var mt = new ModuloTecido
                             {
-                                mt = new ModuloTecido
-                                {
-                                    Modulo = modulo,
-                                    Tecido = tecido,
-                                    IdTecido = tecido.Id,
-                                    ValorTecido = price,
-                                    DtUltimaRevisao = dtRevisao,
-                                    FlAtivo = true
-                                };
-                                modulo.ModulosTecidos.Add(mt);
-                                if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
-                            }
-                            else
-                            {
-                                mt.ValorTecido = price;
-                                if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
-                                mt.FlAtivo = true;
-                            }
+                                Modulo = modulo,
+                                Tecido = tecido,
+                                IdTecido = tecido.Id,
+                                ValorTecido = price,
+                                DtUltimaRevisao = dtRevisao,
+                                FlAtivo = true
+                            };
+                            modulo.ModulosTecidos.Add(mt);
+                            if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
                         }
                     }
                 }
@@ -768,6 +749,12 @@ public class ExcelImportService
             var fornecedor = await _context.Fornecedores.FindAsync(idFornecedor);
             if (fornecedor == null)
                 throw new Exception($"Fornecedor com ID {idFornecedor} não encontrado.");
+
+            var deactivateSql = @"
+                UPDATE modulo_tecido 
+                SET fl_ativo = false 
+                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+            await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
             // === CACHES ===
             var categoriasCache = await _context.Categorias.ToListAsync();
@@ -940,28 +927,18 @@ public class ExcelImportService
                         }
 
                         if (lastModulo.ModulosTecidos == null) lastModulo.ModulosTecidos = new List<ModuloTecido>();
-                        var mt = lastModulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id || (tecido.Id == 0 && x.Tecido == tecido));
 
-                        if (mt == null)
+                        var mt = new ModuloTecido
                         {
-                            mt = new ModuloTecido
-                            {
-                                Modulo = lastModulo,
-                                Tecido = tecido,
-                                IdTecido = tecido.Id,
-                                ValorTecido = valorTecido,
-                                DtUltimaRevisao = dtRevisao,
-                                FlAtivo = true
-                            };
-                            lastModulo.ModulosTecidos.Add(mt);
-                            if (lastModulo.Id > 0) _context.ModulosTecidos.Add(mt);
-                        }
-                        else
-                        {
-                            mt.ValorTecido = valorTecido;
-                            if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
-                            mt.FlAtivo = true;
-                        }
+                            Modulo = lastModulo,
+                            Tecido = tecido,
+                            IdTecido = tecido.Id,
+                            ValorTecido = valorTecido,
+                            DtUltimaRevisao = dtRevisao,
+                            FlAtivo = true
+                        };
+                        lastModulo.ModulosTecidos.Add(mt);
+                        if (lastModulo.Id > 0) _context.ModulosTecidos.Add(mt);
                     }
                 }
             }
@@ -1160,28 +1137,18 @@ public class ExcelImportService
                         }
 
                         if (lastModulo.ModulosTecidos == null) lastModulo.ModulosTecidos = new List<ModuloTecido>();
-                        var mt = lastModulo.ModulosTecidos.FirstOrDefault(x => x.IdTecido == tecido.Id || (tecido.Id == 0 && x.Tecido == tecido));
 
-                        if (mt == null)
+                        var mt = new ModuloTecido
                         {
-                            mt = new ModuloTecido
-                            {
-                                Modulo = lastModulo,
-                                Tecido = tecido,
-                                IdTecido = tecido.Id,
-                                ValorTecido = valorTecido,
-                                DtUltimaRevisao = dtRevisao,
-                                FlAtivo = true
-                            };
-                            lastModulo.ModulosTecidos.Add(mt);
-                            if (lastModulo.Id > 0) _context.ModulosTecidos.Add(mt);
-                        }
-                        else
-                        {
-                            mt.ValorTecido = valorTecido;
-                            if (dtRevisao.HasValue) mt.DtUltimaRevisao = dtRevisao;
-                            mt.FlAtivo = true;
-                        }
+                            Modulo = lastModulo,
+                            Tecido = tecido,
+                            IdTecido = tecido.Id,
+                            ValorTecido = valorTecido,
+                            DtUltimaRevisao = dtRevisao,
+                            FlAtivo = true
+                        };
+                        lastModulo.ModulosTecidos.Add(mt);
+                        if (lastModulo.Id > 0) _context.ModulosTecidos.Add(mt);
                     }
                 }
             }
