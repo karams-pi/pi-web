@@ -156,6 +156,27 @@ export default function EmissaoListaPrecosPage() {
     }]);
   };
 
+  const addAllToSelection = () => {
+    if (items.length === 0) return;
+    
+    setSelectedItems(prev => {
+      const currentIds = new Set(prev.map(si => si.modulo.id));
+      const newItems = items
+        .filter(mod => !currentIds.has(mod.id))
+        .map(mod => ({
+          tempId: Math.random().toString(36).substr(2, 9),
+          modulo: mod
+        }));
+      
+      if (newItems.length === 0) {
+        alert("Todos os itens listados já estão na seleção!");
+        return prev;
+      }
+      
+      return [...prev, ...newItems];
+    });
+  };
+
   const removeFromSelection = (tempId: string) => {
     setSelectedItems(prev => prev.filter(i => i.tempId !== tempId));
   };
@@ -306,7 +327,12 @@ export default function EmissaoListaPrecosPage() {
         
         {/* Left: Search and Add */}
         <div className="card" style={{ padding: 16 }}>
-           <h4 style={{ marginBottom: 12 }}>1. Buscar Módulos</h4>
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+             <h4 style={{ margin: 0 }}>1. Buscar Módulos</h4>
+             <button className="btn btn-sm btn-primary" onClick={addAllToSelection} disabled={loading || items.length === 0}>
+               Adicionar Todos
+             </button>
+           </div>
            <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
               <div style={{ flex: 1 }}>
                 <SearchableSelect 
