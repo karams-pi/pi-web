@@ -142,10 +142,11 @@ export function printPriceListReport({
 
   // 3. Prepare Header Rows
   const standardHeaders = [
-      "Modelo", "Módulo", "Larg", "Prof", "Alt", "M³", "Frete"
+      "Modelo", "Módulo", "Larg", "Prof", "Alt", "M³"
   ];
 
   const colGroup = `
+    <colgroup>
         <col style="width: 10%">
         <col style="width: 12%">
         <col style="width: 18%">
@@ -153,13 +154,12 @@ export function printPriceListReport({
         <col style="width: 4%">
         <col style="width: 4%">
         <col style="width: 4%">
-        <col style="width: 6%">
     </colgroup>
   `;
 
   const headerRow1 = `
     <tr>
-        <th>Foto</th>
+        <th rowspan="2">Foto</th>
         ${standardHeaders.map(h => `<th rowspan="2">${h}</th>`).join("")}
         <th colspan="${sortedFabricIds.length}" class="center" style="text-align: center;">
             Valor Final (${currency === 'BRL' ? 'Reais' : 'EXW'})
@@ -223,7 +223,6 @@ export function printPriceListReport({
               const freightUSD = freightMap.get(mod.id) || 0;
               const risk = getRiskVal(mod.idFornecedor);
               const freightDisp = currency === "BRL" ? freightUSD * risk : freightUSD;
-              const colFrete = `<td class="right">${fmt(freightDisp)}</td>`;
 
               let fabricCols = "";
               sortedFabricIds.forEach(fid => {
@@ -245,7 +244,6 @@ export function printPriceListReport({
                       ${colProf}
                       ${colAlt}
                       ${colM3}
-                      ${colFrete}
                       ${fabricCols}
                   </tr>
               `;

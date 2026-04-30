@@ -250,7 +250,7 @@ public class ModuloExportService
             .OrderBy(t => Regex.Replace(t!.Nome, @"\d+", m => m.Value.PadLeft(5, '0')))
             .ToList();
 
-        int fabricStartCol = 8; // Shifted by 1 due to Frete column
+        int fabricStartCol = 7; 
         int maxCols = fabricStartCol + uniqueFabrics.Count - 1;
 
         int currentRow = 5;
@@ -285,7 +285,6 @@ public class ModuloExportService
                 ws.Cells[currentRow, 4, currentRow + 1, 4].Merge = true; ws.Cells[currentRow, 4].Value = "Prof";
                 ws.Cells[currentRow, 5, currentRow + 1, 5].Merge = true; ws.Cells[currentRow, 5].Value = "Alt";
                 ws.Cells[currentRow, 6, currentRow + 1, 6].Merge = true; ws.Cells[currentRow, 6].Value = "M³";
-                ws.Cells[currentRow, 7, currentRow + 1, 7].Merge = true; ws.Cells[currentRow, 7].Value = "Frete";
 
                 ws.Cells[currentRow, fabricStartCol, currentRow, maxCols].Merge = true;
                 ws.Cells[currentRow, fabricStartCol].Value = $"Valor Final ({(currency == "BRL" ? "Reais" : "EXW")})";
@@ -329,7 +328,6 @@ public class ModuloExportService
                     }
 
                     decimal freightDisp = currency == "BRL" ? freightUSD * riskVal : freightUSD;
-                    ws.Cells[currentRow, 7].Value = freightDisp;
 
                     for (int i = 0; i < uniqueFabrics.Count; i++)
                     {
@@ -370,7 +368,7 @@ public class ModuloExportService
                 var tableRange = ws.Cells[brandStartRow, 1, brandEndRow, maxCols];
                 foreach (var cell in tableRange) { cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); }
                 ws.Cells[brandStartRow, 2, brandEndRow, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                ws.Cells[brandStartRow, 3, brandEndRow, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                ws.Cells[brandStartRow, 3, brandEndRow, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 ws.Cells[brandStartRow, fabricStartCol, brandEndRow, maxCols].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
                 currentRow++;
@@ -378,7 +376,7 @@ public class ModuloExportService
         }
 
         string curSymbol = currency == "BRL" ? "R$ " : "$ ";
-        ws.Cells[5, 7, currentRow, maxCols].Style.Numberformat.Format = $"\"{curSymbol}\"#,##0.00";
+        ws.Cells[5, fabricStartCol, currentRow, maxCols].Style.Numberformat.Format = $"\"{curSymbol}\"#,##0.00";
         ws.Cells[5, 3, currentRow, 6].Style.Numberformat.Format = "#,##0.00";
 
         ws.Column(1).Width = 22;
@@ -387,7 +385,6 @@ public class ModuloExportService
         ws.Column(4).Width = 7;
         ws.Column(5).Width = 7;
         ws.Column(6).Width = 7;
-        ws.Column(7).Width = 10; // Frete
         for (int i = 0; i < uniqueFabrics.Count; i++) ws.Column(fabricStartCol + i).Width = 12;
 
         return package.GetAsByteArray();
