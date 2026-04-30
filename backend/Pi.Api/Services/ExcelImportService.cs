@@ -1027,108 +1027,108 @@ public class ExcelImportService
                 if (worksheet.Dimension == null) continue;
                 var rowCount = worksheet.Dimension.Rows;
 
-                Modulo? lastModulo = null;
+                string currentMarca = "";
+                string currentBrandFromB = "";
+                string currentComposition = "";
+                decimal currentLarg = 0;
+                decimal currentProf = 0;
+                decimal currentAlt = 0;
 
                 for (int row = 2; row <= rowCount; row++) // Skip header row
                 {
-                    // === Reads ===
                     var brandFromA = worksheet.Cells[row, 1].Text?.Trim();
                     var brandFromB = worksheet.Cells[row, 2].Text?.Trim();
                     
-                    // Prioritize Column A for Brand, fallback to Column B
-                    var marcaNome = !string.IsNullOrEmpty(brandFromA) && !brandFromA.Equals("LINHA", StringComparison.OrdinalIgnoreCase) 
-                                    ? brandFromA : brandFromB;
+                    if (!string.IsNullOrEmpty(brandFromB)) currentBrandFromB = brandFromB;
 
-                    var largRaw = worksheet.Cells[row, 3].Value;
-                    var profRaw = worksheet.Cells[row, 4].Value; // FIXED: Column 4 is Depth
-                    var altRaw = worksheet.Cells[row, 5].Value;  // FIXED: Column 5 is Height
+                    var tempMarca = !string.IsNullOrEmpty(brandFromA) && !brandFromA.Equals("LINHA", StringComparison.OrdinalIgnoreCase) 
+                                    ? brandFromA : currentBrandFromB;
+                    if (!string.IsNullOrEmpty(tempMarca)) currentMarca = tempMarca;
+
+                    var largRaw = worksheet.Cells[row, 3].Text?.Trim();
+                    var profRaw = worksheet.Cells[row, 4].Text?.Trim();
+                    var altRaw = worksheet.Cells[row, 5].Text?.Trim();
                     var compositionRaw = worksheet.Cells[row, 6].Text?.Trim();
+
+                    if (!string.IsNullOrEmpty(compositionRaw)) currentComposition = compositionRaw;
+                    if (!string.IsNullOrEmpty(largRaw)) currentLarg = UniversalParseDecimal(largRaw);
+                    if (!string.IsNullOrEmpty(profRaw)) currentProf = UniversalParseDecimal(profRaw);
+                    if (!string.IsNullOrEmpty(altRaw)) currentAlt = UniversalParseDecimal(altRaw);
+
                     var tecidoNome = worksheet.Cells[row, 7].Text?.Trim();
                     var cellValor = worksheet.Cells[row, 8].Value;
                     var valorTecido = UniversalParseDecimal(cellValor);
 
-                    // Improved logic for isNewSpec: if we have a brand or a model and composition
-                    bool isNewSpec = (!string.IsNullOrEmpty(marcaNome) && !marcaNome.Equals("MODELO", StringComparison.OrdinalIgnoreCase))
-                                     || (!string.IsNullOrEmpty(brandFromB) && !string.IsNullOrEmpty(compositionRaw));
+                    if (string.IsNullOrEmpty(currentBrandFromB) || string.IsNullOrEmpty(currentComposition) || string.IsNullOrEmpty(tecidoNome) || valorTecido <= 0)
+                        continue;
 
-                    if (isNewSpec && !string.IsNullOrEmpty(brandFromB) && !string.IsNullOrEmpty(compositionRaw))
+                    var modelName = currentBrandFromB;
+                    var descricaoNormalized = NormalizeString($"{modelName} - {currentComposition}");
+
+                    // Get/Create Marca
+                    if (!marcasMap.TryGetValue(currentMarca, out var marca))
                     {
-                        // Use Column B (Model) + Column F (Composition) for a better description
-                        var modelName = brandFromB;
-                        var descricaoNormalized = NormalizeString($"{modelName} - {compositionRaw}");
-                        
-                        // Dimensions are in METERS in Livintus file, keep as is
-                        var larg = UniversalParseDecimal(largRaw);
-                        var prof = UniversalParseDecimal(profRaw);
-                        var alt = UniversalParseDecimal(altRaw);
+                        marca = new Marca { Nome = currentMarca };
+                        _context.Marcas.Add(marca);
+                        if (!dryRun) _context.SaveChanges();
+                        marcasMap[currentMarca] = marca;
+                    }
 
-                        // Get/Create Marca
-                        if (!marcasMap.TryGetValue(marcaNome!, out var marca))
+                    Modulo? modulo = null;
+                    string largKey = currentLarg.ToString("F2", CultureInfo.InvariantCulture);
+                    if (marca.Id > 0)
+                    {
+                        string modKey = $"{marca.Id}|{descricaoNormalized}|{largKey}";
+                        modulosDict.TryGetValue(modKey, out modulo);
+                    }
+
+                    if (modulo == null)
+                    {
+                        modulo = _context.Modulos.Local
+                            .FirstOrDefault(m => m.IdFornecedor == idFornecedor 
+                                           && (m.Marca == marca || m.IdMarca == marca.Id)
+                                           && NormalizeString(m.Descricao) == descricaoNormalized
+                                           && Math.Abs(m.Largura - currentLarg) < 0.01m);
+                    }
+
+                    if (modulo == null)
+                    {
+                        modulo = new Modulo
                         {
-                            marca = new Marca { Nome = marcaNome! };
-                            _context.Marcas.Add(marca);
-                            if (!dryRun) _context.SaveChanges(); // Need ID if not dry-run
-                            marcasMap[marcaNome!] = marca;
-                        }
-
-                        // Get/Create Modulo
-                        Modulo? modulo = null;
-                        string largKey = larg.ToString("F2", CultureInfo.InvariantCulture);
+                            IdFornecedor = idFornecedor,
+                            Marca = marca,
+                            Categoria = categoria,
+                            IdMarca = marca.Id,
+                            IdCategoria = categoria.Id,
+                            Descricao = descricaoNormalized,
+                            Largura = currentLarg,
+                            Profundidade = currentProf,
+                            Altura = currentAlt,
+                            Pa = 0,
+                            M3 = (currentLarg * currentProf * currentAlt),
+                            ModulosTecidos = new List<ModuloTecido>()
+                        };
+                        _context.Modulos.Add(modulo);
+                        
                         if (marca.Id > 0)
                         {
                             string modKey = $"{marca.Id}|{descricaoNormalized}|{largKey}";
-                            modulosDict.TryGetValue(modKey, out modulo);
+                            modulosDict[modKey] = modulo;
                         }
-
-                        if (modulo == null)
-                        {
-                            // Check local cache for newly created modules
-                            modulo = _context.Modulos.Local
-                                .FirstOrDefault(m => m.IdFornecedor == idFornecedor 
-                                               && (m.Marca == marca || m.IdMarca == marca.Id)
-                                               && NormalizeString(m.Descricao) == descricaoNormalized
-                                               && Math.Abs(m.Largura - larg) < 0.01m);
-                        }
-
-                        if (modulo == null)
-                        {
-                            modulo = new Modulo
-                            {
-                                IdFornecedor = idFornecedor,
-                                Marca = marca,
-                                Categoria = categoria,
-                                IdMarca = marca.Id,
-                                IdCategoria = categoria.Id,
-                                Descricao = descricaoNormalized,
-                                Largura = larg,
-                                Profundidade = prof,
-                                Altura = alt,
-                                Pa = 0,
-                                M3 = (larg * prof * alt), // No division by 1M since inputs are in meters
-                                ModulosTecidos = new List<ModuloTecido>()
-                            };
-                            _context.Modulos.Add(modulo);
-                        }
-                        else
-                        {
-                            // Update existing module
-                            if (modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>();
-                            modulo.Categoria = categoria;
-                            modulo.Marca = marca;
-                            modulo.Largura = larg;
-                            modulo.Profundidade = prof;
-                            modulo.Altura = alt;
-                            modulo.M3 = (larg * prof * alt); // No division by 1M
-                        }
-                        lastModulo = modulo;
+                    }
+                    else
+                    {
+                        if (modulo.ModulosTecidos == null) modulo.ModulosTecidos = new List<ModuloTecido>();
+                        modulo.Categoria = categoria;
+                        modulo.Marca = marca;
+                        modulo.Largura = currentLarg;
+                        modulo.Profundidade = currentProf;
+                        modulo.Altura = currentAlt;
+                        modulo.M3 = (currentLarg * currentProf * currentAlt);
                     }
 
-                    // Process price for the current modulo
-                    if (lastModulo != null && !string.IsNullOrEmpty(tecidoNome) && 
-                        !tecidoNome.Equals("LINHA", StringComparison.OrdinalIgnoreCase) && 
-                        valorTecido > 0)
+                    if (!tecidoNome.Equals("LINHA", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Get/Create Tecido
                         if (!tecidosMap.TryGetValue(tecidoNome, out var tecido))
                         {
                             tecido = new Tecido { Nome = tecidoNome };
@@ -1136,19 +1136,17 @@ public class ExcelImportService
                             tecidosMap[tecidoNome] = tecido;
                         }
 
-                        if (lastModulo.ModulosTecidos == null) lastModulo.ModulosTecidos = new List<ModuloTecido>();
-
                         var mt = new ModuloTecido
                         {
-                            Modulo = lastModulo,
+                            Modulo = modulo,
                             Tecido = tecido,
                             IdTecido = tecido.Id,
                             ValorTecido = valorTecido,
                             DtUltimaRevisao = dtRevisao,
                             FlAtivo = true
                         };
-                        lastModulo.ModulosTecidos.Add(mt);
-                        if (lastModulo.Id > 0) _context.ModulosTecidos.Add(mt);
+                        modulo.ModulosTecidos.Add(mt);
+                        if (modulo.Id > 0) _context.ModulosTecidos.Add(mt);
                     }
                 }
             }
