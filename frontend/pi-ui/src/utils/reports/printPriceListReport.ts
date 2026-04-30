@@ -215,6 +215,7 @@ export function printPriceListReport({
               }
 
               const colDesc = `<td class="desc">${mod.descricao}</td>`;
+              const colPa = `<td class="center">${fmtDim(mod.pa)}</td>`;
               const colLarg = `<td class="center">${fmtDim(mod.largura)}</td>`;
               const colProf = `<td class="center">${fmtDim(mod.profundidade)}</td>`;
               const colAlt = `<td class="center">${fmtDim(mod.altura)}</td>`;
@@ -240,6 +241,7 @@ export function printPriceListReport({
                   <tr>
                       ${colMarca}
                       ${colDesc}
+                      ${colPa}
                       ${colLarg}
                       ${colProf}
                       ${colAlt}
