@@ -242,6 +242,25 @@ public class PisController : ControllerBase
         // Convert to UTC for PostgreSQL
         pi.DataPi = pi.DataPi.ToUniversalTime();
 
+        if (pi.PiItens == null) pi.PiItens = new List<PiItem>();
+
+        if (pi.PiItensPecas != null)
+        {
+            foreach (var peca in pi.PiItensPecas)
+            {
+                if (peca.PiItens != null)
+                {
+                    foreach (var item in peca.PiItens)
+                    {
+                        if (!pi.PiItens.Contains(item))
+                        {
+                            pi.PiItens.Add(item);
+                        }
+                    }
+                }
+            }
+        }
+
         _db.Pis.Add(pi);
         
         // Update product codes if provided
