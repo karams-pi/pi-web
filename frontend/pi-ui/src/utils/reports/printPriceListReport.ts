@@ -221,10 +221,6 @@ export function printPriceListReport({
               const colAlt = `<td class="center">${fmtDim(mod.altura)}</td>`;
               const colM3 = `<td class="center">${fmt(mod.m3)}</td>`;
               
-              const freightUSD = freightMap.get(mod.id) || 0;
-              const risk = getRiskVal(mod.idFornecedor);
-              const freightDisp = currency === "BRL" ? freightUSD * risk : freightUSD;
-
               let fabricCols = "";
               sortedFabricIds.forEach(fid => {
                   const mt = mod.modulosTecidos?.find(x => x.idTecido === fid);
