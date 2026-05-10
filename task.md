@@ -1,5 +1,7 @@
-# Deployment Fixes
+# Tarefas - Migração de Schema (public -> pi)
 
-- [/] Fix "Failed to fetch" error
-    - [x] Update backend CORS policy to allow production domains <!-- id: 0 -->
-    - [ ] Verify environment variable usage in `Program.cs` <!-- id: 1 -->
+- [x] Criar script SQL de migração (`db/migration_schema_pi.sql`)
+- [x] Modificar `AppDbContext.cs` para usar o schema `pi`
+- [x] Gerar nova migration do EF Core para sincronizar o estado do código
+- [/] Validar script SQL e alterações no backend
+- [ ] (Opcional) Limpeza de views após validação final

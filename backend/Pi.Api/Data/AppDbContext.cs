@@ -36,6 +36,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("pi");
+
         // ===== Tabelas já existentes =====
         modelBuilder.Entity<Cliente>().ToTable("clientes");
         modelBuilder.Entity<Modelo>().ToTable("modelo");

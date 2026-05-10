@@ -17,6 +17,7 @@ namespace Pi.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("pi")
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -43,7 +44,7 @@ namespace Pi.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("uq_categoria_nome");
 
-                    b.ToTable("categoria", (string)null);
+                    b.ToTable("categoria", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Cliente", b =>
@@ -120,7 +121,7 @@ namespace Pi.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("clientes", (string)null);
+                    b.ToTable("clientes", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Configuracao", b =>
@@ -194,7 +195,7 @@ namespace Pi.Api.Migrations
 
                     b.HasIndex("IdFornecedor");
 
-                    b.ToTable("configuracoes", (string)null);
+                    b.ToTable("configuracoes", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ConfiguracoesFreteItem", b =>
@@ -229,7 +230,7 @@ namespace Pi.Api.Migrations
                     b.HasIndex("IdFreteItem")
                         .HasDatabaseName("ix_configuracoes_frete_item_id_frete_item");
 
-                    b.ToTable("configuracoes_frete_item", (string)null);
+                    b.ToTable("configuracoes_frete_item", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>
@@ -259,7 +260,7 @@ namespace Pi.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("uq_fornecedor_cnpj");
 
-                    b.ToTable("fornecedor", (string)null);
+                    b.ToTable("fornecedor", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Frete", b =>
@@ -279,7 +280,7 @@ namespace Pi.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("frete", (string)null);
+                    b.ToTable("frete", "pi");
 
                     b.HasData(
                         new
@@ -333,7 +334,7 @@ namespace Pi.Api.Migrations
                     b.HasIndex("IdFrete")
                         .HasDatabaseName("ix_frete_item_id_frete");
 
-                    b.ToTable("frete_item", (string)null);
+                    b.ToTable("frete_item", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ListaPreco", b =>
@@ -441,7 +442,7 @@ namespace Pi.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("lista_preco", (string)null);
+                    b.ToTable("lista_preco", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Marca", b =>
@@ -478,7 +479,7 @@ namespace Pi.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("uq_marca_nome");
 
-                    b.ToTable("marca", (string)null);
+                    b.ToTable("marca", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Modelo", b =>
@@ -515,7 +516,7 @@ namespace Pi.Api.Migrations
 
                     b.HasIndex("IdFornecedor");
 
-                    b.ToTable("modelo", (string)null);
+                    b.ToTable("modelo", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Modulo", b =>
@@ -583,7 +584,7 @@ namespace Pi.Api.Migrations
 
                     b.HasIndex("ModeloId");
 
-                    b.ToTable("modulo", (string)null);
+                    b.ToTable("modulo", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ModuloTecido", b =>
@@ -631,7 +632,7 @@ namespace Pi.Api.Migrations
                     b.HasIndex("IdModulo", "IdTecido")
                         .HasDatabaseName("ix_modulo_tecido_id_modulo_id_tecido_multi");
 
-                    b.ToTable("modulo_tecido", (string)null);
+                    b.ToTable("modulo_tecido", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiItem", b =>
@@ -726,7 +727,7 @@ namespace Pi.Api.Migrations
 
                     b.HasIndex("IdPiItemPeca");
 
-                    b.ToTable("pi_item", (string)null);
+                    b.ToTable("pi_item", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiItemPeca", b =>
@@ -755,7 +756,7 @@ namespace Pi.Api.Migrations
 
                     b.HasIndex("IdPi");
 
-                    b.ToTable("pi_item_peca", (string)null);
+                    b.ToTable("pi_item_peca", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.ProformaInvoice", b =>
@@ -874,7 +875,7 @@ namespace Pi.Api.Migrations
                     b.HasIndex("PiSequencia")
                         .HasDatabaseName("ix_pi_sequencia");
 
-                    b.ToTable("pi", (string)null);
+                    b.ToTable("pi", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>
@@ -898,7 +899,7 @@ namespace Pi.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("uq_tecido_nome");
 
-                    b.ToTable("tecido", (string)null);
+                    b.ToTable("tecido", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.VersaoSistema", b =>
@@ -922,7 +923,7 @@ namespace Pi.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("versao_sistema");
+                    b.ToTable("versao_sistema", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Configuracao", b =>
