@@ -24,11 +24,11 @@ export default function HomeMenu() {
         <div className="title">MENU DE NAVEGAÇÃO</div>
 
         <div className="home-menuGrid">
-          <MenuButton to="/clientes" label="Cadastro de Clientes" />
-          <MenuButton to="/produtos" label="Cadastro de Produtos" />
-          <MenuButton to="/proforma-invoice" label="Criar Proforma Invoice" />
-          <MenuButton to="/config" label="Configurações" />
-          <MenuButton to="/emissao-lista-preco" label="Emissão de Lista de Preços" />
+          <MenuButton to="/pi/clientes" label="Cadastro de Clientes" />
+          <MenuButton to="/pi/modulos" label="Cadastro de Produtos" />
+          <MenuButton to="/pi/proforma-invoice" label="Criar Proforma Invoice" />
+          <MenuButton to="/pi/config" label="Configurações" />
+          <MenuButton to="/pi/emissao-lista-preco" label="Emissão de Lista de Preços" />
         </div>
       </section>
     </div>

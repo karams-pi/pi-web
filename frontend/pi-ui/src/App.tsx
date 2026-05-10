@@ -68,23 +68,29 @@ export default function App() {
         <div className={isPrintRoute ? "" : "container"}>
           <Routes>
             <Route path="/" element={<HomeMenu />} />
-            <Route path="/clientes" element={<ClientesPage />} />
-            <Route path="/fornecedores" element={<FornecedoresPage />} />
-            <Route path="/categorias" element={<CategoriasPage />} />
-            <Route path="/marcas" element={<MarcasPage />} />
-            <Route path="/tecidos" element={<TecidosPage />} />
-            <Route path="/modulos" element={<ModulosPage />} />
-            <Route path="/proforma-invoice" element={<ProformaInvoicePage />} />
+            
+            {/* Módulo PI (Proforma Invoice) */}
+            <Route path="/pi">
+              <Route index element={<HomeMenu />} />
+              <Route path="clientes" element={<ClientesPage />} />
+              <Route path="fornecedores" element={<FornecedoresPage />} />
+              <Route path="categorias" element={<CategoriasPage />} />
+              <Route path="marcas" element={<MarcasPage />} />
+              <Route path="tecidos" element={<TecidosPage />} />
+              <Route path="modulos" element={<ModulosPage />} />
+              <Route path="proforma-invoice" element={<ProformaInvoicePage />} />
+              <Route path="proforma-invoice-v2" element={<ProformaInvoiceV2Page />} />
+              <Route path="proforma-invoice-v2/:id" element={<ProformaInvoiceV2Page />} />
+              <Route path="importacao" element={<ImportacaoPage />} />
+              <Route path="emissao-lista-preco" element={<EmissaoListaPrecosPage />} />
+              <Route path="config" element={<ConfiguracoesPage />} />
+            </Route>
+
+            {/* Rotas de Impressão (Mantidas na raiz por simplicidade de link externo) */}
             <Route path="/print-pi/:id" element={<PrintPiPage />} />
             <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
-            <Route path="/proforma-invoice-v2" element={<ProformaInvoiceV2Page />} />
-            <Route path="/proforma-invoice-v2/:id" element={<ProformaInvoiceV2Page />} />
 
-            <Route path="/importacao" element={<ImportacaoPage />} />
-            <Route path="/emissao-lista-preco" element={<EmissaoListaPrecosPage />} />
-            <Route path="/config" element={<ConfiguracoesPage />} />
             <Route path="/sobre" element={<SobrePage />} />
-            {/* <Route path="/precos" element={<PrecosPage />} /> */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
@@ -109,56 +115,56 @@ function NavLinks() {
         <span>Menu</span>
       </NavLink>
 
-      <NavLink to="/clientes" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/clientes" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Users size={18} />
         <span>Clientes</span>
       </NavLink>
 
-      <NavLink to="/fornecedores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/fornecedores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Truck size={18} />
         <span>Fornecedores</span>
       </NavLink>
 
-      <NavLink to="/categorias" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/categorias" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Layers size={18} />
         <span>Categorias</span>
       </NavLink>
 
-      <NavLink to="/marcas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/marcas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Tag size={18} />
         <span>Modelos</span>
       </NavLink>
 
-      <NavLink to="/tecidos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/tecidos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Scissors size={18} />
         <span>Tecidos</span>
       </NavLink>
 
-      <NavLink to="/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Grid size={18} />
         <span>Modulos</span>
       </NavLink>
 
-      <NavLink to="/emissao-lista-preco" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/emissao-lista-preco" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Download size={18} />
         <span>Lista de Preços</span>
       </NavLink>
 
-      <NavLink to="/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <FileText size={18} />
         <span>Proforma</span>
       </NavLink>
-      <NavLink to="/proforma-invoice-v2" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/proforma-invoice-v2" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <FileText size={18} />
         <span style={{ fontWeight: "bold", color: "#4f9eff" }}>Proforma V2</span>
       </NavLink>
 
-      <NavLink to="/importacao" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/importacao" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Download size={18} />
         <span>Importar</span>
       </NavLink>
 
-      <NavLink to="/config" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi/config" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Settings size={18} />
         <span>Config</span>
       </NavLink>

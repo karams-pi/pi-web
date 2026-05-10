@@ -359,7 +359,7 @@ export default function ProformaInvoiceV2Page() {
     if (rawImg.startsWith("data:") || rawImg.startsWith("http")) return rawImg;
     if (rawImg.length > 100) return `data:image/png;base64,${rawImg}`;
     
-    const baseUrl = (import.meta.env.VITE_API_BASE ?? "http://localhost:5000").replace(/\/+$/, "");
+    const baseUrl = API_BASE;
     return `${baseUrl}${rawImg.startsWith("/") ? "" : "/"}${rawImg}`;
   };
 
@@ -724,7 +724,7 @@ export default function ProformaInvoiceV2Page() {
 
   const novaPi = () => {
     if (id) {
-      navigate("/proforma-invoice-v2");
+      navigate("/pi/proforma-invoice-v2");
     } else {
       setItens([]);
       loadInitialData();

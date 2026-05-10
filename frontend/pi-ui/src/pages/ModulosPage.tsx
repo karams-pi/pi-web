@@ -768,7 +768,7 @@ export default function ModulosPage() {
                         <button
                           type="button"
                           className="btn btn-sm"
-                          onClick={() => navigate("/marcas")}
+                          onClick={() => navigate("/pi/marcas")}
                           title="Cadastrar novo modelo"
                           style={{ minWidth: "40px" }}
                         >
