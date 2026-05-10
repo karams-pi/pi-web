@@ -57,6 +57,20 @@ a {
   margin: 0 !important;
 }
 
+/* Estilos para a tela de seleção de módulos */
+.app.selection-mode {
+  display: block !important;
+  grid-template-columns: 1fr !important;
+}
+
+.app.selection-mode main {
+  grid-column: 1 / -1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 /* Sidebar and Desktop Layout */
 .sidebar {
   display: none;
