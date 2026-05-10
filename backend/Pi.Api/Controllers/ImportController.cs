@@ -6,7 +6,7 @@ using Pi.Api.Models;
 namespace Pi.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/pi/[controller]")]
 [RequestSizeLimit(104857600)] // 100 MB
 public class ImportController : ControllerBase
 {

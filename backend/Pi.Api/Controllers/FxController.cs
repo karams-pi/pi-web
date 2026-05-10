@@ -4,7 +4,7 @@ using Pi.Api.Services;
 namespace Pi.Api.Controllers
 {
     [ApiController]
-    [Route("api/fx")]
+    [Route("api/pi/fx")]
     public class FxController : ControllerBase
     {
         private readonly FxService _fx;

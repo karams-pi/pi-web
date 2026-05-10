@@ -96,7 +96,7 @@ export async function exportModulosExcel(params: {
   status?: string;
   validityDays?: number;
 }) {
-  const res = await fetch(`${API_BASE}/api/modulos/excel`, {
+  const res = await fetch(`${API_BASE}/api/pi/modulos/excel`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),
@@ -112,7 +112,7 @@ export async function exportPriceListExcel(params: {
   cotacao: number;
   validityDays?: number;
 }) {
-  const res = await fetch(`${API_BASE}/api/modulos/excel-price-list`, {
+  const res = await fetch(`${API_BASE}/api/pi/modulos/excel-price-list`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),

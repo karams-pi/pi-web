@@ -6,7 +6,7 @@ using Pi.Api.Models;
 namespace Pi.Api.Controllers;
 
 [ApiController]
-[Route("api/configuracoesfreteitem")]
+[Route("api/pi/configuracoesfreteitem")]
 public class ConfiguracoesFreteItemController : ControllerBase
 {
     private readonly AppDbContext _db;

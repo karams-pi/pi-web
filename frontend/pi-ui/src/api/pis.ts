@@ -32,7 +32,7 @@ export async function deletePi(id: number) {
 }
 
 export async function exportPiExcel(id: number, currency = "EXW", validity = 30, lang = "PT") {
-  const res = await fetch(`${API_BASE}/api/pis/${id}/excel?currency=${currency}&validity=${validity}&lang=${lang}`, {
+  const res = await fetch(`${API_BASE}/api/pi/pis/${id}/excel?currency=${currency}&validity=${validity}&lang=${lang}`, {
     headers: {
         // Add auth if needed
     }

@@ -7,7 +7,7 @@ using Pi.Api.Models;
 namespace Pi.Api.Controllers;
 
 [ApiController]
-[Route("api/listas-preco")]
+[Route("api/pi/listas-preco")]
 public class ListaPrecosController : ControllerBase
 {
     private readonly AppDbContext _db;

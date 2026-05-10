@@ -6,7 +6,7 @@ using Pi.Api.Models;
 namespace Pi.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/pi/[controller]")]
 public class ModulosTecidosController : ControllerBase
 {
     private readonly AppDbContext _db;

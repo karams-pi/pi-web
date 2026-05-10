@@ -1,3 +1,4 @@
+import { API_BASE } from "../../api/api";
 import type { Modulo, Configuracao, Marca } from "../../api/types";
 import { calculateCotacaoRisco } from "../calculations";
 
@@ -40,7 +41,7 @@ export function printPriceListReport({
     if (isLikelyBase64) {
       return `data:image/png;base64,${path}`;
     }
-    return `http://localhost:5000/${path.replace(/^\/+/, "")}`;
+    return `${API_BASE}/${path.replace(/^\/+/, "")}`;
   };
   // Note: ideally API_BASE should be passed but I'll hardcode or use a placeholder for now as I can't easily import from another file into this pure utility if it's not set up for it.
   // Actually, I'll use a safer way or pass it in options.

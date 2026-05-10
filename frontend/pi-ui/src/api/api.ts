@@ -3,7 +3,12 @@ const RAW_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5000";
 export const API_BASE = RAW_BASE.replace(/\/+$/, ""); // remove barra final
 
 function buildUrl(path: string): string {
-  return path.startsWith("http") ? path : `${API_BASE}${path}`;
+  // Se a rota começa com /api/, inserimos /pi para organizar os módulos
+  const finalPath = path.startsWith("/api/") 
+    ? path.replace("/api/", "/api/pi/") 
+    : path;
+
+  return path.startsWith("http") ? path : `${API_BASE}${finalPath}`;
 }
 
 function isJsonContentType(ct: string | null): boolean {

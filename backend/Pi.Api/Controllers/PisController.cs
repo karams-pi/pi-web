@@ -7,7 +7,7 @@ using Pi.Api.Services;
 namespace Pi.Api.Controllers;
 
 [ApiController]
-[Route("api/pis")]
+[Route("api/pi/pis")]
 public class PisController : ControllerBase
 {
     private readonly AppDbContext _db;
