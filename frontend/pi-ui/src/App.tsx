@@ -1,5 +1,6 @@
 import { Routes, Route, NavLink, Link } from "react-router-dom";
-import HomeMenu from "./pages/HomeMenu";
+import ModuleSelector from "./pages/ModuleSelector";
+import PiHomeMenu from "./pages/PiHomeMenu";
 import ClientesPage from "./pages/ClientesPage";
 import FornecedoresPage from "./pages/FornecedoresPage";
 import CategoriasPage from "./pages/CategoriasPage";
@@ -52,26 +53,30 @@ export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const location = useLocation();
 
+  const isSelectionPage = location.pathname === "/";
   const isPrintRoute = location.pathname.startsWith("/print-pi");
 
+  // Esconder UI global em telas de seleção ou impressão
+  const showGlobalUI = !isPrintRoute && !isSelectionPage;
+
   return (
-    <div className={`app ${isPrintRoute ? "print-mode" : ""}`}>
-      {!isPrintRoute && (
+    <div className={`app ${isPrintRoute ? "print-mode" : ""} ${isSelectionPage ? "selection-mode" : ""}`}>
+      {showGlobalUI && (
         <Sidebar 
           isCollapsed={isSidebarCollapsed} 
           setIsCollapsed={setIsSidebarCollapsed} 
         />
       )}
-      {!isPrintRoute && <Header />}
+      {showGlobalUI && <Header />}
 
-      <main className={isPrintRoute ? "" : "main"}>
-        <div className={isPrintRoute ? "" : "container"}>
+      <main className={showGlobalUI ? "main" : ""}>
+        <div className={showGlobalUI ? "container" : ""}>
           <Routes>
-            <Route path="/" element={<HomeMenu />} />
+            <Route path="/" element={<ModuleSelector />} />
             
             {/* Módulo PI (Proforma Invoice) */}
             <Route path="/pi">
-              <Route index element={<HomeMenu />} />
+              <Route index element={<PiHomeMenu />} />
               <Route path="clientes" element={<ClientesPage />} />
               <Route path="fornecedores" element={<FornecedoresPage />} />
               <Route path="categorias" element={<CategoriasPage />} />

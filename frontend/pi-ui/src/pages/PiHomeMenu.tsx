@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 
-export default function HomeMenu() {
+export default function PiHomeMenu() {
   return (
     <div className="home">
       <section className="card home-logos-card">
