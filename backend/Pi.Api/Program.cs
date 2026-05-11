@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Data;
+using Pi.Api.Models.Edc;
 
 using OfficeOpenXml;
 
@@ -37,10 +38,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
     }
 
-    options.UseNpgsql(connectionString);
+    options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable("__EFMigrationsHistory", "public"));
 });
 
-// Registrar HttpClient e CotacaoService
 // Registrar HttpClient e CotacaoService
 builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
@@ -48,6 +48,7 @@ builder.Services.AddHttpClient<Pi.Api.Services.CotacaoService>()
         UseProxy = false
     });
 builder.Services.AddScoped<Pi.Api.Services.ICalculoService, Pi.Api.Services.CalculoService>();
+builder.Services.AddScoped<Pi.Api.Services.IEdcCalculationService, Pi.Api.Services.EdcCalculationService>();
 builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 builder.Services.AddScoped<Pi.Api.Services.PiExportService>();
 builder.Services.AddScoped<Pi.Api.Services.ModuloExportService>();
@@ -76,7 +77,6 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        // Se falhar a migração, logar, mas tentar continuar (ou falhar de vez se preferir)
         Console.WriteLine($"Erro CRÍTICO ao aplicar Migrations: {ex}");
     }
 
@@ -87,7 +87,6 @@ using (var scope = app.Services.CreateScope())
         var attr = (System.Reflection.AssemblyInformationalVersionAttribute?)
             System.Attribute.GetCustomAttribute(asm, typeof(System.Reflection.AssemblyInformationalVersionAttribute));
         var rawVersion = attr?.InformationalVersion ?? asm.GetName().Version?.ToString() ?? "0.0.0";
-        // Strip git hash suffix (e.g. "1.0.0+abc123..." → "1.0.0")
         var currentVersion = rawVersion.Contains('+') ? rawVersion.Split('+')[0] : rawVersion;
 
         var exists = dbContext.VersoesDoSistema.Any(v => v.Versao == currentVersion);
@@ -116,26 +115,33 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"Aviso: Erro ao semear fretes: {ex.Message}");
     }
+
+    // SEED-EDC: Garante dados iniciais para o módulo de Importação
+    try
+    {
+        SeedEdcData(dbContext);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Aviso: Erro ao semear dados EDC: {ex.Message}");
+    }
 }
 
 // Método auxiliar para garantir integridade dos dados de frete
 static void SeedFreightData(AppDbContext db)
 {
-    // 1. Garantir que o EXW existe (mesmo id do AppDbContext)
     if (!db.Fretes.Any(f => f.Id == 4))
     {
         db.Fretes.Add(new Pi.Api.Models.Frete { Id = 4, Nome = "EXW" });
         db.SaveChanges();
     }
 
-    // 1b. Garantir que o FCA (Fábrica) existe
     if (!db.Fretes.Any(f => f.Id == 6))
     {
         db.Fretes.Add(new Pi.Api.Models.Frete { Id = 6, Nome = "FCA (Fábrica)" });
         db.SaveChanges();
     }
 
-    // 1c. Atualizar FCA existente para FCA (Fronteira) se necessário
     var fcaOriginal = db.Fretes.FirstOrDefault(f => f.Id == 2);
     if (fcaOriginal != null && fcaOriginal.Nome == "FCA")
     {
@@ -143,8 +149,6 @@ static void SeedFreightData(AppDbContext db)
         db.SaveChanges();
     }
 
-    // 2. Garantir 17 itens globais (id_fornecedor IS NULL)
-    // Se não houver nenhum, criamos a base
     var hasGlobalDefaults = db.ConfiguracoesFreteItens.Any(c => c.IdFornecedor == null);
     if (!hasGlobalDefaults)
     {
@@ -159,30 +163,69 @@ static void SeedFreightData(AppDbContext db)
             });
         }
         db.SaveChanges();
-        Console.WriteLine("Configurações globais de frete semeadas.");
     }
     else
     {
-        // Se já existem, apenas forçamos o valor correto do frete de fronteira (id 5) se ele for diferente 
-        // ou se estiver zerado (comum em restores antigos)
         var frontierFreight = db.ConfiguracoesFreteItens.FirstOrDefault(c => c.IdFreteItem == 5 && c.IdFornecedor == null);
         if (frontierFreight != null && (frontierFreight.Valor == 0 || frontierFreight.Valor == 361.00m))
         {
             frontierFreight.Valor = 3610.00m;
             db.SaveChanges();
-            Console.WriteLine("Valor do frete de fronteira (Global) normalizado para 3610.00.");
         }
     }
 }
 
-// SEMPRE ativar página de erro detalhada para debugar no Render (temporário)
-app.UseDeveloperExceptionPage();
+static void SeedEdcData(AppDbContext db)
+{
+    // 1. NCM Padrão (Amortecedores)
+    if (!db.Ncms.Any(n => n.Codigo == "87088000"))
+    {
+        db.Ncms.Add(new Ncm 
+        { 
+            Codigo = "87088000", 
+            Descricao = "AMORTECEDORES DE SUSPENSÃO",
+            AliquotaII = 0.18m,
+            AliquotaIPI = 0.0306m,
+            AliquotaPis = 0.0312m,
+            AliquotaCofins = 0.1437m,
+            AliquotaIcmsPadrao = 0.19m
+        });
+    }
 
+    // 2. Taxas Aduaneiras Padrão
+    if (!db.TaxasAduaneiras.Any())
+    {
+        db.TaxasAduaneiras.AddRange(new List<TaxasAduaneiras> {
+            new() { Nome = "TAXA SISCOMEX", ValorPadrao = 214.50m, Moeda = "BRL", Tipo = "Fixo" },
+            new() { Nome = "LIBERAÇÃO DE B/L", ValorPadrao = 490.00m, Moeda = "BRL", Tipo = "Fixo" },
+            new() { Nome = "T.H.C|CAPATAZIA", ValorPadrao = 1547.00m, Moeda = "BRL", Tipo = "Fixo" },
+            new() { Nome = "AFRMM", ValorPadrao = 0.08m, Moeda = "BRL", Tipo = "Percentual" }, 
+            new() { Nome = "DESEMBARAÇO ADUANEIRO", ValorPadrao = 2400.00m, Moeda = "BRL", Tipo = "Fixo" }
+        });
+    }
+
+    // 3. Portos
+    if (!db.Portos.Any(p => p.Sigla == "PNG"))
+    {
+        db.Portos.Add(new Porto { Nome = "PARANAGUÁ", Sigla = "PNG", Pais = "BRASIL", Tipo = "Maritimo" });
+    }
+    if (!db.Portos.Any(p => p.Sigla == "SHA"))
+    {
+        db.Portos.Add(new Porto { Nome = "SHANGHAI", Sigla = "SHA", Pais = "CHINA", Tipo = "Maritimo" });
+    }
+
+    // 4. Configuração Fiscal PR
+    if (!db.ConfiguracoesFiscais.Any(c => c.UF == "PR"))
+    {
+        db.ConfiguracoesFiscais.Add(new ConfiguracaoFiscal { UF = "PR", AliquotaIcms = 0.19m, AliquotaFCP = 0.00m });
+    }
+
+    db.SaveChanges();
+}
+
+app.UseDeveloperExceptionPage();
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseCors("dev");
-
 app.MapControllers();
-
 app.Run();

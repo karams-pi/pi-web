@@ -14,6 +14,16 @@ import SobrePage from "./pages/SobrePage";
 import PrintPiFerguilePage from "./pages/PrintPiFerguilePage";
 import ProformaInvoiceV2Page from "./pages/ProformaInvoiceV2Page";
 import EmissaoListaPrecosPage from "./pages/EmissaoListaPrecosPage";
+import EdcDashboard from "./pages/edc/EdcDashboard";
+import NcmsPage from "./pages/edc/NcmsPage";
+import ImportadoresPage from "./pages/edc/ImportadoresPage";
+import ExportadoresPage from "./pages/edc/ExportadoresPage";
+import ProdutosEdcPage from "./pages/edc/ProdutosEdcPage";
+import TaxasAduaneirasPage from "./pages/edc/TaxasAduaneirasPage";
+import ConfiguracoesFiscaisPage from "./pages/edc/ConfiguracoesFiscaisPage";
+import EstudosEdcPage from "./pages/edc/EstudosEdcPage";
+import NovoEstudoEdcPage from "./pages/edc/NovoEstudoEdcPage";
+import DetalheEstudoEdcPage from "./pages/edc/DetalheEstudoEdcPage";
 
 
 // function ProdutosPage() {
@@ -91,6 +101,20 @@ export default function App() {
               <Route path="config" element={<ConfiguracoesPage />} />
             </Route>
 
+            {/* Módulo EDC (Estudo de Custos - Importação) */}
+            <Route path="/edc">
+              <Route index element={<EdcDashboard />} />
+              <Route path="estudos" element={<EstudosEdcPage />} />
+              <Route path="estudos/novo" element={<NovoEstudoEdcPage />} />
+              <Route path="estudos/:id" element={<DetalheEstudoEdcPage />} />
+              <Route path="ncms" element={<NcmsPage />} />
+              <Route path="taxas" element={<TaxasAduaneirasPage />} />
+              <Route path="config-fiscal" element={<ConfiguracoesFiscaisPage />} />
+              <Route path="importadores" element={<ImportadoresPage />} />
+              <Route path="exportadores" element={<ExportadoresPage />} />
+              <Route path="produtos" element={<ProdutosEdcPage />} />
+            </Route>
+
             {/* Rotas de Impressão (Mantidas na raiz por simplicidade de link externo) */}
             <Route path="/print-pi/:id" element={<PrintPiPage />} />
             <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
@@ -109,15 +133,75 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { 
   Menu, X, Home, Users, Truck, Layers, Tag, Scissors, 
-  Grid, FileText, Download, Settings, Info, ChevronLeft, ChevronRight
+  Grid, FileText, Download, Settings, Info, ChevronLeft, ChevronRight,
+  Calculator, ListChecks, BookOpen, Coins, ShieldCheck, Ship, BarChart3, Globe2
 } from "lucide-react";
 
 function NavLinks() {
+  const location = useLocation();
+  const isEdc = location.pathname.startsWith("/edc");
+
+  if (isEdc) {
+    return (
+      <>
+        <NavLink to="/edc" end className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <BarChart3 size={18} />
+          <span>Dashboard</span>
+        </NavLink>
+
+        <NavLink to="/edc/estudos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <ListChecks size={18} />
+          <span>Estudos (EDC)</span>
+        </NavLink>
+
+        <NavLink to="/edc/ncms" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <BookOpen size={18} />
+          <span>NCMs</span>
+        </NavLink>
+
+        <NavLink to="/edc/taxas" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <Coins size={18} />
+          <span>Taxas</span>
+        </NavLink>
+
+        <NavLink to="/edc/config-fiscal" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <ShieldCheck size={18} />
+          <span>Fiscal</span>
+        </NavLink>
+
+        <div className="nav-divider">Cadastros</div>
+
+        <NavLink to="/edc/importadores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <Users size={18} />
+          <span>Importadores</span>
+        </NavLink>
+
+        <NavLink to="/edc/exportadores" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <Globe2 size={18} />
+          <span>Exportadores</span>
+        </NavLink>
+
+        <NavLink to="/edc/produtos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <Grid size={18} />
+          <span>Produtos</span>
+        </NavLink>
+
+        <div className="nav-divider">Sistema</div>
+
+        <NavLink to="/" className="navlink">
+          <Home size={18} />
+          <span>Trocar Módulo</span>
+        </NavLink>
+      </>
+    );
+  }
+
+  // Menu PI (Proforma Invoice)
   return (
     <>
-      <NavLink to="/" end className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+      <NavLink to="/pi" end className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Home size={18} />
-        <span>Menu</span>
+        <span>Menu PI</span>
       </NavLink>
 
       <NavLink to="/pi/clientes" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
@@ -155,10 +239,6 @@ function NavLinks() {
         <span>Lista de Preços</span>
       </NavLink>
 
-      <NavLink to="/pi/proforma-invoice" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-        <FileText size={18} />
-        <span>Proforma</span>
-      </NavLink>
       <NavLink to="/pi/proforma-invoice-v2" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <FileText size={18} />
         <span style={{ fontWeight: "bold", color: "#4f9eff" }}>Proforma V2</span>
@@ -174,9 +254,9 @@ function NavLinks() {
         <span>Config</span>
       </NavLink>
 
-      <NavLink to="/sobre" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
-        <Info size={18} />
-        <span>Sobre</span>
+      <NavLink to="/" className="navlink">
+        <Grid size={18} />
+        <span>Trocar Módulo</span>
       </NavLink>
     </>
   );
@@ -194,7 +274,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean, setIsC
       </button>
 
       <Link to="/" className="brand">
-        PI Web
+        {location.pathname.startsWith("/edc") ? "EDC System" : "PI Web"}
       </Link>
 
       <nav className="nav">

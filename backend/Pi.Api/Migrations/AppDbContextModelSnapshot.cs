@@ -233,6 +233,404 @@ namespace Pi.Api.Migrations
                     b.ToTable("configuracoes_frete_item", "pi");
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.Edc.ConfiguracaoFiscal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AliquotaFCP")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("AliquotaIcms")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<bool>("IsencaoIPI")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UF")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("configuracoes_fiscais", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.Exportador", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contato")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Endereco")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("FlAtivo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Pais")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TaxId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("exportadores", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.Importador", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AliquotaIcmsPadrao")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Cnpj")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("FlAtivo")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("InscricaoEstadual")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("RazaoSocial")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("RegimeTributario")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("UF")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("importadores", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.Ncm", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AliquotaCofins")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("AliquotaII")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("AliquotaIPI")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("AliquotaIcmsPadrao")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("AliquotaPis")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("FlAtivo")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ncms", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.Porto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Pais")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Sigla")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("portos", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.ProdutoEdc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CubagemM3")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("FlAtivo")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IdNcm")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("PesoBruto")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("PesoLiquido")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("PrecoFobBase")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Referencia")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("UnidadeMedida")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdNcm");
+
+                    b.ToTable("produtos", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CotacaoDolar")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateTime>("DataEstudo")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("IdExportador")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdImportador")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdPortoDestino")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdPortoOrigem")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NumeroReferencia")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("SpreadCambio")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TipoFrete")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<decimal>("ValorFreteInternacional")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("ValorSeguroInternacional")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdExportador");
+
+                    b.HasIndex("IdImportador");
+
+                    b.HasIndex("IdPortoDestino");
+
+                    b.HasIndex("IdPortoOrigem");
+
+                    b.ToTable("simulacoes", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdcDespesa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdSimulacao")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MetodoRateio")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Moeda")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("NomeDespesa")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdSimulacao");
+
+                    b.ToTable("simulacao_despesas", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdcItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CubagemTotal")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<int>("IdProduto")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdSimulacao")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("PesoBrutoTotal")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("PesoLiquidoTotal")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("Quantidade")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("ValorFobUnitario")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdProduto");
+
+                    b.HasIndex("IdSimulacao");
+
+                    b.ToTable("simulacao_itens", "edc");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.TaxasAduaneiras", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Moeda")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<decimal>("ValorPadrao")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("taxas_aduaneiras", "edc");
+                });
+
             modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>
                 {
                     b.Property<long>("Id")
@@ -952,6 +1350,80 @@ namespace Pi.Api.Migrations
                     b.Navigation("FreteItem");
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.Edc.ProdutoEdc", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Edc.Ncm", "Ncm")
+                        .WithMany()
+                        .HasForeignKey("IdNcm")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ncm");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdc", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Edc.Exportador", "Exportador")
+                        .WithMany()
+                        .HasForeignKey("IdExportador")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Edc.Importador", "Importador")
+                        .WithMany()
+                        .HasForeignKey("IdImportador")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Edc.Porto", "PortoDestino")
+                        .WithMany()
+                        .HasForeignKey("IdPortoDestino")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Pi.Api.Models.Edc.Porto", "PortoOrigem")
+                        .WithMany()
+                        .HasForeignKey("IdPortoOrigem")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Exportador");
+
+                    b.Navigation("Importador");
+
+                    b.Navigation("PortoDestino");
+
+                    b.Navigation("PortoOrigem");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdcDespesa", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Edc.SimulacaoEdc", "Simulacao")
+                        .WithMany("Despesas")
+                        .HasForeignKey("IdSimulacao")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Simulacao");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdcItem", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Edc.ProdutoEdc", "Produto")
+                        .WithMany()
+                        .HasForeignKey("IdProduto")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Edc.SimulacaoEdc", "Simulacao")
+                        .WithMany("Itens")
+                        .HasForeignKey("IdSimulacao")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Produto");
+
+                    b.Navigation("Simulacao");
+                });
+
             modelBuilder.Entity("Pi.Api.Models.FreteItem", b =>
                 {
                     b.HasOne("Pi.Api.Models.Frete", "Frete")
@@ -1105,6 +1577,13 @@ namespace Pi.Api.Migrations
             modelBuilder.Entity("Pi.Api.Models.Categoria", b =>
                 {
                     b.Navigation("Modulos");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdc", b =>
+                {
+                    b.Navigation("Despesas");
+
+                    b.Navigation("Itens");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Fornecedor", b =>

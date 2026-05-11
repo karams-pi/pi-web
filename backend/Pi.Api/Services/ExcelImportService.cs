@@ -820,12 +820,15 @@ public class ExcelImportService
                     {
                         var descricaoNormalized = NormalizeString(descricaoRaw);
                         if (string.IsNullOrEmpty(descricaoNormalized) || 
+                            descricaoNormalized == "-" ||
                             descricaoNormalized.Equals("COMPOSICAO", StringComparison.OrdinalIgnoreCase) ||
                             descricaoNormalized.Equals("COMPOSIÇÃO", StringComparison.OrdinalIgnoreCase))
                         {
                             // Skip header-like or empty description rows but don't reset lastModulo until we find a valid one
                             continue;
                         }
+
+                        if (marcaNome == "-") continue;
 
                         var larg = UniversalParseDecimal(worksheet.Cells[row, 3].Value);
 
@@ -1059,7 +1062,9 @@ public class ExcelImportService
                     var cellValor = worksheet.Cells[row, 8].Value;
                     var valorTecido = UniversalParseDecimal(cellValor);
 
-                    if (string.IsNullOrEmpty(currentBrandFromB) || string.IsNullOrEmpty(currentComposition) || string.IsNullOrEmpty(tecidoNome) || valorTecido <= 0)
+                    if (string.IsNullOrEmpty(currentBrandFromB) || currentBrandFromB == "-" || 
+                        string.IsNullOrEmpty(currentComposition) || currentComposition == "-" ||
+                        string.IsNullOrEmpty(tecidoNome) || valorTecido <= 0)
                         continue;
 
                     var modelName = currentBrandFromB;

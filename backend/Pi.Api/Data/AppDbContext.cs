@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Models;
+using Pi.Api.Models.Edc;
 
 namespace Pi.Api.Data;
 
@@ -33,6 +34,18 @@ public class AppDbContext : DbContext
 
     // Versionamento
     public DbSet<VersaoSistema> VersoesDoSistema => Set<VersaoSistema>();
+
+    // EDC (Estimativa de Custos) - Schema: edc
+    public DbSet<Ncm> Ncms => Set<Ncm>();
+    public DbSet<Importador> Importadores => Set<Importador>();
+    public DbSet<Exportador> Exportadores => Set<Exportador>();
+    public DbSet<ProdutoEdc> ProdutosEdc => Set<ProdutoEdc>();
+    public DbSet<Porto> Portos => Set<Porto>();
+    public DbSet<TaxasAduaneiras> TaxasAduaneiras => Set<TaxasAduaneiras>();
+    public DbSet<ConfiguracaoFiscal> ConfiguracoesFiscais => Set<ConfiguracaoFiscal>();
+    public DbSet<SimulacaoEdc> SimulacoesEdc => Set<SimulacaoEdc>();
+    public DbSet<SimulacaoEdcItem> SimulacaoEdcItens => Set<SimulacaoEdcItem>();
+    public DbSet<SimulacaoEdcDespesa> SimulacaoEdcDespesas => Set<SimulacaoEdcDespesa>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -363,6 +376,43 @@ public class AppDbContext : DbContext
         //
         // Se ainda existir a classe Modelo no projeto por outros motivos, ok,
         // mas não deve estar mais no DbContext nem com migrations novas.
+
+        // ===== CONFIGURAÇÃO SCHEMA EDC =====
+
+        modelBuilder.Entity<Ncm>(e => e.ToTable("ncms", "edc"));
+        modelBuilder.Entity<Importador>(e => e.ToTable("importadores", "edc"));
+        modelBuilder.Entity<Exportador>(e => e.ToTable("exportadores", "edc"));
+        modelBuilder.Entity<Porto>(e => e.ToTable("portos", "edc"));
+        modelBuilder.Entity<TaxasAduaneiras>(e => e.ToTable("taxas_aduaneiras", "edc"));
+        modelBuilder.Entity<ConfiguracaoFiscal>(e => e.ToTable("configuracoes_fiscais", "edc"));
+
+        modelBuilder.Entity<ProdutoEdc>(entity =>
+        {
+            entity.ToTable("produtos", "edc");
+            entity.HasOne(x => x.Ncm).WithMany().HasForeignKey(x => x.IdNcm).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SimulacaoEdc>(entity =>
+        {
+            entity.ToTable("simulacoes", "edc");
+            entity.HasOne(x => x.Importador).WithMany().HasForeignKey(x => x.IdImportador).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(x => x.Exportador).WithMany().HasForeignKey(x => x.IdExportador).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(x => x.PortoOrigem).WithMany().HasForeignKey(x => x.IdPortoOrigem).OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(x => x.PortoDestino).WithMany().HasForeignKey(x => x.IdPortoDestino).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<SimulacaoEdcItem>(entity =>
+        {
+            entity.ToTable("simulacao_itens", "edc");
+            entity.HasOne(x => x.Simulacao).WithMany(x => x.Itens).HasForeignKey(x => x.IdSimulacao).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(x => x.Produto).WithMany().HasForeignKey(x => x.IdProduto).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SimulacaoEdcDespesa>(entity =>
+        {
+            entity.ToTable("simulacao_despesas", "edc");
+            entity.HasOne(x => x.Simulacao).WithMany(x => x.Despesas).HasForeignKey(x => x.IdSimulacao).OnDelete(DeleteBehavior.Cascade);
+        });
 
         base.OnModelCreating(modelBuilder);
     }
