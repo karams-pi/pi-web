@@ -26,7 +26,6 @@ public class ModuloExportService
         ws.Cells["A1"].Style.Font.Size = 14;
 
         // Deployment Verification Marker
-        ws.Cells["Z1"].Value = "v2-quote";
         ws.Cells["Z1"].Style.Font.Color.SetColor(Color.White);
 
         // Hidden Quote (White font)
@@ -150,14 +149,14 @@ public class ModuloExportService
                     for (int i = 0; i < uniqueFabrics.Count; i++)
                     {
                         var fid = uniqueFabrics[i]!.Id;
-                        var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid);
+                        var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid && x.FlAtivo);
                         if (mt != null)
                         {
                             // Find best config (Supplier-specific or Global)
                             var modConfig = configs.FirstOrDefault(c => c.IdFornecedor == mod.IdFornecedor) 
                                             ?? configs.FirstOrDefault(c => c.IdFornecedor == null);
 
-                            decimal val = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.Fornecedor?.Nome);
+                            decimal val = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome);
                             ws.Cells[currentRow, fabricStartCol + i].Value = val;
                         }
                         else
@@ -327,8 +326,8 @@ public class ModuloExportService
                     decimal riskVal = 1;
                     if (modConfig != null && cotacao > 0)
                     {
-                        bool isFerguile = !string.IsNullOrEmpty(mod.Fornecedor?.Nome) && 
-                            (mod.Fornecedor.Nome.ToLower().Contains("ferguile") || mod.Fornecedor.Nome.ToLower().Contains("livintus"));
+                        bool isFerguile = (mod.IdFornecedor == 3 || mod.IdFornecedor == 4) || (!string.IsNullOrEmpty(mod.Fornecedor?.Nome) && 
+                            (mod.Fornecedor.Nome.ToLower().Contains("ferguile") || mod.Fornecedor.Nome.ToLower().Contains("livintus")));
                         riskVal = isFerguile ? modConfig.ValorReducaoDolar : (cotacao - modConfig.ValorReducaoDolar);
                     }
 
@@ -337,10 +336,10 @@ public class ModuloExportService
                     for (int i = 0; i < uniqueFabrics.Count; i++)
                     {
                         var fid = uniqueFabrics[i]!.Id;
-                        var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid);
+                        var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid && x.FlAtivo);
                         if (mt != null)
                         {
-                            decimal basePrice = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.Fornecedor?.Nome);
+                            decimal basePrice = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome);
                             ws.Cells[currentRow, fabricStartCol + i].Value = basePrice + freightDisp;
                         }
                         else
@@ -396,7 +395,7 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    internal decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, string? fornecedorName)
+    internal decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, long? idFornecedor, string? fornecedorName)
     {
         if (config == null) return valorTecido;
         
@@ -412,10 +411,12 @@ public class ModuloExportService
 
         if (cotacao == 0) return 0;
 
-        bool isFerguile = !string.IsNullOrEmpty(fornecedorName) && 
-            (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus"));
+        // IDs 3=Ferguile, 4=Livintus. Using ID is more robust than Name if Navigation Property is not loaded.
+        bool isFerguile = (idFornecedor == 3 || idFornecedor == 4) || (!string.IsNullOrEmpty(fornecedorName) && 
+            (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus")));
 
         decimal cotacaoRisco = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
+        
         if (cotacaoRisco <= 0) return 0;
 
         decimal valorBase = valorTecido / cotacaoRisco;

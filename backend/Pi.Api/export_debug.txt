@@ -1,0 +1,656 @@
+  [CalcPrice] VT:1185,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5709 Forn:4 ConfigForn:4 isFerguile:True base:259,87 risk:4,56 cot:4,912
+  [CalcPrice] VT:1240,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5709 Forn:4 ConfigForn:4 isFerguile:True base:271,93 risk:4,56 cot:4,912
+  [CalcPrice] VT:1290,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5709 Forn:4 ConfigForn:4 isFerguile:True base:282,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:875,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5709 Forn:4 ConfigForn:4 isFerguile:True base:191,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:2900,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5681 Forn:4 ConfigForn:4 isFerguile:True base:635,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:3070,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5681 Forn:4 ConfigForn:4 isFerguile:True base:673,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:3198,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5681 Forn:4 ConfigForn:4 isFerguile:True base:701,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:3170,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5682 Forn:4 ConfigForn:4 isFerguile:True base:695,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:3350,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5682 Forn:4 ConfigForn:4 isFerguile:True base:734,65 risk:4,56 cot:4,912
+  [CalcPrice] VT:3510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5682 Forn:4 ConfigForn:4 isFerguile:True base:769,74 risk:4,56 cot:4,912
+  [CalcPrice] VT:3510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5683 Forn:4 ConfigForn:4 isFerguile:True base:769,74 risk:4,56 cot:4,912
+  [CalcPrice] VT:3720,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5683 Forn:4 ConfigForn:4 isFerguile:True base:815,79 risk:4,56 cot:4,912
+  [CalcPrice] VT:3900,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5683 Forn:4 ConfigForn:4 isFerguile:True base:855,26 risk:4,56 cot:4,912
+  [CalcPrice] VT:1570,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5680 Forn:4 ConfigForn:4 isFerguile:True base:344,30 risk:4,56 cot:4,912
+  [CalcPrice] VT:1650,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5680 Forn:4 ConfigForn:4 isFerguile:True base:361,84 risk:4,56 cot:4,912
+  [CalcPrice] VT:1720,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5680 Forn:4 ConfigForn:4 isFerguile:True base:377,19 risk:4,56 cot:4,912
+  [CalcPrice] VT:4560,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5674 Forn:4 ConfigForn:4 isFerguile:True base:1000,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:4820,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5674 Forn:4 ConfigForn:4 isFerguile:True base:1057,02 risk:4,56 cot:4,912
+  [CalcPrice] VT:5050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5674 Forn:4 ConfigForn:4 isFerguile:True base:1107,46 risk:4,56 cot:4,912
+  [CalcPrice] VT:5050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5675 Forn:4 ConfigForn:4 isFerguile:True base:1107,46 risk:4,56 cot:4,912
+  [CalcPrice] VT:5340,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5675 Forn:4 ConfigForn:4 isFerguile:True base:1171,05 risk:4,56 cot:4,912
+  [CalcPrice] VT:5590,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5675 Forn:4 ConfigForn:4 isFerguile:True base:1225,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:5590,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5676 Forn:4 ConfigForn:4 isFerguile:True base:1225,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:5910,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5676 Forn:4 ConfigForn:4 isFerguile:True base:1296,05 risk:4,56 cot:4,912
+  [CalcPrice] VT:6180,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5676 Forn:4 ConfigForn:4 isFerguile:True base:1355,26 risk:4,56 cot:4,912
+  [CalcPrice] VT:1930,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5671 Forn:4 ConfigForn:4 isFerguile:True base:423,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:2070,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5671 Forn:4 ConfigForn:4 isFerguile:True base:453,95 risk:4,56 cot:4,912
+  [CalcPrice] VT:2185,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5671 Forn:4 ConfigForn:4 isFerguile:True base:479,17 risk:4,56 cot:4,912
+  [CalcPrice] VT:2250,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5672 Forn:4 ConfigForn:4 isFerguile:True base:493,42 risk:4,56 cot:4,912
+  [CalcPrice] VT:2410,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5672 Forn:4 ConfigForn:4 isFerguile:True base:528,51 risk:4,56 cot:4,912
+  [CalcPrice] VT:2535,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5672 Forn:4 ConfigForn:4 isFerguile:True base:555,92 risk:4,56 cot:4,912
+  [CalcPrice] VT:2480,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5673 Forn:4 ConfigForn:4 isFerguile:True base:543,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:2650,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5673 Forn:4 ConfigForn:4 isFerguile:True base:581,14 risk:4,56 cot:4,912
+  [CalcPrice] VT:2780,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5673 Forn:4 ConfigForn:4 isFerguile:True base:609,65 risk:4,56 cot:4,912
+  [CalcPrice] VT:2185,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5657 Forn:4 ConfigForn:4 isFerguile:True base:479,17 risk:4,56 cot:4,912
+  [CalcPrice] VT:2330,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5657 Forn:4 ConfigForn:4 isFerguile:True base:510,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:2450,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5657 Forn:4 ConfigForn:4 isFerguile:True base:537,28 risk:4,56 cot:4,912
+  [CalcPrice] VT:2310,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5658 Forn:4 ConfigForn:4 isFerguile:True base:506,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:2465,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5658 Forn:4 ConfigForn:4 isFerguile:True base:540,57 risk:4,56 cot:4,912
+  [CalcPrice] VT:2595,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5658 Forn:4 ConfigForn:4 isFerguile:True base:569,08 risk:4,56 cot:4,912
+  [CalcPrice] VT:2445,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5659 Forn:4 ConfigForn:4 isFerguile:True base:536,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:2610,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5659 Forn:4 ConfigForn:4 isFerguile:True base:572,37 risk:4,56 cot:4,912
+  [CalcPrice] VT:2745,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5659 Forn:4 ConfigForn:4 isFerguile:True base:601,97 risk:4,56 cot:4,912
+  [CalcPrice] VT:2445,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5752 Forn:4 ConfigForn:4 isFerguile:True base:536,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:2559,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5752 Forn:4 ConfigForn:4 isFerguile:True base:561,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:2649,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5752 Forn:4 ConfigForn:4 isFerguile:True base:580,92 risk:4,56 cot:4,912
+  [CalcPrice] VT:2547,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5753 Forn:4 ConfigForn:4 isFerguile:True base:558,55 risk:4,56 cot:4,912
+  [CalcPrice] VT:2672,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5753 Forn:4 ConfigForn:4 isFerguile:True base:585,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:2542,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5753 Forn:4 ConfigForn:4 isFerguile:True base:557,46 risk:4,56 cot:4,912
+  [CalcPrice] VT:2660,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5754 Forn:4 ConfigForn:4 isFerguile:True base:583,33 risk:4,56 cot:4,912
+  [CalcPrice] VT:2786,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5754 Forn:4 ConfigForn:4 isFerguile:True base:610,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:2898,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5754 Forn:4 ConfigForn:4 isFerguile:True base:635,53 risk:4,56 cot:4,912
+  [CalcPrice] VT:2106,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5755 Forn:4 ConfigForn:4 isFerguile:True base:461,84 risk:4,56 cot:4,912
+  [CalcPrice] VT:2186,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5755 Forn:4 ConfigForn:4 isFerguile:True base:479,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:2259,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5755 Forn:4 ConfigForn:4 isFerguile:True base:495,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:2203,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5756 Forn:4 ConfigForn:4 isFerguile:True base:483,11 risk:4,56 cot:4,912
+  [CalcPrice] VT:2293,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5756 Forn:4 ConfigForn:4 isFerguile:True base:502,85 risk:4,56 cot:4,912
+  [CalcPrice] VT:2366,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5756 Forn:4 ConfigForn:4 isFerguile:True base:518,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:2310,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5757 Forn:4 ConfigForn:4 isFerguile:True base:506,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:2400,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5757 Forn:4 ConfigForn:4 isFerguile:True base:526,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:2479,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5757 Forn:4 ConfigForn:4 isFerguile:True base:543,64 risk:4,56 cot:4,912
+  [CalcPrice] VT:2270,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5748 Forn:4 ConfigForn:4 isFerguile:True base:497,81 risk:4,56 cot:4,912
+  [CalcPrice] VT:2420,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5748 Forn:4 ConfigForn:4 isFerguile:True base:530,70 risk:4,56 cot:4,912
+  [CalcPrice] VT:2520,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5748 Forn:4 ConfigForn:4 isFerguile:True base:552,63 risk:4,56 cot:4,912
+  [CalcPrice] VT:1270,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5748 Forn:4 ConfigForn:4 isFerguile:True base:278,51 risk:4,56 cot:4,912
+  [CalcPrice] VT:2870,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5760 Forn:4 ConfigForn:4 isFerguile:True base:629,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:3050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5760 Forn:4 ConfigForn:4 isFerguile:True base:668,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:3199,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5760 Forn:4 ConfigForn:4 isFerguile:True base:701,54 risk:4,56 cot:4,912
+  [CalcPrice] VT:1480,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5760 Forn:4 ConfigForn:4 isFerguile:True base:324,56 risk:4,56 cot:4,912
+  [CalcPrice] VT:2240,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5655 Forn:4 ConfigForn:4 isFerguile:True base:491,23 risk:4,56 cot:4,912
+  [CalcPrice] VT:2385,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5655 Forn:4 ConfigForn:4 isFerguile:True base:523,03 risk:4,56 cot:4,912
+  [CalcPrice] VT:2510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5655 Forn:4 ConfigForn:4 isFerguile:True base:550,44 risk:4,56 cot:4,912
+  [CalcPrice] VT:2665,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5656 Forn:4 ConfigForn:4 isFerguile:True base:584,43 risk:4,56 cot:4,912
+  [CalcPrice] VT:2850,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5656 Forn:4 ConfigForn:4 isFerguile:True base:625,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:3010,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5656 Forn:4 ConfigForn:4 isFerguile:True base:660,09 risk:4,56 cot:4,912
+  [CalcPrice] VT:2798,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5645 Forn:4 ConfigForn:4 isFerguile:True base:613,60 risk:4,56 cot:4,912
+  [CalcPrice] VT:2950,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5645 Forn:4 ConfigForn:4 isFerguile:True base:646,93 risk:4,56 cot:4,912
+  [CalcPrice] VT:3070,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5645 Forn:4 ConfigForn:4 isFerguile:True base:673,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:2990,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5646 Forn:4 ConfigForn:4 isFerguile:True base:655,70 risk:4,56 cot:4,912
+  [CalcPrice] VT:3150,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5646 Forn:4 ConfigForn:4 isFerguile:True base:690,79 risk:4,56 cot:4,912
+  [CalcPrice] VT:3280,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5646 Forn:4 ConfigForn:4 isFerguile:True base:719,30 risk:4,56 cot:4,912
+  [CalcPrice] VT:2880,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5685 Forn:4 ConfigForn:4 isFerguile:True base:631,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:3030,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5685 Forn:4 ConfigForn:4 isFerguile:True base:664,47 risk:4,56 cot:4,912
+  [CalcPrice] VT:3160,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5685 Forn:4 ConfigForn:4 isFerguile:True base:692,98 risk:4,56 cot:4,912
+  [CalcPrice] VT:3140,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5686 Forn:4 ConfigForn:4 isFerguile:True base:688,60 risk:4,56 cot:4,912
+  [CalcPrice] VT:3310,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5686 Forn:4 ConfigForn:4 isFerguile:True base:725,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:3460,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5686 Forn:4 ConfigForn:4 isFerguile:True base:758,77 risk:4,56 cot:4,912
+  [CalcPrice] VT:3420,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5687 Forn:4 ConfigForn:4 isFerguile:True base:750,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:3620,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5687 Forn:4 ConfigForn:4 isFerguile:True base:793,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:3790,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5687 Forn:4 ConfigForn:4 isFerguile:True base:831,14 risk:4,56 cot:4,912
+  [CalcPrice] VT:1550,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5684 Forn:4 ConfigForn:4 isFerguile:True base:339,91 risk:4,56 cot:4,912
+  [CalcPrice] VT:1630,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5684 Forn:4 ConfigForn:4 isFerguile:True base:357,46 risk:4,56 cot:4,912
+  [CalcPrice] VT:1699,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5684 Forn:4 ConfigForn:4 isFerguile:True base:372,59 risk:4,56 cot:4,912
+  [CalcPrice] VT:3550,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5690 Forn:4 ConfigForn:4 isFerguile:True base:778,51 risk:4,56 cot:4,912
+  [CalcPrice] VT:3750,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5690 Forn:4 ConfigForn:4 isFerguile:True base:822,37 risk:4,56 cot:4,912
+  [CalcPrice] VT:3920,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5690 Forn:4 ConfigForn:4 isFerguile:True base:859,65 risk:4,56 cot:4,912
+  [CalcPrice] VT:4720,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5691 Forn:4 ConfigForn:4 isFerguile:True base:1035,09 risk:4,56 cot:4,912
+  [CalcPrice] VT:4970,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5691 Forn:4 ConfigForn:4 isFerguile:True base:1089,91 risk:4,56 cot:4,912
+  [CalcPrice] VT:5190,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5691 Forn:4 ConfigForn:4 isFerguile:True base:1138,16 risk:4,56 cot:4,912
+  [CalcPrice] VT:4980,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5692 Forn:4 ConfigForn:4 isFerguile:True base:1092,11 risk:4,56 cot:4,912
+  [CalcPrice] VT:5260,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5692 Forn:4 ConfigForn:4 isFerguile:True base:1153,51 risk:4,56 cot:4,912
+  [CalcPrice] VT:5350,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5692 Forn:4 ConfigForn:4 isFerguile:True base:1173,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:5260,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5693 Forn:4 ConfigForn:4 isFerguile:True base:1153,51 risk:4,56 cot:4,912
+  [CalcPrice] VT:5560,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5693 Forn:4 ConfigForn:4 isFerguile:True base:1219,30 risk:4,56 cot:4,912
+  [CalcPrice] VT:5820,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5693 Forn:4 ConfigForn:4 isFerguile:True base:1276,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:2050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5700 Forn:4 ConfigForn:4 isFerguile:True base:449,56 risk:4,56 cot:4,912
+  [CalcPrice] VT:2199,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5701 Forn:4 ConfigForn:4 isFerguile:True base:482,24 risk:4,56 cot:4,912
+  [CalcPrice] VT:2499,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5702 Forn:4 ConfigForn:4 isFerguile:True base:548,03 risk:4,56 cot:4,912
+  [CalcPrice] VT:1920,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5698 Forn:4 ConfigForn:4 isFerguile:True base:421,05 risk:4,56 cot:4,912
+  [CalcPrice] VT:2030,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5698 Forn:4 ConfigForn:4 isFerguile:True base:445,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:2110,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5698 Forn:4 ConfigForn:4 isFerguile:True base:462,72 risk:4,56 cot:4,912
+  [CalcPrice] VT:1210,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5698 Forn:4 ConfigForn:4 isFerguile:True base:265,35 risk:4,56 cot:4,912
+  [CalcPrice] VT:2199,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5699 Forn:4 ConfigForn:4 isFerguile:True base:482,24 risk:4,56 cot:4,912
+  [CalcPrice] VT:2320,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5699 Forn:4 ConfigForn:4 isFerguile:True base:508,77 risk:4,56 cot:4,912
+  [CalcPrice] VT:2425,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5699 Forn:4 ConfigForn:4 isFerguile:True base:531,80 risk:4,56 cot:4,912
+  [CalcPrice] VT:1290,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5699 Forn:4 ConfigForn:4 isFerguile:True base:282,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:1380,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5714 Forn:4 ConfigForn:4 isFerguile:True base:302,63 risk:4,56 cot:4,912
+  [CalcPrice] VT:1450,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5714 Forn:4 ConfigForn:4 isFerguile:True base:317,98 risk:4,56 cot:4,912
+  [CalcPrice] VT:1499,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5714 Forn:4 ConfigForn:4 isFerguile:True base:328,73 risk:4,56 cot:4,912
+  [CalcPrice] VT:910,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5714 Forn:4 ConfigForn:4 isFerguile:True base:199,56 risk:4,56 cot:4,912
+  [CalcPrice] VT:1490,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5713 Forn:4 ConfigForn:4 isFerguile:True base:326,75 risk:4,56 cot:4,912
+  [CalcPrice] VT:1560,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5713 Forn:4 ConfigForn:4 isFerguile:True base:342,11 risk:4,56 cot:4,912
+  [CalcPrice] VT:1610,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5713 Forn:4 ConfigForn:4 isFerguile:True base:353,07 risk:4,56 cot:4,912
+  [CalcPrice] VT:1020,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5713 Forn:4 ConfigForn:4 isFerguile:True base:223,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:1670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5716 Forn:4 ConfigForn:4 isFerguile:True base:366,23 risk:4,56 cot:4,912
+  [CalcPrice] VT:1740,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5716 Forn:4 ConfigForn:4 isFerguile:True base:381,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:1795,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5716 Forn:4 ConfigForn:4 isFerguile:True base:393,64 risk:4,56 cot:4,912
+  [CalcPrice] VT:1160,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5716 Forn:4 ConfigForn:4 isFerguile:True base:254,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:2740,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5706 Forn:4 ConfigForn:4 isFerguile:True base:600,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:2825,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5706 Forn:4 ConfigForn:4 isFerguile:True base:619,52 risk:4,56 cot:4,912
+  [CalcPrice] VT:2895,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5706 Forn:4 ConfigForn:4 isFerguile:True base:634,87 risk:4,56 cot:4,912
+  [CalcPrice] VT:2170,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5706 Forn:4 ConfigForn:4 isFerguile:True base:475,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:1899,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5668 Forn:4 ConfigForn:4 isFerguile:True base:416,45 risk:4,56 cot:4,912
+  [CalcPrice] VT:2015,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5668 Forn:4 ConfigForn:4 isFerguile:True base:441,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:2110,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5668 Forn:4 ConfigForn:4 isFerguile:True base:462,72 risk:4,56 cot:4,912
+  [CalcPrice] VT:1140,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5668 Forn:4 ConfigForn:4 isFerguile:True base:250,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:2195,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5669 Forn:4 ConfigForn:4 isFerguile:True base:481,36 risk:4,56 cot:4,912
+  [CalcPrice] VT:2340,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5669 Forn:4 ConfigForn:4 isFerguile:True base:513,16 risk:4,56 cot:4,912
+  [CalcPrice] VT:2465,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5669 Forn:4 ConfigForn:4 isFerguile:True base:540,57 risk:4,56 cot:4,912
+  [CalcPrice] VT:1260,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5669 Forn:4 ConfigForn:4 isFerguile:True base:276,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:2420,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5670 Forn:4 ConfigForn:4 isFerguile:True base:530,70 risk:4,56 cot:4,912
+  [CalcPrice] VT:2540,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5670 Forn:4 ConfigForn:4 isFerguile:True base:557,02 risk:4,56 cot:4,912
+  [CalcPrice] VT:2670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5670 Forn:4 ConfigForn:4 isFerguile:True base:585,53 risk:4,56 cot:4,912
+  [CalcPrice] VT:1360,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5670 Forn:4 ConfigForn:4 isFerguile:True base:298,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:1460,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5667 Forn:4 ConfigForn:4 isFerguile:True base:320,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:1530,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5667 Forn:4 ConfigForn:4 isFerguile:True base:335,53 risk:4,56 cot:4,912
+  [CalcPrice] VT:1595,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5667 Forn:4 ConfigForn:4 isFerguile:True base:349,78 risk:4,56 cot:4,912
+  [CalcPrice] VT:815,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5667 Forn:4 ConfigForn:4 isFerguile:True base:178,73 risk:4,56 cot:4,912
+  [CalcPrice] VT:2470,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5747 Forn:4 ConfigForn:4 isFerguile:True base:541,67 risk:4,56 cot:4,912
+  [CalcPrice] VT:2600,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5747 Forn:4 ConfigForn:4 isFerguile:True base:570,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:2720,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5747 Forn:4 ConfigForn:4 isFerguile:True base:596,49 risk:4,56 cot:4,912
+  [CalcPrice] VT:2720,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5758 Forn:4 ConfigForn:4 isFerguile:True base:596,49 risk:4,56 cot:4,912
+  [CalcPrice] VT:2870,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5758 Forn:4 ConfigForn:4 isFerguile:True base:629,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:2999,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5758 Forn:4 ConfigForn:4 isFerguile:True base:657,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:2999,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5759 Forn:4 ConfigForn:4 isFerguile:True base:657,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:3160,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5759 Forn:4 ConfigForn:4 isFerguile:True base:692,98 risk:4,56 cot:4,912
+  [CalcPrice] VT:3299,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5759 Forn:4 ConfigForn:4 isFerguile:True base:723,46 risk:4,56 cot:4,912
+  [CalcPrice] VT:1999,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5711 Forn:4 ConfigForn:4 isFerguile:True base:438,38 risk:4,56 cot:4,912
+  [CalcPrice] VT:2075,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5711 Forn:4 ConfigForn:4 isFerguile:True base:455,04 risk:4,56 cot:4,912
+  [CalcPrice] VT:2135,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5711 Forn:4 ConfigForn:4 isFerguile:True base:468,20 risk:4,56 cot:4,912
+  [CalcPrice] VT:1185,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5708 Forn:4 ConfigForn:4 isFerguile:True base:259,87 risk:4,56 cot:4,912
+  [CalcPrice] VT:1240,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5708 Forn:4 ConfigForn:4 isFerguile:True base:271,93 risk:4,56 cot:4,912
+  [CalcPrice] VT:1290,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5708 Forn:4 ConfigForn:4 isFerguile:True base:282,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:730,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5708 Forn:4 ConfigForn:4 isFerguile:True base:160,09 risk:4,56 cot:4,912
+  [CalcPrice] VT:1860,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5647 Forn:4 ConfigForn:4 isFerguile:True base:407,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:1998,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5647 Forn:4 ConfigForn:4 isFerguile:True base:438,16 risk:4,56 cot:4,912
+  [CalcPrice] VT:2115,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5647 Forn:4 ConfigForn:4 isFerguile:True base:463,82 risk:4,56 cot:4,912
+  [CalcPrice] VT:2150,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5648 Forn:4 ConfigForn:4 isFerguile:True base:471,49 risk:4,56 cot:4,912
+  [CalcPrice] VT:2310,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5648 Forn:4 ConfigForn:4 isFerguile:True base:506,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:2435,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5648 Forn:4 ConfigForn:4 isFerguile:True base:533,99 risk:4,56 cot:4,912
+  [CalcPrice] VT:2370,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5649 Forn:4 ConfigForn:4 isFerguile:True base:519,74 risk:4,56 cot:4,912
+  [CalcPrice] VT:2535,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5649 Forn:4 ConfigForn:4 isFerguile:True base:555,92 risk:4,56 cot:4,912
+  [CalcPrice] VT:2670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5649 Forn:4 ConfigForn:4 isFerguile:True base:585,53 risk:4,56 cot:4,912
+  [CalcPrice] VT:575,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5725 Forn:4 ConfigForn:4 isFerguile:True base:126,10 risk:4,56 cot:4,912
+  [CalcPrice] VT:590,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5725 Forn:4 ConfigForn:4 isFerguile:True base:129,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:605,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5725 Forn:4 ConfigForn:4 isFerguile:True base:132,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:495,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5726 Forn:4 ConfigForn:4 isFerguile:True base:108,55 risk:4,56 cot:4,912
+  [CalcPrice] VT:510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5726 Forn:4 ConfigForn:4 isFerguile:True base:111,84 risk:4,56 cot:4,912
+  [CalcPrice] VT:520,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5726 Forn:4 ConfigForn:4 isFerguile:True base:114,04 risk:4,56 cot:4,912
+  [CalcPrice] VT:2990,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5705 Forn:4 ConfigForn:4 isFerguile:True base:655,70 risk:4,56 cot:4,912
+  [CalcPrice] VT:3090,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5705 Forn:4 ConfigForn:4 isFerguile:True base:677,63 risk:4,56 cot:4,912
+  [CalcPrice] VT:3180,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5705 Forn:4 ConfigForn:4 isFerguile:True base:697,37 risk:4,56 cot:4,912
+  [CalcPrice] VT:2360,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5705 Forn:4 ConfigForn:4 isFerguile:True base:517,54 risk:4,56 cot:4,912
+  [CalcPrice] VT:3240,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5677 Forn:4 ConfigForn:4 isFerguile:True base:710,53 risk:4,56 cot:4,912
+  [CalcPrice] VT:3400,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5677 Forn:4 ConfigForn:4 isFerguile:True base:745,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:3540,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5677 Forn:4 ConfigForn:4 isFerguile:True base:776,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:3490,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5678 Forn:4 ConfigForn:4 isFerguile:True base:765,35 risk:4,56 cot:4,912
+  [CalcPrice] VT:3670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5678 Forn:4 ConfigForn:4 isFerguile:True base:804,82 risk:4,56 cot:4,912
+  [CalcPrice] VT:3820,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5678 Forn:4 ConfigForn:4 isFerguile:True base:837,72 risk:4,56 cot:4,912
+  [CalcPrice] VT:3816,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5679 Forn:4 ConfigForn:4 isFerguile:True base:836,84 risk:4,56 cot:4,912
+  [CalcPrice] VT:4020,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5679 Forn:4 ConfigForn:4 isFerguile:True base:881,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:4198,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5679 Forn:4 ConfigForn:4 isFerguile:True base:920,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:2265,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5665 Forn:4 ConfigForn:4 isFerguile:True base:496,71 risk:4,56 cot:4,912
+  [CalcPrice] VT:2425,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5665 Forn:4 ConfigForn:4 isFerguile:True base:531,80 risk:4,56 cot:4,912
+  [CalcPrice] VT:2560,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5665 Forn:4 ConfigForn:4 isFerguile:True base:561,40 risk:4,56 cot:4,912
+  [CalcPrice] VT:1330,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5665 Forn:4 ConfigForn:4 isFerguile:True base:291,67 risk:4,56 cot:4,912
+  [CalcPrice] VT:2895,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5666 Forn:4 ConfigForn:4 isFerguile:True base:634,87 risk:4,56 cot:4,912
+  [CalcPrice] VT:3085,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5666 Forn:4 ConfigForn:4 isFerguile:True base:676,54 risk:4,56 cot:4,912
+  [CalcPrice] VT:3245,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5666 Forn:4 ConfigForn:4 isFerguile:True base:711,62 risk:4,56 cot:4,912
+  [CalcPrice] VT:1690,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5666 Forn:4 ConfigForn:4 isFerguile:True base:370,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:1710,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5664 Forn:4 ConfigForn:4 isFerguile:True base:375,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:1825,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5664 Forn:4 ConfigForn:4 isFerguile:True base:400,22 risk:4,56 cot:4,912
+  [CalcPrice] VT:1915,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5664 Forn:4 ConfigForn:4 isFerguile:True base:419,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:1050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5664 Forn:4 ConfigForn:4 isFerguile:True base:230,26 risk:4,56 cot:4,912
+  [CalcPrice] VT:3420,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5688 Forn:4 ConfigForn:4 isFerguile:True base:750,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:3610,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5688 Forn:4 ConfigForn:4 isFerguile:True base:791,67 risk:4,56 cot:4,912
+  [CalcPrice] VT:3770,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5688 Forn:4 ConfigForn:4 isFerguile:True base:826,75 risk:4,56 cot:4,912
+  [CalcPrice] VT:4760,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5689 Forn:4 ConfigForn:4 isFerguile:True base:1043,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:5010,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5689 Forn:4 ConfigForn:4 isFerguile:True base:1098,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:5230,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5689 Forn:4 ConfigForn:4 isFerguile:True base:1146,93 risk:4,56 cot:4,912
+  [CalcPrice] VT:2710,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5704 Forn:4 ConfigForn:4 isFerguile:True base:594,30 risk:4,56 cot:4,912
+  [CalcPrice] VT:2795,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5704 Forn:4 ConfigForn:4 isFerguile:True base:612,94 risk:4,56 cot:4,912
+  [CalcPrice] VT:2860,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5704 Forn:4 ConfigForn:4 isFerguile:True base:627,19 risk:4,56 cot:4,912
+  [CalcPrice] VT:2160,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5704 Forn:4 ConfigForn:4 isFerguile:True base:473,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:1320,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5717 Forn:4 ConfigForn:4 isFerguile:True base:289,47 risk:4,56 cot:4,912
+  [CalcPrice] VT:1370,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5717 Forn:4 ConfigForn:4 isFerguile:True base:300,44 risk:4,56 cot:4,912
+  [CalcPrice] VT:1410,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5717 Forn:4 ConfigForn:4 isFerguile:True base:309,21 risk:4,56 cot:4,912
+  [CalcPrice] VT:735,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5717 Forn:4 ConfigForn:4 isFerguile:True base:161,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:1875,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5710 Forn:4 ConfigForn:4 isFerguile:True base:411,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:1950,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5710 Forn:4 ConfigForn:4 isFerguile:True base:427,63 risk:4,56 cot:4,912
+  [CalcPrice] VT:2010,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5710 Forn:4 ConfigForn:4 isFerguile:True base:440,79 risk:4,56 cot:4,912
+  [CalcPrice] VT:1420,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5712 Forn:4 ConfigForn:4 isFerguile:True base:311,40 risk:4,56 cot:4,912
+  [CalcPrice] VT:1485,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5712 Forn:4 ConfigForn:4 isFerguile:True base:325,66 risk:4,56 cot:4,912
+  [CalcPrice] VT:1545,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5712 Forn:4 ConfigForn:4 isFerguile:True base:338,82 risk:4,56 cot:4,912
+  [CalcPrice] VT:1225,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5707 Forn:4 ConfigForn:4 isFerguile:True base:268,64 risk:4,56 cot:4,912
+  [CalcPrice] VT:1285,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5707 Forn:4 ConfigForn:4 isFerguile:True base:281,80 risk:4,56 cot:4,912
+  [CalcPrice] VT:1335,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5707 Forn:4 ConfigForn:4 isFerguile:True base:292,76 risk:4,56 cot:4,912
+  [CalcPrice] VT:760,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5707 Forn:4 ConfigForn:4 isFerguile:True base:166,67 risk:4,56 cot:4,912
+  [CalcPrice] VT:1225,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5703 Forn:4 ConfigForn:4 isFerguile:True base:268,64 risk:4,56 cot:4,912
+  [CalcPrice] VT:1290,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5703 Forn:4 ConfigForn:4 isFerguile:True base:282,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:1340,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5703 Forn:4 ConfigForn:4 isFerguile:True base:293,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:785,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5703 Forn:4 ConfigForn:4 isFerguile:True base:172,15 risk:4,56 cot:4,912
+  [CalcPrice] VT:3260,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5643 Forn:4 ConfigForn:4 isFerguile:True base:714,91 risk:4,56 cot:4,912
+  [CalcPrice] VT:3440,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5643 Forn:4 ConfigForn:4 isFerguile:True base:754,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:3599,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5643 Forn:4 ConfigForn:4 isFerguile:True base:789,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:3499,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5644 Forn:4 ConfigForn:4 isFerguile:True base:767,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:3700,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5644 Forn:4 ConfigForn:4 isFerguile:True base:811,40 risk:4,56 cot:4,912
+  [CalcPrice] VT:3859,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5644 Forn:4 ConfigForn:4 isFerguile:True base:846,27 risk:4,56 cot:4,912
+  [CalcPrice] VT:2380,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5641 Forn:4 ConfigForn:4 isFerguile:True base:521,93 risk:4,56 cot:4,912
+  [CalcPrice] VT:2510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5641 Forn:4 ConfigForn:4 isFerguile:True base:550,44 risk:4,56 cot:4,912
+  [CalcPrice] VT:2625,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5641 Forn:4 ConfigForn:4 isFerguile:True base:575,66 risk:4,56 cot:4,912
+  [CalcPrice] VT:2715,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5642 Forn:4 ConfigForn:4 isFerguile:True base:595,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:2870,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5642 Forn:4 ConfigForn:4 isFerguile:True base:629,39 risk:4,56 cot:4,912
+  [CalcPrice] VT:2995,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5642 Forn:4 ConfigForn:4 isFerguile:True base:656,80 risk:4,56 cot:4,912
+  [CalcPrice] VT:1540,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5640 Forn:4 ConfigForn:4 isFerguile:True base:337,72 risk:4,56 cot:4,912
+  [CalcPrice] VT:1620,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5640 Forn:4 ConfigForn:4 isFerguile:True base:355,26 risk:4,56 cot:4,912
+  [CalcPrice] VT:1690,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5640 Forn:4 ConfigForn:4 isFerguile:True base:370,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5718 Forn:4 ConfigForn:4 isFerguile:True base:111,84 risk:4,56 cot:4,912
+  [CalcPrice] VT:520,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5718 Forn:4 ConfigForn:4 isFerguile:True base:114,04 risk:4,56 cot:4,912
+  [CalcPrice] VT:540,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5718 Forn:4 ConfigForn:4 isFerguile:True base:118,42 risk:4,56 cot:4,912
+  [CalcPrice] VT:605,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5719 Forn:4 ConfigForn:4 isFerguile:True base:132,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:630,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5719 Forn:4 ConfigForn:4 isFerguile:True base:138,16 risk:4,56 cot:4,912
+  [CalcPrice] VT:650,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5719 Forn:4 ConfigForn:4 isFerguile:True base:142,54 risk:4,56 cot:4,912
+  [CalcPrice] VT:699,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5720 Forn:4 ConfigForn:4 isFerguile:True base:153,29 risk:4,56 cot:4,912
+  [CalcPrice] VT:730,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5720 Forn:4 ConfigForn:4 isFerguile:True base:160,09 risk:4,56 cot:4,912
+  [CalcPrice] VT:760,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5720 Forn:4 ConfigForn:4 isFerguile:True base:166,67 risk:4,56 cot:4,912
+  [CalcPrice] VT:850,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5749 Forn:4 ConfigForn:4 isFerguile:True base:186,40 risk:4,56 cot:4,912
+  [CalcPrice] VT:890,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5749 Forn:4 ConfigForn:4 isFerguile:True base:195,18 risk:4,56 cot:4,912
+  [CalcPrice] VT:920,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5749 Forn:4 ConfigForn:4 isFerguile:True base:201,75 risk:4,56 cot:4,912
+  [CalcPrice] VT:990,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5761 Forn:4 ConfigForn:4 isFerguile:True base:217,11 risk:4,56 cot:4,912
+  [CalcPrice] VT:1030,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5761 Forn:4 ConfigForn:4 isFerguile:True base:225,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:1070,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5761 Forn:4 ConfigForn:4 isFerguile:True base:234,65 risk:4,56 cot:4,912
+  [CalcPrice] VT:605,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5721 Forn:4 ConfigForn:4 isFerguile:True base:132,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:630,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5721 Forn:4 ConfigForn:4 isFerguile:True base:138,16 risk:4,56 cot:4,912
+  [CalcPrice] VT:650,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5721 Forn:4 ConfigForn:4 isFerguile:True base:142,54 risk:4,56 cot:4,912
+  [CalcPrice] VT:325,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5721 Forn:4 ConfigForn:4 isFerguile:True base:71,27 risk:4,56 cot:4,912
+  [CalcPrice] VT:670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5722 Forn:4 ConfigForn:4 isFerguile:True base:146,93 risk:4,56 cot:4,912
+  [CalcPrice] VT:699,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5722 Forn:4 ConfigForn:4 isFerguile:True base:153,29 risk:4,56 cot:4,912
+  [CalcPrice] VT:720,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5722 Forn:4 ConfigForn:4 isFerguile:True base:157,89 risk:4,56 cot:4,912
+  [CalcPrice] VT:395,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5722 Forn:4 ConfigForn:4 isFerguile:True base:86,62 risk:4,56 cot:4,912
+  [CalcPrice] VT:780,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5723 Forn:4 ConfigForn:4 isFerguile:True base:171,05 risk:4,56 cot:4,912
+  [CalcPrice] VT:815,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5723 Forn:4 ConfigForn:4 isFerguile:True base:178,73 risk:4,56 cot:4,912
+  [CalcPrice] VT:845,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5723 Forn:4 ConfigForn:4 isFerguile:True base:185,31 risk:4,56 cot:4,912
+  [CalcPrice] VT:510,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5724 Forn:4 ConfigForn:4 isFerguile:True base:111,84 risk:4,56 cot:4,912
+  [CalcPrice] VT:525,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5724 Forn:4 ConfigForn:4 isFerguile:True base:115,13 risk:4,56 cot:4,912
+  [CalcPrice] VT:540,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5724 Forn:4 ConfigForn:4 isFerguile:True base:118,42 risk:4,56 cot:4,912
+  [CalcPrice] VT:1745,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5661 Forn:4 ConfigForn:4 isFerguile:True base:382,68 risk:4,56 cot:4,912
+  [CalcPrice] VT:1845,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5661 Forn:4 ConfigForn:4 isFerguile:True base:404,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:1930,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5661 Forn:4 ConfigForn:4 isFerguile:True base:423,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:1115,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5661 Forn:4 ConfigForn:4 isFerguile:True base:244,52 risk:4,56 cot:4,912
+  [CalcPrice] VT:1920,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5662 Forn:4 ConfigForn:4 isFerguile:True base:421,05 risk:4,56 cot:4,912
+  [CalcPrice] VT:2035,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5662 Forn:4 ConfigForn:4 isFerguile:True base:446,27 risk:4,56 cot:4,912
+  [CalcPrice] VT:2130,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5662 Forn:4 ConfigForn:4 isFerguile:True base:467,11 risk:4,56 cot:4,912
+  [CalcPrice] VT:1190,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5662 Forn:4 ConfigForn:4 isFerguile:True base:260,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:2125,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5663 Forn:4 ConfigForn:4 isFerguile:True base:466,01 risk:4,56 cot:4,912
+  [CalcPrice] VT:2260,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5663 Forn:4 ConfigForn:4 isFerguile:True base:495,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:2375,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5663 Forn:4 ConfigForn:4 isFerguile:True base:520,83 risk:4,56 cot:4,912
+  [CalcPrice] VT:1275,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5663 Forn:4 ConfigForn:4 isFerguile:True base:279,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:1260,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5660 Forn:4 ConfigForn:4 isFerguile:True base:276,32 risk:4,56 cot:4,912
+  [CalcPrice] VT:1315,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5660 Forn:4 ConfigForn:4 isFerguile:True base:288,38 risk:4,56 cot:4,912
+  [CalcPrice] VT:1365,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5660 Forn:4 ConfigForn:4 isFerguile:True base:299,34 risk:4,56 cot:4,912
+  [CalcPrice] VT:810,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5660 Forn:4 ConfigForn:4 isFerguile:True base:177,63 risk:4,56 cot:4,912
+  [CalcPrice] VT:3050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5651 Forn:4 ConfigForn:4 isFerguile:True base:668,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:3240,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5651 Forn:4 ConfigForn:4 isFerguile:True base:710,53 risk:4,56 cot:4,912
+  [CalcPrice] VT:3400,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5651 Forn:4 ConfigForn:4 isFerguile:True base:745,61 risk:4,56 cot:4,912
+  [CalcPrice] VT:1870,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5651 Forn:4 ConfigForn:4 isFerguile:True base:410,09 risk:4,56 cot:4,912
+  [CalcPrice] VT:3210,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5652 Forn:4 ConfigForn:4 isFerguile:True base:703,95 risk:4,56 cot:4,912
+  [CalcPrice] VT:3410,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5652 Forn:4 ConfigForn:4 isFerguile:True base:747,81 risk:4,56 cot:4,912
+  [CalcPrice] VT:3670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5652 Forn:4 ConfigForn:4 isFerguile:True base:804,82 risk:4,56 cot:4,912
+  [CalcPrice] VT:1970,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5652 Forn:4 ConfigForn:4 isFerguile:True base:432,02 risk:4,56 cot:4,912
+  [CalcPrice] VT:3450,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5653 Forn:4 ConfigForn:4 isFerguile:True base:756,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:3660,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5653 Forn:4 ConfigForn:4 isFerguile:True base:802,63 risk:4,56 cot:4,912
+  [CalcPrice] VT:3830,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5653 Forn:4 ConfigForn:4 isFerguile:True base:839,91 risk:4,56 cot:4,912
+  [CalcPrice] VT:2090,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5653 Forn:4 ConfigForn:4 isFerguile:True base:458,33 risk:4,56 cot:4,912
+  [CalcPrice] VT:3760,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5654 Forn:4 ConfigForn:4 isFerguile:True base:824,56 risk:4,56 cot:4,912
+  [CalcPrice] VT:3990,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5654 Forn:4 ConfigForn:4 isFerguile:True base:875,0 risk:4,56 cot:4,912
+  [CalcPrice] VT:4190,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5654 Forn:4 ConfigForn:4 isFerguile:True base:918,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:2230,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5654 Forn:4 ConfigForn:4 isFerguile:True base:489,04 risk:4,56 cot:4,912
+  [CalcPrice] VT:1640,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5650 Forn:4 ConfigForn:4 isFerguile:True base:359,65 risk:4,56 cot:4,912
+  [CalcPrice] VT:1740,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5650 Forn:4 ConfigForn:4 isFerguile:True base:381,58 risk:4,56 cot:4,912
+  [CalcPrice] VT:1820,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5650 Forn:4 ConfigForn:4 isFerguile:True base:399,12 risk:4,56 cot:4,912
+  [CalcPrice] VT:1030,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5650 Forn:4 ConfigForn:4 isFerguile:True base:225,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:3310,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5696 Forn:4 ConfigForn:4 isFerguile:True base:725,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:3490,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5696 Forn:4 ConfigForn:4 isFerguile:True base:765,35 risk:4,56 cot:4,912
+  [CalcPrice] VT:3640,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5696 Forn:4 ConfigForn:4 isFerguile:True base:798,25 risk:4,56 cot:4,912
+  [CalcPrice] VT:2900,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5694 Forn:4 ConfigForn:4 isFerguile:True base:635,96 risk:4,56 cot:4,912
+  [CalcPrice] VT:3050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5694 Forn:4 ConfigForn:4 isFerguile:True base:668,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:3180,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5694 Forn:4 ConfigForn:4 isFerguile:True base:697,37 risk:4,56 cot:4,912
+  [CalcPrice] VT:3050,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5695 Forn:4 ConfigForn:4 isFerguile:True base:668,86 risk:4,56 cot:4,912
+  [CalcPrice] VT:3210,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5695 Forn:4 ConfigForn:4 isFerguile:True base:703,95 risk:4,56 cot:4,912
+  [CalcPrice] VT:3350,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5695 Forn:4 ConfigForn:4 isFerguile:True base:734,65 risk:4,56 cot:4,912
+  [CalcPrice] VT:3670,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5697 Forn:4 ConfigForn:4 isFerguile:True base:804,82 risk:4,56 cot:4,912
+  [CalcPrice] VT:3880,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5697 Forn:4 ConfigForn:4 isFerguile:True base:850,88 risk:4,56 cot:4,912
+  [CalcPrice] VT:4060,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5697 Forn:4 ConfigForn:4 isFerguile:True base:890,35 risk:4,56 cot:4,912
+  [CalcPrice] VT:1495,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5715 Forn:4 ConfigForn:4 isFerguile:True base:327,85 risk:4,56 cot:4,912
+  [CalcPrice] VT:1560,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5715 Forn:4 ConfigForn:4 isFerguile:True base:342,11 risk:4,56 cot:4,912
+  [CalcPrice] VT:1615,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5715 Forn:4 ConfigForn:4 isFerguile:True base:354,17 risk:4,56 cot:4,912
+  [CalcPrice] VT:1040,000 ID:4 isF:True CR:4,56 Red:4,56 Cot:4,912
+Mod:5715 Forn:4 ConfigForn:4 isFerguile:True base:228,07 risk:4,56 cot:4,912
