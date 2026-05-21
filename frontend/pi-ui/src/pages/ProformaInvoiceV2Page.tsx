@@ -949,7 +949,7 @@ export default function ProformaInvoiceV2Page() {
       } else {
         const res = await createPi(payload as ProformaInvoice);
         setForm(prev => ({ ...prev, id: res.id, piSequencia: res.piSequencia }));
-        navigate(`/pis/${res.id}`, { replace: true });
+        navigate(`/pi/proforma-invoice-v2/${res.id}`, { replace: true });
       }
       alert("PI Salva com sucesso!");
     } catch (e) {
@@ -1596,7 +1596,7 @@ export default function ProformaInvoiceV2Page() {
         {showSearchModal && (
           <PiSearchModal 
             onClose={() => setShowSearchModal(false)} 
-            onSelect={(selectedPi) => { setShowSearchModal(false); navigate(`/proforma-invoice-v2/${selectedPi.id}`); }}
+            onSelect={(selectedPi) => { setShowSearchModal(false); navigate(`/pi/proforma-invoice-v2/${selectedPi.id}`); }}
           />
         )}
 

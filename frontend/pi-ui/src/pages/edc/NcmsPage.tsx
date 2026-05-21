@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Plus, Search, Edit2, Trash2, Save, X, Info } from 'lucide-react';
+import { BookOpen, Plus, Search, Edit2, Trash2, Save, X, Info, Calculator } from 'lucide-react';
 
 interface Ncm {
   id: number;
@@ -45,18 +45,32 @@ const NcmsPage: React.FC = () => {
     e.preventDefault();
     const method = editingNcm ? 'PUT' : 'POST';
     const url = editingNcm ? `/api/edc/ncms/${editingNcm.id}` : '/api/edc/ncms';
+    const payload = editingNcm ? { ...formData, id: editingNcm.id } : formData;
     
     try {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (response.ok) {
         fetchNcms();
         setShowModal(false);
       }
     } catch (error) { console.error(error); }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Deseja realmente inativar este NCM?')) {
+      try {
+        const response = await fetch(`/api/edc/ncms/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          fetchNcms();
+        }
+      } catch (error) { console.error(error); }
+    }
   };
 
   const filteredNcms = ncms.filter(n => 
@@ -120,8 +134,32 @@ const NcmsPage: React.FC = () => {
                   <td><span className="badge badge-success">{(n.aliquotaIcmsPadrao * 100).toFixed(0)}%</span></td>
                   <td style={{ textAlign: 'right' }}>
                     <div className="action-buttons" style={{ justifyContent: 'flex-end' }}>
-                      <button className="btn-icon"><Edit2 size={16} /></button>
-                      <button className="btn-icon btn-icon-danger"><Trash2 size={16} /></button>
+                      <button 
+                        className="btn-icon" 
+                        onClick={() => {
+                          setEditingNcm(n);
+                          setFormData({
+                            codigo: n.codigo,
+                            descricao: n.descricao,
+                            aliquotaII: n.aliquotaII,
+                            aliquotaIPI: n.aliquotaIPI,
+                            aliquotaPis: n.aliquotaPis,
+                            aliquotaCofins: n.aliquotaCofins,
+                            aliquotaIcmsPadrao: n.aliquotaIcmsPadrao
+                          });
+                          setShowModal(true);
+                        }}
+                        title="Editar NCM"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button 
+                        className="btn-icon btn-icon-danger" 
+                        onClick={() => handleDelete(n.id)}
+                        title="Inativar NCM"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>

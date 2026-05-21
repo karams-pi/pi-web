@@ -5,10 +5,11 @@ import {
   ArrowLeft, Building, Globe, Ship, 
   DollarSign, Percent, TrendingUp, Info, Package, Anchor
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const NovoEstudoEdcPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   
   const [importadores, setImportadores] = useState<any[]>([]);
   const [exportadores, setExportadores] = useState<any[]>([]);
@@ -48,7 +49,25 @@ const NovoEstudoEdcPage: React.FC = () => {
         setProdutos(pro);
         setTaxasPadrao(tax);
         
-        if (tax.length > 0) {
+        if (id) {
+          const sim = await fetch(`/api/edc/simulacoes/${id}`).then(r => r.json());
+          setFormData({
+            id: sim.id,
+            numeroReferencia: sim.numeroReferencia,
+            idImportador: sim.idImportador || 0,
+            idExportador: sim.idExportador || 0,
+            idPortoOrigem: sim.idPortoOrigem || 0,
+            idPortoDestino: sim.idPortoDestino || 0,
+            cotacaoDolar: sim.cotacaoDolar || 5.25,
+            spreadCambio: sim.spreadCambio || 0.05,
+            tipoFrete: sim.tipoFrete || 'FOB',
+            valorFreteInternacional: sim.valorFreteInternacional || 0,
+            valorSeguroInternacional: sim.valorSeguroInternacional || 0,
+            status: sim.status || 'Rascunho',
+            itens: sim.itens || [],
+            despesas: sim.despesas || []
+          });
+        } else if (tax.length > 0) {
           setFormData(prev => ({
             ...prev,
             despesas: tax.map((t: any) => ({
@@ -62,7 +81,7 @@ const NovoEstudoEdcPage: React.FC = () => {
       } catch (error) { console.error(error); }
     };
     loadData();
-  }, []);
+  }, [id]);
 
   const handleAddItem = () => {
     setFormData({
@@ -85,13 +104,23 @@ const NovoEstudoEdcPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('/api/edc/simulacoes', {
-        method: 'POST',
+      const url = id ? `/api/edc/simulacoes/${id}` : '/api/edc/simulacoes';
+      const method = id ? 'PUT' : 'POST';
+      const payload = id ? { ...formData, id: parseInt(id) } : formData;
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
-      if (response.ok) navigate('/edc/estudos');
-    } catch (error) { console.error(error); }
+      if (response.ok) {
+        navigate('/edc/estudos');
+      } else {
+        alert('Erro ao salvar simulação.');
+      }
+    } catch (error) { 
+      console.error(error); 
+      alert('Erro ao salvar simulação.');
+    }
   };
 
   const totalFob = formData.itens.reduce((acc, i) => acc + (i.quantidade * i.valorFobUnitario), 0);
@@ -105,8 +134,8 @@ const NovoEstudoEdcPage: React.FC = () => {
           <Calculator size={24} />
         </div>
         <div>
-          <h1 className="page-title">Nova Simulação de Custo</h1>
-          <p className="page-description">Configure os parâmetros logísticos e fiscais para o Estudo de Nacionalização.</p>
+          <h1 className="page-title">{id ? 'Editar Simulação de Custo' : 'Nova Simulação de Custo'}</h1>
+          <p className="page-description">{id ? 'Modifique os parâmetros logísticos e fiscais do Estudo de Nacionalização.' : 'Configure os parâmetros logísticos e fiscais para o Estudo de Nacionalização.'}</p>
         </div>
         <div className="page-header-line"></div>
       </div>
@@ -240,7 +269,7 @@ const NovoEstudoEdcPage: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <button className="btn btn-primary" style={{ width: '100%', height: '54px', fontSize: '1.1rem' }} onClick={handleSave}>
               <Save size={20} />
-              <span>Gerar Estudo EDC</span>
+              <span>{id ? 'Salvar Estudo EDC' : 'Gerar Estudo EDC'}</span>
             </button>
             <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => navigate('/edc/estudos')}>
               <X size={18} />

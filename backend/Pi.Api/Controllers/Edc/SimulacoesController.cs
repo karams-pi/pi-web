@@ -75,6 +75,85 @@ public class SimulacoesController : ControllerBase
         return CreatedAtAction(nameof(GetSimulacao), new { id = simulacao.Id }, simulacao);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutSimulacao(int id, SimulacaoEdc simulacao)
+    {
+        if (id != simulacao.Id)
+        {
+            return BadRequest();
+        }
+
+        var dbSimulacao = await _context.SimulacoesEdc
+            .Include(s => s.Itens)
+            .Include(s => s.Despesas)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (dbSimulacao == null)
+        {
+            return NotFound();
+        }
+
+        // Atualiza campos do cabeçalho
+        dbSimulacao.NumeroReferencia = simulacao.NumeroReferencia;
+        dbSimulacao.DataEstudo = simulacao.DataEstudo;
+        dbSimulacao.IdImportador = simulacao.IdImportador;
+        dbSimulacao.IdExportador = simulacao.IdExportador;
+        dbSimulacao.IdPortoOrigem = simulacao.IdPortoOrigem;
+        dbSimulacao.IdPortoDestino = simulacao.IdPortoDestino;
+        dbSimulacao.CotacaoDolar = simulacao.CotacaoDolar;
+        dbSimulacao.SpreadCambio = simulacao.SpreadCambio;
+        dbSimulacao.TipoFrete = simulacao.TipoFrete;
+        dbSimulacao.ValorFreteInternacional = simulacao.ValorFreteInternacional;
+        dbSimulacao.ValorSeguroInternacional = simulacao.ValorSeguroInternacional;
+        dbSimulacao.Status = simulacao.Status;
+
+        // Atualiza itens (remova antigos, adicione novos)
+        if (dbSimulacao.Itens != null)
+        {
+            _context.RemoveRange(dbSimulacao.Itens);
+        }
+        dbSimulacao.Itens = simulacao.Itens?.Select(i => new SimulacaoEdcItem
+        {
+            IdProduto = i.IdProduto,
+            Quantidade = i.Quantidade,
+            ValorFobUnitario = i.ValorFobUnitario,
+            PesoLiquidoTotal = i.PesoLiquidoTotal,
+            PesoBrutoTotal = i.PesoBrutoTotal,
+            CubagemTotal = i.CubagemTotal
+        }).ToList() ?? new List<SimulacaoEdcItem>();
+
+        // Atualiza despesas (remova antigas, adicione novas)
+        if (dbSimulacao.Despesas != null)
+        {
+            _context.RemoveRange(dbSimulacao.Despesas);
+        }
+        dbSimulacao.Despesas = simulacao.Despesas?.Select(d => new SimulacaoEdcDespesa
+        {
+            NomeDespesa = d.NomeDespesa,
+            Valor = d.Valor,
+            Moeda = d.Moeda,
+            MetodoRateio = d.MetodoRateio
+        }).ToList() ?? new List<SimulacaoEdcDespesa>();
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.SimulacoesEdc.Any(s => s.Id == id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteSimulacao(int id)
     {

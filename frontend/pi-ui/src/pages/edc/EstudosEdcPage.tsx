@@ -34,6 +34,24 @@ const EstudosEdcPage: React.FC = () => {
     finally { setLoading(false); }
   };
 
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Deseja realmente excluir este estudo de custo?")) {
+      try {
+        const response = await fetch(`/api/edc/simulacoes/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          fetchEstudos();
+        } else {
+          alert("Erro ao excluir o estudo.");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Erro ao excluir o estudo.");
+      }
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case 'aprovado': return <span className="badge badge-success">Aprovado</span>;
@@ -128,8 +146,8 @@ const EstudosEdcPage: React.FC = () => {
                   <td style={{ textAlign: 'right' }}>
                     <div className="action-buttons" style={{ justifyContent: 'flex-end' }}>
                       <button className="btn-icon" title="Ver Detalhes" onClick={() => navigate(`/edc/estudos/${e.id}`)}><ExternalLink size={16} /></button>
-                      <button className="btn-icon"><Edit2 size={16} /></button>
-                      <button className="btn-icon btn-icon-danger"><Trash2 size={16} /></button>
+                      <button className="btn-icon" title="Editar Estudo" onClick={() => navigate(`/edc/estudos/editar/${e.id}`)}><Edit2 size={16} /></button>
+                      <button className="btn-icon btn-icon-danger" title="Excluir Estudo" onClick={() => handleDelete(e.id)}><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>

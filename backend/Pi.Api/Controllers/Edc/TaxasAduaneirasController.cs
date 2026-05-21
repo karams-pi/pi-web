@@ -24,4 +24,48 @@ public class TaxasAduaneirasController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(taxa);
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutTaxa(int id, TaxasAduaneiras taxa)
+    {
+        if (id != taxa.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(taxa).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.TaxasAduaneiras.Any(t => t.Id == id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTaxa(int id)
+    {
+        var taxa = await _context.TaxasAduaneiras.FindAsync(id);
+        if (taxa == null)
+        {
+            return NotFound();
+        }
+
+        _context.TaxasAduaneiras.Remove(taxa);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

@@ -38,7 +38,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         connectionString = $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password}";
     }
 
-    options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable("__EFMigrationsHistory", "public"));
+    options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable("__EFMigrationsHistory", "pi"));
 });
 
 // Registrar HttpClient e CotacaoService

@@ -106,6 +106,7 @@ export default function App() {
               <Route index element={<EdcDashboard />} />
               <Route path="estudos" element={<EstudosEdcPage />} />
               <Route path="estudos/novo" element={<NovoEstudoEdcPage />} />
+              <Route path="estudos/editar/:id" element={<NovoEstudoEdcPage />} />
               <Route path="estudos/:id" element={<DetalheEstudoEdcPage />} />
               <Route path="ncms" element={<NcmsPage />} />
               <Route path="taxas" element={<TaxasAduaneirasPage />} />
