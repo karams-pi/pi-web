@@ -39,6 +39,8 @@ public class SimulacoesController : ControllerBase
             .Include(s => s.PortoOrigem!)
             .Include(s => s.PortoDestino!)
             .Include(s => s.Itens!)
+                .ThenInclude(i => i.Modelo!)
+            .Include(s => s.Itens!)
                 .ThenInclude(i => i.Produto!)
                     .ThenInclude(p => p.Ncm!)
             .Include(s => s.Despesas!)
@@ -105,6 +107,8 @@ public class SimulacoesController : ControllerBase
         dbSimulacao.TipoFrete = simulacao.TipoFrete;
         dbSimulacao.ValorFreteInternacional = simulacao.ValorFreteInternacional;
         dbSimulacao.ValorSeguroInternacional = simulacao.ValorSeguroInternacional;
+        dbSimulacao.ComissaoPercentual = simulacao.ComissaoPercentual;
+        dbSimulacao.FlExibirComissao = simulacao.FlExibirComissao;
         dbSimulacao.Status = simulacao.Status;
 
         // Atualiza itens (remova antigos, adicione novos)
@@ -115,6 +119,7 @@ public class SimulacoesController : ControllerBase
         dbSimulacao.Itens = simulacao.Itens?.Select(i => new SimulacaoEdcItem
         {
             IdProduto = i.IdProduto,
+            IdModelo = i.IdModelo,
             Quantidade = i.Quantidade,
             ValorFobUnitario = i.ValorFobUnitario,
             PesoLiquidoTotal = i.PesoLiquidoTotal,

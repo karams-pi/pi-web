@@ -25,4 +25,49 @@ public class ExportadoresController : ControllerBase
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetExportadores), new { id = exportador.Id }, exportador);
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutExportador(int id, Exportador exportador)
+    {
+        if (id != exportador.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(exportador).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Exportadores.Any(e => e.Id == id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteExportador(int id)
+    {
+        var exportador = await _context.Exportadores.FindAsync(id);
+        if (exportador == null)
+        {
+            return NotFound();
+        }
+
+        // Soft delete
+        exportador.FlAtivo = false;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

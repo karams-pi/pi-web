@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pi.Api.Data;
@@ -11,9 +12,11 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523142858_AddModeloEdc")]
+    partial class AddModeloEdc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -510,17 +513,11 @@ namespace Pi.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ComissaoPercentual")
-                        .HasColumnType("numeric(18,4)");
-
                     b.Property<decimal>("CotacaoDolar")
                         .HasColumnType("numeric(18,4)");
 
                     b.Property<DateTime>("DataEstudo")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("FlExibirComissao")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("IdExportador")
                         .HasColumnType("integer");

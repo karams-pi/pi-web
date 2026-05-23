@@ -27,5 +27,8 @@ public class Exportador
     [MaxLength(100)]
     public string? Contato { get; set; }
 
+    [MaxLength(20)]
+    public string? Incoterm { get; set; }
+
     public bool FlAtivo { get; set; } = true;
 }

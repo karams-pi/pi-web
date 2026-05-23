@@ -35,7 +35,95 @@ const DetalheEstudoEdcPage: React.FC = () => {
   if (loading) return <div className="page-container animate-pulse">Calculando impostos e taxas...</div>;
   if (!estudo) return <div className="page-container">Estudo não localizado.</div>;
 
-  const totalNacionalizado = 145200.00; // Simulado para o visual
+  const ptaxFator = 1 + (estudo.spreadCambio / 100);
+  const freteBrl = (estudo.valorFreteInternacional * ptaxFator) * estudo.cotacaoDolar;
+  const seguroBrl = estudo.valorSeguroInternacional * estudo.cotacaoDolar;
+  
+  // Calcular despesas aduaneiras dinamicamente
+  const despesasDetalhadas = estudo.despesas ? estudo.despesas.map((d: any) => {
+    const isAfrmm = d.nomeDespesa.toUpperCase() === 'AFRMM';
+    let valorBrl = 0;
+    let detalheTipo = 'Fixo';
+
+    if (isAfrmm) {
+      const percentual = d.valor > 1 ? d.valor : d.valor * 100;
+      detalheTipo = `${percentual.toFixed(0)}%`;
+      valorBrl = freteBrl * (percentual / 100);
+    } else {
+      valorBrl = d.moeda === 'USD' ? d.valor * estudo.cotacaoDolar : d.valor;
+    }
+
+    return {
+      nomeDespesa: d.nomeDespesa,
+      moeda: d.moeda,
+      detalheTipo,
+      valorBrl,
+      isAfrmm
+    };
+  }) : [];
+
+  const totalDespesasPortuariasBrl = despesasDetalhadas.reduce((acc: number, d: any) => acc + d.valorBrl, 0);
+
+  // Calcular itens com rateio de frete e despesas
+  const totalFobBrl = estudo.itens.reduce((acc: number, i: any) => acc + (i.quantidade * i.valorFobUnitario), 0) * estudo.cotacaoDolar;
+
+  // Se ativado no estudo, acrescentar a comissão comercial na visualização da tabela de despesas
+  const comissaoValBrl = (estudo.flExibirComissao && estudo.comissaoPercentual > 0)
+    ? totalFobBrl * (estudo.comissaoPercentual / 100)
+    : 0;
+
+  if (estudo.flExibirComissao && estudo.comissaoPercentual > 0) {
+    despesasDetalhadas.push({
+      nomeDespesa: `COMISSÃO COMERCIAL (${estudo.comissaoPercentual.toFixed(2)}%)`,
+      moeda: 'USD',
+      detalheTipo: 'Percentual',
+      valorBrl: comissaoValBrl,
+      isAfrmm: false
+    });
+  }
+
+  const totalDespesasBrl = despesasDetalhadas.reduce((acc: number, d: any) => acc + d.valorBrl, 0);
+
+  const itensCalculados = estudo.itens.map((item: any) => {
+    const itemFobBrl = item.quantidade * item.valorFobUnitario * estudo.cotacaoDolar;
+    const fatorRateio = totalFobBrl > 0 ? itemFobBrl / totalFobBrl : 0;
+    
+    const itemValorAduaneiro = itemFobBrl + (freteBrl * fatorRateio) + (seguroBrl * fatorRateio);
+    
+    const aliqII = item.produto?.ncm?.aliquotaII || 0.18;
+    const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0.031;
+    const aliqPis = item.produto?.ncm?.aliquotaPis || 0.0312;
+    const aliqCof = item.produto?.ncm?.aliquotaCofins || 0.1437;
+    const aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao || 0.18;
+
+    const ii = itemValorAduaneiro * aliqII;
+    const ipi = (itemValorAduaneiro + ii) * aliqIPI;
+    const pisCofins = itemValorAduaneiro * (aliqPis + aliqCof);
+    const taxasPort = totalDespesasPortuariasBrl * fatorRateio;
+
+    const baseIcmsSemIcms = itemValorAduaneiro + ii + ipi + pisCofins + taxasPort;
+    const icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
+    
+    const totalNacItem = itemValorAduaneiro + ii + ipi + pisCofins + taxasPort + icms;
+
+    return {
+      ...item,
+      itemFobBrl,
+      itemValorAduaneiro,
+      ii,
+      ipi,
+      pisCofins,
+      taxasPort,
+      icms,
+      totalNacItem
+    };
+  });
+
+  const totalII = itensCalculados.reduce((acc: number, i: any) => acc + i.ii, 0);
+  const totalIPI = itensCalculados.reduce((acc: number, i: any) => acc + i.ipi, 0);
+  const totalPisCofins = itensCalculados.reduce((acc: number, i: any) => acc + i.pisCofins, 0);
+  const totalIcms = itensCalculados.reduce((acc: number, i: any) => acc + i.icms, 0);
+  const totalNacionalizado = itensCalculados.reduce((acc: number, i: any) => acc + i.totalNacItem, 0) + comissaoValBrl;
 
   return (
     <div className="animate-fadeIn">
@@ -50,7 +138,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
         </div>
         <div className="page-header-line" style={{ background: 'linear-gradient(90deg, #10b981, transparent)' }}></div>
         <div className="action-buttons" style={{ marginLeft: 'auto' }}>
-          <button className="btn btn-secondary"><Printer size={18} /><span>Imprimir</span></button>
+          <button className="btn btn-secondary" onClick={() => window.print()}><Printer size={18} /><span>Imprimir</span></button>
           <button className="btn btn-primary"><Download size={18} /><span>Exportar EDC</span></button>
         </div>
       </div>
@@ -64,14 +152,14 @@ const DetalheEstudoEdcPage: React.FC = () => {
         <div className="card" style={{ borderLeft: '4px solid #a78bfa' }}>
           <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--muted)', letterSpacing: '1px' }}>Exportador</span>
           <p style={{ fontWeight: '700', fontSize: '1.2rem', margin: '8px 0 0' }}>{estudo.exportador?.nome}</p>
-          <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>País: {estudo.exportador?.pais}</span>
+          <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>País: {estudo.exportador?.pais} | Frete: {estudo.tipoFrete || 'N/A'}</span>
         </div>
         <div className="card" style={{ background: 'linear-gradient(135deg, rgba(79, 158, 255, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)', border: '1px solid rgba(79, 158, 255, 0.2)' }}>
           <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--muted)', letterSpacing: '1px' }}>Custo Total Nacionalizado</span>
           <p style={{ fontWeight: '800', fontSize: '1.8rem', margin: '8px 0 0', color: 'var(--primary)' }}>
-            R$ {totalNacionalizado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R$ {totalNacionalizado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Câmbio: R$ {(estudo.cotacaoDolar + estudo.spreadCambio).toFixed(4)}</span>
+          <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Câmbio: R$ {estudo.cotacaoDolar.toFixed(2)} | PTAX: {estudo.spreadCambio}%</span>
         </div>
       </div>
 
@@ -94,7 +182,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {estudo.itens.map((item: any, idx: number) => (
+              {itensCalculados.map((item: any, idx: number) => (
                 <tr key={idx}>
                   <td style={{ paddingLeft: '24px' }}>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -102,19 +190,26 @@ const DetalheEstudoEdcPage: React.FC = () => {
                         <Package size={18} style={{ color: 'var(--muted)' }} />
                       </div>
                       <div>
-                        <strong style={{ display: 'block', color: '#fff' }}>{item.produto?.referencia}</strong>
+                        <strong style={{ display: 'block', color: '#fff' }}>
+                          {item.modelo ? `${item.modelo.codigo} - ${item.modelo.nome}` : item.produto?.referencia}
+                        </strong>
+                        {item.modelo && (
+                          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block' }}>
+                            Ref: {item.produto?.referencia} - {item.produto?.descricao}
+                          </span>
+                        )}
                         <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>NCM: {item.produto?.ncm?.codigo}</span>
                       </div>
                     </div>
                   </td>
-                  <td>R$ {(item.quantidade * item.valorFobUnitario * 5.30).toLocaleString('pt-BR')}</td>
-                  <td>R$ {(item.quantidade * 140).toLocaleString('pt-BR')}</td>
-                  <td>R$ {(item.quantidade * 35).toLocaleString('pt-BR')}</td>
-                  <td>R$ {(item.quantidade * 95).toLocaleString('pt-BR')}</td>
-                  <td>R$ {(item.quantidade * 42).toLocaleString('pt-BR')}</td>
-                  <td style={{ color: 'var(--primary)', fontWeight: '600' }}>R$ {(item.quantidade * 115).toLocaleString('pt-BR')}</td>
+                  <td>R$ {item.itemValorAduaneiro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>R$ {item.ii.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>R$ {item.ipi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>R$ {item.pisCofins.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>R$ {item.taxasPort.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td style={{ color: 'var(--primary)', fontWeight: '600' }}>R$ {item.icms.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td style={{ paddingRight: '24px', textAlign: 'right' }}>
-                    <strong style={{ color: '#fff' }}>R$ {(item.quantidade * 820).toLocaleString('pt-BR')}</strong>
+                    <strong style={{ color: '#fff' }}>R$ {item.totalNacItem.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                   </td>
                 </tr>
               ))}
@@ -125,7 +220,56 @@ const DetalheEstudoEdcPage: React.FC = () => {
                     VALOR FINAL DA IMPORTAÇÃO:
                  </td>
                  <td style={{ padding: '24px', textAlign: 'right', fontSize: '1.4rem', fontWeight: '800', color: 'var(--primary)' }}>
-                    R$ {totalNacionalizado.toLocaleString('pt-BR')}
+                    R$ {totalNacionalizado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                 </td>
+               </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      {/* Seção 2: Despesas Aduaneiras e Logísticas (Planilha do Usuário) */}
+      <div className="card" style={{ padding: '0', overflow: 'hidden', marginTop: '2rem' }}>
+        <div className="card-header" style={{ padding: '24px', marginBottom: '0' }}>
+          <h3 className="card-title">Despesas Aduaneiras e Logísticas</h3>
+        </div>
+        <div className="table-responsive">
+          <table className="table">
+            <thead style={{ background: 'rgba(255,255,255,0.02)' }}>
+              <tr>
+                <th style={{ paddingLeft: '24px' }}>Descrição da Despesa</th>
+                <th>Tipo/Percentual</th>
+                <th>Moeda Origem</th>
+                <th style={{ paddingRight: '24px', textAlign: 'right' }}>Valor (R$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {despesasDetalhadas.map((despesa: any, idx: number) => (
+                <tr key={idx}>
+                  <td style={{ paddingLeft: '24px', fontWeight: '600', color: '#fff' }}>{despesa.nomeDespesa}</td>
+                  <td>
+                    <span className="badge" style={{ 
+                      backgroundColor: despesa.isAfrmm ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255,255,255,0.05)', 
+                      color: despesa.isAfrmm ? '#fbbf24' : 'var(--muted)',
+                      borderColor: despesa.isAfrmm ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255,255,255,0.1)'
+                    }}>
+                      {despesa.detalheTipo}
+                    </span>
+                  </td>
+                  <td>{despesa.moeda}</td>
+                  <td style={{ paddingRight: '24px', textAlign: 'right', fontWeight: '700', color: '#fff' }}>
+                    R$ {despesa.valorBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot style={{ background: 'rgba(79, 158, 255, 0.02)' }}>
+               <tr>
+                 <td colSpan={3} style={{ padding: '20px 24px', textAlign: 'right', fontWeight: '700', color: 'var(--muted)' }}>
+                    TOTAL DESPESAS ADUANEIRAS E LOGÍSTICAS:
+                 </td>
+                 <td style={{ padding: '20px 24px', textAlign: 'right', fontSize: '1.2rem', fontWeight: '800', color: '#fff' }}>
+                    R$ {totalDespesasBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                  </td>
                </tr>
             </tfoot>
@@ -142,8 +286,8 @@ const DetalheEstudoEdcPage: React.FC = () => {
             <div>
               <h4 style={{ margin: '0 0 8px 0', color: '#fff' }}>Resumo de Carga Tributária</h4>
               <p style={{ fontSize: '0.9rem', color: 'var(--muted)', margin: '0' }}>
-                Total de Impostos Federais: R$ 24.500,00 (16.8% do total)<br/>
-                Total de Impostos Estaduais (ICMS): R$ 18.200,00 (12.5% do total)
+                Total de Impostos Federais: R$ {(totalII + totalIPI + totalPisCofins).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({( ((totalII + totalIPI + totalPisCofins) / totalNacionalizado) * 100 ).toFixed(1)}% do total)<br/>
+                Total de Impostos Estaduais (ICMS): R$ {totalIcms.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({( (totalIcms / totalNacionalizado) * 100 ).toFixed(1)}% do total)
               </p>
             </div>
           </div>
@@ -156,7 +300,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
             <div>
               <h4 style={{ margin: '0 0 8px 0', color: '#fff' }}>Conformidade Fiscal</h4>
               <p style={{ fontSize: '0.9rem', color: 'var(--muted)', margin: '0' }}>
-                Este estudo foi gerado com base nas alíquotas vigentes na data de hoje ({new Date().toLocaleDateString()}) para o estado de {estudo.importador?.uf}.
+                Este estudo foi gerado com base nas alíquotas vigentes na data de hoje ({new Date().toLocaleDateString()}) para o estado de {estudo.importador?.uf || 'PR'}.
               </p>
             </div>
           </div>

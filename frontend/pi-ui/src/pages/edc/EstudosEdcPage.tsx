@@ -139,7 +139,7 @@ const EstudosEdcPage: React.FC = () => {
                   </td>
                   <td>
                     <div style={{ fontWeight: '600' }}>
-                      USD {e.cotacaoDolar.toFixed(4)}
+                      R$ {e.cotacaoDolar.toFixed(2)}
                     </div>
                   </td>
                   <td>{getStatusBadge(e.status)}</td>

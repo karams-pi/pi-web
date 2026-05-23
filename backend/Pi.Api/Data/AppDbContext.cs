@@ -40,6 +40,7 @@ public class AppDbContext : DbContext
     public DbSet<Importador> Importadores => Set<Importador>();
     public DbSet<Exportador> Exportadores => Set<Exportador>();
     public DbSet<ProdutoEdc> ProdutosEdc => Set<ProdutoEdc>();
+    public DbSet<ModeloEdc> ModelosEdc => Set<ModeloEdc>();
     public DbSet<Porto> Portos => Set<Porto>();
     public DbSet<TaxasAduaneiras> TaxasAduaneiras => Set<TaxasAduaneiras>();
     public DbSet<ConfiguracaoFiscal> ConfiguracoesFiscais => Set<ConfiguracaoFiscal>();
@@ -400,12 +401,18 @@ public class AppDbContext : DbContext
             entity.HasOne(x => x.PortoOrigem).WithMany().HasForeignKey(x => x.IdPortoOrigem).OnDelete(DeleteBehavior.SetNull);
             entity.HasOne(x => x.PortoDestino).WithMany().HasForeignKey(x => x.IdPortoDestino).OnDelete(DeleteBehavior.SetNull);
         });
+        modelBuilder.Entity<ModeloEdc>(entity =>
+        {
+            entity.ToTable("modelos", "edc");
+            entity.HasOne(x => x.Produto).WithMany().HasForeignKey(x => x.IdProduto).OnDelete(DeleteBehavior.Restrict);
+        });
 
         modelBuilder.Entity<SimulacaoEdcItem>(entity =>
         {
             entity.ToTable("simulacao_itens", "edc");
             entity.HasOne(x => x.Simulacao).WithMany(x => x.Itens).HasForeignKey(x => x.IdSimulacao).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne(x => x.Produto).WithMany().HasForeignKey(x => x.IdProduto).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(x => x.Modelo).WithMany().HasForeignKey(x => x.IdModelo).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<SimulacaoEdcDespesa>(entity =>

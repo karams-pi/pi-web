@@ -19,6 +19,7 @@ import NcmsPage from "./pages/edc/NcmsPage";
 import ImportadoresPage from "./pages/edc/ImportadoresPage";
 import ExportadoresPage from "./pages/edc/ExportadoresPage";
 import ProdutosEdcPage from "./pages/edc/ProdutosEdcPage";
+import ModelosEdcPage from "./pages/edc/ModelosEdcPage";
 import TaxasAduaneirasPage from "./pages/edc/TaxasAduaneirasPage";
 import ConfiguracoesFiscaisPage from "./pages/edc/ConfiguracoesFiscaisPage";
 import EstudosEdcPage from "./pages/edc/EstudosEdcPage";
@@ -114,6 +115,7 @@ export default function App() {
               <Route path="importadores" element={<ImportadoresPage />} />
               <Route path="exportadores" element={<ExportadoresPage />} />
               <Route path="produtos" element={<ProdutosEdcPage />} />
+              <Route path="modelos" element={<ModelosEdcPage />} />
             </Route>
 
             {/* Rotas de Impressão (Mantidas na raiz por simplicidade de link externo) */}
@@ -185,6 +187,11 @@ function NavLinks() {
         <NavLink to="/edc/produtos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
           <Grid size={18} />
           <span>Produtos</span>
+        </NavLink>
+
+        <NavLink to="/edc/modelos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <Layers size={18} />
+          <span>Modelos</span>
         </NavLink>
 
         <div className="nav-divider">Sistema</div>

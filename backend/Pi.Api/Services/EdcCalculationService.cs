@@ -48,10 +48,12 @@ public class EdcCalculationService : IEdcCalculationService
 
     public void ProcessarNacionalizacaoCompleta(SimulacaoEdc simulacao)
     {
-        decimal cotacaoFinal = simulacao.CotacaoDolar + simulacao.SpreadCambio;
+        decimal cotacaoFinal = simulacao.CotacaoDolar;
         
         // 1. Calcular Frete e Seguro em BRL
-        decimal freteBrl = simulacao.ValorFreteInternacional * cotacaoFinal;
+        // PTAX (%) é a propriedade SpreadCambio do banco (ex: 1.5 representa 1.5%)
+        decimal ptaxFator = 1 + (simulacao.SpreadCambio / 100m);
+        decimal freteBrl = (simulacao.ValorFreteInternacional * ptaxFator) * cotacaoFinal;
         decimal seguroBrl = simulacao.ValorSeguroInternacional * cotacaoFinal;
         
         // 2. Calcular Valor FOB Total em BRL para rateio
@@ -75,9 +77,28 @@ public class EdcCalculationService : IEdcCalculationService
             decimal cofins = CalcularPisCofins(itemValorAduaneiro, item.Produto.Ncm.AliquotaCofins);
             
             // Taxas Aduaneiras (Rateio das despesas da simulação)
-            decimal taxasItemBrl = simulacao.Despesas
-                .Where(d => d.MetodoRateio == "Valor FOB")
-                .Sum(d => d.Valor * fatorRateio);
+            decimal taxasItemBrl = 0;
+            if (simulacao.Despesas != null)
+            {
+                foreach (var d in simulacao.Despesas)
+                {
+                    decimal valorDespesaBrl = 0;
+                    if (d.NomeDespesa.ToUpper() == "AFRMM")
+                    {
+                        decimal percentual = d.Valor > 1 ? d.Valor / 100m : d.Valor;
+                        valorDespesaBrl = freteBrl * percentual;
+                    }
+                    else
+                    {
+                        valorDespesaBrl = d.Moeda == "USD" ? d.Valor * cotacaoFinal : d.Valor;
+                    }
+
+                    if (d.MetodoRateio == "Valor FOB")
+                    {
+                        taxasItemBrl += valorDespesaBrl * fatorRateio;
+                    }
+                }
+            }
 
             // Base ICMS "Por Dentro"
             decimal baseIcmsSemIcms = itemValorAduaneiro + ii + ipi + pis + cofins + taxasItemBrl;

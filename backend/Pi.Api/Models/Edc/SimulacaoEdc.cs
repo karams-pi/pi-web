@@ -49,6 +49,11 @@ public class SimulacaoEdc
     [Column(TypeName = "numeric(18,2)")]
     public decimal ValorSeguroInternacional { get; set; }
 
+    [Column(TypeName = "numeric(18,4)")]
+    public decimal ComissaoPercentual { get; set; }
+
+    public bool FlExibirComissao { get; set; } = false;
+
     [MaxLength(50)]
     public string Status { get; set; } = "Rascunho"; // Rascunho, Aprovado, Arquivado
 

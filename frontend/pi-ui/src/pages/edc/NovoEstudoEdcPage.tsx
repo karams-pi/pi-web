@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Calculator, Save, X, Plus, Trash2, 
-  ArrowLeft, Building, Globe, Ship, 
-  DollarSign, Percent, TrendingUp, Info, Package, Anchor
+  ArrowLeft, Building, Globe, 
+  DollarSign, TrendingUp, Info
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -14,10 +14,10 @@ const NovoEstudoEdcPage: React.FC = () => {
   const [importadores, setImportadores] = useState<any[]>([]);
   const [exportadores, setExportadores] = useState<any[]>([]);
   const [portos, setPortos] = useState<any[]>([]);
-  const [produtos, setProdutos] = useState<any[]>([]);
-  const [taxasPadrao, setTaxasPadrao] = useState<any[]>([]);
+  const [modelos, setModelos] = useState<any[]>([]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
+    id: undefined as number | undefined,
     numeroReferencia: `EDC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
     idImportador: 0,
     idExportador: 0,
@@ -28,26 +28,27 @@ const NovoEstudoEdcPage: React.FC = () => {
     tipoFrete: 'FOB',
     valorFreteInternacional: 0,
     valorSeguroInternacional: 0,
+    comissaoPercentual: 0,
+    flExibirComissao: false,
     status: 'Rascunho',
     itens: [] as any[],
     despesas: [] as any[]
-  });
+  }));
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [imp, exp, por, pro, tax] = await Promise.all([
+        const [imp, exp, por, mods, tax] = await Promise.all([
           fetch('/api/edc/importadores').then(r => r.json()),
           fetch('/api/edc/exportadores').then(r => r.json()),
           fetch('/api/edc/portos').then(r => r.json()),
-          fetch('/api/edc/produtos').then(r => r.json()),
+          fetch('/api/edc/modelos').then(r => r.json()),
           fetch('/api/edc/taxasaduaneiras').then(r => r.json())
         ]);
         setImportadores(imp);
         setExportadores(exp);
         setPortos(por);
-        setProdutos(pro);
-        setTaxasPadrao(tax);
+        setModelos(mods);
         
         if (id) {
           const sim = await fetch(`/api/edc/simulacoes/${id}`).then(r => r.json());
@@ -63,6 +64,8 @@ const NovoEstudoEdcPage: React.FC = () => {
             tipoFrete: sim.tipoFrete || 'FOB',
             valorFreteInternacional: sim.valorFreteInternacional || 0,
             valorSeguroInternacional: sim.valorSeguroInternacional || 0,
+            comissaoPercentual: sim.comissaoPercentual || 0,
+            flExibirComissao: sim.flExibirComissao || false,
             status: sim.status || 'Rascunho',
             itens: sim.itens || [],
             despesas: sim.despesas || []
@@ -84,9 +87,18 @@ const NovoEstudoEdcPage: React.FC = () => {
   }, [id]);
 
   const handleAddItem = () => {
+    const firstModel = modelos[0];
     setFormData({
       ...formData,
-      itens: [...formData.itens, { idProduto: produtos[0]?.id || 0, quantidade: 1, valorFobUnitario: 0 }]
+      itens: [
+        ...formData.itens, 
+        { 
+          idModelo: firstModel?.id || 0, 
+          idProduto: firstModel?.idProduto || 0, 
+          quantidade: 1, 
+          valorFobUnitario: 0 
+        }
+      ]
     });
   };
 
@@ -124,7 +136,7 @@ const NovoEstudoEdcPage: React.FC = () => {
   };
 
   const totalFob = formData.itens.reduce((acc, i) => acc + (i.quantidade * i.valorFobUnitario), 0);
-  const cotacaoFinal = formData.cotacaoDolar + formData.spreadCambio;
+  const cotacaoFinal = formData.cotacaoDolar;
 
   return (
     <div className="animate-fadeIn">
@@ -164,7 +176,15 @@ const NovoEstudoEdcPage: React.FC = () => {
                 <label>Exportador (Fornecedor)</label>
                 <div className="input-with-icon">
                    <Globe size={16} />
-                   <select value={formData.idExportador} onChange={e => setFormData({...formData, idExportador: parseInt(e.target.value)})}>
+                   <select value={formData.idExportador} onChange={e => {
+                     const selectedId = parseInt(e.target.value);
+                     const selectedExp = exportadores.find(exp => exp.id === selectedId);
+                     setFormData(prev => ({
+                       ...prev,
+                       idExportador: selectedId,
+                       tipoFrete: selectedExp?.incoterm || prev.tipoFrete || 'FOB'
+                     }));
+                   }}>
                     <option value="0">Selecione o Fornecedor...</option>
                     {exportadores.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
                   </select>
@@ -173,7 +193,7 @@ const NovoEstudoEdcPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Seção 2: Itens */}
+           {/* Seção 2: Itens */}
           <div className="card">
             <div className="card-header">
               <h3 className="card-title">2. Itens da Proforma</h3>
@@ -183,32 +203,87 @@ const NovoEstudoEdcPage: React.FC = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Produto / Referência</th>
-                    <th style={{ width: '120px' }}>Quantidade</th>
+                    <th>Modelo Comercial</th>
+                    <th style={{ width: '80px' }}>U.M.</th>
+                    <th style={{ width: '150px' }}>Quantidade</th>
                     <th style={{ width: '160px' }}>FOB Unit. (USD)</th>
                     <th style={{ width: '50px' }}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {formData.itens.length === 0 ? (
-                    <tr><td colSpan={4} style={{ textAlign: 'center', opacity: 0.5, padding: '30px' }}>Nenhum item adicionado.</td></tr>
-                  ) : formData.itens.map((item, idx) => (
-                    <tr key={idx}>
-                      <td>
-                        <select className="premium-select" value={item.idProduto} onChange={e => updateItem(idx, 'idProduto', parseInt(e.target.value))}>
-                          {produtos.map(p => <option key={p.id} value={p.id}>{p.referencia} - {p.descricao}</option>)}
-                        </select>
-                      </td>
-                      <td><input type="number" value={item.quantidade} onChange={e => updateItem(idx, 'quantidade', parseFloat(e.target.value))} /></td>
-                      <td>
-                        <div className="input-with-icon">
-                          <DollarSign size={14} />
-                          <input type="number" step="0.01" value={item.valorFobUnitario} onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value))} />
-                        </div>
-                      </td>
-                      <td><button className="btn-icon btn-icon-danger" onClick={() => handleRemoveItem(idx)}><Trash2 size={16} /></button></td>
-                    </tr>
-                  ))}
+                    <tr><td colSpan={5} style={{ textAlign: 'center', opacity: 0.5, padding: '30px' }}>Nenhum item adicionado.</td></tr>
+                  ) : formData.itens.map((item, idx) => {
+                    const model = modelos.find(m => m.id === item.idModelo);
+                    const prod = model?.produto;
+                    const unit = prod?.unidadeMedida || 'UN';
+                    return (
+                      <tr key={idx}>
+                        <td>
+                          <select 
+                            className="premium-select" 
+                            value={item.idModelo || 0} 
+                            onChange={e => {
+                              const selectedId = parseInt(e.target.value);
+                              const selectedModel = modelos.find(m => m.id === selectedId);
+                              
+                              const newItens = [...formData.itens];
+                              newItens[idx].idModelo = selectedId;
+                              newItens[idx].idProduto = selectedModel?.idProduto || 0;
+                              setFormData({ ...formData, itens: newItens });
+                            }}
+                          >
+                            <option value="0">Selecione o Modelo...</option>
+                            {modelos.map(m => (
+                              <option key={m.id} value={m.id}>
+                                {m.codigo} - {m.nome} ({m.produto?.referencia})
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>
+                          <span className="badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.25)' }}>
+                            {unit}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <input 
+                              type="number" 
+                              value={item.quantidade} 
+                              onChange={e => updateItem(idx, 'quantidade', parseFloat(e.target.value))} 
+                            />
+                            {unit === 'T' && (
+                              <span 
+                                className="badge" 
+                                style={{ 
+                                  backgroundColor: 'rgba(59, 130, 246, 0.15)', 
+                                  color: '#60a5fa', 
+                                  borderColor: 'rgba(59, 130, 246, 0.25)', 
+                                  fontSize: '0.75rem', 
+                                  padding: '4px 8px', 
+                                  width: 'fit-content',
+                                  marginTop: '4px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                ⚖️ {(item.quantidade * 1000).toLocaleString('pt-BR')} kg
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="input-with-icon">
+                            <DollarSign size={14} />
+                            <input type="number" step="0.01" value={item.valorFobUnitario} onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value))} />
+                          </div>
+                        </td>
+                        <td><button className="btn-icon btn-icon-danger" onClick={() => handleRemoveItem(idx)}><Trash2 size={16} /></button></td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -221,14 +296,14 @@ const NovoEstudoEdcPage: React.FC = () => {
             <div className="card-header"><h3 className="card-title" style={{ color: 'var(--primary)' }}>Logística & Câmbio</h3></div>
             <div className="form-stack">
               <div className="form-group">
-                <label>Câmbio PTAX (USD)</label>
+                <label>Câmbio (USD)</label>
                 <div className="input-with-icon">
                    <TrendingUp size={16} />
                    <input type="number" step="0.0001" value={formData.cotacaoDolar} onChange={e => setFormData({...formData, cotacaoDolar: parseFloat(e.target.value)})} />
                 </div>
               </div>
               <div className="form-group">
-                <label>Spread Bancário (%)</label>
+                <label>PTAX (%)</label>
                 <input type="number" step="0.0001" value={formData.spreadCambio} onChange={e => setFormData({...formData, spreadCambio: parseFloat(e.target.value)})} />
               </div>
               <div className="form-group">
@@ -246,6 +321,37 @@ const NovoEstudoEdcPage: React.FC = () => {
                   {portos.map(p => <option key={p.id} value={p.id}>{p.sigla} - {p.nome}</option>)}
                 </select>
               </div>
+              <div className="form-group">
+                <label>Frete (Informativo)</label>
+                <input 
+                  type="text" 
+                  className="premium-input" 
+                  value={formData.tipoFrete} 
+                  onChange={e => setFormData({...formData, tipoFrete: e.target.value})} 
+                  placeholder="Ex: 1x40, 1x20, LCL, FOB..." 
+                  maxLength={20}
+                />
+              </div>
+              <div className="form-group">
+                <label>Comissão (%)</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  value={formData.comissaoPercentual} 
+                  onChange={e => setFormData({...formData, comissaoPercentual: parseFloat(e.target.value) || 0})} 
+                  placeholder="Ex: 5"
+                />
+              </div>
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  id="chkExibirComissao" 
+                  checked={formData.flExibirComissao} 
+                  onChange={e => setFormData({...formData, flExibirComissao: e.target.checked})} 
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }} 
+                />
+                <label htmlFor="chkExibirComissao" style={{ cursor: 'pointer', margin: 0, fontSize: '0.9rem', color: '#fff' }}>Exibir Comissão no Relatório</label>
+              </div>
             </div>
 
             <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -253,14 +359,28 @@ const NovoEstudoEdcPage: React.FC = () => {
                 <span style={{ opacity: 0.7 }}>FOB Total:</span>
                 <span style={{ fontWeight: '600' }}>USD {totalFob.toLocaleString()}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                <span style={{ opacity: 0.7 }}>Câmbio Final:</span>
-                <span style={{ fontWeight: '600' }}>R$ {cotacaoFinal.toFixed(4)}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ opacity: 0.7 }}>Câmbio:</span>
+                <span style={{ fontWeight: '600' }}>R$ {formData.cotacaoDolar.toFixed(2)}</span>
               </div>
-              <div style={{ textAlign: 'right' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ opacity: 0.7 }}>Frete c/ PTAX:</span>
+                <span style={{ fontWeight: '600' }}>USD {(formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ opacity: 0.7 }}>Seguro:</span>
+                <span style={{ fontWeight: '600' }}>USD {formData.valorSeguroInternacional.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              {formData.flExibirComissao && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                  <span style={{ opacity: 0.7, color: '#fbbf24' }}>Comissão ({formData.comissaoPercentual}%):</span>
+                  <span style={{ fontWeight: '600', color: '#fbbf24' }}>USD {(totalFob * (formData.comissaoPercentual / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              )}
+              <div style={{ textAlign: 'right', marginTop: formData.flExibirComissao ? '0' : '1.5rem' }}>
                 <span style={{ fontSize: '0.8rem', opacity: 0.6, display: 'block', marginBottom: '4px' }}>Custo Est. Nacionalizado</span>
                 <span style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>
-                  R$ {(totalFob * cotacaoFinal * 1.62).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R$ {((((totalFob + (formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)) + formData.valorSeguroInternacional) * formData.cotacaoDolar) * 1.45) + (formData.flExibirComissao ? (totalFob * (formData.comissaoPercentual / 100) * formData.cotacaoDolar) : 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>

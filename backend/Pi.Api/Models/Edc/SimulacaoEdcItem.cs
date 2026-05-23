@@ -20,6 +20,10 @@ public class SimulacaoEdcItem
     [ForeignKey(nameof(IdProduto))]
     public ProdutoEdc? Produto { get; set; }
 
+    public int? IdModelo { get; set; }
+    [ForeignKey(nameof(IdModelo))]
+    public ModeloEdc? Modelo { get; set; }
+
     [Column(TypeName = "numeric(18,4)")]
     public decimal Quantidade { get; set; }
 

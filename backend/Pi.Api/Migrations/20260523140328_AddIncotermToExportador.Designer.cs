@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pi.Api.Data;
@@ -11,9 +12,11 @@ using Pi.Api.Data;
 namespace Pi.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523140328_AddIncotermToExportador")]
+    partial class AddIncotermToExportador
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -345,41 +348,6 @@ namespace Pi.Api.Migrations
                     b.ToTable("importadores", "edc");
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.Edc.ModeloEdc", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("FlAtivo")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("IdProduto")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdProduto");
-
-                    b.ToTable("modelos", "edc");
-                });
-
             modelBuilder.Entity("Pi.Api.Models.Edc.Ncm", b =>
                 {
                     b.Property<int>("Id")
@@ -510,17 +478,11 @@ namespace Pi.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ComissaoPercentual")
-                        .HasColumnType("numeric(18,4)");
-
                     b.Property<decimal>("CotacaoDolar")
                         .HasColumnType("numeric(18,4)");
 
                     b.Property<DateTime>("DataEstudo")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("FlExibirComissao")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("IdExportador")
                         .HasColumnType("integer");
@@ -618,9 +580,6 @@ namespace Pi.Api.Migrations
                     b.Property<decimal>("CubagemTotal")
                         .HasColumnType("numeric(18,4)");
 
-                    b.Property<int?>("IdModelo")
-                        .HasColumnType("integer");
-
                     b.Property<int>("IdProduto")
                         .HasColumnType("integer");
 
@@ -640,8 +599,6 @@ namespace Pi.Api.Migrations
                         .HasColumnType("numeric(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdModelo");
 
                     b.HasIndex("IdProduto");
 
@@ -1400,17 +1357,6 @@ namespace Pi.Api.Migrations
                     b.Navigation("FreteItem");
                 });
 
-            modelBuilder.Entity("Pi.Api.Models.Edc.ModeloEdc", b =>
-                {
-                    b.HasOne("Pi.Api.Models.Edc.ProdutoEdc", "Produto")
-                        .WithMany()
-                        .HasForeignKey("IdProduto")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Produto");
-                });
-
             modelBuilder.Entity("Pi.Api.Models.Edc.ProdutoEdc", b =>
                 {
                     b.HasOne("Pi.Api.Models.Edc.Ncm", "Ncm")
@@ -1468,11 +1414,6 @@ namespace Pi.Api.Migrations
 
             modelBuilder.Entity("Pi.Api.Models.Edc.SimulacaoEdcItem", b =>
                 {
-                    b.HasOne("Pi.Api.Models.Edc.ModeloEdc", "Modelo")
-                        .WithMany()
-                        .HasForeignKey("IdModelo")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Pi.Api.Models.Edc.ProdutoEdc", "Produto")
                         .WithMany()
                         .HasForeignKey("IdProduto")
@@ -1484,8 +1425,6 @@ namespace Pi.Api.Migrations
                         .HasForeignKey("IdSimulacao")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Modelo");
 
                     b.Navigation("Produto");
 
