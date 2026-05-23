@@ -136,7 +136,6 @@ const NovoEstudoEdcPage: React.FC = () => {
   };
 
   const totalFob = formData.itens.reduce((acc, i) => acc + (i.quantidade * i.valorFobUnitario), 0);
-  const cotacaoFinal = formData.cotacaoDolar;
 
   return (
     <div className="animate-fadeIn">
