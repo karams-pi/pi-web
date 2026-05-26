@@ -522,6 +522,9 @@ namespace Pi.Api.Migrations
                     b.Property<bool>("FlExibirComissao")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("FlSimularSubfaturamento")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("IdExportador")
                         .HasColumnType("integer");
 
@@ -534,10 +537,23 @@ namespace Pi.Api.Migrations
                     b.Property<int?>("IdPortoOrigem")
                         .HasColumnType("integer");
 
+                    b.Property<string>("MetodoCalculoFederais")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("MetodoCalculoIcms")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("NumeroReferencia")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("PercentualSubfaturamento")
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<decimal>("SpreadCambio")
                         .HasColumnType("numeric(18,4)");
@@ -635,6 +651,9 @@ namespace Pi.Api.Migrations
 
                     b.Property<decimal>("Quantidade")
                         .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal?>("ValorFobSubfaturado")
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal>("ValorFobUnitario")
                         .HasColumnType("numeric(18,2)");
@@ -1116,6 +1135,10 @@ namespace Pi.Api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id_pi_item_peca");
 
+                    b.Property<long?>("IdSubModulo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_sub_modulo");
+
                     b.Property<decimal>("Largura")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("largura");
@@ -1174,6 +1197,8 @@ namespace Pi.Api.Migrations
                         .HasDatabaseName("ix_pi_item_id_pi");
 
                     b.HasIndex("IdPiItemPeca");
+
+                    b.HasIndex("IdSubModulo");
 
                     b.ToTable("pi_item", "pi");
                 });
@@ -1324,6 +1349,63 @@ namespace Pi.Api.Migrations
                         .HasDatabaseName("ix_pi_sequencia");
 
                     b.ToTable("pi", "pi");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.SubModulo", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("codigo");
+
+                    b.Property<string>("DescricaoProduto")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("descricao_produto");
+
+                    b.Property<bool>("FlAtivo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("fl_ativo");
+
+                    b.Property<long>("IdModulo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_modulo");
+
+                    b.Property<long>("IdTecidoBase")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id_tecido_base");
+
+                    b.Property<string>("TecidoEspecifico")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("tecido_especifico");
+
+                    b.Property<decimal>("VolumeM3")
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("volume_m3");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdModulo")
+                        .HasDatabaseName("ix_sub_modulo_id_modulo");
+
+                    b.HasIndex("IdTecidoBase")
+                        .HasDatabaseName("ix_sub_modulo_id_tecido_base");
+
+                    b.HasIndex("IdModulo", "TecidoEspecifico")
+                        .HasDatabaseName("ix_sub_modulo_modulo_tecido_especifico");
+
+                    b.ToTable("sub_modulo", "pi");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Tecido", b =>
@@ -1591,11 +1673,18 @@ namespace Pi.Api.Migrations
                         .HasForeignKey("IdPiItemPeca")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Pi.Api.Models.SubModulo", "SubModulo")
+                        .WithMany()
+                        .HasForeignKey("IdSubModulo")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ModuloTecido");
 
                     b.Navigation("Pi");
 
                     b.Navigation("PiItemPeca");
+
+                    b.Navigation("SubModulo");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.PiItemPeca", b =>
@@ -1640,6 +1729,25 @@ namespace Pi.Api.Migrations
                     b.Navigation("Fornecedor");
 
                     b.Navigation("Frete");
+                });
+
+            modelBuilder.Entity("Pi.Api.Models.SubModulo", b =>
+                {
+                    b.HasOne("Pi.Api.Models.Modulo", "Modulo")
+                        .WithMany()
+                        .HasForeignKey("IdModulo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Api.Models.Tecido", "TecidoBase")
+                        .WithMany()
+                        .HasForeignKey("IdTecidoBase")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Modulo");
+
+                    b.Navigation("TecidoBase");
                 });
 
             modelBuilder.Entity("Pi.Api.Models.Categoria", b =>

@@ -30,6 +30,10 @@ const NovoEstudoEdcPage: React.FC = () => {
     valorSeguroInternacional: 0,
     comissaoPercentual: 0,
     flExibirComissao: false,
+    flSimularSubfaturamento: false,
+    percentualSubfaturamento: 50,
+    metodoCalculoIcms: 'SimplificadoExcel',
+    metodoCalculoFederais: 'SimplificadoExcel',
     status: 'Rascunho',
     itens: [] as any[],
     despesas: [] as any[]
@@ -66,6 +70,10 @@ const NovoEstudoEdcPage: React.FC = () => {
             valorSeguroInternacional: sim.valorSeguroInternacional || 0,
             comissaoPercentual: sim.comissaoPercentual || 0,
             flExibirComissao: sim.flExibirComissao || false,
+            flSimularSubfaturamento: sim.flSimularSubfaturamento || false,
+            percentualSubfaturamento: sim.percentualSubfaturamento || 50,
+            metodoCalculoIcms: sim.metodoCalculoIcms || 'SimplificadoExcel',
+            metodoCalculoFederais: sim.metodoCalculoFederais || 'SimplificadoExcel',
             status: sim.status || 'Rascunho',
             itens: sim.itens || [],
             despesas: sim.despesas || []
@@ -96,7 +104,8 @@ const NovoEstudoEdcPage: React.FC = () => {
           idModelo: firstModel?.id || 0, 
           idProduto: firstModel?.idProduto || 0, 
           quantidade: 1, 
-          valorFobUnitario: 0 
+          valorFobUnitario: 0,
+          valorFobSubfaturado: null
         }
       ]
     });
@@ -204,14 +213,17 @@ const NovoEstudoEdcPage: React.FC = () => {
                   <tr>
                     <th>Modelo Comercial</th>
                     <th style={{ width: '80px' }}>U.M.</th>
-                    <th style={{ width: '150px' }}>Quantidade</th>
-                    <th style={{ width: '160px' }}>FOB Unit. (USD)</th>
+                    <th style={{ width: '130px' }}>Quantidade</th>
+                    <th style={{ width: '150px' }}>FOB Unit. (USD)</th>
+                    {formData.flSimularSubfaturamento && (
+                      <th style={{ width: '150px' }}>FOB Sub Unit. (USD)</th>
+                    )}
                     <th style={{ width: '50px' }}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {formData.itens.length === 0 ? (
-                    <tr><td colSpan={5} style={{ textAlign: 'center', opacity: 0.5, padding: '30px' }}>Nenhum item adicionado.</td></tr>
+                    <tr><td colSpan={formData.flSimularSubfaturamento ? 6 : 5} style={{ textAlign: 'center', opacity: 0.5, padding: '30px' }}>Nenhum item adicionado.</td></tr>
                   ) : formData.itens.map((item, idx) => {
                     const model = modelos.find(m => m.id === item.idModelo);
                     const prod = model?.produto;
@@ -279,6 +291,23 @@ const NovoEstudoEdcPage: React.FC = () => {
                             <input type="number" step="0.01" value={item.valorFobUnitario} onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value))} />
                           </div>
                         </td>
+                        {formData.flSimularSubfaturamento && (
+                          <td>
+                            <div className="input-with-icon">
+                              <DollarSign size={14} style={{ color: '#a78bfa' }} />
+                              <input 
+                                type="number" 
+                                step="0.01" 
+                                placeholder={item.valorFobUnitario ? (item.valorFobUnitario * (formData.percentualSubfaturamento / 100)).toFixed(2) : '0.00'}
+                                value={item.valorFobSubfaturado === null || item.valorFobSubfaturado === undefined ? '' : item.valorFobSubfaturado} 
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  updateItem(idx, 'valorFobSubfaturado', val === '' ? null : parseFloat(val));
+                                }} 
+                              />
+                            </div>
+                          </td>
+                        )}
                         <td><button className="btn-icon btn-icon-danger" onClick={() => handleRemoveItem(idx)}><Trash2 size={16} /></button></td>
                       </tr>
                     );
@@ -351,6 +380,53 @@ const NovoEstudoEdcPage: React.FC = () => {
                 />
                 <label htmlFor="chkExibirComissao" style={{ cursor: 'pointer', margin: 0, fontSize: '0.9rem', color: '#fff' }}>Exibir Comissão no Relatório</label>
               </div>
+
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <input 
+                  type="checkbox" 
+                  id="chkSimularSubfaturamento" 
+                  checked={formData.flSimularSubfaturamento} 
+                  onChange={e => setFormData({...formData, flSimularSubfaturamento: e.target.checked})} 
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#a78bfa' }} 
+                />
+                <label htmlFor="chkSimularSubfaturamento" style={{ cursor: 'pointer', margin: 0, fontSize: '0.9rem', color: '#fff' }}>Simular Subfaturamento (Split)</label>
+              </div>
+
+              {formData.flSimularSubfaturamento && (
+                <div className="form-group animate-fadeIn" style={{ marginTop: '8px' }}>
+                  <label style={{ color: '#a78bfa' }}>Percentual Declarado (%)</label>
+                  <input 
+                    type="number" 
+                    value={formData.percentualSubfaturamento} 
+                    onChange={e => setFormData({...formData, percentualSubfaturamento: parseFloat(e.target.value) || 50})} 
+                    placeholder="Ex: 50"
+                  />
+                </div>
+              )}
+
+              <div className="form-group" style={{ marginTop: '8px' }}>
+                <label>Método de ICMS</label>
+                <select 
+                  className="premium-select"
+                  value={formData.metodoCalculoIcms} 
+                  onChange={e => setFormData({...formData, metodoCalculoIcms: e.target.value})}
+                >
+                  <option value="SimplificadoExcel">Simplificado (Igual ao Excel)</option>
+                  <option value="PorDentroLegal">Legal / Por Dentro (Correto)</option>
+                </select>
+              </div>
+
+              <div className="form-group" style={{ marginTop: '8px' }}>
+                <label>Tributos Federais</label>
+                <select 
+                  className="premium-select"
+                  value={formData.metodoCalculoFederais} 
+                  onChange={e => setFormData({...formData, metodoCalculoFederais: e.target.value})}
+                >
+                  <option value="SimplificadoExcel">Simplificado (Igual ao Excel)</option>
+                  <option value="Legal">Legal (Apenas Aduaneiro)</option>
+                </select>
+              </div>
             </div>
 
             <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -358,6 +434,14 @@ const NovoEstudoEdcPage: React.FC = () => {
                 <span style={{ opacity: 0.7 }}>FOB Total:</span>
                 <span style={{ fontWeight: '600' }}>USD {totalFob.toLocaleString()}</span>
               </div>
+              {formData.flSimularSubfaturamento && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#a78bfa' }}>
+                  <span style={{ opacity: 0.9 }}>FOB Declarado (SUB):</span>
+                  <span style={{ fontWeight: '600' }}>
+                    USD {formData.itens.reduce((acc, i) => acc + (i.quantidade * (i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined ? i.valorFobSubfaturado : (i.valorFobUnitario * (formData.percentualSubfaturamento / 100)))), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ opacity: 0.7 }}>Câmbio:</span>
                 <span style={{ fontWeight: '600' }}>R$ {formData.cotacaoDolar.toFixed(2)}</span>
@@ -376,11 +460,34 @@ const NovoEstudoEdcPage: React.FC = () => {
                   <span style={{ fontWeight: '600', color: '#fbbf24' }}>USD {(totalFob * (formData.comissaoPercentual / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               )}
-              <div style={{ textAlign: 'right', marginTop: formData.flExibirComissao ? '0' : '1.5rem' }}>
-                <span style={{ fontSize: '0.8rem', opacity: 0.6, display: 'block', marginBottom: '4px' }}>Custo Est. Nacionalizado</span>
-                <span style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>
-                  R$ {((((totalFob + (formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)) + formData.valorSeguroInternacional) * formData.cotacaoDolar) * 1.45) + (formData.flExibirComissao ? (totalFob * (formData.comissaoPercentual / 100) * formData.cotacaoDolar) : 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
+
+              {/* Seção de Totais Lado a Lado */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '1.5rem' }}>
+                <div style={{ textAlign: 'right', borderBottom: formData.flSimularSubfaturamento ? '1px solid rgba(255,255,255,0.05)' : 'none', paddingBottom: formData.flSimularSubfaturamento ? '8px' : '0' }}>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.6, display: 'block', marginBottom: '2px' }}>
+                    {formData.flSimularSubfaturamento ? 'Custo Cheio (Sem Subfaturamento)' : 'Custo Est. Nacionalizado'}
+                  </span>
+                  <span style={{ fontSize: formData.flSimularSubfaturamento ? '1.4rem' : '1.8rem', fontWeight: '800', color: formData.flSimularSubfaturamento ? 'var(--muted)' : 'var(--primary)' }}>
+                    R$ {((((totalFob + (formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)) + formData.valorSeguroInternacional) * formData.cotacaoDolar) * 1.45) + (formData.flExibirComissao ? (totalFob * (formData.comissaoPercentual / 100) * formData.cotacaoDolar) : 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                
+                {formData.flSimularSubfaturamento && (
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.85rem', color: '#a78bfa', fontWeight: '600', display: 'block', marginBottom: '2px' }}>
+                      Custo Nacionalizado c/ SUB ({formData.percentualSubfaturamento}%)
+                    </span>
+                    <span style={{ fontSize: '1.8rem', fontWeight: '800', color: '#a78bfa' }}>
+                      R$ {(() => {
+                        const totalFobSubVal = formData.itens.reduce((acc, i) => acc + (i.quantidade * (i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined ? i.valorFobSubfaturado : (i.valorFobUnitario * (formData.percentualSubfaturamento / 100)))), 0);
+                        const valorFobPorForaBrl = (totalFob - totalFobSubVal) * formData.cotacaoDolar;
+                        const aduaneiroSubBrl = ((totalFobSubVal + (formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)) + formData.valorSeguroInternacional) * formData.cotacaoDolar);
+                        const comissaoBrl = formData.flExibirComissao ? (totalFob * (formData.comissaoPercentual / 100) * formData.cotacaoDolar) : 0;
+                        return ((aduaneiroSubBrl * 1.45) + valorFobPorForaBrl + comissaoBrl).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                      })()}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

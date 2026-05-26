@@ -136,6 +136,8 @@ public class PiExportService
                 .ThenInclude(i => i.ModuloTecido!)
                     .ThenInclude(mt => mt.Tecido!)
             .Include(p => p.PiItens)
+                .ThenInclude(i => i.SubModulo!)
+            .Include(p => p.PiItens)
                 .ThenInclude(i => i.PiItemPeca)
             .FirstOrDefaultAsync(p => p.Id == piId);
 
@@ -865,7 +867,7 @@ public class PiExportService
                 ws.Cells[currentRow, 7].Value = item.Profundidade;
                 ws.Cells[currentRow, 8].Value = item.Quantidade;
                 ws.Cells[currentRow, 9].Value = item.M3 * item.Quantidade;
-                ws.Cells[currentRow, 10].Value = item.ModuloTecido?.Tecido?.Nome;
+                ws.Cells[currentRow, 10].Value = item.SubModulo?.TecidoEspecifico ?? item.ModuloTecido?.Tecido?.Nome;
                 ws.Cells[currentRow, 11].Value = item.ModuloTecido?.CodigoModuloTecido;
                 ws.Cells[currentRow, 12].Value = item.Observacao;
 

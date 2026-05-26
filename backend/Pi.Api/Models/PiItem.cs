@@ -82,6 +82,12 @@ public class PiItem
     [Column("finishing")]
     public string? Finishing { get; set; }
 
+    [Column("id_sub_modulo")]
+    public long? IdSubModulo { get; set; }
+
+    [ForeignKey(nameof(IdSubModulo))]
+    public SubModulo? SubModulo { get; set; }
+
     // Navigation
     public ProformaInvoice? Pi { get; set; }
     public ModuloTecido? ModuloTecido { get; set; }

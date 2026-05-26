@@ -127,6 +127,14 @@ public class PisController : ControllerBase
                         i.Feet,
                         i.Finishing,
                         i.IdPiItemPeca,
+                        i.IdSubModulo,
+                        SubModulo = i.SubModulo != null ? new {
+                            i.SubModulo.Id,
+                            i.SubModulo.Codigo,
+                            i.SubModulo.DescricaoProduto,
+                            i.SubModulo.TecidoEspecifico,
+                            i.SubModulo.VolumeM3
+                        } : null,
                         ModuloTecido = i.ModuloTecido != null ? new {
                             i.ModuloTecido.Id,
                             i.ModuloTecido.CodigoModuloTecido,
@@ -167,6 +175,14 @@ public class PisController : ControllerBase
                     i.Feet,
                     i.Finishing,
                     i.IdPiItemPeca,
+                    i.IdSubModulo,
+                    SubModulo = i.SubModulo != null ? new {
+                        i.SubModulo.Id,
+                        i.SubModulo.Codigo,
+                        i.SubModulo.DescricaoProduto,
+                        i.SubModulo.TecidoEspecifico,
+                        i.SubModulo.VolumeM3
+                    } : null,
                     ModuloTecido = i.ModuloTecido != null ? new {
                         i.ModuloTecido.Id,
                         i.ModuloTecido.CodigoModuloTecido,
@@ -454,6 +470,7 @@ public class PisController : ControllerBase
         target.Observacao = source.Observacao;
         target.Feet = source.Feet;
         target.Finishing = source.Finishing;
+        target.IdSubModulo = source.IdSubModulo;
     }
 
     [HttpDelete("{id}")]

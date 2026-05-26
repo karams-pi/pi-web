@@ -54,6 +54,17 @@ public class SimulacaoEdc
 
     public bool FlExibirComissao { get; set; } = false;
 
+    public bool FlSimularSubfaturamento { get; set; } = false;
+
+    [Column(TypeName = "numeric(18,4)")]
+    public decimal PercentualSubfaturamento { get; set; } = 50m;
+
+    [MaxLength(50)]
+    public string MetodoCalculoIcms { get; set; } = "SimplificadoExcel";
+
+    [MaxLength(50)]
+    public string MetodoCalculoFederais { get; set; } = "SimplificadoExcel";
+
     [MaxLength(50)]
     public string Status { get; set; } = "Rascunho"; // Rascunho, Aprovado, Arquivado
 

@@ -21,7 +21,8 @@ import { listModelos } from "../api/modelos";
 import { listMarcas } from "../api/marcas";
 import { listCategorias } from "../api/categorias";
 import { listTecidos } from "../api/tecidos";
-import type { ModuloTecido, Configuracao, ProformaInvoice, PiItemPeca, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido } from "../api/types";
+import { listSubModulosByModulo } from "../api/submodulos";
+import type { ModuloTecido, Configuracao, ProformaInvoice, PiItemPeca, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido, SubModulo } from "../api/types";
 import { Save, Plus, Trash2, Search, Printer, FileSpreadsheet, FileText, Pencil } from "lucide-react";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { PiSearchModal } from "../components/PiSearchModal";
@@ -70,6 +71,8 @@ type ItemGrid = {
   ValorFinalItemBRL: number;
   ValorFinalItemUSDRisco: number;
   idPiItemPeca?: number;
+  idSubModulo?: number;
+  subModulo?: SubModulo;
   codigoModuloTecido?: string;
   observacao?: string;
   feet?: string;
@@ -169,6 +172,31 @@ export default function ProformaInvoiceV2Page() {
   const [selModuloTecido, setSelModuloTecido] = useState("");
   const [codigoModuloTecido, setCodigoModuloTecido] = useState("");
   const [quantidade, setQuantidade] = useState<number | string>(1);
+  const [subModulos, setSubModulos] = useState<SubModulo[]>([]);
+  const [selSubModuloId, setSelSubModuloId] = useState<string>("");
+
+  useEffect(() => {
+    if (isFerguile && selModuloTecido && selModuloTecido !== "0") {
+      const mt = modulosTecidos.find(m => String(m.id) === selModuloTecido);
+      if (mt?.modulo) {
+        listSubModulosByModulo(mt.modulo.id)
+          .then(res => {
+            setSubModulos(res || []);
+            // If the current selSubModuloId is not in the new results, clear it
+            if (res && !res.some(sm => String(sm.id) === selSubModuloId)) {
+              setSelSubModuloId("");
+            }
+          })
+          .catch(console.error);
+      } else {
+        setSubModulos([]);
+        setSelSubModuloId("");
+      }
+    } else {
+      setSubModulos([]);
+      setSelSubModuloId("");
+    }
+  }, [selModuloTecido, isFerguile, modulosTecidos]);
 
   useEffect(() => {
     loadInitialData();
@@ -254,6 +282,8 @@ export default function ProformaInvoiceV2Page() {
                   ValorFinalItemBRL: item.valorFinalItemBRL,
                   ValorFinalItemUSDRisco: item.valorFinalItemUSDRisco,
                   idPiItemPeca: peca.id,
+                  idSubModulo: item.idSubModulo,
+                  subModulo: item.subModulo,
                   codigoModuloTecido: item.tempCodigoModuloTecido || item.moduloTecido?.codigoModuloTecido || item.codigoModuloTecido || "",
                   observacao: item.observacao,
                   feet: item.feet,
@@ -282,6 +312,8 @@ export default function ProformaInvoiceV2Page() {
               ValorFinalItemBRL: i.valorFinalItemBRL,
               ValorFinalItemUSDRisco: i.valorFinalItemUSDRisco,
               idPiItemPeca: i.idPiItemPeca,
+              idSubModulo: i.idSubModulo,
+              subModulo: i.subModulo,
               codigoModuloTecido: i.tempCodigoModuloTecido || i.moduloTecido?.codigoModuloTecido || i.codigoModuloTecido || "",
               observacao: i.observacao,
               feet: i.feet,
@@ -692,11 +724,27 @@ export default function ProformaInvoiceV2Page() {
     }
   }, [form.cotacaoRisco, isFerguile, totalM3Pi, form.moedaExibicao]);
 
+  const handleSubModuloChange = (subModuloIdStr: string) => {
+    setSelSubModuloId(subModuloIdStr);
+    if (!subModuloIdStr) return;
+    const sm = subModulos.find(x => String(x.id) === subModuloIdStr);
+    if (!sm) return;
+
+    // Find the general ModuloTecido that matches the same model (idModulo) and the general base fabric (idTecidoBase)
+    const mt = modulosTecidos.find(x => x.idModulo === sm.idModulo && x.idTecido === sm.idTecidoBase);
+    if (mt) {
+      setSelModuloTecido(String(mt.id));
+      setCodigoModuloTecido(sm.codigo);
+    }
+  };
+
   const addItem = () => { 
     setEditingItemTempId(null);
     setSelModuloTecido("");
     setCodigoModuloTecido("");
     setQuantidade(1);
+    setSelSubModuloId("");
+    setSubModulos([]);
     setShowItemModal(true); 
   };
 
@@ -716,6 +764,18 @@ export default function ProformaInvoiceV2Page() {
       setFilterCategoria(String(mt.modulo?.categoria?.id || ""));
       setFilterMarca(String(mt.modulo?.marca?.id || ""));
       setFilterTecido(String(mt.tecido?.id || ""));
+
+      // Force immediate specific fabrics load to bypass useEffect async lag during load
+      if (isFerguile && mt.modulo) {
+        listSubModulosByModulo(mt.modulo.id).then(res => {
+          setSubModulos(res || []);
+          if (item.idSubModulo) {
+            setSelSubModuloId(String(item.idSubModulo));
+          } else {
+            setSelSubModuloId("");
+          }
+        }).catch(console.error);
+      }
     }
 
     setShowItemModal(true);
@@ -795,6 +855,10 @@ export default function ProformaInvoiceV2Page() {
       config?.percentualGordura || 0
     );
     
+    const sm = isFerguile && selSubModuloId 
+      ? subModulos.find(x => String(x.id) === selSubModuloId) 
+      : null;
+
     if (editingItemTempId !== null) {
       // MODE: EDIT
       setItens(prev => prev.map(it => {
@@ -804,6 +868,7 @@ export default function ProformaInvoiceV2Page() {
           const newAltura = mt.modulo?.altura ?? it.altura;
           const cM3 = newLargura * newProfundidade * newAltura;
           const newM3 = cM3 > 100 ? cM3 / 1000000 : cM3;
+          const finalM3 = sm ? sm.volumeM3 : (newM3 > 0 ? newM3 : it.m3);
 
           return {
             ...it,
@@ -814,8 +879,10 @@ export default function ProformaInvoiceV2Page() {
             largura: newLargura,
             profundidade: newProfundidade,
             altura: newAltura,
-            m3: newM3 > 0 ? newM3 : it.m3,
+            m3: finalM3,
             ValorEXW: exw,
+            idSubModulo: sm ? sm.id : undefined,
+            subModulo: sm || undefined,
             codigoModuloTecido: codigoModuloTecido
           };
         }
@@ -828,6 +895,7 @@ export default function ProformaInvoiceV2Page() {
       const alt = mt.modulo?.altura || 0;
       const cM3 = larg * prof * alt;
       const newM3 = cM3 > 100 ? cM3 / 1000000 : cM3;
+      const finalM3 = sm ? sm.volumeM3 : newM3;
 
       const newItem: ItemGrid = {
         tempId: Math.random(),
@@ -838,12 +906,14 @@ export default function ProformaInvoiceV2Page() {
         profundidade: prof,
         altura: alt,
         pa: 0,
-        m3: newM3,
+        m3: finalM3,
         ValorEXW: exw,
         ValorFreteRateadoBRL: 0,
         ValorFreteRateadoUSD: 0,
         ValorFinalItemBRL: 0,
         ValorFinalItemUSDRisco: 0,
+        idSubModulo: sm ? sm.id : undefined,
+        subModulo: sm || undefined,
         codigoModuloTecido: codigoModuloTecido
       };
       setItens([...itens, newItem]);
@@ -854,6 +924,7 @@ export default function ProformaInvoiceV2Page() {
     setSelModuloTecido("");
     setCodigoModuloTecido("");
     setQuantidade(1);
+    setSelSubModuloId("");
   };
 
   const removeItem = (tempId: number) => {
@@ -925,6 +996,7 @@ export default function ProformaInvoiceV2Page() {
           feet: item.feet,
           finishing: item.finishing || "",
           idPiItemPeca: item.idPiItemPeca,
+          idSubModulo: item.idSubModulo,
           rateioFrete: 0,
         }))
       }));
@@ -1002,6 +1074,7 @@ export default function ProformaInvoiceV2Page() {
           feet: item.feet,
           finishing: item.finishing || "",
           idPiItemPeca: item.idPiItemPeca,
+          idSubModulo: item.idSubModulo,
           rateioFrete: 0,
         }))
       }));
@@ -1433,7 +1506,7 @@ export default function ProformaInvoiceV2Page() {
                                   ) : (
                                     isFerguile && (
                                       <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
-                                        {mtInfo?.tecido?.nome ? (group.commonCode ? `${mtInfo.tecido.nome} - ${group.commonCode}` : mtInfo.tecido.nome) : "-"}
+                                        {item.subModulo?.tecidoEspecifico || mtInfo?.tecido?.nome || "-"}
                                       </td>
                                     )
                                   )}
@@ -1669,6 +1742,25 @@ export default function ProformaInvoiceV2Page() {
                   placeholder="Selecione um módulo..."
                 />
               </div>
+
+              {isFerguile && selModuloTecido && selModuloTecido !== "0" && (
+                <div className="field" style={{ marginBottom: "25px" }}>
+                  <label className="label" style={{ color: "#94a3b8" }}>Tecido Específico (Ferguile)</label>
+                  <select
+                    className="cl-select"
+                    value={selSubModuloId}
+                    onChange={(e) => handleSubModuloChange(e.target.value)}
+                    style={{ width: "100%", padding: "8px", background: "#1e1e2d", color: "#e0e0e0", border: "1px solid #333", borderRadius: "4px" }}
+                  >
+                    <option value="">Selecione o Tecido...</option>
+                    {subModulos.map(sm => (
+                      <option key={sm.id} value={sm.id}>
+                        {sm.tecidoEspecifico} - {sm.descricaoProduto} (Cód: {sm.codigo}, Vol: {sm.volumeM3} m³)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "25px", marginBottom: "35px" }}>
                 <div className="field">

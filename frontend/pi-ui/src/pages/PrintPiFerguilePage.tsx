@@ -116,7 +116,7 @@ export default function PrintPiFerguilePage() {
       return {
         item, mt, referencia: marca, descricao: mt?.modulo?.descricao || "",
         quantidade: item.quantidade, quantidadePeca: item.quantidadePeca, volM3,
-        fabricName: (mt?.tecido?.nome || "Sem Tecido") + (item.codigoModuloTecido ? ` - ${item.codigoModuloTecido}` : ""), 
+        fabricName: (item.subModulo?.tecidoEspecifico || mt?.tecido?.nome || "Sem Tecido") + (item.codigoModuloTecido ? ` - ${item.codigoModuloTecido}` : ""), 
         itemUnitFinalDisp
       };
     });

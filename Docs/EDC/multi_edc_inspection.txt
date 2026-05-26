@@ -1,0 +1,369 @@
+INSPECTION OF ALL EDCs IN DOCS/EDC
+============================================================
+
+FILE: EDC - AGROSAFRA - 06-05-2026.xlsx
+---------------------------------------
+Sheets: ['Resumo 100%', 'LISTA DE COMPRAS', 'Est. Cust. Naci.', 'Rateio Custos Fixos']
+  Sheet 'Resumo 100%': max_row=59, max_column=18
+  First 10 rows, 15 columns:
+  														
+  														
+  	Estimativa de Custo 100%								Quantidade 					
+  														
+  									100	5.8				
+  									300	2.1				
+  									300	10				
+  				USO: REVENDA		CONSIDERAR ICMS 6%			300	10				
+  		PRODUTO: CABEÇOTES E BLOCOS		PORTO SAÍDA: SHANGHAI		=TODAY()			300	10				
+  		FRETE: FCL		PORTO ENTRADA: PARANAGUÁ		SIMULAÇÃO 100%			100	11.5				
+
+  Sheet 'LISTA DE COMPRAS': max_row=59, max_column=27
+  First 10 rows, 15 columns:
+  LISTA DE COMPRA														
+  														
+  Item	Estimativa de Custo 100%	Produto	NCM	II	IPI	PIS	COFINS	ICMS	Quantidade 	Preço Unitário	Preço Unitário Sub 50%	Preço total por produto	Preço total por produto	Preço total por produto Sub
+  									=SUM(J5:J57)	=SUM(K5:K57)		=SUM(M5:M57)	=F59	
+  1		Cylinder Head Cummins ISB 5.9/6.7	84099959	0.16	0.0301	0.0312	0.1497	0.06	30	328.57	=K5/2	=K5*J5	=M5*$N$4	=L5*J5*$N$4
+  2		Cylinder Head Volvo FH13	84099959	0.16	0.0301	0.0312	0.1497	0.06	30	1275		=K6*J6	=M6*$N$4	=L6*J6*$N$4
+  3		Cylinder Head Cummins 4BT 	84099959	0.16	0.0301	0.0312	0.1497	0.06	20	200		=K7*J7	=M7*$N$4	=L7*J7*$N$4
+  4		Cylinder Head MB 457/460 Axor	84099959	0.16	0.0301	0.0312	0.1497	0.06	240	132.43		=K8*J8	=M8*$N$4	=L8*J8*$N$4
+  5		CABECOTE CUMMINS SERIE C	84099959	0.16	0.0301	0.0312	0.1497	0.06	20	229.43		=K9*J9	=M9*$N$4	=L9*J9*$N$4
+  6		CABECOTE MAN 4CIL D08	84099959	0.16	0.0301	0.0312	0.1497	0.06	3	707.96		=K10*J10	=M10*$N$4	=L10*J10*$N$4
+
+  Sheet 'Est. Cust. Naci.': max_row=62, max_column=55
+  First 10 rows, 15 columns:
+  														
+  		DETALHES DO PRODUTO									VALOR ADUANEIRO			
+  	Nº	ITEM	Código	Bitola (mm)	Embal.	NCM	QTD	% Rateio Preço	Preço unitário Fábrica (USD)	Preço x QTD (Valor em USD)	Preço x QTD (valor em BRL)	Preço x QTD (valor em BRL) SUB	THC (valor em BRL)	Valor do frete (Valor em BRL)
+  Nº											=N62	4.8887	0	
+  AAA											=SUM(L6:L58)			=SUM(O6:O58)
+  AAA	='LISTA DE COMPRAS'!A5	='LISTA DE COMPRAS'!C5				='LISTA DE COMPRAS'!D5	='LISTA DE COMPRAS'!J5	='LISTA DE COMPRAS'!P5	='LISTA DE COMPRAS'!K5	=H6*J6	=K6*$L$4	=L6*50%	=$N$4*I6	='Rateio Custos Fixos'!E12
+  	='LISTA DE COMPRAS'!A6	='LISTA DE COMPRAS'!C6				='LISTA DE COMPRAS'!D6	='LISTA DE COMPRAS'!J6	='LISTA DE COMPRAS'!P6	='LISTA DE COMPRAS'!K6	=H7*J7	=K7*$L$4	=L7*50%	=$N$4*I7	='Rateio Custos Fixos'!E13
+  	='LISTA DE COMPRAS'!A7	='LISTA DE COMPRAS'!C7				='LISTA DE COMPRAS'!D7	='LISTA DE COMPRAS'!J7	='LISTA DE COMPRAS'!P7	='LISTA DE COMPRAS'!K7	=H8*J8	=K8*$L$4	=L8*50%	=$N$4*I8	='Rateio Custos Fixos'!E14
+  	='LISTA DE COMPRAS'!A8	='LISTA DE COMPRAS'!C8				='LISTA DE COMPRAS'!D8	='LISTA DE COMPRAS'!J8	='LISTA DE COMPRAS'!P8	='LISTA DE COMPRAS'!K8	=H9*J9	=K9*$L$4	=L9*50%	=$N$4*I9	='Rateio Custos Fixos'!E15
+  	='LISTA DE COMPRAS'!A9	='LISTA DE COMPRAS'!C9				='LISTA DE COMPRAS'!D9	='LISTA DE COMPRAS'!J9	='LISTA DE COMPRAS'!P9	='LISTA DE COMPRAS'!K9	=H10*J10	=K10*$L$4	=L10*50%	=$N$4*I10	='Rateio Custos Fixos'!E16
+
+  Sheet 'Rateio Custos Fixos': max_row=66, max_column=23
+  First 10 rows, 15 columns:
+  CÂMBIO					FRETE	R$								
+  					3363	=F2*B3								
+  #VALUE!	5.1				2344	=F3								
+  #VALUE!	<openpyxl.worksheet.formula.ArrayFormula object at 0x000002AB83F5D6A0>				TOTAL	=SUM(G2:G3)								
+  						=G4/B3								
+  														
+  														
+  														
+  														
+  Produto	Quantidade	='[2]Lista de Compra'!Q2		FRETE	TAXA SISCOMEX	LIBERAÇÃO DE B/L	T.H.C|  CAPATAZIA	ISPS	DAMAGE PROTECTION	DESCONSOLIDAÇÃO	DEVOLUÇÃO DE CONTAINER	TRS	AFRMM	ARMAZENAGEM TCP
+
+
+============================================================
+
+FILE: EDC - CHAPA INOX - 24-03-2026 - ALUPROM.xlsx
+--------------------------------------------------
+Sheets: ['Resumo 100%', 'LISTA DE COMPRAS', 'Est. Cust. Naci.', 'Rateio Custos Fixos']
+  Sheet 'Resumo 100%': max_row=62, max_column=19
+  First 10 rows, 15 columns:
+  														
+  														
+  	Estimativa de Custo 100%													
+  														
+  		CLIENTE: ALUPLOM												
+  														
+  														
+  		REGIME TRIBUTÁRIO: PRESUMIDO		USO: INDUSTRIALIZAÇÃO		CONSIDERAR ICMS 6%			Valor das despesas	52965.3615976				
+  		PRODUTO: CHAPA DE AÇO INOX		PORTO SAÍDA: SHANGHAI		=TODAY()			Custo total	90312.50935759999				
+  		FRETE: FCL		PORTO ENTRADA: PARANGUÁ		SIMULAÇÃO 100%								
+
+  Sheet 'LISTA DE COMPRAS': max_row=16, max_column=28
+  First 10 rows, 15 columns:
+  LISTA DE COMPRA														
+  														
+  Item	Estimativa de Custo 100%	Produto	NCM	II	IPI	PIS	COFINS	ICMS	Quantidade (kg)	Preço Unitário	Preço Unitário Sub 50%	Preço total por produto	Preço total por produto	Preço total por produto Sub
+  									=SUM(J5:J5)	=SUM(K5:K5)		=SUM(M5:M5)	5.38	
+  1		Chapa de aço Inox	72192300	0.126	0.0365	0.021	0.0965	0.06	27	1500	=K5/2	=K5*J5	=M5*$N$4	=L5*J5*$N$4
+  														
+  														
+  														
+  														
+  														
+
+  Sheet 'Est. Cust. Naci.': max_row=43, max_column=54
+  First 10 rows, 15 columns:
+  														
+  		DETALHES DO PRODUTO									VALOR ADUANEIRO			
+  	Nº	ITEM	Código	Bitola (mm)	Embal.	NCM	QTD	% Rateio Preço	Preço unitário Fábrica (USD)	Preço x QTD (Valor em USD)	Preço x QTD (valor em BRL)	Preço x QTD (valor em BRL) SUB	THC (valor em BRL)	Valor do frete (Valor em BRL)
+  Nº											=N13	4.8887	0	
+  AAA														
+  AAA	='LISTA DE COMPRAS'!A5	='LISTA DE COMPRAS'!C5				='LISTA DE COMPRAS'!D5	='LISTA DE COMPRAS'!J5	='LISTA DE COMPRAS'!Q5	='LISTA DE COMPRAS'!K5	=H6*J6	=K6*$L$4	=L6*50%	=$N$4*I6	='Rateio Custos Fixos'!E13
+  														 
+  														
+  														
+  														
+
+  Sheet 'Rateio Custos Fixos': max_row=18, max_column=22
+  First 10 rows, 15 columns:
+  CÂMBIO					FRETE	R$								
+  					3500	=F2*B3								
+  #VALUE!	5.26				2800	=F3								
+  #VALUE!	<openpyxl.worksheet.formula.ArrayFormula object at 0x000002AB83F86210>				TOTAL	=SUM(G2:G3)								
+  						=G4/B3								
+  														
+  														
+  														
+  														
+  Produto	Quantidade	='[2]Lista de Compra'!Q2		FRETE	TAXA SISCOMEX	LIBERAÇÃO DE B/L	T.H.C|  CAPATAZIA	ISPS	DAMAGE PROTECTION	DESCONSOLIDAÇÃO	DEVOLUÇÃO DE CONTAINER	TRS	AFRMM	ARMAZENAGEM TCP
+
+
+============================================================
+
+FILE: EDC - FIBRA- 24-03-2026 .xlsx
+-----------------------------------
+Sheets: ['Resumo 100%', 'LISTA DE COMPRAS', 'Est. Cust. Naci.', 'Rateio Custos Fixos']
+  Sheet 'Resumo 100%': max_row=57, max_column=18
+  First 10 rows, 15 columns:
+  														
+  														
+  	Estimativa de Custo 100%								Quantidade 					
+  														
+  									100	5.8				
+  									300	2.1				
+  									300	10				
+  		REGIME TRIBUTÁRIO: LUCRO PRESUMIDO/ REAL		USO: REVENDA		CONSIDERAR ICMS 6%			300	10				
+  		PRODUTO: FIBRA		PORTO SAÍDA: QINGDAO		=TODAY()			300	10				
+  		FRETE: FCL		PORTO ENTRADA: PARANAGUÁ		SIMULAÇÃO 100%			100	11.5				
+
+  Sheet 'LISTA DE COMPRAS': max_row=11, max_column=27
+  First 10 rows, 15 columns:
+  LISTA DE COMPRA														
+  														
+  Item	kg Unitário	Produto	NCM	II	IPI	PIS	COFINS	ICMS	Quantidade 	Preço Unitário	Preço Unitário Sub 50%	Preço total por produto	Preço total por produto	Preço total por produto Sub
+  									=SUM(J5:J9)	=SUM(K5:K9)		=SUM(M5:M9)	=F11	
+  1		FIBRA  0.9DX38MM  na versão virgem	55032090	0.126	0.0365	0.021	0.0965	0.06	3920	1.21	=K5/2	=K5*J5	=M5*$N$4	=L5*J5*$N$4
+  2												=K6*J6	=M6*$N$4	=L6*J6*$N$4
+  3												=K7*J7	=M7*$N$4	=L7*J7*$N$4
+  4												=K8*J8	=M8*$N$4	=L8*J8*$N$4
+  5												=K9*J9	=M9*$N$4	=L9*J9*$N$4
+  														
+
+  Sheet 'Est. Cust. Naci.': max_row=14, max_column=55
+  First 10 rows, 15 columns:
+  														
+  		DETALHES DO PRODUTO									VALOR ADUANEIRO			
+  	Nº	ITEM	Código	Bitola (mm)	Embal.	NCM	QTD	% Rateio Preço	Preço unitário Fábrica (USD)	Preço x QTD (Valor em USD)	Preço x QTD (valor em BRL)	Preço x QTD (valor em BRL) SUB	THC (valor em BRL)	Valor do frete (Valor em BRL)
+  Nº											=N14	4.8887	0	
+  AAA											=SUM(L6:L10)			=SUM(O6:O10)
+  AAA	='LISTA DE COMPRAS'!A5	='LISTA DE COMPRAS'!C5				='LISTA DE COMPRAS'!D6	='LISTA DE COMPRAS'!J5	='LISTA DE COMPRAS'!P5	='LISTA DE COMPRAS'!K5	=H6*J6	=K6*$L$4	=L6*50%	=$N$4*I6	='Rateio Custos Fixos'!E12
+  	='LISTA DE COMPRAS'!A6	='LISTA DE COMPRAS'!C6				='LISTA DE COMPRAS'!D7	='LISTA DE COMPRAS'!J6	='LISTA DE COMPRAS'!P6	='LISTA DE COMPRAS'!K6	=H7*J7	=K7*$L$4	=L7*50%	=$N$4*I7	='Rateio Custos Fixos'!E13
+  	='LISTA DE COMPRAS'!A7	='LISTA DE COMPRAS'!C7				='LISTA DE COMPRAS'!D8	='LISTA DE COMPRAS'!J7	='LISTA DE COMPRAS'!P7	='LISTA DE COMPRAS'!K7	=H8*J8	=K8*$L$4	=L8*50%	=$N$4*I8	='Rateio Custos Fixos'!E14
+  	='LISTA DE COMPRAS'!A8	='LISTA DE COMPRAS'!C8				='LISTA DE COMPRAS'!D9	='LISTA DE COMPRAS'!J8	='LISTA DE COMPRAS'!P8	='LISTA DE COMPRAS'!K8	=H9*J9	=K9*$L$4	=L9*50%	=$N$4*I9	='Rateio Custos Fixos'!E15
+  	='LISTA DE COMPRAS'!A9	='LISTA DE COMPRAS'!C9				='LISTA DE COMPRAS'!#REF!	='LISTA DE COMPRAS'!J9	='LISTA DE COMPRAS'!P9	='LISTA DE COMPRAS'!K9	=H10*J10	=K10*$L$4	=L10*50%	=$N$4*I10	='Rateio Custos Fixos'!E16
+
+  Sheet 'Rateio Custos Fixos': max_row=17, max_column=22
+  First 10 rows, 15 columns:
+  CÂMBIO					FRETE	R$								
+  					3200	=F2*B3								
+  #VALUE!	5.23				1900	=F3								
+  #VALUE!	<openpyxl.worksheet.formula.ArrayFormula object at 0x000002AB83F86210>				TOTAL	=SUM(G2:G3)								
+  						=G4/B3								
+  														
+  														
+  														
+  														
+  Produto	Quantidade	='[2]Lista de Compra'!Q2		FRETE	TAXA SISCOMEX	LIBERAÇÃO DE B/L	T.H.C|  CAPATAZIA	ISPS	DAMAGE PROTECTION	DESCONSOLIDAÇÃO	DEVOLUÇÃO DE CONTAINER	TRS	AFRMM	ARMAZENAGEM 
+
+
+============================================================
+
+FILE: EDC - RALLI - 11-03-2026.xlsx
+-----------------------------------
+Sheets: ['Resumo 100%', 'LISTA DE COMPRAS', 'Est. Cust. Naci.', 'Rateio Custos Fixos']
+  Sheet 'Resumo 100%': max_row=58, max_column=18
+  First 10 rows, 15 columns:
+  														
+  														
+  	Estimativa de Custo 100%								Quantidade 					
+  														
+  									100	5.8				
+  									300	2.1				
+  									300	10				
+  		REGIME TRIBUTÁRIO: SIMPLES NACIONAL		USO: REVENDA		CONSIDERAR ICMS 18%			300	10				
+  		PRODUTO: AMORTECEDORES		PORTO SAÍDA: SHANGHAI		=TODAY()			300	10				
+  		FRETE: 1x40		PORTO ENTRADA: PARANAGUÁ		SIMULAÇÃO 100%			100	11.5				
+
+  Sheet 'LISTA DE COMPRAS': max_row=59, max_column=27
+  First 10 rows, 15 columns:
+  LISTA DE COMPRA														
+  														
+  Item	Estimativa de Custo 100%	Produto	NCM	II	IPI	PIS	COFINS	ICMS	Quantidade 	Preço Unitário	Preço Unitário Sub 50%	Preço total por produto	Preço total por produto	Preço total por produto Sub
+  									=SUM(J5:J57)	=SUM(K5:K57)		=SUM(M5:M57)	=F59	
+  1		2231832	8708-8000	0.18	0.0306	0.0312	0.1437	0.18	100	5.8	=K5/2	=K5*J5	=M5*$N$4	=L5*J5*$N$4
+  2		1384624	8708-8000	0.18	0.0306	0.0312	0.1437	0.18	300	2.1		=K6*J6	=M6*$N$4	=L6*J6*$N$4
+  3		1515117	8708-8000	0.18	0.0306	0.0312	0.1437	0.18	300	10		=K7*J7	=M7*$N$4	=L7*J7*$N$4
+  4		1515118	8708-8000	0.18	0.0306	0.0312	0.1437	0.18	300	10		=K8*J8	=M8*$N$4	=L8*J8*$N$4
+  5		1777207	8708-8000	0.18	0.0306	0.0312	0.1437	0.18	300	10		=K9*J9	=M9*$N$4	=L9*J9*$N$4
+  6		1349840.1	8708-8000	0.18	0.0306	0.0312	0.1437	0.18	100	11.5		=K10*J10	=M10*$N$4	=L10*J10*$N$4
+
+  Sheet 'Est. Cust. Naci.': max_row=62, max_column=54
+  First 10 rows, 15 columns:
+  														
+  		DETALHES DO PRODUTO									VALOR ADUANEIRO			
+  	Nº	ITEM	Código	Bitola (mm)	Embal.	NCM	QTD	% Rateio Preço	Preço unitário Fábrica (USD)	Preço x QTD (Valor em USD)	Preço x QTD (valor em BRL)	Preço x QTD (valor em BRL) SUB	THC (valor em BRL)	Valor do frete (Valor em BRL)
+  Nº											=N62	4.8887	0	
+  AAA											=SUM(L6:L58)			=SUM(O6:O58)
+  AAA	='LISTA DE COMPRAS'!A5	='LISTA DE COMPRAS'!C5				='LISTA DE COMPRAS'!D6	='LISTA DE COMPRAS'!J5	='LISTA DE COMPRAS'!P5	='LISTA DE COMPRAS'!K5	=H6*J6	=K6*$L$4	=L6*50%	=$N$4*I6	='Rateio Custos Fixos'!E12
+  	='LISTA DE COMPRAS'!A6	='LISTA DE COMPRAS'!C6				='LISTA DE COMPRAS'!D7	='LISTA DE COMPRAS'!J6	='LISTA DE COMPRAS'!P6	='LISTA DE COMPRAS'!K6	=H7*J7	=K7*$L$4	=L7*50%	=$N$4*I7	='Rateio Custos Fixos'!E13
+  	='LISTA DE COMPRAS'!A7	='LISTA DE COMPRAS'!C7				='LISTA DE COMPRAS'!D8	='LISTA DE COMPRAS'!J7	='LISTA DE COMPRAS'!P7	='LISTA DE COMPRAS'!K7	=H8*J8	=K8*$L$4	=L8*50%	=$N$4*I8	='Rateio Custos Fixos'!E14
+  	='LISTA DE COMPRAS'!A8	='LISTA DE COMPRAS'!C8				='LISTA DE COMPRAS'!D9	='LISTA DE COMPRAS'!J8	='LISTA DE COMPRAS'!P8	='LISTA DE COMPRAS'!K8	=H9*J9	=K9*$L$4	=L9*50%	=$N$4*I9	='Rateio Custos Fixos'!E15
+  	='LISTA DE COMPRAS'!A9	='LISTA DE COMPRAS'!C9				='LISTA DE COMPRAS'!D10	='LISTA DE COMPRAS'!J9	='LISTA DE COMPRAS'!P9	='LISTA DE COMPRAS'!K9	=H10*J10	=K10*$L$4	=L10*50%	=$N$4*I10	='Rateio Custos Fixos'!E16
+
+  Sheet 'Rateio Custos Fixos': max_row=66, max_column=22
+  First 10 rows, 15 columns:
+  CÂMBIO					FRETE	R$								
+  					3000	=F2*B3								
+  #VALUE!	5.16				2500	=F3								
+  #VALUE!	<openpyxl.worksheet.formula.ArrayFormula object at 0x000002AB83FE0640>				TOTAL	=SUM(G2:G3)								
+  						=G4/B3								
+  														
+  														
+  														
+  														
+  Produto	Quantidade	='[2]Lista de Compra'!Q2		FRETE	TAXA SISCOMEX	LIBERAÇÃO DE B/L	T.H.C|  CAPATAZIA	ISPS	DAMAGE PROTECTION	DESCONSOLIDAÇÃO	DEVOLUÇÃO DE CONTAINER	TRS	AFRMM	ARMAZENAGEM TCP
+
+
+============================================================
+
+FILE: EDC - VTC - EPS - 18-05-2026 .xlsb
+----------------------------------------
+XLSB File (binary). Trying to inspect sheets using pandas pyxlsb...
+Sheets: ['Resumo 100%', 'Resumo 50%', 'Lista de Compra', 'Est. Cust. Naci.', 'Planilha2', 'Est. Cust. Nacionalização', 'Resumo', 'Planilha1', 'Rateio Custos Fixos']
+  Sheet 'Resumo 100%': shape (61, 8)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7...
+  Sample:
+   Unnamed: 0  Unnamed: 1                           Unnamed: 2                         Unnamed: 3 Unnamed: 4             Unnamed: 5 Unnamed: 6          Unnamed: 7
+0         NaN         NaN                                  NaN                                NaN        NaN                    NaN        NaN                 NaN
+1         NaN         NaN                                  NaN                                NaN        NaN                    NaN        NaN                 NaN
+2         NaN         NaN  Estimativa de Custo 100% por dentro                                NaN        NaN                    NaN        NaN                 NaN
+3         NaN         NaN                                  NaN                                NaN        NaN                    NaN        NaN                 NaN
+4         NaN         NaN                                  NaN                       CLIENTE: VTC        NaN                    NaN        NaN                 NaN
+5         NaN         NaN                                  NaN                                NaN        NaN                    NaN        NaN                 NaN
+6         NaN         NaN                                  NaN                                NaN        NaN                    NaN        NaN                 NaN
+7         NaN         NaN                                  NaN  REGIME TRIBUTÁRIO: PRESUMIDO/REAL        NaN  USO: INDUSTRIALIZAÇÃO        NaN  CONSIDERAR ICMS 0%
+8         NaN         NaN                                  NaN                       PRODUTO: EPS        NaN    PORTO SAÍDA: NINGBO        NaN               46160
+9         NaN         NaN                                  NaN                         FRETE: FCL        NaN  PORTO ENTRADA: SANTOS        NaN      SIMULAÇÃO 100%
+
+  Sheet 'Resumo 50%': shape (60, 8)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7...
+  Sample:
+   Unnamed: 0  Unnamed: 1                    Unnamed: 2                  Unnamed: 3 Unnamed: 4                Unnamed: 5 Unnamed: 6           Unnamed: 7
+0         NaN         NaN                           NaN                         NaN        NaN                       NaN        NaN                  NaN
+1         NaN         NaN                           NaN                         NaN        NaN                       NaN        NaN                  NaN
+2         NaN         NaN  Estimativa de Custo Câmbio B                         NaN        NaN                       NaN        NaN                  NaN
+3         NaN         NaN                           NaN                         NaN        NaN                       NaN        NaN                  NaN
+4         NaN         NaN                           NaN            CLIENTE: Delmar         NaN                       NaN        NaN                  NaN
+5         NaN         NaN                           NaN                         NaN        NaN                       NaN        NaN                  NaN
+6         NaN         NaN                           NaN                         NaN        NaN                       NaN        NaN                  NaN
+7         NaN         NaN                           NaN  REGIME TRIBUTÁRIO: SIMPLES        NaN     USO: INDUSTRIALIZAÇÃO        NaN  CONSIDERAR ICMS 18%
+8         NaN         NaN                           NaN    PRODUTO: Galões de leite        NaN     PORTO SAÍDA: SHANGHAI        NaN                46056
+9         NaN         NaN                           NaN                  FRETE: LCL        NaN  PORTO ENTRADA: PARANAGUÁ        NaN        SIMULAÇÃO 50%
+
+  Sheet 'Lista de Compra': shape (29, 19)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8, Unnamed: 9...
+  Sample:
+   Unnamed: 0         Unnamed: 1 Unnamed: 2  Unnamed: 3  Unnamed: 4 Unnamed: 5 Unnamed: 6 Unnamed: 7 Unnamed: 8 Unnamed: 9      Unnamed: 10     Unnamed: 11  Unnamed: 12        Unnamed: 13          Unnamed: 14     Unnamed: 15          Unnamed: 16              Unnamed: 17  Unnamed: 18
+0         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+1         NaN  LISTA DE PRODUTOS        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+2         NaN               Item    Produto         NaN         NCM         II        IPI        PIS     COFINS       ICMS  Quantidade (kg)  Preço Unitário  Preço total  Preço Subfaturado  % Rateio Quantidade  % Rateio Preço  Preço Nacionalizado  Preço Sub Nacionalizado  Diferença %
+3         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN               51             NaN        79815                0.5                    1               1                  NaN                      NaN          NaN
+4         NaN                  1        EPS         NaN  3903.11.20       0.18     0.0325      0.021     0.0965          0               51            1565        79815            39907.5                    1               1         13109.630443             11500.175253     0.122769
+5         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+6         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+7         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+8         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+9         NaN                NaN        NaN         NaN         NaN        NaN        NaN        NaN        NaN        NaN              NaN             NaN          NaN                NaN                  NaN             NaN                  NaN                      NaN          NaN
+
+  Sheet 'Est. Cust. Naci.': shape (8, 48)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8, Unnamed: 9...
+  Sample:
+  Unnamed: 0           Unnamed: 1  Unnamed: 2 Unnamed: 3      Unnamed: 4            Unnamed: 5          Unnamed: 6                  Unnamed: 7                      Unnamed: 8                  Unnamed: 9        Unnamed: 10         Unnamed: 11                    Unnamed: 12            Unnamed: 13            Unnamed: 14          Unnamed: 15            Unnamed: 16   Unnamed: 17   Unnamed: 18   Unnamed: 19 Unnamed: 20     Unnamed: 21           Unnamed: 22       Unnamed: 23       Unnamed: 24        Unnamed: 25 Unnamed: 26        Unnamed: 27      Unnamed: 28             Unnamed: 29 Unnamed: 30 Unnamed: 31 Unnamed: 32      Unnamed: 33  Unnamed: 34     Unnamed: 35  Unnamed: 36                Unnamed: 37       Unnamed: 38            Unnamed: 39                  Unnamed: 40   Unnamed: 41   Unnamed: 42  Unnamed: 43     Unnamed: 44         Unnamed: 45  Unnamed: 46 Unnamed: 47
+0        NaN  DETALHES DO PRODUTO         NaN        NaN             NaN                   NaN                 NaN                         NaN                             NaN             VALOR ADUANEIRO                NaN                 NaN                            NaN                    NaN                    NaN                  NaN               IMPOSTOS           NaN           NaN           NaN         NaN             NaN                   NaN  TAXAS PORTUÁRIAS               NaN                NaN         NaN                NaN              NaN                     NaN         NaN         NaN         NaN              NaN          NaN             NaN          NaN                        NaN               NaN                    NaN                          NaN           NaN           NaN          NaN             NaN                 NaN          NaN         NaN
+1        NaN                 ITEM         NCM        QTD  Participação %  Preço unitário (USD)  Preço unitário SUB  Preço x QTD (Valor em USD)  Preço x QTD (Valor em USD) SUB  Preço x QTD (valor em BRL)  Preço x QTD (SUB)  THC (valor em BRL)  Valor do frete (Valor em BRL)  TOTAL VALOR ADUANEIRO  VALOR ADUANEIRO (SUB)  VALOR TOTAL COM I.I  IMPOSTO DE IMPORTAÇÃO           IPI           PIS        COFINS        ICMS  TOTAL IMPOSTOS  TOTAL IMPOSTOS (SUB)     TAXA SISCOMEX  LIBERAÇÃO DE B/L  T.H.C|  CAPATAZIA        ISPS  DAMAGE PROTECTION  DESCONSOLIDAÇÃO  DEVOLUÇÃO DE CONTAINER         TRS         TRS       AFRMM  ARMAZENAGEM TCP  SCANNER TCP  HANDLING - TCP  PESAGEM TCP  Taxa Expediente Portuária  FRETE RODOVIÁRIO  DESEMBARAÇO ADUANEIRO  TOTAL DESEMBARAÇO ADUANEIRO         TOTAL     TOTAL SUB          NaN  VALOR UNITÁRIO  VALOR UNITÁRIO SUB          NaN   Diferença
+2         Nº                  NaN         NaN        NaN             NaN                   NaN                 NaN                         NaN                             NaN                        5.02                NaN                   0                            NaN              459844.34              259508.69          542616.3212             82771.9812  17635.030439  11394.942745  52362.474996           0    164164.42938           82082.21469            154.23               935               3800       438.8             743.46          1086.59                     290     1200.97      943.62   4733.8432            10369      4088.08         1028.87       719.92                        250             12000                   1800                   44582.3832  668591.15258  586508.93789          NaN             NaN                 NaN          NaN         NaN
+3        AAA                  EPS         NaN        NaN             NaN                   NaN                 NaN                         NaN                             NaN                         NaN                NaN                 NaN                            NaN                    NaN                    NaN                  NaN                   0.18        0.0325         0.021        0.0965           0             NaN                   NaN               NaN               NaN                NaN         NaN                NaN              NaN                     NaN         NaN         NaN        0.08              NaN          NaN             NaN          NaN                        NaN               NaN                    NaN                          NaN           NaN           NaN          NaN             NaN                 NaN          NaN         NaN
+4        NaN                    1  3903.11.20         51               1                  1565               782.5                       79815                         39907.5                    400671.3          200335.65                   0                       59173.04              459844.34              259508.69          542616.3212             82771.9812  17635.030439  11394.942745  52362.474996           0    164164.42938           82082.21469            154.23               935               3800       438.8             743.46          1086.59                     290     1200.97      943.62   4733.8432            10369      4088.08         1028.87       719.92                        250             12000                   1800                   44582.3832  668591.15258  586508.93789          NaN    13109.630443        11500.175253          NaN    0.122769
+5        NaN                    0           0          0               0                     0                   0                           0                               0                           0                  0                   0                              0                      0                      0                    0                      0             0             0             0           0               0                     0                 0                 0                  0           0                  0                0                       0           0         NaN           0                0            0               0            0                        NaN                 0                      0                            0             0             0          NaN             0x7                 0x7          NaN         0x7
+6        NaN                  NaN         NaN        NaN             NaN                   NaN                 NaN                         NaN                             NaN                         NaN                NaN                 NaN                            NaN                    NaN                    NaN                  NaN                    NaN           NaN           NaN           NaN         NaN             NaN                   NaN               NaN               NaN                NaN         NaN                NaN              NaN                     NaN         NaN         NaN         NaN              NaN          NaN             NaN          NaN                        NaN               NaN                    NaN                          NaN           NaN           NaN          NaN             NaN                 NaN          NaN         NaN
+7        NaN                  NaN         NaN        NaN             NaN                   NaN                 NaN                         NaN                             NaN                    400671.3          200335.65                 NaN                            NaN                    NaN                    NaN                  NaN             41385.9906    8817.51522   5697.471373  26181.237498           0             NaN                   NaN               NaN               NaN                NaN         NaN                NaN              NaN                     NaN         NaN         NaN         NaN              NaN          NaN             NaN          NaN                        NaN               NaN                    NaN                          NaN           NaN           NaN          NaN             NaN                 NaN          NaN         NaN
+
+  Sheet 'Planilha2': shape (16, 14)
+  Columns: PRODUTO, Unnamed: 1, VALOR UNITÁRIO, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8, euro...
+  Sample:
+                                  PRODUTO  Unnamed: 1  VALOR UNITÁRIO  Unnamed: 3  Unnamed: 4  Unnamed: 5  Unnamed: 6  Unnamed: 7                              Unnamed: 8            euro           dolar  Unnamed: 11      Unnamed: 12  Unnamed: 13
+0                                  O-RING         NaN       24.927142         NaN         NaN         NaN         NaN         NaN                                     NaN  VALOR UNITÁRIO  VALOR UNITÁRIO          NaN  PROFORMA ANTIGA          NaN
+1                                  O-RING         NaN       10.205809         NaN         NaN         NaN         NaN         NaN                                     NaN             NaN             NaN          NaN              NaN          NaN
+2                 EX 40102693 -  OIL SEAL         NaN      185.550001         NaN         NaN         NaN         NaN         NaN                                OIL SEAL      141.987574      133.198847    -0.061898       134.462604    -0.009399
+3                                OIL SEAL         NaN      134.462604         NaN         NaN         NaN         NaN         NaN  EX 500383043 -  BREATHER FILTER GASKET       33.276764       31.107864    -0.065178        40.705743    -0.235787
+4         EX 504024777 -  OIL SUMP GASKET         NaN      479.612269         NaN         NaN         NaN         NaN         NaN                 EX 40102693 -  OIL SEAL      202.348176        189.8406    -0.061812       185.550001     0.023124
+5                 EX 40102143 -  OIL SEAL         NaN      149.329692         NaN         NaN         NaN         NaN         NaN                                  NOZZLE        36.38927       33.948221    -0.067082        43.465829    -0.218968
+6                MAIN BEARING STD (GREEN)         NaN       75.685858         NaN         NaN         NaN         NaN         NaN     EX 2992144 -  THRUST WASHER SET STD      331.519904      309.281036    -0.067082       295.699201     0.045931
+7     EX 2992144 -  THRUST WASHER SET STD         NaN      295.699201         NaN         NaN         NaN         NaN         NaN                           NOZZLE HOLDER       61.678791       57.535953    -0.067168        67.210435    -0.143943
+8  EX 99443768 -  EXHAUST MANIFOLD GASKET         NaN       16.741225         NaN         NaN         NaN         NaN         NaN             EX 5801630047 -  THERMOSTAT      995.564817      934.533276    -0.061303       880.674022     0.061157
+9         EX 2996504 -  ENGINE GASKET SET         NaN     4098.116307         NaN         NaN         NaN         NaN         NaN                MAIN BEARING STD (GREEN)       69.948056       65.281531    -0.066714        75.685858    -0.137467
+
+  Sheet 'Est. Cust. Nacionalização': shape (14, 37)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8, Unnamed: 9...
+  Sample:
+  Unnamed: 0           Unnamed: 1 Unnamed: 2 Unnamed: 3      Unnamed: 4            Unnamed: 5                  Unnamed: 6                  Unnamed: 7          Unnamed: 8                     Unnamed: 9            Unnamed: 10            Unnamed: 11 Unnamed: 12 Unnamed: 13 Unnamed: 14 Unnamed: 15     Unnamed: 16       Unnamed: 17       Unnamed: 18        Unnamed: 19 Unnamed: 20        Unnamed: 21      Unnamed: 22             Unnamed: 23 Unnamed: 24 Unnamed: 25      Unnamed: 26  Unnamed: 27     Unnamed: 28  Unnamed: 29                   Unnamed: 30       Unnamed: 31            Unnamed: 32                  Unnamed: 33 Unnamed: 34              Unnamed: 35     Unnamed: 36
+0        NaN  DETALHES DO PRODUTO        NaN        NaN             NaN                   NaN                         NaN             VALOR ADUANEIRO                 NaN                            NaN                    NaN               IMPOSTOS         NaN         NaN         NaN         NaN             NaN  TAXAS PORTUÁRIAS               NaN                NaN         NaN                NaN              NaN                     NaN         NaN         NaN              NaN          NaN             NaN          NaN                           NaN               NaN                    NaN                          NaN         NaN                      NaN             NaN
+1        NaN                 ITEM        NCM        QTD  Participação %  Preço unitário (USD)  Preço x QTD (Valor em USD)  Preço x QTD (valor em BRL)  THC (valor em BRL)  Valor do frete (Valor em BRL)  TOTAL VALOR ADUANEIRO  IMPOSTO DE IMPORTAÇÃO         IPI         PIS      COFINS        ICMS  TOTAL IMPOSTOS     TAXA SISCOMEX  LIBERAÇÃO DE B/L  T.H.C|  CAPATAZIA        ISPS  DAMAGE PROTECTION  DESCONSOLIDAÇÃO  DEVOLUÇÃO DE CONTAINER         TRS       AFRMM  ARMAZENAGEM TCP  SCANNER TCP  HANDLING - TCP  PESAGEM TCP  TAXA DO PARCEIRO - PARANAGUÁ  FRETE RODOVIÁRIO  DESEMBARAÇO ADUANEIRO  TOTAL DESEMBARAÇO ADUANEIRO       TOTAL  VALOR DENTRO & FORA 50%  VALOR UNITÁRIO
+2         Nº                  NaN        NaN        NaN             NaN                   NaN                         NaN                        5.02                 990                            NaN                   0x17                   0.18      0.0975       0.021      0.0965        0.18            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0.08             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                      NaN             NaN
+3       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+4       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+5       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+6       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+7       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+8       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+9       0x17                  NaN        NaN       0x17            0x17                  0x17                        0x17                        0x17                0x17                           0x17                   0x17                   0x17        0x17        0x17        0x17        0x17            0x17              0x17              0x17               0x17        0x17               0x17             0x17                    0x17        0x17        0x17             0x17         0x17            0x17         0x17                          0x17              0x17                   0x17                         0x17        0x17                     0x17            0x17
+
+  Sheet 'Resumo': shape (16, 9)
+  Columns: NOME: GLOBAL VENTURES, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8...
+  Sample:
+                 NOME: GLOBAL VENTURES Unnamed: 1                                               Unnamed: 2  Unnamed: 3           Unnamed: 4         Unnamed: 5           Unnamed: 6      Unnamed: 7            Unnamed: 8
+0  REGIME TRIBUTÁRIO: NACIONAL SIMPLES        NaN                                          FUNÇÃO: REVENDA         NaN   CONSIDERAR ICMS 6%                NaN                  NaN             NaN                   NaN
+1              PRODUTO: OBRAS PLASTICO        NaN                                     PORTO SAÍDA: XINGANG         NaN                  NaN                NaN                  NaN             NaN                   NaN
+2                           FRETE: LCL        NaN                                 PORTO ENTRADA: PARANAGUÁ         NaN                  NaN                NaN                  NaN             NaN                   NaN
+3                              Produto       Item                                                Descrição  Quantidade                Preço  Preço Subfaturado  % Rateio Quantidade  % Rateio Preço  Preço Nacionalização
+4                                  NaN        NaN                                                      NaN        6002               811.37                0.5                  1.0               1                   NaN
+5                                  NaN          1               Split double spatular pig (sheep) ear tag         1000                  0.1               0.05             0.166611        0.000123                  0x17
+6                                  NaN          2  Open round piglet(sheep) ear tag (with square male tag)           0                    0                  0                    0               0                  0x17
+7                                  NaN          3  Open round piglet(sheep) ear tag (with square male tag)           0                    0                  0                    0               0                  0x17
+8                                  NaN          4                          White head large one-pc ear tag        1000                 0.21              0.105             0.166611        0.000259                  0x17
+9                                  NaN          5                           Long neck large one-pc ear tag           0                    0                  0                    0               0                  0x17
+
+  Sheet 'Planilha1': shape (4, 10)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8, Unnamed: 9...
+  Sample:
+   Unnamed: 0  Unnamed: 1  Unnamed: 2  Unnamed: 3  Unnamed: 4  Unnamed: 5  Unnamed: 6  Unnamed: 7  Unnamed: 8  Unnamed: 9
+0         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN
+1         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN
+2         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN         1.0  40169300.0
+3         NaN         NaN         NaN         NaN         NaN         NaN         NaN         NaN         4.0  84833021.0
+
+  Sheet 'Rateio Custos Fixos': shape (12, 22)
+  Columns: Unnamed: 0, Unnamed: 1, Unnamed: 2, Unnamed: 3, Unnamed: 4, Unnamed: 5, Unnamed: 6, Unnamed: 7, Unnamed: 8, Unnamed: 9...
+  Sample:
+  Unnamed: 0  Unnamed: 1      Unnamed: 2  Unnamed: 3 Unnamed: 4     Unnamed: 5        Unnamed: 6         Unnamed: 7             Unnamed: 8 Unnamed: 9      Unnamed: 10             Unnamed: 11 Unnamed: 12 Unnamed: 13 Unnamed: 14          Unnamed: 15 Unnamed: 16 Unnamed: 17 Unnamed: 18                Unnamed: 19       Unnamed: 20            Unnamed: 21
+0        NaN         NaN             NaN         NaN        NaN            NaN               NaN                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+1     CÂMBIO         NaN             NaN         NaN        NaN          FRETE                R$                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+2        NaN         NaN             NaN         NaN        NaN          10652          53473.04                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+3        0xf        5.02             NaN         NaN        NaN           5700              5700                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+4        0xf      6.1436             NaN         NaN        NaN          TOTAL          59173.04                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+5        NaN         NaN             NaN         NaN        NaN            NaN      11787.458167                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+6        NaN         NaN             NaN         NaN        NaN            NaN               NaN                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+7        NaN         NaN             NaN         NaN        NaN            NaN               NaN                NaN                    NaN        NaN              NaN                     NaN         NaN         NaN         NaN                  NaN         NaN         NaN         NaN                        NaN               NaN                    NaN
+8    Produto  Quantidade  % Rateio Preço         NaN      FRETE  TAXA SISCOMEX  LIBERAÇÃO DE B/L  T.H.C|  CAPATAZIA  Container Control Fee        CRS  DESCONSOLIDAÇÃO  DEVOLUÇÃO DE CONTAINER         TRS         TSF       AFRMM  ARMAZENAGEM Movecta    SCANNER     HANDLING    PESAGEM   Taxa Expediente Portuária  FRETE RODOVIÁRIO  DESEMBARAÇO ADUANEIRO
+9        NaN         NaN             NaN         NaN   59173.04         154.23               935               3800                  438.8     743.46          1086.59                     290     1200.97      943.62        0.08                10369     4088.08     1028.87      719.92                        250             12000                   1800
+
+
+============================================================
+

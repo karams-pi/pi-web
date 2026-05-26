@@ -30,6 +30,9 @@ public class SimulacaoEdcItem
     [Column(TypeName = "numeric(18,2)")]
     public decimal ValorFobUnitario { get; set; }
 
+    [Column(TypeName = "numeric(18,2)")]
+    public decimal? ValorFobSubfaturado { get; set; }
+
     // Campos calculados/copiados do produto no momento do estudo para histórico
     [Column(TypeName = "numeric(18,4)")]
     public decimal PesoLiquidoTotal { get; set; }

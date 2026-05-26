@@ -191,3 +191,18 @@ export type PiItemPeca = {
   piItens?: PiItem[];
 };
 
+export type SubModulo = {
+  id: number;
+  idModulo: number;
+  idTecidoBase: number;
+  codigo: string;
+  descricaoProduto: string;
+  tecidoEspecifico: string;
+  volumeM3: number;
+  flAtivo: boolean;
+  tecidoBase?: {
+    id: number;
+    nome: string;
+  };
+};
+

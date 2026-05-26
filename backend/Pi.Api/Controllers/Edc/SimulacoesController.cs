@@ -109,6 +109,10 @@ public class SimulacoesController : ControllerBase
         dbSimulacao.ValorSeguroInternacional = simulacao.ValorSeguroInternacional;
         dbSimulacao.ComissaoPercentual = simulacao.ComissaoPercentual;
         dbSimulacao.FlExibirComissao = simulacao.FlExibirComissao;
+        dbSimulacao.FlSimularSubfaturamento = simulacao.FlSimularSubfaturamento;
+        dbSimulacao.PercentualSubfaturamento = simulacao.PercentualSubfaturamento;
+        dbSimulacao.MetodoCalculoIcms = simulacao.MetodoCalculoIcms;
+        dbSimulacao.MetodoCalculoFederais = simulacao.MetodoCalculoFederais;
         dbSimulacao.Status = simulacao.Status;
 
         // Atualiza itens (remova antigos, adicione novos)
@@ -122,6 +126,7 @@ public class SimulacoesController : ControllerBase
             IdModelo = i.IdModelo,
             Quantidade = i.Quantidade,
             ValorFobUnitario = i.ValorFobUnitario,
+            ValorFobSubfaturado = i.ValorFobSubfaturado,
             PesoLiquidoTotal = i.PesoLiquidoTotal,
             PesoBrutoTotal = i.PesoBrutoTotal,
             CubagemTotal = i.CubagemTotal

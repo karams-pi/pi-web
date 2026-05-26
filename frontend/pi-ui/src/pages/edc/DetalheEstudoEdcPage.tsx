@@ -84,32 +84,94 @@ const DetalheEstudoEdcPage: React.FC = () => {
 
   const totalDespesasBrl = despesasDetalhadas.reduce((acc: number, d: any) => acc + d.valorBrl, 0);
 
+  const totalQuantidade = estudo.itens.reduce((acc: number, i: any) => acc + i.quantidade, 0);
+  const totalPeso = estudo.itens.reduce((acc: number, i: any) => acc + (i.pesoLiquidoTotal > 0 ? i.pesoLiquidoTotal : ((i.produto?.pesoLiquido * i.quantidade) || 0)), 0);
+  const totalVolume = estudo.itens.reduce((acc: number, i: any) => acc + (i.cubagemTotal > 0 ? i.cubagemTotal : ((i.produto?.cubagemM3 * i.quantidade) || 0)), 0);
+
   const itensCalculados = estudo.itens.map((item: any) => {
     const itemFobBrl = item.quantidade * item.valorFobUnitario * estudo.cotacaoDolar;
     const fatorRateio = totalFobBrl > 0 ? itemFobBrl / totalFobBrl : 0;
     
-    const itemValorAduaneiro = itemFobBrl + (freteBrl * fatorRateio) + (seguroBrl * fatorRateio);
+    // Valor Aduaneiro com FOB Cheio
+    const itemValorAduaneiroCheio = itemFobBrl + (freteBrl * fatorRateio) + (seguroBrl * fatorRateio);
     
-    const aliqII = item.produto?.ncm?.aliquotaII || 0.18;
-    const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0.031;
-    const aliqPis = item.produto?.ncm?.aliquotaPis || 0.0312;
-    const aliqCof = item.produto?.ncm?.aliquotaCofins || 0.1437;
-    const aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao || 0.18;
-
-    const ii = itemValorAduaneiro * aliqII;
-    const ipi = (itemValorAduaneiro + ii) * aliqIPI;
-    const pisCofins = itemValorAduaneiro * (aliqPis + aliqCof);
-    const taxasPort = totalDespesasPortuariasBrl * fatorRateio;
-
-    const baseIcmsSemIcms = itemValorAduaneiro + ii + ipi + pisCofins + taxasPort;
-    const icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
+    // Determina o FOB Subfaturado
+    const valorFobUnitarioSub = item.valorFobSubfaturado !== null && item.valorFobSubfaturado !== undefined
+      ? item.valorFobSubfaturado
+      : (estudo.flSimularSubfaturamento 
+          ? (item.valorFobUnitario * (estudo.percentualSubfaturamento / 100)) 
+          : item.valorFobUnitario);
+          
+    const itemFobSubBrl = item.quantidade * valorFobUnitarioSub * estudo.cotacaoDolar;
     
-    const totalNacItem = itemValorAduaneiro + ii + ipi + pisCofins + taxasPort + icms;
+    // Base de cálculo aduaneiro para impostos
+    const baseCalculoAduaneiro = estudo.flSimularSubfaturamento
+      ? (itemFobSubBrl + (freteBrl * fatorRateio) + (seguroBrl * fatorRateio))
+      : itemValorAduaneiroCheio;
+    
+    const aliqII = item.produto?.ncm?.aliquotaII || 0;
+    const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0;
+    const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
+    const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
+    const aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao || 0;
+
+    const ii = baseCalculoAduaneiro * aliqII;
+    const ipi = (baseCalculoAduaneiro + ii) * aliqIPI;
+    
+    let pisCofins = 0;
+    if (estudo.metodoCalculoFederais === 'SimplificadoExcel') {
+      pisCofins = (baseCalculoAduaneiro + ii) * (aliqPis + aliqCof);
+    } else {
+      pisCofins = baseCalculoAduaneiro * (aliqPis + aliqCof);
+    }
+
+    // Rateio avançado de taxas portuárias por item
+    let taxasPort = 0;
+    if (estudo.despesas) {
+      estudo.despesas.forEach((d: any) => {
+        const isAfrmm = d.nomeDespesa.toUpperCase() === 'AFRMM';
+        let valorDespesaBrl = 0;
+        if (isAfrmm) {
+          const percentual = d.valor > 1 ? d.valor : d.valor * 100;
+          valorDespesaBrl = freteBrl * (percentual / 100);
+        } else {
+          valorDespesaBrl = d.moeda === 'USD' ? d.valor * estudo.cotacaoDolar : d.valor;
+        }
+
+        let fatorDespesa = 0;
+        if (d.metodoRateio === 'Quantidade') {
+          fatorDespesa = totalQuantidade > 0 ? item.quantidade / totalQuantidade : 0;
+        } else if (d.metodoRateio === 'Peso') {
+          const itemPeso = item.pesoLiquidoTotal > 0 ? item.pesoLiquidoTotal : ((item.produto?.pesoLiquido * item.quantidade) || 0);
+          fatorDespesa = totalPeso > 0 ? itemPeso / totalPeso : 0;
+        } else if (d.metodoRateio === 'Volume') {
+          const itemVolume = item.cubagemTotal > 0 ? item.cubagemTotal : ((item.produto?.cubagemM3 * item.quantidade) || 0);
+          fatorDespesa = totalVolume > 0 ? itemVolume / totalVolume : 0;
+        } else {
+          fatorDespesa = fatorRateio;
+        }
+
+        taxasPort += valorDespesaBrl * fatorDespesa;
+      });
+    }
+
+    // ICMS
+    let icms = 0;
+    if (estudo.metodoCalculoIcms === 'SimplificadoExcel') {
+      icms = baseCalculoAduaneiro * aliqIcms;
+    } else {
+      const baseIcmsSemIcms = baseCalculoAduaneiro + ii + ipi + pisCofins + taxasPort;
+      icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
+    }
+    
+    // O custo final real do item nacionalizado é baseado no aduaneiro cheio + impostos declarados
+    const totalNacItem = itemValorAduaneiroCheio + ii + ipi + pisCofins + taxasPort + icms;
 
     return {
       ...item,
       itemFobBrl,
-      itemValorAduaneiro,
+      itemValorAduaneiro: itemValorAduaneiroCheio,
+      baseCalculoAduaneiro,
       ii,
       ipi,
       pisCofins,
@@ -159,7 +221,18 @@ const DetalheEstudoEdcPage: React.FC = () => {
           <p style={{ fontWeight: '800', fontSize: '1.8rem', margin: '8px 0 0', color: 'var(--primary)' }}>
             R$ {totalNacionalizado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Câmbio: R$ {estudo.cotacaoDolar.toFixed(2)} | PTAX: {estudo.spreadCambio}%</span>
+          <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <span>Câmbio: R$ {estudo.cotacaoDolar.toFixed(2)} | PTAX: {estudo.spreadCambio}%</span>
+            {estudo.flSimularSubfaturamento && (
+              <span style={{ color: '#a78bfa', fontWeight: '600' }}>
+                ⚡ Subfaturamento: {estudo.percentualSubfaturamento}% Ativo
+              </span>
+            )}
+            <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
+              ICMS: {estudo.metodoCalculoIcms === 'SimplificadoExcel' ? 'Excel' : 'Legal'} | 
+              Federais: {estudo.metodoCalculoFederais === 'SimplificadoExcel' ? 'Excel' : 'Legal'}
+            </span>
+          </div>
         </div>
       </div>
 

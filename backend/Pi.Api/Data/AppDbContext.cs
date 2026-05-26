@@ -20,6 +20,8 @@ public class AppDbContext : DbContext
     public DbSet<Modulo> Modulos => Set<Modulo>();
     public DbSet<ModuloTecido> ModulosTecidos => Set<ModuloTecido>();
 
+    public DbSet<SubModulo> SubModulos => Set<SubModulo>();
+
     public DbSet<ListaPreco> ListasPreco => Set<ListaPreco>();
 
     public DbSet<Configuracao> Configuracoes => Set<Configuracao>();
@@ -176,7 +178,7 @@ public class AppDbContext : DbContext
 
             entity.Property(x => x.ValorTecido).HasColumnType("numeric(18,3)");
 
-    entity.Property(x => x.CodigoModuloTecido).HasColumnName("codigo_modulo_tecido").HasMaxLength(10);
+            entity.Property(x => x.CodigoModuloTecido).HasColumnName("codigo_modulo_tecido").HasMaxLength(10);
 
             entity.HasOne(x => x.Modulo)
                 .WithMany(x => x.ModulosTecidos)
@@ -186,6 +188,33 @@ public class AppDbContext : DbContext
             entity.HasOne(x => x.Tecido)
                 .WithMany(x => x.ModulosTecidos)
                 .HasForeignKey(x => x.IdTecido)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // SubModulo
+        modelBuilder.Entity<SubModulo>(entity =>
+        {
+            entity.ToTable("sub_modulo");
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.IdModulo).HasDatabaseName("ix_sub_modulo_id_modulo");
+            entity.HasIndex(x => x.IdTecidoBase).HasDatabaseName("ix_sub_modulo_id_tecido_base");
+            entity.HasIndex(x => new { x.IdModulo, x.TecidoEspecifico }).HasDatabaseName("ix_sub_modulo_modulo_tecido_especifico");
+
+            entity.Property(x => x.Codigo).HasColumnName("codigo").HasMaxLength(15).IsRequired();
+            entity.Property(x => x.DescricaoProduto).HasColumnName("descricao_produto").HasMaxLength(255).IsRequired();
+            entity.Property(x => x.TecidoEspecifico).HasColumnName("tecido_especifico").HasMaxLength(50).IsRequired();
+            entity.Property(x => x.VolumeM3).HasColumnName("volume_m3").HasColumnType("numeric(18,6)").IsRequired();
+            entity.Property(x => x.FlAtivo).HasColumnName("fl_ativo").IsRequired();
+
+            entity.HasOne(x => x.Modulo)
+                .WithMany()
+                .HasForeignKey(x => x.IdModulo)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.TecidoBase)
+                .WithMany()
+                .HasForeignKey(x => x.IdTecidoBase)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -348,6 +377,11 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.IdModuloTecido)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.SubModulo)
+                .WithMany()
+                .HasForeignKey(x => x.IdSubModulo)
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(x => x.PiItemPeca)
                 .WithMany(x => x.PiItens)
