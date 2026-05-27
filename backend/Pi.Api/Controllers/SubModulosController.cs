@@ -109,4 +109,55 @@ public class SubModulosController : ControllerBase
 
         return Ok(item);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<SubModulo>> Create([FromBody] SubModulo item)
+    {
+        if (item == null)
+            return BadRequest("Dados inválidos.");
+
+        // Limpa referências de navegação para evitar problemas no EF Core
+        item.Modulo = null;
+        item.TecidoBase = null;
+
+        _db.SubModulos.Add(item);
+        await _db.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+    }
+
+    [HttpPut("{id:long}")]
+    public async Task<IActionResult> Update(long id, [FromBody] SubModulo item)
+    {
+        if (item == null || item.Id != id)
+            return BadRequest("Dados inconsistentes.");
+
+        var existing = await _db.SubModulos.FirstOrDefaultAsync(x => x.Id == id);
+        if (existing == null)
+            return NotFound("SubMódulo não encontrado.");
+
+        existing.IdModulo = item.IdModulo;
+        existing.IdTecidoBase = item.IdTecidoBase;
+        existing.Codigo = item.Codigo;
+        existing.DescricaoProduto = item.DescricaoProduto;
+        existing.TecidoEspecifico = item.TecidoEspecifico;
+        existing.VolumeM3 = item.VolumeM3;
+        existing.FlAtivo = item.FlAtivo;
+
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete(long id)
+    {
+        var existing = await _db.SubModulos.FirstOrDefaultAsync(x => x.Id == id);
+        if (existing == null)
+            return NotFound("SubMódulo não encontrado.");
+
+        _db.SubModulos.Remove(existing);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

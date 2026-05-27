@@ -6,6 +6,7 @@ import FornecedoresPage from "./pages/FornecedoresPage";
 import CategoriasPage from "./pages/CategoriasPage";
 import TecidosPage from "./pages/TecidosPage";
 import ModulosPage from "./pages/ModulosPage";
+import SubModulosPage from "./pages/SubModulosPage";
 import MarcasPage from "./pages/MarcasPage";
 import ProformaInvoicePage from "./pages/ProformaInvoicePage";
 import PrintPiPage from "./pages/PrintPiPage";
@@ -94,6 +95,7 @@ export default function App() {
               <Route path="marcas" element={<MarcasPage />} />
               <Route path="tecidos" element={<TecidosPage />} />
               <Route path="modulos" element={<ModulosPage />} />
+              <Route path="submodulos" element={<SubModulosPage />} />
               <Route path="proforma-invoice" element={<ProformaInvoicePage />} />
               <Route path="proforma-invoice-v2" element={<ProformaInvoiceV2Page />} />
               <Route path="proforma-invoice-v2/:id" element={<ProformaInvoiceV2Page />} />
@@ -240,6 +242,11 @@ function NavLinks() {
       <NavLink to="/pi/modulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
         <Grid size={18} />
         <span>Modulos</span>
+      </NavLink>
+
+      <NavLink to="/pi/submodulos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+        <Layers size={18} />
+        <span>SubMódulos</span>
       </NavLink>
 
       <NavLink to="/pi/emissao-lista-preco" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>

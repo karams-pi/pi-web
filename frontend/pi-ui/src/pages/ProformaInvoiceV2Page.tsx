@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE } from "../api/api";
 import { 
   listFretes
 } from "../api/fretes";

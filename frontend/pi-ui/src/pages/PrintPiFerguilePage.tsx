@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getPi } from "../api/pis";
-import type { ProformaInvoice, ModuloTecido } from "../api/types";
+import type { ProformaInvoice } from "../api/types";
 import { getCliente, type Cliente } from "../api/clientes";
 import { getSupplierMetadata } from "../utils/supplierDefaults";
 
@@ -199,7 +199,7 @@ export default function PrintPiFerguilePage() {
         </thead>
         <tbody>
           {processedData.rows.map((row, index) => {
-            const bSpan = processedData.brandSpans[index]; const dSpan = processedData.descSpans[index]; const risk = processedData.risk; const isBR = currency === "BRL";
+            const bSpan = processedData.brandSpans[index]; const dSpan = processedData.descSpans[index]; const isBR = currency === "BRL";
             return (
               <tr key={index}>
                 {bSpan > 0 && <td rowSpan={bSpan} style={cellStyle}>{row.mt?.modulo?.marca?.imagem && <img src={row.mt.modulo.marca.imagem.startsWith("data:") ? row.mt.modulo.marca.imagem : `data:image/png;base64,${row.mt.modulo.marca.imagem}`} style={{ maxWidth: 50 }} />}</td>}
