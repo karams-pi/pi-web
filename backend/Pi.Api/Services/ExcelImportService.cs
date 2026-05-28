@@ -138,8 +138,8 @@ public class ExcelImportService
             var modulosDict = new Dictionary<string, Modulo>();
             foreach(var m in modulosDb)
             {
-                // Chave: catId|marcaId|descricao|largura
-                string key = $"{m.IdCategoria}|{m.IdMarca}|{NormalizeString(m.Descricao)}|{m.Largura.ToString("F2", CultureInfo.InvariantCulture)}";
+                // Chave: catId|marcaId|descricao|largura|profundidade
+                string key = $"{m.IdCategoria}|{m.IdMarca}|{NormalizeString(m.Descricao)}|{m.Largura.ToString("F2", CultureInfo.InvariantCulture)}|{m.Profundidade.ToString("F2", CultureInfo.InvariantCulture)}";
                 if (!modulosDict.ContainsKey(key))
                     modulosDict[key] = m;
             }
@@ -230,7 +230,8 @@ public class ExcelImportService
                     decimal pa = 0; 
 
                     string largKey = largura.ToString("F2", CultureInfo.InvariantCulture);
-                    string modKey = $"{idCategoria}|{idMarca}|{NormalizeString(descricao)}|{largKey}";
+                    string profKey = profundidade.ToString("F2", CultureInfo.InvariantCulture);
+                    string modKey = $"{idCategoria}|{idMarca}|{NormalizeString(descricao)}|{largKey}|{profKey}";
                     Modulo modulo;
 
                     if (modulosDict.TryGetValue(modKey, out var existingMod))
@@ -365,7 +366,8 @@ public class ExcelImportService
             .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor 
                                    && m.IdMarca == idMarca 
                                    && m.Descricao.ToUpper() == descricao.ToUpper()
-                                   && Math.Abs(m.Largura - larg) < 0.01m);
+                                   && Math.Abs(m.Largura - larg) < 0.01m
+                                   && Math.Abs(m.Profundidade - prof) < 0.01m);
 
         bool isNew = false;
         if (modulo == null)
@@ -647,7 +649,8 @@ public class ExcelImportService
                              .FirstOrDefaultAsync(m => m.IdFornecedor == idFornecedor
                                                     && m.IdMarca == marca.Id
                                                     && m.Descricao.ToUpper() == descricao
-                                                    && Math.Abs(m.Largura - larg) < 0.01m);
+                                                    && Math.Abs(m.Largura - larg) < 0.01m
+                                                    && Math.Abs(m.Profundidade - prof) < 0.01m);
                     }
 
                     if (modulo == null)
@@ -656,7 +659,8 @@ public class ExcelImportService
                             .FirstOrDefault(m => m.IdFornecedor == idFornecedor
                                               && (m.Marca == marca || (m.IdMarca > 0 && m.IdMarca == marca.Id))
                                               && m.Descricao.ToUpper() == descricao
-                                              && Math.Abs(m.Largura - larg) < 0.01m);
+                                              && Math.Abs(m.Largura - larg) < 0.01m
+                                              && Math.Abs(m.Profundidade - prof) < 0.01m);
                     }
 
                     if (modulo == null)
