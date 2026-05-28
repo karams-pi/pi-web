@@ -306,6 +306,10 @@ export default function EmissaoListaPrecosPage() {
              <option value="BRL">BRL (R$)</option>
            </select>
         </div>
+        <div style={{ width: 110 }}>
+           <label className="label">Cotação USD</label>
+           <input className="cl-input" type="number" step="0.0001" value={cotacao} onChange={e => setCotacao(Number(e.target.value))} />
+        </div>
         <div style={{ width: 90 }}>
            <label className="label">Validade</label>
            <input className="cl-input" type="number" value={validityDays} onChange={e => setValidityDays(Number(e.target.value))} title="Dias de validade" />

@@ -35,14 +35,13 @@ Este relatório cruza os dados das tabelas de preços adaptadas no Excel com os 
 Quando novos módulos de novos modelos são importados, as marcas são criadas no banco de dados com a imagem nula (`imagem = NULL`). A lista a seguir mostra quais modelos estão sem imagem ativa para cada fornecedor.
 
 ### Fornecedor: Karams
-Foram encontrados **23** modelos de Karams sem imagem:
+Foram encontrados **22** modelos de Karams sem imagem:
 
 - `[ ]` ALMOFADAS DECORATIVAS
 - `[ ]` ALMOFADAS DE RIM
 - `[ ]` CAMA KAZUMI
 - `[ ]` CAMA TORINO
 - `[ ]` CAMA YUMI
-- `[ ]` ESTOFADO ALOHA
 - `[ ]` ESTOFADO ALOHA (BASE LAMINADA)
 - `[ ]` ESTOFADO ALOHA (BASE TAPEÇADA)
 - `[ ]` ESTOFADO CAMPINA
@@ -62,10 +61,7 @@ Foram encontrados **23** modelos de Karams sem imagem:
 - `[ ]` PUFF RANHURA
 
 ### Fornecedor: Koyo
-Foram encontrados **2** modelos de Koyo sem imagem:
-
-- `[ ]` GERAL
-- `[ ]` POLTRONA HANA
+🟢 Nenhum modelo de Koyo está sem imagem!
 
 
 *Relatório gerado automaticamente por Antigravity AI.*
