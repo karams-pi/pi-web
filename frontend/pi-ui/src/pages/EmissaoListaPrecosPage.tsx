@@ -146,10 +146,6 @@ export default function EmissaoListaPrecosPage() {
 
   // Add to selection
   const addToSelection = (mod: Modulo) => {
-    if (selectedItems.some(si => si.modulo.id === mod.id)) {
-      alert("Módulo já está na lista!");
-      return;
-    }
     setSelectedItems(prev => [...prev, {
       tempId: Math.random().toString(36).substr(2, 9),
       modulo: mod
