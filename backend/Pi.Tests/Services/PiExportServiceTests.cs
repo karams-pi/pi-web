@@ -46,6 +46,7 @@ public class PiExportServiceTests
             Cliente = client,
             Frete = freight,
             Configuracoes = config,
+            PiSequencia = "00001",
             DataPi = DateTimeOffset.Now,
             PiItens = new List<PiItem>
             {

@@ -87,7 +87,9 @@ public class ModulosController : ControllerBase
             .ToListAsync();
 
         // Create a mapping of ModuloId -> Freight
-        var freightMap = request.Items.ToDictionary(i => i.ModuloId, i => i.ValorFreteRateadoUSD);
+        var freightMap = request.Items
+            .GroupBy(i => i.ModuloId)
+            .ToDictionary(g => g.Key, g => g.First().ValorFreteRateadoUSD);
 
         var fileBytes = _exportService.ExportPriceListToExcel(modules, request.Currency, request.Cotacao, configs, freightMap, request.ValidityDays);
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ListaDePrecos.xlsx");

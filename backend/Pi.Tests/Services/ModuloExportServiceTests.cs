@@ -46,7 +46,7 @@ public class ModuloExportServiceTests
         };
 
         // Act
-        var result = _service.CalcPrice(valorTecido, currency, cotacao, config, supplier);
+        var result = _service.CalcPrice(valorTecido, currency, cotacao, config, null, supplier);
 
         // Assert
         result.Should().Be(expected);
