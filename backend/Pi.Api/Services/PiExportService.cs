@@ -334,6 +334,7 @@ public class PiExportService
         int currentRow = startRow + 2;
         var itemsByBrand = pi.PiItens
             .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
+            .OrderBy(g => g.Key?.Nome ?? "Outros")
             .ToList();
         
         var brandItemsMap = new Dictionary<long, List<PiItem>>();
@@ -705,7 +706,7 @@ public class PiExportService
 
         ws.Cells[currentRow, 8, currentRow + 10, totalCol].Style.Font.Size = 8;
 
-        ws.Column(1).Width = 10;
+        ws.Column(1).Width = 15;
         ws.Column(2).Width = 15;
         ws.Column(3).Width = 35;
         ws.Column(10).Width = 20;
@@ -792,7 +793,10 @@ public class PiExportService
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
 
         int currentRow = startRow + 1;
-        var groups = pi.PiItens.GroupBy(i => i.ModuloTecido?.Modulo?.Marca).ToList();
+        var groups = pi.PiItens
+            .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
+            .OrderBy(g => g.Key?.Nome ?? "Outros")
+            .ToList();
         
         var renderedItems = new List<PiItem>();
         foreach (var group in groups)
@@ -973,6 +977,7 @@ public class PiExportService
         dataRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         dataRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
+        ws.Column(1).Width = 15;
         ws.Column(3).Width = 35;
         ws.Column(10).Width = 20;
 
@@ -1039,10 +1044,13 @@ public class PiExportService
             float imgWidth = img.Width;
             float imgHeight = img.Height;
 
-            int totalRows = endRow - startRow + 1;
-            float cellHeightPoints = (totalRows == 1) ? 65 : (totalRows * 25);
+            float cellHeightPoints = 0;
+            for (int r = startRow; r <= endRow; r++)
+            {
+                cellHeightPoints += (float)(ws.Row(r).Height > 0 ? ws.Row(r).Height : 15);
+            }
             float cellHeightPixels = cellHeightPoints * 1.333f;
-            float cellWidthPixels = 10 * 7.5f; // column width is 10
+            float cellWidthPixels = (float)(ws.Column(1).Width > 0 ? ws.Column(1).Width : 10) * 7.5f;
 
             float availableWidth = cellWidthPixels - 6; // 3px padding on left/right
             float availableHeight = cellHeightPixels - 6; // 3px padding on top/bottom

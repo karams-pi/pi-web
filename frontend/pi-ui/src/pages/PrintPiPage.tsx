@@ -145,7 +145,9 @@ export default function PrintPiPage() {
         itemsByMarca[marca].push({ item, mt });
     });
 
-    const brandGroups = Object.entries(itemsByMarca).map(([_, brandItems]) => {
+    const brandGroups = Object.entries(itemsByMarca)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([_, brandItems]) => {
          const sortedItems = [...brandItems].sort((a, b) => {
              const fabKeyA = (a.mt?.tecido?.nome || "ZZBase").toLowerCase();
              const fabKeyB = (b.mt?.tecido?.nome || "ZZBase").toLowerCase();

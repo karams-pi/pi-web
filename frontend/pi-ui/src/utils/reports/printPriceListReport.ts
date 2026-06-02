@@ -47,10 +47,7 @@ export function printPriceListReport({
   // Actually, I'll use a safer way or pass it in options.
 
   function getRiskVal(idFornecedor: number): number {
-    const config = configsMap.get(idFornecedor) || configsMap.get(null);
-    if (!config || !cotacao) return 1;
-    const sName = maps.fornecedor.get(idFornecedor);
-    return calculateCotacaoRisco(sName, cotacao, config.valorReducaoDolar);
+    return cotacao || 1;
   }
 
   function calcFinalPrice(valorTecido: number, idFornecedor: number, modId: number): number {

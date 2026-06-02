@@ -54,12 +54,17 @@ export default function EmissaoListaPrecosPage() {
 
   // Data
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [allFornecedores, setAllFornecedores] = useState<Fornecedor[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [allCategorias, setAllCategorias] = useState<Categoria[]>([]);
   const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [allMarcas, setAllMarcas] = useState<Marca[]>([]);
   const [tecidos, setTecidos] = useState<Tecido[]>([]);
+  const [allTecidos, setAllTecidos] = useState<Tecido[]>([]);
   const [fretes, setFretes] = useState<Frete[]>([]);
   const [configsMap, setConfigsMap] = useState<Map<number | null, Configuracao>>(new Map());
   const [cotacao, setCotacao] = useState<number>(0);
+  const [actualDollar, setActualDollar] = useState<number>(0);
 
   // Freight Settings
   const [selectedFreteId, setSelectedFreteId] = useState("");
@@ -76,30 +81,62 @@ export default function EmissaoListaPrecosPage() {
   const [historyLoading, setHistoryLoading] = useState(false);
 
   // Maps
-  const fornMap = useMemo(() => new Map(fornecedores.map(f => [f.id, f.nome])), [fornecedores]);
-  const catMap = useMemo(() => new Map(categorias.map(c => [c.id, c.nome])), [categorias]);
-  const marcaMap = useMemo(() => new Map(marcas.map(m => [m.id, m])), [marcas]);
-  const tecidoMap = useMemo(() => new Map(tecidos.map(t => [t.id, t.nome])), [tecidos]);
+  const fornMap = useMemo(() => new Map(allFornecedores.map(f => [f.id, f.nome])), [allFornecedores]);
+  const catMap = useMemo(() => new Map(allCategorias.map(c => [c.id, c.nome])), [allCategorias]);
+  const marcaMap = useMemo(() => new Map(allMarcas.map(m => [m.id, m])), [allMarcas]);
+  const tecidoMap = useMemo(() => new Map(allTecidos.map(t => [t.id, t.nome])), [allTecidos]);
 
   // Load initial data
   useEffect(() => {
-    getCotacaoUSD().then(v => setCotacao(v)).catch(console.error);
     listFretes().then(setFretes).catch(console.error);
-    
-    getLatestConfigsAll().then(configs => {
-      const map = new Map<number | null, Configuracao>();
-      configs.forEach(c => { if (c) map.set(c.idFornecedor ?? null, c); });
-      setConfigsMap(map);
-    }).catch(console.error);
 
-    Promise.all([listFornecedores(), listCategorias(), listMarcas(), listTecidos()])
-      .then(([f, c, m, t]) => {
-        setFornecedores(f);
-        setCategorias(c);
-        setMarcas(m);
-        setTecidos(t);
-      }).catch(console.error);
+    Promise.all([
+      getCotacaoUSD(),
+      getLatestConfigsAll(),
+      listFornecedores(),
+      listCategorias(),
+      listMarcas(),
+      listTecidos()
+    ]).then(([usd, configs, f, c, m, t]) => {
+      const dollar = usd ? Number(usd.toFixed(2)) : 0;
+      setActualDollar(dollar);
+
+      const map = new Map<number | null, Configuracao>();
+      configs.forEach(conf => { if (conf) map.set(conf.idFornecedor ?? null, conf); });
+      setConfigsMap(map);
+
+      setFornecedores(f);
+      setAllFornecedores(f);
+      setCategorias(c);
+      setAllCategorias(c);
+      setMarcas(m);
+      setAllMarcas(m);
+      setTecidos(t);
+      setAllTecidos(t);
+
+      // Set initial cotação de risco based on global config
+      const globalConfig = map.get(null);
+      if (globalConfig) {
+        const initialRisk = calculateCotacaoRisco(undefined, dollar, globalConfig.valorReducaoDolar);
+        setCotacao(initialRisk);
+      } else {
+        setCotacao(dollar);
+      }
+    }).catch(console.error);
   }, []);
+
+  const handleFornecedorFilterChange = (val: string) => {
+    setFilterFornecedor(val);
+    if (actualDollar > 0 && configsMap.size > 0) {
+      const fid = val ? Number(val) : null;
+      const config = configsMap.get(fid) || configsMap.get(null);
+      const supplier = allFornecedores.find(f => f.id === fid);
+      if (config) {
+        const riskVal = calculateCotacaoRisco(supplier?.nome, actualDollar, config.valorReducaoDolar);
+        setCotacao(riskVal);
+      }
+    }
+  };
 
   const loadHistory = useCallback(async () => {
     try {
@@ -209,9 +246,8 @@ export default function EmissaoListaPrecosPage() {
     return selectedItems.map(item => {
       const mod = item.modulo;
       const c = configsMap.get(mod.idFornecedor) || configsMap.get(null);
-      const supplier = fornecedores.find(f => f.id === mod.idFornecedor);
       
-      const riskVal = c ? calculateCotacaoRisco(supplier?.nome, cotacao, c.valorReducaoDolar) : 1;
+      const riskVal = cotacao || 1;
       const freightUSD = calculateFreteRateio(totalFreteBRL / (riskVal || 1), totalM3, mod.m3, selectedItems.length, 1, tipoRateio);
       const freightDisp = currency === "BRL" ? freightUSD * riskVal : freightUSD;
 
@@ -223,7 +259,7 @@ export default function EmissaoListaPrecosPage() {
         config: c
       };
     });
-  }, [selectedItems, totalFreteBRL, tipoRateio, cotacao, configsMap, currency, fornecedores]);
+  }, [selectedItems, totalFreteBRL, tipoRateio, cotacao, configsMap, currency]);
 
   // Handlers for Saving and Loading from History
   const handleSaveEmission = async () => {
@@ -368,14 +404,13 @@ export default function EmissaoListaPrecosPage() {
     const c = configsMap.get(mod.idFornecedor) || configsMap.get(null);
     if (!c) return 0;
     
-    const supplier = fornecedores.find(f => f.id === mod.idFornecedor);
-    const riskVal = calculateCotacaoRisco(supplier?.nome, cotacao, c.valorReducaoDolar);
+    const riskVal = cotacao || 1;
     
     const exw = calculateEXW(valorTecido, riskVal, c.percentualComissao, c.percentualGordura);
     const unitUSD = exw + freightUSD;
 
     return currency === "BRL" ? unitUSD * riskVal : unitUSD;
-  }, [configsMap, cotacao, currency, fornecedores]);
+  }, [configsMap, cotacao, currency]);
 
   return (
     <div className="list-container">
@@ -410,8 +445,8 @@ export default function EmissaoListaPrecosPage() {
              <option value="BRL">BRL (R$)</option>
            </select>
         </div>
-        <div style={{ width: 110 }}>
-           <label className="label">Cotação USD</label>
+        <div style={{ width: 140 }}>
+           <label className="label">Cotação de Risco</label>
            <input className="cl-input" type="number" step="0.0001" value={cotacao} onChange={e => setCotacao(Number(e.target.value))} />
         </div>
         <div style={{ width: 90 }}>
@@ -555,7 +590,7 @@ export default function EmissaoListaPrecosPage() {
               <div style={{ flex: 1 }}>
                 <SearchableSelect 
                   value={filterFornecedor}
-                  onChange={setFilterFornecedor}
+                  onChange={handleFornecedorFilterChange}
                   options={[{ value: "", label: "Fornecedor (Todos)" }, ...fornecedores.map(f => ({ value: f.id, label: f.nome }))]}
                   placeholder="Fornecedor"
                 />
@@ -621,6 +656,9 @@ export default function EmissaoListaPrecosPage() {
                               )}
                               <div>
                                 <div style={{ fontWeight: 600, color: '#e2e8f0' }}>{m.descricao}</div>
+                                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                  Marca: <span style={{ color: '#cbd5e1' }}>{marcaMap.get(m.idMarca)?.nome || "N/A"}</span>
+                                </div>
                                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Fornecedor: {fornMap.get(m.idFornecedor)}</div>
                               </div>
                             </div>

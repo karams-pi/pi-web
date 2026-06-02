@@ -37,7 +37,7 @@ public class ModuloExportService
             {
                 var fornName = config.IdFornecedor.HasValue ? modules.FirstOrDefault(m => m.IdFornecedor == config.IdFornecedor)?.Fornecedor?.Nome ?? "" : "";
                 bool isFerguile = fornName.ToLower().Contains("ferguile") || fornName.ToLower().Contains("livintus");
-                decimal valorQuote = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
+                decimal valorQuote = Math.Round(isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar), 2);
                 hiddenQuoteValue = $"Cotação na exportação: {valorQuote:N2}";
             }
             else
@@ -172,6 +172,16 @@ public class ModuloExportService
 
                 // Brand Identification (Merged Column 1)
                 int brandEndRow = currentRow - 1;
+                int totalRows = brandEndRow - brandStartRow + 1;
+                if (totalRows == 1)
+                {
+                    ws.Row(brandStartRow).Height = 85;
+                }
+                else if (totalRows * 25 < 85)
+                {
+                    ws.Row(brandStartRow).Height = 85 - (totalRows - 1) * 25;
+                }
+
                 ws.Cells[brandStartRow, 1, brandEndRow, 1].Merge = true;
                 ws.Cells[brandStartRow, 1].Value = brand?.Nome ?? "Outros";
                 ws.Cells[brandStartRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -181,7 +191,6 @@ public class ModuloExportService
                 if (brand?.Imagem != null)
                 {
                     AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicB_{brand.Id}_{brandStartRow}", hasText: true);
-                    if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 85;
                 }
 
                 // Final Borders and formatting for the brand table
@@ -206,7 +215,7 @@ public class ModuloExportService
         ws.Cells[5, 3, currentRow, 7].Style.Numberformat.Format = "#,##0.00";
 
         // Column widths
-        ws.Column(1).Width = 22; // Foto
+        ws.Column(1).Width = 30; // Foto
         ws.Column(2).Width = 35; // Modelo
         ws.Column(3).Width = 10; // Módulo
         ws.Column(4).Width = 7;
@@ -324,13 +333,7 @@ public class ModuloExportService
                     var modConfig = configs.FirstOrDefault(c => c.IdFornecedor == mod.IdFornecedor) 
                                     ?? configs.FirstOrDefault(c => c.IdFornecedor == null);
                     
-                    decimal riskVal = 1;
-                    if (modConfig != null && cotacao > 0)
-                    {
-                        bool isFerguile = (mod.IdFornecedor == 3 || mod.IdFornecedor == 4) || (!string.IsNullOrEmpty(mod.Fornecedor?.Nome) && 
-                            (mod.Fornecedor.Nome.ToLower().Contains("ferguile") || mod.Fornecedor.Nome.ToLower().Contains("livintus")));
-                        riskVal = isFerguile ? modConfig.ValorReducaoDolar : (cotacao - modConfig.ValorReducaoDolar);
-                    }
+                    decimal riskVal = cotacao > 0 ? cotacao : 1;
 
                     decimal freightDisp = currency == "BRL" ? freightUSD * riskVal : freightUSD;
 
@@ -340,7 +343,31 @@ public class ModuloExportService
                         var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid && x.FlAtivo);
                         if (mt != null)
                         {
-                            decimal basePrice = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome);
+                            decimal basePrice;
+                            if (modConfig == null)
+                            {
+                                basePrice = mt.ValorTecido;
+                            }
+                            else if (currency == "BRL")
+                            {
+                                decimal vComissao = mt.ValorTecido * (modConfig.PercentualComissao / 100);
+                                decimal vGordura = mt.ValorTecido * (modConfig.PercentualGordura / 100);
+                                basePrice = Math.Round(mt.ValorTecido + vComissao + vGordura, 2);
+                            }
+                            else
+                            {
+                                if (cotacao <= 0)
+                                {
+                                    basePrice = 0;
+                                }
+                                else
+                                {
+                                    decimal valorBase = mt.ValorTecido / cotacao;
+                                    decimal comissao = valorBase * (modConfig.PercentualComissao / 100);
+                                    decimal gordura = valorBase * (modConfig.PercentualGordura / 100);
+                                    basePrice = Math.Round(valorBase + comissao + gordura, 2);
+                                }
+                            }
                             ws.Cells[currentRow, fabricStartCol + i].Value = basePrice + freightDisp;
                         }
                         else
@@ -355,6 +382,16 @@ public class ModuloExportService
                 }
 
                 int brandEndRow = currentRow - 1;
+                int totalRows = brandEndRow - brandStartRow + 1;
+                if (totalRows == 1)
+                {
+                    ws.Row(brandStartRow).Height = 85;
+                }
+                else if (totalRows * 25 < 85)
+                {
+                    ws.Row(brandStartRow).Height = 85 - (totalRows - 1) * 25;
+                }
+
                 ws.Cells[brandStartRow, 1, brandEndRow, 1].Merge = true;
                 ws.Cells[brandStartRow, 1].Value = brand?.Nome ?? "Outros";
                 ws.Cells[brandStartRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -364,7 +401,6 @@ public class ModuloExportService
                 if (brand?.Imagem != null)
                 {
                     AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicPL_{brand.Id}_{brandStartRow}", hasText: true);
-                    if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 85;
                 }
 
                 var tableRange = ws.Cells[brandStartRow, 1, brandEndRow, maxCols];
@@ -386,7 +422,7 @@ public class ModuloExportService
         ws.Cells[5, fabricStartCol, currentRow, maxCols].Style.Numberformat.Format = $"\"{curSymbol}\"#,##0.00";
         ws.Cells[5, 3, currentRow, 7].Style.Numberformat.Format = "#,##0.00";
 
-        ws.Column(1).Width = 22; // Foto
+        ws.Column(1).Width = 30; // Foto
         ws.Column(2).Width = 35; // Modelo
         ws.Column(3).Width = 10; // Módulo
         ws.Column(4).Width = 7;
@@ -418,7 +454,7 @@ public class ModuloExportService
         bool isFerguile = (idFornecedor == 3 || idFornecedor == 4) || (!string.IsNullOrEmpty(fornecedorName) && 
             (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus")));
 
-        decimal cotacaoRisco = isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar);
+        decimal cotacaoRisco = Math.Round(isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar), 2);
         
         if (cotacaoRisco <= 0) return 0;
 
@@ -440,10 +476,13 @@ public class ModuloExportService
             float imgWidth = img.Width;
             float imgHeight = img.Height;
 
-            int totalRows = endRow - startRow + 1;
-            float cellHeightPoints = (totalRows == 1) ? 85 : (totalRows * 25);
+            float cellHeightPoints = 0;
+            for (int r = startRow; r <= endRow; r++)
+            {
+                cellHeightPoints += (float)(ws.Row(r).Height > 0 ? ws.Row(r).Height : 15);
+            }
             float cellHeightPixels = cellHeightPoints * 1.333f;
-            float cellWidthPixels = 22 * 7.5f; // column width is 22
+            float cellWidthPixels = (float)(ws.Column(1).Width > 0 ? ws.Column(1).Width : 22) * 7.5f;
 
             float availableWidth = cellWidthPixels - 12; // 6px padding on left/right
             float availableHeight = cellHeightPixels - (hasText ? 24 : 8); // margin for text/padding

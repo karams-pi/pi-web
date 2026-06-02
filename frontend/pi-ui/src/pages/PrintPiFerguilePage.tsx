@@ -105,7 +105,20 @@ export default function PrintPiFerguilePage() {
         pi.piItens.forEach((i: any) => { allItems.push({ ...i, quantidadePeca: i.quantidadePeca || 1 }); totalSofaQty += (i.quantidadePeca || 1); });
     }
 
-    const rows = allItems.map((item) => {
+    // Sort allItems by Brand Name (Marca) to group them alphabetically
+    const groupedByBrand: Record<string, any[]> = {};
+    allItems.forEach(i => {
+        const mt = i.moduloTecido || (i as any).ModuloTecido;
+        const marca = mt?.modulo?.marca?.nome || "Outros";
+        if (!groupedByBrand[marca]) groupedByBrand[marca] = [];
+        groupedByBrand[marca].push(i);
+    });
+    const sortedAllItems: any[] = [];
+    Object.keys(groupedByBrand).sort((a, b) => a.localeCompare(b)).forEach(brand => {
+        sortedAllItems.push(...groupedByBrand[brand]);
+    });
+
+    const rows = sortedAllItems.map((item) => {
       const mt = item.moduloTecido || (item as any).ModuloTecido;
       const marca = mt?.modulo?.marca?.nome || "Outros";
       const volM3 = (item.m3 || 0) * (item.quantidade || 0);
