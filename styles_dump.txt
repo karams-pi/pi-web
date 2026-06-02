@@ -1,0 +1,133 @@
+--- Cells with Fills ---
+Cell A10: val='FOTO' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell B10: val='REFERENCIA' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell C10: val='CÓDIGO ' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell D10: val='DESCRIPCIÓN' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell E10: val='DESC/VOL' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell F10: val='MARCA' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell G10: val='LARG.' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell H10: val='ALT.' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell I10: val='PROF.' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell J10: val='CANT.' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell K10: val='TOTAL M3' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell L10: val='FABRICACIÓN ' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell M10: val='TELA ' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell N10: val='OBSERVACIÓN' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell O10: val='DESPESAS' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell P10: val='UNIT DOLAR' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell Q10: val='TOTAL USD' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell B11: val='AREZZO' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C11: val='2442' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J11: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q11: val='620.1038461538461' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C13: val='17759' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J13: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q13: val='1360.2876923076924' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C15: val='3724' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J15: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q15: val='620.1038461538461' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell R16: val='Preço dolar 4,57' | type=solid | fg=FFFFFF00 | bg=FFFFFF00
+Cell C17: val='17728' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J17: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q17: val='1360.2876923076924' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell R17: val='' | type=solid | fg=FFFFFF00 | bg=FFFFFF00
+Cell R18: val='' | type=solid | fg=FFFFFF00 | bg=FFFFFF00
+Cell B19: val='KYOTO' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C19: val='4439' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J19: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q19: val='332.87384615384616' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C20: val='8520' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J20: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q20: val='310.6438461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C21: val='19610' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J21: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q21: val='353.2938461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C22: val='19833' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J22: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q22: val='353.2938461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C23: val='17723' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J23: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q23: val='686.4676923076923' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C24: val='9449' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J24: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q24: val='343.2338461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C25: val='17725' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J25: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q25: val='661.5276923076924' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C26: val='19834' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J26: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q26: val='368.38384615384615' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C27: val='10646' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J27: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q27: val='310.6438461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C28: val='8622' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J28: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q28: val='310.6438461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C29: val='19835' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J29: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q29: val='413.2138461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell B30: val='POLTRONA CONDOR MANUAL' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C30: val='15856' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J30: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q30: val='693.7876923076924' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C31: val='19588' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J31: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q31: val='346.8938461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell A32: val='' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell B32: val='PARMA' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C32: val='19836' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J32: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q32: val='318.0438461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C33: val='7888' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J33: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q33: val='285.68384615384616' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C34: val='7894' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J34: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q34: val='285.68384615384616' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell A35: val='' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell B35: val='BLEND' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C35: val='17717' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J35: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q35: val='504.5338461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C36: val='19932' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J36: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q36: val='538.9438461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C37: val='12951' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J37: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q37: val='1077.8876923076923' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C38: val='19724' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J38: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q38: val='486.8138461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C39: val='19837' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J39: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q39: val='449.2038461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell C40: val='10541' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J40: val='3' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q40: val='1616.8315384615385' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell A41: val='' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell B41: val='CHANDON GIRATÓRIA' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C41: val='12220' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J41: val='2' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q41: val='811.3876923076923' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell A42: val='' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell B42: val='CHABLIS' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C42: val='19901' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J42: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q42: val='476.1038461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell A43: val='' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell B43: val='CHABLIS
+CHESS' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C43: val='19902' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J43: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q43: val='747.0638461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell B44: val='SANTORINI' | type=solid | fg=FFEFF6FF | bg=FFF8FAFC
+Cell C44: val='19592' | type=solid | fg=FFFFFFFF | bg=FFF8FAFC
+Cell J44: val='1' | type=solid | fg=FFECF9E7 | bg=FFEFF6FF
+Cell Q44: val='776.2938461538462' | type=solid | fg=FFFFF3F3 | bg=FFF8FAFC
+Cell J45: val='39' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell K45: val='90.49024199999997' | type=solid | fg=FF2C3E50 | bg=FF333399
+Cell L45: val='' | type=solid | fg=FFF8FAFC | bg=FFFFFFFF
+Cell M45: val='' | type=solid | fg=FFF8FAFC | bg=FFFFFFFF
+Cell O45: val='' | type=solid | fg=FFF8FAFC | bg=FFFFFFFF
+Cell P45: val='' | type=solid | fg=FFF8FAFC | bg=FFFFFFFF
+Cell Q45: val='17820.09' | type=solid | fg=FF2C3E50 | bg=FF333399

@@ -1,54 +1,129 @@
-Columns: [0, 1, 2, 3, 4, 5, 6, 7]
+Sheet Name: Proforma Invoice
+Max Row: 75, Max Column: 19
 
-First 50 rows:
-           0          1         2           3          4                           5      6                          7
-0        NaN     MODELO  COMP (m)  ALTURA (m)  PROF. (m)                  COMPOSIÇÃO  LINHA  VALOR EM REAIS (UNITÁRIO)
-1   BALDUZZI   BALDUZZI      1.08         0.9       1.14                     MÓDULOS   CO-5                       2160
-2        NaN   BALDUZZI      1.08         0.9       1.14                     MÓDULOS   CO-6                       2260
-3        NaN   BALDUZZI      1.08         0.9       1.14                     MÓDULOS   CO-7                       2340
-4        NaN   BALDUZZI      1.18         0.9       1.14                     MÓDULOS   CO-5                       2250
-5        NaN   BALDUZZI      1.18         0.9       1.14                     MÓDULOS   CO-6                       2360
-6        NaN   BALDUZZI      1.18         0.9       1.14                     MÓDULOS   CO-7                       2245
-7        NaN   BALDUZZI      1.28         0.9       1.14                     MÓDULOS   CO-5                       2350
-8        NaN   BALDUZZI      1.28         0.9       1.14                     MÓDULOS   CO-6                       2460
-9        NaN   BALDUZZI      1.28         0.9       1.14                     MÓDULOS   CO-7                       2560
-10       NaN   BALDUZZI      0.75         0.9       1.14                     MÓDULOS   CO-5                       1860
-11       NaN   BALDUZZI      0.75         0.9       1.14                     MÓDULOS   CO-6                       1930
-12       NaN   BALDUZZI      0.75         0.9       1.14                     MÓDULOS   CO-7                       1995
-13       NaN   BALDUZZI      0.85         0.9       1.14                     MÓDULOS   CO-5                       1945
-14       NaN   BALDUZZI      0.85         0.9       1.14                     MÓDULOS   CO-6                       2025
-15       NaN   BALDUZZI      0.85         0.9       1.14                     MÓDULOS   CO-7                       2090
-16       NaN   BALDUZZI      0.95         0.9       1.14                     MÓDULOS   CO-5                       2040
-17       NaN   BALDUZZI      0.95         0.9       1.14                     MÓDULOS   CO-6                       2120
-18       NaN   BALDUZZI      0.95         0.9       1.14                     MÓDULOS   CO-7                       2190
-19       NaN   BALDUZZI      1.08         0.9       1.59                     MÓDULOS   CO-5                       2480
-20       NaN   BALDUZZI      1.08         0.9       1.59                     MÓDULOS   CO-6                       2610
-21       NaN   BALDUZZI      1.08         0.9       1.59                     MÓDULOS   CO-7                       2715
-22       NaN   BALDUZZI      1.18         0.9       1.59                     MÓDULOS   CO-5                       2580
-23       NaN   BALDUZZI      1.18         0.9       1.59                     MÓDULOS   CO-6                       2715
-24       NaN   BALDUZZI      1.18         0.9       1.59                     MÓDULOS   CO-7                       2825
-25       NaN   BALDUZZI      1.28         0.9       1.59                     MÓDULOS   CO-5                       2690
-26       NaN   BALDUZZI      1.28         0.9       1.59                     MÓDULOS   CO-6                       2825
-27       NaN   BALDUZZI      1.28         0.9       1.59                     MÓDULOS   CO-7                       2935
-28       NaN   BALDUZZI      1.14        0.45       1.14                        PUFF   CO-5                       1555
-29       NaN   BALDUZZI      1.14        0.45       1.14                        PUFF   CO-6                       1615
-30       NaN   BALDUZZI      1.14        0.45       1.14                        PUFF   CO-7                       1670
-31       NaN    INSIEME      2.24        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-5                       6840
-32       NaN    INSIEME      2.24        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-6                       7060
-33       NaN    INSIEME      2.24        0.98        1.6   2 MÓDULOS\nAssento s/bç:    CO-7                       7230
-34       NaN    INSIEME      2.54        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-5                       7290
-35       NaN    INSIEME      2.54        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-6                       7510
-36       NaN    INSIEME      2.54        0.98        1.6   2 MÓDULOS\nAssento s/bç:    CO-7                       7700
-37       NaN    INSIEME      2.84        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-5                       7840
-38       NaN    INSIEME      2.84        0.98          1   2 MÓDULOS\nAssento s/bç:    CO-6                       8090
-39       NaN    INSIEME      2.84        0.98        1.6   2 MÓDULOS\nAssento s/bç:    CO-7                       8290
-40       NaN    INSIEME      3.14        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-5                      10065
-41       NaN    INSIEME      3.14        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-6                      10375
-42       NaN    INSIEME      3.14        0.98        1.6  3 MÓDULOS\nAssento s/bç :    CO-7                      10620
-43       NaN    INSIEME      3.59        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-5                      10705
-44       NaN    INSIEME      3.59        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-6                      11020
-45       NaN    INSIEME      3.59        0.98        1.6  3 MÓDULOS\nAssento s/bç :    CO-7                      11290
-46       NaN    INSIEME      4.04        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-5                      11485
-47       NaN    INSIEME      4.04        0.98          1  3 MÓDULOS\nAssento s/bç :    CO-6                      11840
-48       NaN    INSIEME      4.04        0.98        1.6  3 MÓDULOS\nAssento s/bç :    CO-7                      12125
-49  FRASCATI  FRASCATTI       2.2        0.93       1.12     2 MÓDULOS\nAssento s/bç   CO-5                       3938
+--- Column Widths ---
+Column A: 90.7109375
+Column B: 64.85546875
+Column C: 59.5703125
+Column D: 132.0
+Column E: 82.85546875
+Column F: 42.7109375
+Column G: 40.28515625
+Column H: 36.28515625
+Column I: 35.7109375
+Column J: 39.0
+Column K: 59.7109375
+Column L: 68.28515625
+Column M: 51.5703125
+Column N: 109.42578125
+Column O: 25.42578125
+Column P: 71.5703125
+Column Q: 76.7109375
+Column R: 20.7109375
+Column S: 23.5703125
+
+--- Merged Ranges ---
+B35:B40
+A58:Q58
+J13:J14
+L13:L14
+M11:M12
+D17:D18
+D11:D12
+F11:F18
+J15:J16
+A32:A34
+L15:L16
+J11:J12
+B19:B29
+P11:P12
+F30:F31
+J47:Q57
+M15:M16
+A1:I9
+M13:M14
+N17:N18
+I68:M75
+D13:D14
+P17:P18
+A11:A18
+F35:F40
+B11:B18
+C11:C12
+J1:Q9
+B32:B34
+Q15:Q16
+D15:D16
+N13:N14
+P13:P14
+M17:M18
+C17:C18
+O17:O18
+O11:O12
+Q17:Q18
+Q11:Q12
+A19:A29
+N15:N16
+L11:L12
+P15:P16
+B30:B31
+C13:C14
+N11:N12
+F19:F29
+A35:A40
+O13:O14
+J17:J18
+Q13:Q14
+L17:L18
+C15:C16
+A47:I57
+F32:F34
+O15:O16
+A30:A31
+
+--- Cell Values and Formats ---
+Row 01: A1: 'FERGUILE ESTOFADOS LTDA
+CNPJ: 27.499.537/0001-0...' (Format: General), B1: None, C1: None, D1: None, E1: None, F1: None, G1: None, H1: None, I1: None, J1: 'PROFORMA INVOICE: FRG2026-PO-04
+DATA: 29/05/202...' (Format: General), K1: None, L1: None, M1: None, N1: None, O1: None, P1: None, Q1: None, R1: None, S1: None
+Row 10: A10: 'FOTO' (Format: General), B10: 'REFERENCIA' (Format: General), C10: 'CÓDIGO ' (Format: General), D10: 'DESCRIPCIÓN' (Format: General), E10: 'DESC/VOL' (Format: General), F10: 'MARCA' (Format: General), G10: 'LARG.' (Format: General), H10: 'ALT.' (Format: General), I10: 'PROF.' (Format: General), J10: 'CANT.' (Format: General), K10: 'TOTAL M3' (Format: General), L10: 'FABRICACIÓN ' (Format: General), M10: 'TELA ' (Format: General), N10: 'OBSERVACIÓN' (Format: General), O10: 'DESPESAS' (Format: General), P10: 'UNIT DOLAR' (Format: General), Q10: 'TOTAL USD' (Format: General), R10: None, S10: None
+Row 11: A11: None, B11: 'AREZZO' (Format: General), C11: '2442' (Format: General), D11: 'ESTOFADO AREZZO 2LG CHAISE/DIR 2,88 X 2,05 TC-1...' (Format: General), E11: '02LG.BR/ESQ' (Format: General), F11: 'Ferguile' (Format: General), G11: '1.84' (Format: General), H11: '1' (Format: 0.00), I11: '1.04' (Format: General), J11: '1' (Format: #,##0), K11: '1.9136000000000002' (Format: #,##0.00), L11: 'TC-12' (Format: General), M11: '12011' (Format: General), N11: 'Chaise, olhando de frente lado direito, sentado...' (Format: General), O11: '7.293846153846153' (Format: _-\$* #,##0.00_-), P11: '620.1038461538461' (Format: _-\$* #,##0.00_-), Q11: '620.1038461538461' (Format: _-\$* #,##0.00_-), R11: None, S11: '7.293846153846153' (Format: 0.00)
+Row 12: A12: None, B12: None, C12: None, D12: None, E12: 'CHESS/DIR' (Format: General), F12: None, G12: '1' (Format: 0.00), H12: '1' (Format: 0.00), I12: '2.05' (Format: 0.00), J12: None, K12: '2.05' (Format: #,##0.00), L12: None, M12: None, N12: None, O12: None, P12: None, Q12: None, R12: None, S12: None
+Row 13: A13: None, B13: None, C13: '17759' (Format: General), D13: 'ESTOFADO AREZZO 2LG CHAISE/ESQ 2,05 X 2,88 TC-1...' (Format: General), E13: '02LG.BR/DIR' (Format: General), F13: None, G13: '1.84' (Format: 0.00), H13: '1' (Format: 0.00), I13: '1.04' (Format: 0.00), J13: '2' (Format: #,##0), K13: '3.8272000000000004' (Format: #,##0.00), L13: 'TC-13' (Format: General), M13: '13024' (Format: General), N13: 'Chaise, olhando de frente lado esquerdo, sentad...' (Format: General), O13: '7.293846153846153' (Format: _-\$* #,##0.00_-), P13: '680.1438461538462' (Format: _-\$* #,##0.00_-), Q13: '1360.2876923076924' (Format: _-\$* #,##0.00_-), R13: None, S13: '284.4638949671772' (Format: 0.00)
+Row 14: A14: None, B14: None, C14: None, D14: None, E14: 'CHESS/ESQ' (Format: General), F14: None, G14: '1' (Format: 0.00), H14: '1' (Format: 0.00), I14: '2.05' (Format: 0.00), J14: None, K14: '4.1' (Format: #,##0.00), L14: None, M14: None, N14: None, O14: None, P14: None, Q14: None, R14: None, S14: None
+Row 15: A15: None, B15: None, C15: '3724' (Format: General), D15: 'ESTOFADO AREZZO 2LG CHAISE/DIR 2,88 X 2,05 TC-1...' (Format: General), E15: '02LG.BR/ESQ' (Format: General), F15: None, G15: '1.84' (Format: 0.00), H15: '1' (Format: 0.00), I15: '1.04' (Format: 0.00), J15: '1' (Format: #,##0), K15: '1.9136000000000002' (Format: #,##0.00), L15: 'TC-12' (Format: General), M15: '12003' (Format: General), N15: 'Chaise, olhando de frente lado direito, sentado...' (Format: General), O15: '7.293846153846153' (Format: _-\$* #,##0.00_-), P15: '620.1038461538461' (Format: _-\$* #,##0.00_-), Q15: '620.1038461538461' (Format: _-\$* #,##0.00_-), R15: None, S15: None
+Row 16: A16: None, B16: None, C16: None, D16: None, E16: 'CHESS/DIR' (Format: General), F16: None, G16: '1' (Format: 0.00), H16: '1' (Format: 0.00), I16: '2.05' (Format: 0.00), J16: None, K16: '2.05' (Format: #,##0.00), L16: None, M16: None, N16: None, O16: None, P16: None, Q16: None, R16: 'Preço dolar 4,57' (Format: General), S16: None
+Row 17: A17: None, B17: None, C17: '17728' (Format: General), D17: 'ESTOFADO AREZZO 2LG CHAISE/DIR 2,88 X 2,05 TC-1...' (Format: General), E17: '02LG.BR/ESQ' (Format: General), F17: None, G17: '1.84' (Format: 0.00), H17: '1' (Format: 0.00), I17: '1.04' (Format: 0.00), J17: '2' (Format: #,##0), K17: '3.8272000000000004' (Format: #,##0.00), L17: 'TC-13' (Format: General), M17: '13024' (Format: General), N17: 'Chaise, olhando de frente lado direito, sentado...' (Format: General), O17: '7.293846153846153' (Format: _-\$* #,##0.00_-), P17: '680.1438461538462' (Format: _-\$* #,##0.00_-), Q17: '1360.2876923076924' (Format: _-\$* #,##0.00_-), R17: None, S17: None
+Row 18: A18: None, B18: None, C18: None, D18: None, E18: 'CHESS/DIR' (Format: General), F18: None, G18: '1' (Format: 0.00), H18: '1' (Format: 0.00), I18: '2.05' (Format: 0.00), J18: None, K18: '4.1' (Format: #,##0.00), L18: None, M18: None, N18: None, O18: None, P18: None, Q18: None, R18: None, S18: None
+Row 19: A19: None, B19: 'KYOTO' (Format: General), C19: '4439' (Format: General), D19: 'ESTOFADO KYOTO 2,30 TC-12023' (Format: General), E19: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F19: 'Ferguile' (Format: General), G19: '2.3' (Format: 0.00), H19: '1.08' (Format: 0.00), I19: '0.98' (Format: 0.00), J19: '1' (Format: #,##0), K19: '2.43432' (Format: #,##0.00), L19: 'TC-12' (Format: General), M19: '12023' (Format: General), N19: None, O19: '7.293846153846153' (Format: _-\$* #,##0.00_-), P19: '332.87384615384616' (Format: _-\$* #,##0.00_-), Q19: '332.87384615384616' (Format: _-\$* #,##0.00_-), R19: None, S19: None
+Row 20: A20: None, B20: None, C20: '8520' (Format: General), D20: 'ESTOFADO KYOTO 2,10 TC-12011' (Format: General), E20: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F20: None, G20: '2.1' (Format: 0.00), H20: '1.08' (Format: 0.00), I20: '0.98' (Format: 0.00), J20: '1' (Format: #,##0), K20: '2.22264' (Format: #,##0.00), L20: 'TC-12' (Format: General), M20: '12011' (Format: General), N20: None, O20: '7.293846153846153' (Format: _-\$* #,##0.00_-), P20: '310.6438461538462' (Format: _-\$* #,##0.00_-), Q20: '310.6438461538462' (Format: _-\$* #,##0.00_-), R20: None, S20: None
+Row 21: A21: None, B21: None, C21: '19610' (Format: General), D21: 'ESTOFADO KYOTO 2,30 TC-10064' (Format: General), E21: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F21: None, G21: '2.3' (Format: 0.00), H21: '1.08' (Format: 0.00), I21: '0.98' (Format: 0.00), J21: '1' (Format: #,##0), K21: '2.43432' (Format: #,##0.00), L21: 'TC-10' (Format: General), M21: '10064' (Format: General), N21: None, O21: '7.293846153846153' (Format: _-\$* #,##0.00_-), P21: '353.2938461538462' (Format: _-\$* #,##0.00_-), Q21: '353.2938461538462' (Format: _-\$* #,##0.00_-), R21: None, S21: None
+Row 22: A22: None, B22: None, C22: '19833' (Format: General), D22: 'ESTOFADO KYOTO 2,30 TC-10065' (Format: General), E22: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F22: None, G22: '2.3' (Format: 0.00), H22: '1.08' (Format: 0.00), I22: '0.98' (Format: 0.00), J22: '1' (Format: #,##0), K22: '2.43432' (Format: #,##0.00), L22: 'TC-10' (Format: General), M22: '10065' (Format: General), N22: None, O22: '7.293846153846153' (Format: _-\$* #,##0.00_-), P22: '353.2938461538462' (Format: _-\$* #,##0.00_-), Q22: '353.2938461538462' (Format: _-\$* #,##0.00_-), R22: None, S22: None
+Row 23: A23: None, B23: None, C23: '17723' (Format: General), D23: 'ESTOFADO KYOTO 2,10 TC-13024' (Format: General), E23: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F23: None, G23: '2.1' (Format: 0.00), H23: '1.08' (Format: 0.00), I23: '0.98' (Format: 0.00), J23: '2' (Format: #,##0), K23: '4.44528' (Format: #,##0.00), L23: 'TC-13' (Format: General), M23: '13024' (Format: General), N23: None, O23: '7.293846153846153' (Format: _-\$* #,##0.00_-), P23: '343.2338461538462' (Format: _-\$* #,##0.00_-), Q23: '686.4676923076923' (Format: _-\$* #,##0.00_-), R23: None, S23: None
+Row 24: A24: None, B24: None, C24: '9449' (Format: General), D24: 'ESTOFADO KYOTO 2,10 TC-13025' (Format: General), E24: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F24: None, G24: '2.1' (Format: 0.00), H24: '1.08' (Format: 0.00), I24: '0.98' (Format: 0.00), J24: '1' (Format: #,##0), K24: '2.22264' (Format: #,##0.00), L24: 'TC-13' (Format: General), M24: '13025' (Format: General), N24: None, O24: '7.293846153846153' (Format: _-\$* #,##0.00_-), P24: '343.2338461538462' (Format: _-\$* #,##0.00_-), Q24: '343.2338461538462' (Format: _-\$* #,##0.00_-), R24: None, S24: None
+Row 25: A25: None, B25: None, C25: '17725' (Format: General), D25: 'ESTOFADO KYOTO 2,10 TC-10065' (Format: General), E25: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F25: None, G25: '2.1' (Format: 0.00), H25: '1.08' (Format: 0.00), I25: '0.98' (Format: 0.00), J25: '2' (Format: #,##0), K25: '4.44528' (Format: #,##0.00), L25: 'TC-10' (Format: General), M25: '10065' (Format: General), N25: 'SE 1 DELES NÃO ENTRAR NO CAMINHÃO PODE FICAR' (Format: General), O25: '7.293846153846153' (Format: _-\$* #,##0.00_-), P25: '330.7638461538462' (Format: _-\$* #,##0.00_-), Q25: '661.5276923076924' (Format: _-\$* #,##0.00_-), R25: None, S25: None
+Row 26: A26: None, B26: None, C26: '19834' (Format: General), D26: 'ESTOFADO KYOTO 2,30 TC-13008' (Format: General), E26: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F26: None, G26: '2.3' (Format: 0.00), H26: '1.08' (Format: 0.00), I26: '0.98' (Format: 0.00), J26: '1' (Format: #,##0), K26: '2.43432' (Format: #,##0.00), L26: 'TC-13' (Format: General), M26: '13008' (Format: General), N26: None, O26: '7.293846153846153' (Format: _-\$* #,##0.00_-), P26: '368.38384615384615' (Format: _-\$* #,##0.00_-), Q26: '368.38384615384615' (Format: _-\$* #,##0.00_-), R26: None, S26: None
+Row 27: A27: None, B27: None, C27: '10646' (Format: General), D27: 'ESTOFADO KYOTO 2,10 TC-12021' (Format: General), E27: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F27: None, G27: '2.1' (Format: 0.00), H27: '1.08' (Format: 0.00), I27: '0.98' (Format: 0.00), J27: '1' (Format: #,##0), K27: '2.22264' (Format: #,##0.00), L27: 'TC-12' (Format: General), M27: '12021' (Format: General), N27: None, O27: '7.293846153846153' (Format: _-\$* #,##0.00_-), P27: '310.6438461538462' (Format: _-\$* #,##0.00_-), Q27: '310.6438461538462' (Format: _-\$* #,##0.00_-), R27: None, S27: None
+Row 28: A28: None, B28: None, C28: '8622' (Format: General), D28: 'ESTOFADO KYOTO 2,10 TC-12003' (Format: General), E28: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F28: None, G28: '2.1' (Format: 0.00), H28: '1.08' (Format: 0.00), I28: '0.98' (Format: 0.00), J28: '1' (Format: #,##0), K28: '2.22264' (Format: #,##0.00), L28: 'TC-12' (Format: General), M28: '12003' (Format: General), N28: 'SE NÃO ENTRAR NO CAMINHÃO PODE FICAR' (Format: General), O28: '7.293846153846153' (Format: _-\$* #,##0.00_-), P28: '310.6438461538462' (Format: _-\$* #,##0.00_-), Q28: '310.6438461538462' (Format: _-\$* #,##0.00_-), R28: None, S28: None
+Row 29: A29: None, B29: None, C29: '19835' (Format: General), D29: 'ESTOFADO KYOTO 2,50 TC-13024' (Format: General), E29: 'BIPARTIDO' (Format: General), F29: None, G29: '2.5' (Format: 0.00), H29: '1.08' (Format: 0.00), I29: '0.98' (Format: 0.00), J29: '1' (Format: #,##0), K29: '2.646' (Format: #,##0.00), L29: 'TC-13' (Format: General), M29: '13024' (Format: General), N29: None, O29: '7.293846153846153' (Format: _-\$* #,##0.00_-), P29: '413.2138461538462' (Format: _-\$* #,##0.00_-), Q29: '413.2138461538462' (Format: _-\$* #,##0.00_-), R29: None, S29: None
+Row 30: A30: None, B30: 'POLTRONA CONDOR MANUAL' (Format: General), C30: '15856' (Format: General), D30: 'POLTRONA CONDOR 0,82 MANUAL TC-13025' (Format: General), E30: 'POLT CONDOR MANUAL' (Format: General), F30: 'Ferguile' (Format: General), G30: '0.82' (Format: 0.00), H30: '1.02' (Format: 0.00), I30: '0.97' (Format: 0.00), J30: '2' (Format: #,##0), K30: '1.6226159999999998' (Format: #,##0.00), L30: 'TC / ST / NOBUCK' (Format: General), M30: '13025' (Format: General), N30: None, O30: '7.293846153846153' (Format: _-\$* #,##0.00_-), P30: '346.8938461538462' (Format: _-\$* #,##0.00_-), Q30: '693.7876923076924' (Format: _-\$* #,##0.00_-), R30: None, S30: None
+Row 31: A31: None, B31: None, C31: '19588' (Format: General), D31: 'POLTRONA CONDOR 0,82 MANUAL TC-10065' (Format: General), E31: 'POLT CONDOR MANUAL' (Format: General), F31: None, G31: '0.82' (Format: 0.00), H31: '1.02' (Format: 0.00), I31: '0.97' (Format: 0.00), J31: '1' (Format: #,##0), K31: '0.8113079999999999' (Format: #,##0.00), L31: 'TC / ST / NOBUCK' (Format: General), M31: '10065' (Format: General), N31: None, O31: '7.293846153846153' (Format: _-\$* #,##0.00_-), P31: '346.8938461538462' (Format: _-\$* #,##0.00_-), Q31: '346.8938461538462' (Format: _-\$* #,##0.00_-), R31: None, S31: None
+Row 32: A32: None, B32: 'PARMA' (Format: General), C32: '19836' (Format: General), D32: 'ESTOFADO PARMA 1,80 TC-13025' (Format: General), E32: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F32: 'Ferguile' (Format: General), G32: '1.8' (Format: 0.00), H32: '1.1' (Format: 0.00), I32: '0.98' (Format: 0.00), J32: '1' (Format: #,##0), K32: '1.9404000000000001' (Format: #,##0.00), L32: 'TC-13' (Format: General), M32: '13025' (Format: General), N32: None, O32: '7.293846153846153' (Format: _-\$* #,##0.00_-), P32: '318.0438461538462' (Format: _-\$* #,##0.00_-), Q32: '318.0438461538462' (Format: _-\$* #,##0.00_-), R32: None, S32: None
+Row 33: A33: None, B33: None, C33: '7888' (Format: General), D33: 'ESTOFADO PARMA 1,80 TC-12015' (Format: General), E33: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F33: None, G33: '1.8' (Format: 0.00), H33: '1.1' (Format: 0.00), I33: '0.98' (Format: 0.00), J33: '1' (Format: #,##0), K33: '1.9404000000000001' (Format: #,##0.00), L33: 'TC-12' (Format: General), M33: '12015' (Format: General), N33: None, O33: '7.293846153846153' (Format: _-\$* #,##0.00_-), P33: '285.68384615384616' (Format: _-\$* #,##0.00_-), Q33: '285.68384615384616' (Format: _-\$* #,##0.00_-), R33: None, S33: None
+Row 34: A34: None, B34: None, C34: '7894' (Format: General), D34: 'ESTOFADO PARMA 1,80 TC-12023' (Format: General), E34: 'PEÇA ÚNICA - 2 ASSENTOS' (Format: General), F34: None, G34: '1.8' (Format: 0.00), H34: '1.1' (Format: 0.00), I34: '0.98' (Format: 0.00), J34: '1' (Format: #,##0), K34: '1.9404000000000001' (Format: #,##0.00), L34: 'TC-12' (Format: General), M34: '12023' (Format: General), N34: None, O34: '7.293846153846153' (Format: _-\$* #,##0.00_-), P34: '285.68384615384616' (Format: _-\$* #,##0.00_-), Q34: '285.68384615384616' (Format: _-\$* #,##0.00_-), R34: None, S34: None
+Row 35: A35: None, B35: 'BLEND' (Format: General), C35: '17717' (Format: General), D35: 'ESTOFADO BLEND 2,22 BIP TC-10064' (Format: General), E35: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F35: 'Ferguile' (Format: General), G35: '2.22' (Format: 0.00), H35: '0.93' (Format: 0.00), I35: '1.07' (Format: 0.00), J35: '1' (Format: #,##0), K35: '2.2091220000000007' (Format: #,##0.00), L35: 'TC-10' (Format: General), M35: '10064' (Format: General), N35: None, O35: '7.293846153846153' (Format: _-\$* #,##0.00_-), P35: '504.5338461538462' (Format: _-\$* #,##0.00_-), Q35: '504.5338461538462' (Format: _-\$* #,##0.00_-), R35: None, S35: None
+Row 36: A36: None, B36: None, C36: '19932' (Format: General), D36: 'ESTOFADO BLEND 2,22 BIP TC-13004' (Format: General), E36: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F36: None, G36: '2.22' (Format: 0.00), H36: '0.93' (Format: 0.00), I36: '1.07' (Format: 0.00), J36: '1' (Format: #,##0), K36: '2.2091220000000007' (Format: #,##0.00), L36: 'TC-13' (Format: General), M36: '13004' (Format: General), N36: None, O36: '7.293846153846153' (Format: _-\$* #,##0.00_-), P36: '538.9438461538462' (Format: _-\$* #,##0.00_-), Q36: '538.9438461538462' (Format: _-\$* #,##0.00_-), R36: None, S36: None
+Row 37: A37: None, B37: None, C37: '12951' (Format: General), D37: 'ESTOFADO BLEND 2,22 BIP TC-13025' (Format: General), E37: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F37: None, G37: '2.22' (Format: 0.00), H37: '0.93' (Format: 0.00), I37: '1.07' (Format: 0.00), J37: '2' (Format: #,##0), K37: '4.418244000000001' (Format: #,##0.00), L37: 'TC-13' (Format: General), M37: '13025' (Format: General), N37: None, O37: '7.293846153846153' (Format: _-\$* #,##0.00_-), P37: '538.9438461538462' (Format: _-\$* #,##0.00_-), Q37: '1077.8876923076923' (Format: _-\$* #,##0.00_-), R37: None, S37: None
+Row 38: A38: None, B38: None, C38: '19724' (Format: General), D38: 'ESTOFADO BLEND 2,22 BIP TC-12013' (Format: General), E38: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F38: None, G38: '2.22' (Format: 0.00), H38: '0.93' (Format: 0.00), I38: '1.07' (Format: 0.00), J38: '1' (Format: #,##0), K38: '2.2091220000000007' (Format: #,##0.00), L38: 'TC-12' (Format: General), M38: '12013' (Format: General), N38: None, O38: '7.293846153846153' (Format: _-\$* #,##0.00_-), P38: '486.8138461538462' (Format: _-\$* #,##0.00_-), Q38: '486.8138461538462' (Format: _-\$* #,##0.00_-), R38: None, S38: None
+Row 39: A39: None, B39: None, C39: '19837' (Format: General), D39: 'ESTOFADO BLEND 1,82 BIP TC-12003' (Format: General), E39: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F39: None, G39: '1.82' (Format: 0.00), H39: '0.93' (Format: 0.00), I39: '1.07' (Format: 0.00), J39: '1' (Format: #,##0), K39: '1.8110820000000003' (Format: #,##0.00), L39: 'TC-12' (Format: General), M39: '12003' (Format: General), N39: None, O39: '7.293846153846153' (Format: _-\$* #,##0.00_-), P39: '449.2038461538462' (Format: _-\$* #,##0.00_-), Q39: '449.2038461538462' (Format: _-\$* #,##0.00_-), R39: None, S39: None
+Row 40: A40: None, B40: None, C40: '10541' (Format: General), D40: 'ESTOFADO BLEND 2,22 BIP TC-13024' (Format: General), E40: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F40: None, G40: '2.22' (Format: 0.00), H40: '0.93' (Format: 0.00), I40: '1.07' (Format: 0.00), J40: '3' (Format: #,##0), K40: '6.627366000000002' (Format: #,##0.00), L40: 'TC-13' (Format: General), M40: '13024' (Format: General), N40: None, O40: '7.293846153846153' (Format: _-\$* #,##0.00_-), P40: '538.9438461538462' (Format: _-\$* #,##0.00_-), Q40: '1616.8315384615385' (Format: _-\$* #,##0.00_-), R40: None, S40: None
+Row 41: A41: None, B41: 'CHANDON GIRATÓRIA' (Format: General), C41: '12220' (Format: General), D41: 'POLTRONA CHANDON GIRATORIA COURO 702' (Format: General), E41: 'POLTRONA GIRATÓRIA' (Format: General), F41: 'Livintus' (Format: General), G41: '0.86' (Format: 0.00), H41: '0.78' (Format: 0.00), I41: '0.9' (Format: 0.00), J41: '2' (Format: #,##0), K41: '1.20744' (Format: #,##0.00), L41: 'C0-7' (Format: General), M41: '702' (Format: General), N41: None, O41: '7.293846153846153' (Format: _-\$* #,##0.00_-), P41: '405.69384615384615' (Format: _-\$* #,##0.00_-), Q41: '811.3876923076923' (Format: _-\$* #,##0.00_-), R41: None, S41: None
+Row 42: A42: None, B42: 'CHABLIS' (Format: General), C42: '19901' (Format: General), D42: 'ESTOFADO CHABLIS 2,10 BIP TC-14041' (Format: General), E42: 'BIPARTIDO - 2 ASSENTOS' (Format: General), F42: 'Ferguile' (Format: General), G42: '2.1' (Format: 0.00), H42: '0.86' (Format: 0.00), I42: '0.92' (Format: 0.00), J42: '1' (Format: #,##0), K42: '1.66152' (Format: #,##0.00), L42: 'TC-14' (Format: General), M42: '14041' (Format: General), N42: 'Chaise, olhando de frente lado esquerdo, sentad...' (Format: General), O42: '7.293846153846153' (Format: _-\$* #,##0.00_-), P42: '476.1038461538462' (Format: _-\$* #,##0.00_-), Q42: '476.1038461538462' (Format: _-\$* #,##0.00_-), R42: None, S42: None
+Row 43: A43: None, B43: 'CHABLIS
+CHESS' (Format: General), C43: '19902' (Format: General), D43: 'ESTOFADO CHABLIS 3,00 CHAISE/ESQ TC-13002' (Format: General), E43: 'BIPARTIDO - 3 ASSENTOS + CHAISE' (Format: General), F43: 'Ferguile' (Format: General), G43: '3' (Format: 0.00), H43: '0.86' (Format: 0.00), I43: '0.92' (Format: 0.00), J43: '1' (Format: #,##0), K43: '2.3736' (Format: #,##0.00), L43: 'TC-13' (Format: General), M43: '13002' (Format: General), N43: None, O43: '7.293846153846153' (Format: _-\$* #,##0.00_-), P43: '747.0638461538462' (Format: _-\$* #,##0.00_-), Q43: '747.0638461538462' (Format: _-\$* #,##0.00_-), R43: None, S43: None
+Row 44: A44: None, B44: 'SANTORINI' (Format: General), C44: '19592' (Format: General), D44: 'ESTOFADO SANTORINI 3,00 BIP TC-16005 COM ALMOFA...' (Format: General), E44: 'BIPARTIDO - 3
+ASSENTOS ' (Format: General), F44: 'Ferguile' (Format: General), G44: '3' (Format: 0.00), H44: '0.95' (Format: 0.00), I44: '1.25' (Format: 0.00), J44: '1' (Format: #,##0), K44: '3.5624999999999996' (Format: #,##0.00), L44: 'TC-16' (Format: General), M44: '16005' (Format: General), N44: None, O44: '7.293846153846153' (Format: _-\$* #,##0.00_-), P44: '776.2938461538462' (Format: _-\$* #,##0.00_-), Q44: '776.2938461538462' (Format: _-\$* #,##0.00_-), R44: None, S44: None
+Row 45: A45: 'TOTAL' (Format: General), B45: None, C45: None, D45: None, E45: None, F45: None, G45: None, H45: None, I45: None, J45: '39' (Format: #,##0), K45: '90.49024199999997' (Format: #,##0.00), L45: None, M45: None, N45: None, O45: None, P45: None, Q45: '17820.09' (Format: _-[$$-409]* #,##0.00_ ;_-[$$-409]* \-#,##0.00\ ;_-[$$-409]* \-??_ ;_-@_ ), R45: None, S45: None
+Row 47: A47: 'DETALLES BANCARIOS:
+Beneficiary: FERGUILE ESTOF...' (Format: General), B47: None, C47: None, D47: None, E47: None, F47: None, G47: None, H47: None, I47: None, J47: 'DATOS GENERALES DEL PRODUCTO
+Marca: Ferguile/Li...' (Format: General), K47: None, L47: None, M47: None, N47: None, O47: None, P47: None, Q47: None, R47: None, S47: None
+Row 58: A58: '* Esta proforma es válida por 10 días a partir ...' (Format: General), B58: None, C58: None, D58: None, E58: None, F58: None, G58: None, H58: None, I58: None, J58: None, K58: None, L58: None, M58: None, N58: None, O58: None, P58: None, Q58: None, R58: None, S58: None
