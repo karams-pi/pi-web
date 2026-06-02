@@ -718,108 +718,107 @@ public class PiExportService
         var dateObj = pi.DataPi.DateTime;
 
         // ═══════════════ HEADER ═══════════════
-        ws.Cells["A1:G6"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
-        ws.Cells["A1:G1"].Merge = true;
-        ws.Cells["A1"].Value = metadata.Name;
-        ws.Cells["A1"].Style.Font.Bold = true;
-        ws.Cells["A1"].Style.Font.Size = 13;
-        
-        ws.Cells["A2"].Value = t("NIT", lang) + " " + metadata.Cnpj;
-        ws.Cells["A3"].Value = t("ADDRESS", lang) + " " + metadata.Address;
-        ws.Cells["A5"].Value = (lang == "ES" ? "CÓDIGO POSTAL: " : (lang == "EN" ? "ZIP CODE: " : "CEP: ")) + metadata.Zip + " - " + metadata.City + " - " + metadata.State;
-        ws.Cells["A6"].Value = t("COUNTRY", lang) + " " + metadata.Country;
-        ws.Cells["A7"].Value = t("DELIVERY_TIME", lang) + " " + (!string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "60 dias");
-        ws.Cells["A8"].Value = t("INCOTERM", lang) + " " + pi.Frete?.Nome + " - ARAPONGAS PR";
-        ws.Cells["A9"].Value = t("PAYMENT_CONDITION", lang) + " " + (!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "A VISTA"));
-        ws.Cells["A10"].Value = "";
+        var supplierRange = ws.Cells["A1:I9"];
+        supplierRange.Merge = true;
+        supplierRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        supplierRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+        supplierRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        supplierRange.Style.WrapText = true;
+        supplierRange.Style.Font.Size = 9;
 
+        string supplierText = $"{metadata.Name}\n" +
+                              $"CNPJ: {metadata.Cnpj}\n" +
+                              $"ADDRESS: {metadata.Address}\n" +
+                              $"{metadata.City} - {metadata.State}\n" +
+                              $"ZIP CODE: {metadata.Zip}\n" +
+                              $"COUNTRY: {metadata.Country}\n" +
+                              $"DELIVERY TIME: {(!string.IsNullOrWhiteSpace(pi.TempoEntrega) ? pi.TempoEntrega : "60 dias")}\n" +
+                              $"INCOTERM: {pi.Frete?.Nome} - ARAPONGAS PR\n" +
+                              $"PAYMENT TERM: {(!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "AT SIGHT"))}";
+        ws.Cells["A1"].Value = supplierText;
 
-        ws.Cells["H1:N9"].Style.Border.BorderAround(ExcelBorderStyle.Thick);
-        ws.Cells["H1"].Value = "PROFORMA INVOICE: " + piNumber;
-        ws.Cells["H1"].Style.Font.Bold = true;
-        ws.Cells["H2"].Value = t("DATE", lang) + " " + dateObj.ToString("dd/MM/yyyy");
-        ws.Cells["H3"].Value = t("ORDER_DATE", lang) + " " + dateObj.ToString("dd/MM/yyyy");
-        ws.Cells["H4"].Value = t("IMPORTER", lang);
-        ws.Cells["H4"].Style.Font.Bold = true;
-        ws.Cells["H5"].Value = pi.Cliente?.Nome;
-        ws.Cells["H6"].Value = t("ADDRESS", lang) + " " + pi.Cliente?.Endereco + (string.IsNullOrEmpty(pi.Cliente?.Cidade) ? "" : ", " + pi.Cliente.Cidade);
-        ws.Cells["H7"].Value = (lang == "ES" ? "CÓDIGO POSTAL: " : (lang == "EN" ? "ZIP CODE: " : "CEP: ")) + pi.Cliente?.Cep;
-        ws.Cells["H8"].Value = t("NIT", lang) + " " + pi.Cliente?.Nit;
-        ws.Cells["H9"].Value = t("RESPONSIBLE", lang) + " " + (pi.Cliente?.PessoaContato ?? "..");
-        ws.Cells[1, 1, 10, 14].Style.Font.Size = 8;
+        var importerRange = ws.Cells["J1:Q9"];
+        importerRange.Merge = true;
+        importerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        importerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+        importerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        importerRange.Style.WrapText = true;
+        importerRange.Style.Font.Size = 9;
 
-        // ═══════════════ TABLE ═══════════════
+        string importerText = $"PROFORMA INVOICE: {piNumber}\n" +
+                              $"DATE: {dateObj:dd/MM/yyyy}\n" +
+                              $"ORDER DATE: {dateObj:dd/MM/yyyy}\n" +
+                              $"IMPORTER:\n" +
+                              $"{pi.Cliente?.Nome}\n" +
+                              $"{(lang == "ES" ? "NIT/CUIT" : "TAX ID")}: {pi.Cliente?.Nit}\n" +
+                              $"ADDRESS: {pi.Cliente?.Endereco}{(string.IsNullOrEmpty(pi.Cliente?.Cidade) ? "" : ", " + pi.Cliente.Cidade)}\n" +
+                              $"ZIP CODE: {pi.Cliente?.Cep}\n" +
+                              $"COUNTRY: {pi.Cliente?.Pais ?? "Argentina"}\n" +
+                              $"RESPONSIBLE PERSON: {pi.Cliente?.PessoaContato ?? ".."}\n" +
+                              $"TEL.: {pi.Cliente?.Telefone}\n" +
+                              $"E-MAIL: {pi.Cliente?.Email}";
+        ws.Cells["J1"].Value = importerText;
+
+        // ═══════════════ TABLE HEADERS ═══════════════
         int startRow = 10;
-        string currentCurrency = currency?.Trim().ToUpper() ?? "EXW";
-        string unitLabel = currentCurrency == "BRL" ? $"UNIT R$ ({t("UNIT", lang)})" : $"UNIT DOLAR ({t("UNIT", lang)})";
-        string totalLabel = currentCurrency == "BRL" ? "TOTAL R$" : "TOTAL USD";
-        
-        bool showFreight = true; // Always show in Excel as requested
-        int totalCol = 14;
+        bool isBRL = string.Equals(currency, "BRL", StringComparison.OrdinalIgnoreCase);
+        string unitLabel = isBRL ? "UNIT REAIS" : "UNIT DOLAR";
+        string totalLabel = isBRL ? "TOTAL BRL" : "TOTAL USD";
 
-        List<string> headerList = new List<string> { 
-            t("PHOTO", lang), t("REFERENCIA", lang), t("DESCRIPTION", lang), t("BRAND", lang), 
-            t("WIDTH", lang), t("HEIGHT", lang), t("DEPTH", lang), t("QTY_UNIT", lang).Replace(" UNID", ""), 
-            t("TOTAL_VOLUME", lang), t("FABRIC", lang), t("FABRIC_N", lang), t("OBSERVATION", lang) 
+        string[] headers = {
+            "FOTO", "REFERENCIA", "CÓDIGO", "DESCRIPCIÓN", "DESC/VOL",
+            "MARCA", "LARG.", "ALT.", "PROF.", "CANT.",
+            "TOTAL M3", "FABRICACIÓN", "TELA", "OBSERVACIÓN", "DESPESAS", unitLabel, totalLabel
         };
-        
-        if (showFreight)
-        {
-            headerList.Add(t("FRETE", lang));
-            headerList.Add("EXW UNIT");
-            headerList.Add("UNIT FINAL");
-        }
 
-        headerList.Add(unitLabel); // This will be USD UNIT (Custo Peça)
-        headerList.Add(totalLabel); // This will be TOTAL USD (Custo Grupo)
-
-        string[] headers = headerList.ToArray();
         for (int i = 0; i < headers.Length; i++)
         {
             var cell = ws.Cells[startRow, i + 1];
             cell.Value = headers[i];
             cell.Style.Font.Bold = true;
             cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            cell.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(44, 62, 80));
+            cell.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(0x2C, 0x3E, 0x50));
             cell.Style.Font.Color.SetColor(Color.White);
             cell.Style.Border.BorderAround(ExcelBorderStyle.Thin);
             cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            cell.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
         }
 
-        // Recalculate freight exactly as the screen does
-        decimal piTotalQty = pi.PiItens.Sum(i => (decimal)i.Quantidade);
+        // ═══════════════ FREIGHT PRE-CALCULATION ═══════════════
         decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
+        decimal risk = pi.CotacaoRisco;
 
-        int currentRow = startRow + 1;
-        var groups = pi.PiItens
-            .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
-            .OrderBy(g => g.Key?.Nome ?? "Outros")
+        var orderedItems = pi.PiItens
+            .OrderBy(i => i.ModuloTecido?.Modulo?.Marca?.Nome ?? "ZZZ")
+            .ThenBy(i => i.ModuloTecido?.Modulo?.Descricao ?? "")
+            .ThenBy(i => i.ModuloTecido?.CodigoModuloTecido ?? "")
             .ToList();
-        
-        var renderedItems = new List<PiItem>();
-        foreach (var group in groups)
+
+        foreach (var item in orderedItems)
         {
-            foreach (var item in group)
+            if (item.Largura == 0 && item.ModuloTecido?.Modulo?.Largura > 0) item.Largura = item.ModuloTecido.Modulo.Largura;
+            if (item.Profundidade == 0 && item.ModuloTecido?.Modulo?.Profundidade > 0) item.Profundidade = item.ModuloTecido.Modulo.Profundidade;
+            if (item.Altura == 0 && item.ModuloTecido?.Modulo?.Altura > 0) item.Altura = item.ModuloTecido.Modulo.Altura;
+            if (item.M3 == 0)
             {
-                renderedItems.Add(item);
+                decimal calcM3 = (decimal)item.Largura * (decimal)item.Profundidade * (decimal)item.Altura;
+                if (calcM3 > 500) item.M3 = calcM3 / 1000000;
+                else if (calcM3 > 0) item.M3 = calcM3;
             }
         }
 
-        // ═══════════════ PRE-CALCULATE FREIGHTS ═══════════════
         var itemFreightUSD = new Dictionary<long, decimal>();
         var itemFreightBRL = new Dictionary<long, decimal>();
         decimal currentRemBRL = piTotalFreteBRL;
         decimal currentRemUSD = piTotalFreteUSD;
 
-        for (int i = 0; i < renderedItems.Count; i++)
+        for (int i = 0; i < orderedItems.Count; i++)
         {
-            var item = renderedItems[i];
-            bool isLast = i == renderedItems.Count - 1;
-            
-            decimal fUnitBRL = 0;
-            decimal fUnitUSD = 0;
+            var item = orderedItems[i];
+            bool isLast = i == orderedItems.Count - 1;
+            decimal fUnitBRL = 0, fUnitUSD = 0;
 
             if (isLast)
             {
@@ -828,10 +827,10 @@ public class PiExportService
             }
             else
             {
-                if (string.Equals(pi.TipoRateio, "IGUAL", System.StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(pi.TipoRateio, "IGUAL", StringComparison.OrdinalIgnoreCase))
                 {
-                    decimal rowShareBRL = renderedItems.Count > 0 ? piTotalFreteBRL / renderedItems.Count : 0;
-                    decimal rowShareUSD = renderedItems.Count > 0 ? piTotalFreteUSD / renderedItems.Count : 0;
+                    decimal rowShareBRL = orderedItems.Count > 0 ? piTotalFreteBRL / orderedItems.Count : 0;
+                    decimal rowShareUSD = orderedItems.Count > 0 ? piTotalFreteUSD / orderedItems.Count : 0;
                     fUnitBRL = item.Quantidade > 0 ? rowShareBRL / item.Quantidade : 0;
                     fUnitUSD = item.Quantidade > 0 ? rowShareUSD / item.Quantidade : 0;
                 }
@@ -847,177 +846,223 @@ public class PiExportService
             itemFreightUSD[item.Id] = fUnitUSD;
         }
 
+        // ═══════════════ DATA ROWS ═══════════════
+        var colorRef   = Color.FromArgb(0xEF, 0xF6, 0xFF); // B: REFERENCIA - light blue
+        var colorCode  = Color.White;                        // C: CODIGO - white
+        var colorQty   = Color.FromArgb(0xEC, 0xF9, 0xE7); // J: CANT. - light green
+        var colorTotal = Color.FromArgb(0xFF, 0xF3, 0xF3); // Q: TOTAL - light pink
+
+        int currentRow = startRow + 1;
         decimal totalQty = 0;
         decimal totalM3 = 0;
-
         decimal totalFinalPI = 0;
 
-        foreach (var group in groups)
+        var brandGroups = orderedItems
+            .GroupBy(i => i.ModuloTecido?.Modulo?.Marca?.Id ?? 0)
+            .Select(g => new {
+                Brand = g.First().ModuloTecido?.Modulo?.Marca,
+                Items = g.OrderBy(i => i.ModuloTecido?.Modulo?.Descricao ?? "")
+                          .ThenBy(i => i.ModuloTecido?.CodigoModuloTecido ?? "")
+                          .ToList()
+            })
+            .OrderBy(g => g.Brand?.Nome ?? "ZZZ")
+            .ToList();
+
+        foreach (var brandGroup in brandGroups)
         {
-            var brand = group.Key;
-            int groupStartRow = currentRow;
-            decimal groupPieceCostDisp = 0;
-            decimal groupTotalValueDisp = 0;
-            foreach (var item in group)
+            var brand = brandGroup.Brand;
+            int brandStartRow = currentRow;
+
+            var modelGroups = brandGroup.Items
+                .GroupBy(i => i.ModuloTecido?.Modulo?.Id ?? 0)
+                .Select(g => new {
+                    ModelName = g.First().SubModulo?.DescricaoProduto
+                                ?? g.First().PiItemPeca?.Descricao
+                                ?? g.First().ModuloTecido?.Modulo?.Descricao
+                                ?? "",
+                    Items = g.OrderBy(i => i.ModuloTecido?.CodigoModuloTecido ?? "").ToList()
+                })
+                .ToList();
+
+            foreach (var modelGroup in modelGroups)
             {
-                ws.Cells[currentRow, 2].Value = brand?.Nome;
-                ws.Cells[currentRow, 3].Value = item.ModuloTecido?.Modulo?.Descricao;
-                ws.Cells[currentRow, 4].Value = item.ModuloTecido?.Modulo?.Fornecedor?.Nome ?? item.ModuloTecido?.Modulo?.Categoria?.Nome ?? metadata.Brand;
-                ws.Cells[currentRow, 5].Value = item.Largura;
+                int modelStartRow = currentRow;
 
-                ws.Cells[currentRow, 6].Value = item.Altura;
-                ws.Cells[currentRow, 7].Value = item.Profundidade;
-                ws.Cells[currentRow, 8].Value = item.Quantidade;
-                ws.Cells[currentRow, 9].Value = item.M3 * item.Quantidade;
-                ws.Cells[currentRow, 10].Value = item.SubModulo?.TecidoEspecifico ?? item.ModuloTecido?.Tecido?.Nome;
-                ws.Cells[currentRow, 11].Value = item.ModuloTecido?.CodigoModuloTecido;
-                ws.Cells[currentRow, 12].Value = item.Observacao;
-
-                decimal freightUnit = (currency == "BRL" ? itemFreightBRL[item.Id] : itemFreightUSD[item.Id]);
-
-                if (showFreight)
+                foreach (var item in modelGroup.Items)
                 {
-                    ws.Cells[currentRow, 13].Value = freightUnit * item.Quantidade;
-                    ws.Cells[currentRow, 13].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                    decimal fUnit = isBRL ? itemFreightBRL[item.Id] : itemFreightUSD[item.Id];
+                    decimal exwUnit = item.ValorEXW;
+                    if (isBRL) exwUnit *= risk;
+                    decimal unitPrice = exwUnit + fUnit;
+                    decimal rowTotal = unitPrice * item.Quantidade;
+                    decimal itemM3Total = Math.Round(item.M3 * item.Quantidade, 4);
+
+                    totalQty += item.Quantidade;
+                    totalM3  += itemM3Total;
+                    totalFinalPI += rowTotal;
+
+                    string codigoVal = item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
+                    string telaCode = codigoVal.Contains("-") ? codigoVal.Split('-')[^1].Trim() : codigoVal;
+                    string descVol = item.SubModulo?.Codigo ?? item.PiItemPeca?.Descricao ?? "";
+                    string fabricacion = item.ModuloTecido?.Tecido?.Nome ?? "";
+                    string descripcion = item.ModuloTecido?.Modulo?.Descricao ?? "";
+                    if (!string.IsNullOrEmpty(codigoVal) && !descripcion.Contains(codigoVal))
+                        descripcion = (descripcion + " " + codigoVal).Trim();
+
+                    ws.Cells[currentRow, 3].Value = codigoVal;
+                    ws.Cells[currentRow, 4].Value = descripcion;
+                    ws.Cells[currentRow, 5].Value = descVol;
+                    ws.Cells[currentRow, 7].Value = item.Largura;
+                    ws.Cells[currentRow, 8].Value = item.Altura;
+                    ws.Cells[currentRow, 9].Value = item.Profundidade;
+                    ws.Cells[currentRow, 10].Value = item.Quantidade;
+                    ws.Cells[currentRow, 11].Value = itemM3Total;
+                    ws.Cells[currentRow, 12].Value = fabricacion;
+                    ws.Cells[currentRow, 13].Value = telaCode;
+                    ws.Cells[currentRow, 14].Value = item.Observacao;
+                    ws.Cells[currentRow, 15].Value = fUnit * item.Quantidade;
+                    ws.Cells[currentRow, 16].Value = unitPrice;
+                    ws.Cells[currentRow, 17].Value = rowTotal;
+
+                    ws.Cells[currentRow, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[currentRow, 3].Style.Fill.BackgroundColor.SetColor(colorCode);
+                    ws.Cells[currentRow, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[currentRow, 10].Style.Fill.BackgroundColor.SetColor(colorQty);
+                    ws.Cells[currentRow, 17].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[currentRow, 17].Style.Fill.BackgroundColor.SetColor(colorTotal);
+
+                    for (int c = 1; c <= 17; c++) ws.Cells[currentRow, c].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    ws.Cells[currentRow, 7].Style.Numberformat.Format  = "0.00";
+                    ws.Cells[currentRow, 8].Style.Numberformat.Format  = "0.00";
+                    ws.Cells[currentRow, 9].Style.Numberformat.Format  = "0.00";
+                    ws.Cells[currentRow, 10].Style.Numberformat.Format = "#,##0";
+                    ws.Cells[currentRow, 11].Style.Numberformat.Format = "#,##0.00";
+                    string moneyFmt = isBRL ? "_-R$* #,##0.00_-" : "_-$* #,##0.00_-";
+                    ws.Cells[currentRow, 15].Style.Numberformat.Format = moneyFmt;
+                    ws.Cells[currentRow, 16].Style.Numberformat.Format = moneyFmt;
+                    ws.Cells[currentRow, 17].Style.Numberformat.Format = moneyFmt;
+
+                    ws.Cells[currentRow, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    ws.Cells[currentRow, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                    ws.Cells[currentRow, 15].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                    ws.Cells[currentRow, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                    ws.Cells[currentRow, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+
+                    ws.Row(currentRow).Height = 25;
+                    currentRow++;
                 }
 
-                decimal risk = pi.CotacaoRisco;
-                bool isBRL = currency == "BRL";
-
-                // Step 1: EXW UNIT (EXW + unit freight)
-                decimal exwUnitUSD = item.ValorEXW + freightUnit;
-                decimal exwUnitDisp = isBRL ? exwUnitUSD * risk : exwUnitUSD;
-
-                // Step 2: UNIT FINAL (EXW UNIT * mod per piece)
-                decimal pQty = item.PiItemPeca?.Quantidade ?? 1m;
-                decimal modPerPeca = pQty > 0 ? (decimal)item.Quantidade / pQty : 0;
-                decimal unitFinalUSD = exwUnitUSD * modPerPeca;
-                decimal unitFinalDisp = isBRL ? unitFinalUSD * risk : unitFinalUSD;
-
-                // Step 3/4 accumulator
-                // We'll write step 1 and 2 per row
-                ws.Cells[currentRow, 14].Value = exwUnitDisp;
-                ws.Cells[currentRow, 15].Value = unitFinalDisp;
-
-                decimal rowTotalValueUSD = exwUnitUSD * (decimal)item.Quantidade;
-                decimal rowTotalValueDisp = isBRL ? rowTotalValueUSD * risk : rowTotalValueUSD;
-
-                groupPieceCostDisp += unitFinalDisp;
-                groupTotalValueDisp += rowTotalValueDisp;
-
-                totalQty += (decimal)item.Quantidade;
-                totalM3 += ((decimal)item.M3 * (decimal)item.Quantidade);
-                
-                ws.Row(currentRow).Height = 25;
-                for (int i = 3; i <= 15; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-                currentRow++;
+                var refRange = ws.Cells[modelStartRow, 2, currentRow - 1, 2];
+                refRange.Merge = true;
+                refRange.Value = modelGroup.ModelName;
+                refRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                refRange.Style.Fill.BackgroundColor.SetColor(colorRef);
+                refRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                refRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                refRange.Style.Font.Bold = true;
+                refRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                refRange.Style.WrapText = true;
             }
 
-            // Write merged group values (Step 3 and 4)
-            int groupEndRow = currentRow - 1;
-            
-            // USD UNIT (Cost per Piece)
-            ws.Cells[groupStartRow, 16, groupEndRow, 16].Merge = true;
-            ws.Cells[groupStartRow, 16].Value = groupPieceCostDisp;
-            ws.Cells[groupStartRow, 16].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            ws.Cells[groupStartRow, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-            ws.Cells[groupStartRow, 16].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            int brandEndRow = currentRow - 1;
 
-            // TOTAL USD (Cost of the group)
-            ws.Cells[groupStartRow, 17, groupEndRow, 17].Merge = true;
-            ws.Cells[groupStartRow, 17].Value = groupTotalValueDisp;
-            ws.Cells[groupStartRow, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            ws.Cells[groupStartRow, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-            ws.Cells[groupStartRow, 17].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            ws.Cells[groupStartRow, 17].Style.Font.Bold = true;
+            var marcaRange = ws.Cells[brandStartRow, 6, brandEndRow, 6];
+            marcaRange.Merge = true;
+            marcaRange.Value = brandGroup.Items.FirstOrDefault()?.ModuloTecido?.Modulo?.Fornecedor?.Nome ?? brand?.Nome ?? metadata.Brand;
+            marcaRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            marcaRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            marcaRange.Style.Font.Bold = true;
+            marcaRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            totalFinalPI += groupTotalValueDisp;
-
-            ws.Cells[groupStartRow, 1, groupEndRow, 1].Merge = true;
-            ws.Cells[groupStartRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            ws.Cells[groupStartRow, 2, groupEndRow, 2].Merge = true;
-            ws.Cells[groupStartRow, 2].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            ws.Cells[groupStartRow, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            ws.Cells[groupStartRow, 2].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(239, 246, 255));
-            ws.Cells[groupStartRow, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            ws.Cells[groupStartRow, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
-            if (brand?.Imagem != null)
-            {
-                AddCenteredImage(ws, groupStartRow, groupEndRow, brand.Imagem, $"PicF_{brand.Id}_{groupStartRow}");
-            }
-            if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 65;
+            ws.Cells[brandStartRow, 1, brandEndRow, 1].Merge = true;
+            ws.Cells[brandStartRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            if (brand?.Imagem != null) AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicF_{brand.Id}_{brandStartRow}");
+            if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 65;
         }
 
-        // Summary Row Ferguile
-        ws.Cells[currentRow, 1, currentRow, 7].Merge = true;
-        ws.Cells[currentRow, 1].Value = t("TOTAL", lang);
+        // ═══════════════ SUMMARY ROW ═══════════════
+        var totalRowBgColor = Color.FromArgb(0x2C, 0x3E, 0x50);
+        ws.Cells[currentRow, 1, currentRow, 9].Merge = true;
+        ws.Cells[currentRow, 1].Value = "TOTAL";
         ws.Cells[currentRow, 1].Style.Font.Bold = true;
         ws.Cells[currentRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-        ws.Cells[currentRow, 8].Value = totalQty;
-        ws.Cells[currentRow, 9].Value = totalM3;
-        
-        if (showFreight)
-        {
-            ws.Cells[currentRow, 13].Value = (currency == "BRL" ? (decimal)pi.ValorTotalFreteBRL : (decimal)pi.ValorTotalFreteUSD);
-        }
-
+        ws.Cells[currentRow, 10].Value = totalQty;
+        ws.Cells[currentRow, 10].Style.Numberformat.Format = "#,##0";
+        ws.Cells[currentRow, 10].Style.Font.Bold = true;
+        ws.Cells[currentRow, 11].Value = totalM3;
+        ws.Cells[currentRow, 11].Style.Numberformat.Format = "#,##0.00";
+        ws.Cells[currentRow, 11].Style.Font.Bold = true;
         ws.Cells[currentRow, 17].Value = totalFinalPI;
-        ws.Cells[currentRow, 8, currentRow, 17].Style.Font.Bold = true;
-        for (int i = 1; i <= 17; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        ws.Cells[currentRow, 17].Style.Numberformat.Format = isBRL
+            ? "_-[R$-416]* #,##0.00_ ;_-[R$-416]* \\-#,##0.00\\ ;_-[R$-416]* \\-??_ ;_-@_ "
+            : "_-[$$ -409]* #,##0.00_ ;_-[$$ -409]* \\-#,##0.00\\ ;_-[$$ -409]* \\-??_ ;_-@_ ";
+        ws.Cells[currentRow, 17].Style.Font.Bold = true;
         ws.Cells[currentRow, 1, currentRow, 17].Style.Fill.PatternType = ExcelFillStyle.Solid;
-        ws.Cells[currentRow, 1, currentRow, 17].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(248, 250, 252));
+        ws.Cells[currentRow, 1, currentRow, 17].Style.Fill.BackgroundColor.SetColor(totalRowBgColor);
+        ws.Cells[currentRow, 1, currentRow, 17].Style.Font.Color.SetColor(Color.White);
+        for (int i = 1; i <= 17; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        ws.Row(currentRow).Height = 20;
         currentRow++;
 
-        ws.Cells[startRow + 1, 13, currentRow - 1, 17].Style.Numberformat.Format = currency == "BRL" ? "_-R$* #,##0.00_-" : "_-$* #,##0.00_-";
-        ws.Cells[startRow + 1, 5, currentRow - 1, 9].Style.Numberformat.Format = "#,##0.00";
+        // Column widths
+        ws.Column(1).Width = 12; ws.Column(2).Width = 13; ws.Column(3).Width = 11;
+        ws.Column(4).Width = 25; ws.Column(5).Width = 15; ws.Column(6).Width = 8;
+        ws.Column(7).Width = 7;  ws.Column(8).Width = 7;  ws.Column(9).Width = 6.5;
+        ws.Column(10).Width = 7; ws.Column(11).Width = 11; ws.Column(12).Width = 13;
+        ws.Column(13).Width = 10; ws.Column(14).Width = 20; ws.Column(15).Width = 10;
+        ws.Column(16).Width = 13; ws.Column(17).Width = 14;
 
-        // Centralização do conteúdo (Ferguile)
-        var dataRange = ws.Cells[startRow + 1, 1, currentRow - 1, totalCol];
-        dataRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        dataRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-        ws.Column(1).Width = 15;
-        ws.Column(3).Width = 35;
-        ws.Column(10).Width = 20;
+        ws.Cells[startRow + 1, 1, currentRow - 1, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
         // ═══════════════ FOOTER ═══════════════
-        currentRow += 1;
-        var footerRange = ws.Cells[currentRow, 1, currentRow + 10, totalCol];
-        footerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        
-        // Accounting Details (Left)
-        ws.Cells[currentRow, 1].Value = t("BANK_DETAILS", lang);
-        ws.Cells[currentRow, 1].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, 1].Value = t("NAME", lang) + ": " + metadata.Bank.BeneficiaryName;
-        ws.Cells[currentRow + 2, 1].Value = t("NIT", lang) + " " + metadata.Cnpj;
-        ws.Cells[currentRow + 3, 1].Value = (lang == "EN" ? "BANK: " : "BANCO: ") + metadata.Bank.Beneficiary;
-        ws.Cells[currentRow + 4, 1].Value = (lang == "EN" ? "BENEFICIARY ACCOUNT: " : "CUENTA BENEFICIARIA: ") + metadata.Bank.BeneficiaryAccount;
-        ws.Cells[currentRow + 5, 1].Value = "IBAN: " + metadata.Bank.BeneficiaryIban;
-        ws.Cells[currentRow + 6, 1].Value = "SWIFT: " + metadata.Bank.BeneficiarySwift;
+        currentRow += 2;
+        int footerStartRow = currentRow;
+        int footerEndRow = currentRow + 10;
 
+        var bankRange = ws.Cells[footerStartRow, 1, footerEndRow, 9];
+        bankRange.Merge = true;
+        bankRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        bankRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+        bankRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        bankRange.Style.WrapText = true;
+        bankRange.Style.Font.Size = 9;
+        string bankText = $"{t("BANK_DETAILS", lang)}\n" +
+                          $"Beneficiary: {metadata.Bank.BeneficiaryName}\n" +
+                          $"CNPJ: {metadata.Cnpj}\n" +
+                          $"BANK: {metadata.Bank.Beneficiary}\n" +
+                          $"BENEFICIARY ACCOUNT: {metadata.Bank.BeneficiaryAccount}\n" +
+                          $"IBAN CODE: {metadata.Bank.BeneficiaryIban}\n" +
+                          $"SWIFT CODE: {metadata.Bank.BeneficiarySwift}";
+        ws.Cells[footerStartRow, 1].Value = bankText;
 
-        // Product Data (Right)
-        int rightCol = 8;
+        var prodRange = ws.Cells[footerStartRow, 10, footerEndRow, 17];
+        prodRange.Merge = true;
+        prodRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        prodRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+        prodRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        prodRange.Style.WrapText = true;
+        prodRange.Style.Font.Size = 9;
+        string brandDisplay = string.Equals(metadata.Brand, "Ferguile", StringComparison.OrdinalIgnoreCase) ? "Ferguile/Livintus" : metadata.Brand;
+        string prodText = $"{t("PRODUCT_DATA", lang)}\n" +
+                          $"{t("BRAND", lang)}: {brandDisplay}\n" +
+                          $"NCM: 94016100\n" +
+                          $"{(lang == "EN" ? "Product: " : "Producto: ")}{totalQty}\n" +
+                          $"CBM M\u00B3: {totalM3:N3}\n" +
+                          $"P.N. TOTAL:\n" +
+                          $"P.B. TOTAL:\n" +
+                          $"{(lang == "EN" ? "TOTAL VOLUME: " : "VOLUMEN TOTAL: ")}{totalM3:N3}\n" +
+                          $"{(lang == "PT" ? "Produtos originais de fabrica" : (lang == "EN" ? "Original factory products" : "Productos originales de fabrica"))}\n" +
+                          $"{t("ORIGIN", lang)}";
+        ws.Cells[footerStartRow, 10].Value = prodText;
 
-        ws.Cells[currentRow, rightCol].Value = t("PRODUCT_DATA", lang);
-        ws.Cells[currentRow, rightCol].Style.Font.Bold = true;
-        ws.Cells[currentRow + 1, rightCol].Value = t("BRAND", lang) + ": " + metadata.Brand;
-        ws.Cells[currentRow + 2, rightCol].Value = "NCM: 94016100";
-        ws.Cells[currentRow + 3, rightCol].Value = lang == "EN" ? "Product: " + totalQty : "Producto: " + totalQty;
-        ws.Cells[currentRow + 4, rightCol].Value = "CBM M³: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 5, rightCol].Value = "P.N. TOTAL:";
-        ws.Cells[currentRow + 6, rightCol].Value = "P.B. TOTAL:";
-        ws.Cells[currentRow + 7, rightCol].Value = lang == "EN" ? "TOTAL VOLUME: " + totalM3.ToString("N3") : "VOLUMEN TOTAL: " + totalM3.ToString("N3");
-        ws.Cells[currentRow + 8, rightCol].Value = lang == "PT" ? "Produtos originais de fabrica" : (lang == "EN" ? "Original factory products" : "Productos originales de fabrica");
-        ws.Cells[currentRow + 9, rightCol].Value = t("ORIGIN", lang);
-
-        ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
-        ws.Cells[currentRow + 11, 1].Value = string.Format(t("VALIDITY_NOTE", lang), validity);
-        ws.Cells[currentRow + 11, 1].Style.Font.Italic = true;
-        ws.Cells[currentRow + 11, 1].Style.Font.Size = 8;
-        
-        ws.Cells[currentRow, 1, currentRow + 10, totalCol].Style.Font.Size = 9;
+        currentRow = footerEndRow + 1;
+        var validityRange = ws.Cells[currentRow, 1, currentRow, 17];
+        validityRange.Merge = true;
+        validityRange.Value = string.Format(t("VALIDITY_NOTE", lang), validity);
+        validityRange.Style.Font.Italic = true;
+        validityRange.Style.Font.Size = 8;
+        validityRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
     }
 
     private string GetFormattedPiNumber(ProformaInvoice pi)
@@ -1033,17 +1078,73 @@ public class PiExportService
         return baseNum;
     }
 
-#pragma warning disable CA1416
+    private static (int width, int height) GetImageDimensions(byte[] bytes)
+    {
+        try
+        {
+            if (bytes.Length > 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+            {
+                // PNG
+                int width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+                int height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+                return (width, height);
+            }
+            if (bytes.Length > 4 && bytes[0] == 0xFF && bytes[1] == 0xD8)
+            {
+                // JPEG
+                int i = 2;
+                while (i < bytes.Length - 4)
+                {
+                    if (bytes[i] == 0xFF)
+                    {
+                        byte marker = bytes[i + 1];
+                        if (marker == 0xD9 || marker == 0xDA) // EOI or SOS
+                            break;
+
+                        int len = (bytes[i + 2] << 8) + bytes[i + 3];
+                        if ((marker >= 0xC0 && marker <= 0xC3) || (marker >= 0xC5 && marker <= 0xC7) || (marker >= 0xC9 && marker <= 0xCB) || (marker >= 0xCD && marker <= 0xCF))
+                        {
+                            int height = (bytes[i + 4] << 8) + bytes[i + 5];
+                            int width = (bytes[i + 6] << 8) + bytes[i + 7];
+                            return (width, height);
+                        }
+                        i += len + 2;
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
+            if (bytes.Length > 10 && bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46)
+            {
+                // GIF
+                int width = bytes[6] | (bytes[7] << 8);
+                int height = bytes[8] | (bytes[9] << 8);
+                return (width, height);
+            }
+            if (bytes.Length > 26 && bytes[0] == 0x42 && bytes[1] == 0x4D)
+            {
+                // BMP
+                int width = bytes[18] | (bytes[19] << 8) | (bytes[20] << 16) | (bytes[21] << 24);
+                int height = bytes[22] | (bytes[23] << 8) | (bytes[24] << 16) | (bytes[25] << 24);
+                return (width, height);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+        return (100, 100); // Default fallback
+    }
+
     private void AddCenteredImage(ExcelWorksheet ws, int startRow, int endRow, byte[] imageBytes, string pictureName)
     {
         try
         {
             using var ms = new MemoryStream(imageBytes);
-            using var img = Image.FromStream(ms);
+            var (imgWidth, imgHeight) = GetImageDimensions(imageBytes);
             
-            float imgWidth = img.Width;
-            float imgHeight = img.Height;
-
             float cellHeightPoints = 0;
             for (int r = startRow; r <= endRow; r++)
             {
@@ -1075,5 +1176,4 @@ public class PiExportService
             Console.WriteLine($"Error adding image: {ex.Message}");
         }
     }
-#pragma warning restore CA1416
 }

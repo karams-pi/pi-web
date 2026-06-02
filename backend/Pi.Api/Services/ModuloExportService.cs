@@ -465,17 +465,73 @@ public class ModuloExportService
         return Math.Round(valorBase + comissao + gordura, 2);
     }
 
-#pragma warning disable CA1416
+    private static (int width, int height) GetImageDimensions(byte[] bytes)
+    {
+        try
+        {
+            if (bytes.Length > 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+            {
+                // PNG
+                int width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+                int height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+                return (width, height);
+            }
+            if (bytes.Length > 4 && bytes[0] == 0xFF && bytes[1] == 0xD8)
+            {
+                // JPEG
+                int i = 2;
+                while (i < bytes.Length - 4)
+                {
+                    if (bytes[i] == 0xFF)
+                    {
+                        byte marker = bytes[i + 1];
+                        if (marker == 0xD9 || marker == 0xDA) // EOI or SOS
+                            break;
+
+                        int len = (bytes[i + 2] << 8) + bytes[i + 3];
+                        if ((marker >= 0xC0 && marker <= 0xC3) || (marker >= 0xC5 && marker <= 0xC7) || (marker >= 0xC9 && marker <= 0xCB) || (marker >= 0xCD && marker <= 0xCF))
+                        {
+                            int height = (bytes[i + 4] << 8) + bytes[i + 5];
+                            int width = (bytes[i + 6] << 8) + bytes[i + 7];
+                            return (width, height);
+                        }
+                        i += len + 2;
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+            }
+            if (bytes.Length > 10 && bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46)
+            {
+                // GIF
+                int width = bytes[6] | (bytes[7] << 8);
+                int height = bytes[8] | (bytes[9] << 8);
+                return (width, height);
+            }
+            if (bytes.Length > 26 && bytes[0] == 0x42 && bytes[1] == 0x4D)
+            {
+                // BMP
+                int width = bytes[18] | (bytes[19] << 8) | (bytes[20] << 16) | (bytes[21] << 24);
+                int height = bytes[22] | (bytes[23] << 8) | (bytes[24] << 16) | (bytes[25] << 24);
+                return (width, height);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+        return (100, 100); // Default fallback
+    }
+
     private void AddCenteredImage(ExcelWorksheet ws, int startRow, int endRow, byte[] imageBytes, string pictureName, bool hasText = true)
     {
         try
         {
             using var ms = new MemoryStream(imageBytes);
-            using var img = Image.FromStream(ms);
+            var (imgWidth, imgHeight) = GetImageDimensions(imageBytes);
             
-            float imgWidth = img.Width;
-            float imgHeight = img.Height;
-
             float cellHeightPoints = 0;
             for (int r = startRow; r <= endRow; r++)
             {
@@ -507,5 +563,4 @@ public class ModuloExportService
             Console.WriteLine($"Error adding image: {ex.Message}");
         }
     }
-#pragma warning restore CA1416
 }

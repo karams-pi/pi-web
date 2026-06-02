@@ -1,6 +1,5 @@
 import { API_BASE } from "../../api/api";
 import type { Modulo, Configuracao, Marca } from "../../api/types";
-import { calculateCotacaoRisco } from "../calculations";
 
 interface PrintPriceListReportOptions {
   modules: Modulo[];
@@ -46,7 +45,7 @@ export function printPriceListReport({
   // Note: ideally API_BASE should be passed but I'll hardcode or use a placeholder for now as I can't easily import from another file into this pure utility if it's not set up for it.
   // Actually, I'll use a safer way or pass it in options.
 
-  function getRiskVal(idFornecedor: number): number {
+  function getRiskVal(_idFornecedor: number): number {
     return cotacao || 1;
   }
 
