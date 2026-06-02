@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Download, Trash2, Printer, FileSpreadsheet } from "lucide-react";
+import { Download, Trash2, Printer, FileSpreadsheet, History } from "lucide-react";
 import PageHeader from "../components/PageHeader";
-import type { Modulo, Configuracao, Categoria, Marca, Fornecedor, Tecido, Frete } from "../api/types";
-import { getModuleFilters, listModulos, exportPriceListExcel } from "../api/modulos";
+import type { Modulo, Configuracao, Categoria, Marca, Fornecedor, Tecido, Frete, ListaEmitida } from "../api/types";
+import { getModuleFilters, listModulos, exportPriceListExcel, getModulo } from "../api/modulos";
+import { createListaEmitida, listListasEmitidas, deleteListaEmitida } from "../api/listasEmitidas";
 import { API_BASE } from "../api/api";
 import { getLatestConfigsAll } from "../api/configuracoes";
 import { listFretes } from "../api/fretes";
@@ -70,6 +71,10 @@ export default function EmissaoListaPrecosPage() {
   const [loading, setLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
 
+  const [nomeReferencia, setNomeReferencia] = useState("");
+  const [history, setHistory] = useState<ListaEmitida[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
   // Maps
   const fornMap = useMemo(() => new Map(fornecedores.map(f => [f.id, f.nome])), [fornecedores]);
   const catMap = useMemo(() => new Map(categorias.map(c => [c.id, c.nome])), [categorias]);
@@ -95,6 +100,22 @@ export default function EmissaoListaPrecosPage() {
         setTecidos(t);
       }).catch(console.error);
   }, []);
+
+  const loadHistory = useCallback(async () => {
+    try {
+      setHistoryLoading(true);
+      const data = await listListasEmitidas();
+      setHistory(data);
+    } catch (e) {
+      console.error("Erro ao carregar historico", e);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
   // Load dynamic filters
   const loadFilters = useCallback(async () => {
@@ -204,8 +225,91 @@ export default function EmissaoListaPrecosPage() {
     });
   }, [selectedItems, totalFreteBRL, tipoRateio, cotacao, configsMap, currency, fornecedores]);
 
+  // Handlers for Saving and Loading from History
+  const handleSaveEmission = async () => {
+    if (itemsWithCalculations.length === 0) return;
+    try {
+      const itensJson = JSON.stringify(
+        itemsWithCalculations.map(si => ({
+          moduloId: si.modulo.id,
+          valorFreteRateadoUSD: si.freightUSD
+        }))
+      );
+      const refName = nomeReferencia.trim() || `Lista de Preços ${new Date().toLocaleString("pt-BR")}`;
+      await createListaEmitida({
+        nomeReferencia: refName,
+        moeda: currency,
+        cotacao,
+        valorFrete: totalFreteBRL,
+        tipoRateio,
+        validadeDias: validityDays,
+        itensJson
+      });
+      loadHistory();
+      setNomeReferencia(""); // Limpa após salvar com sucesso
+    } catch (e) {
+      console.error("Erro ao gravar emissão no histórico:", e);
+    }
+  };
+
+  const handleLoadFromHistory = async (hist: ListaEmitida) => {
+    try {
+      setLoading(true);
+      const parsedItems = JSON.parse(hist.itensJson) as Array<{ moduloId: number; valorFreteRateadoUSD: number }>;
+      
+      const loadedModules = await Promise.all(
+        parsedItems.map(async (item) => {
+          try {
+            return await getModulo(item.moduloId);
+          } catch (err) {
+            console.error(`Erro ao carregar módulo ID ${item.moduloId}:`, err);
+            return null;
+          }
+        })
+      );
+      
+      const validModules = loadedModules.filter((m): m is Modulo => m !== null);
+      
+      if (validModules.length === 0) {
+        alert("Nenhum módulo da lista histórica pôde ser carregado (talvez tenham sido deletados).");
+        return;
+      }
+      
+      const newSelected = validModules.map(mod => ({
+        tempId: Math.random().toString(36).substr(2, 9),
+        modulo: mod
+      }));
+      
+      setSelectedItems(newSelected);
+      setCurrency(hist.moeda as "BRL" | "EXW");
+      setCotacao(hist.cotacao);
+      setTotalFreteBRL(hist.valorFrete);
+      setTipoRateio(hist.tipoRateio as "IGUAL" | "M3");
+      setValidityDays(hist.validadeDias);
+      if (hist.nomeReferencia) {
+        setNomeReferencia(hist.nomeReferencia);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar lista do histórico:", err);
+      alert("Erro ao carregar a lista do histórico.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteHistory = async (id: number) => {
+    if (!confirm("Tem certeza que deseja excluir esta lista do histórico?")) return;
+    try {
+      await deleteListaEmitida(id);
+      loadHistory();
+    } catch (err) {
+      console.error("Erro ao deletar item do histórico:", err);
+      alert("Erro ao deletar item do histórico.");
+    }
+  };
+
   // Handlers for Print/Excel
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (itemsWithCalculations.length === 0) return alert("Selecione itens primeiro.");
     
     printPriceListReport({
@@ -222,6 +326,8 @@ export default function EmissaoListaPrecosPage() {
       },
       validityDays
     });
+
+    await handleSaveEmission();
   };
 
   const handleExcel = async () => {
@@ -247,6 +353,8 @@ export default function EmissaoListaPrecosPage() {
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
+
+      await handleSaveEmission();
     } catch (e) {
       alert("Erro ao exportar Excel");
       console.error(e);
@@ -310,6 +418,17 @@ export default function EmissaoListaPrecosPage() {
            <label className="label">Validade</label>
            <input className="cl-input" type="number" value={validityDays} onChange={e => setValidityDays(Number(e.target.value))} title="Dias de validade" />
         </div>
+        <div style={{ flex: '1 1 200px', minWidth: 150 }}>
+           <label className="label">Nome da Referência (Opcional)</label>
+           <input 
+             className="cl-input" 
+             type="text" 
+             placeholder="Ex: Lista Affair - Sadima" 
+             value={nomeReferencia} 
+             onChange={e => setNomeReferencia(e.target.value)} 
+             maxLength={150}
+           />
+        </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-primary" onClick={handlePrint}>
             <Printer size={18} /> Imprimir PDF
@@ -323,7 +442,106 @@ export default function EmissaoListaPrecosPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      {/* Custom styles for modern glassmorphism sidebar, transitions and layout */}
+      <style>{`
+        .emissao-grid-layout {
+          display: grid;
+          grid-template-columns: 280px 1fr 1.2fr;
+          gap: 20px;
+        }
+        @media (max-width: 1200px) {
+          .emissao-grid-layout {
+            grid-template-columns: 1fr;
+          }
+        }
+        .history-item {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          padding: 12px;
+          position: relative;
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+        .history-item:hover {
+          background: rgba(37, 99, 235, 0.08);
+          border-color: rgba(37, 99, 235, 0.3);
+          transform: translateY(-2px);
+        }
+        .history-delete-btn {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: none;
+          border: none;
+          color: #ef4444;
+          cursor: pointer;
+          opacity: 0.5;
+          transition: opacity 0.2s, background-color 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          border-radius: 4px;
+        }
+        .history-delete-btn:hover {
+          opacity: 1;
+          background: rgba(239, 68, 68, 0.1);
+        }
+      `}</style>
+
+      <div className="emissao-grid-layout">
+        
+        {/* Column 1: History Sidebar */}
+        <div className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', height: 'fit-content' }}>
+           <h4 style={{ margin: 0, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, color: '#f1f5f9' }}>
+             <History size={18} style={{ color: '#3b82f6' }} /> Histórico
+           </h4>
+           {historyLoading ? (
+             <div style={{ textAlign: 'center', padding: 20, color: '#94a3b8' }}>Carregando...</div>
+           ) : (
+             <div style={{ overflowY: 'auto', maxHeight: '600px', display: 'flex', flexDirection: 'column', gap: 10, paddingRight: 4 }}>
+               {history.map(hist => (
+                 <div 
+                   key={hist.id} 
+                   className="history-item"
+                   onClick={() => handleLoadFromHistory(hist)}
+                   title="Clique para carregar na tela"
+                 >
+                   <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.85rem', paddingRight: 24, wordBreak: 'break-word' }}>
+                     {hist.nomeReferencia || "Sem Nome"}
+                   </div>
+                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>
+                     {new Date(hist.dataEmissao || "").toLocaleString("pt-BR", { dateStyle: 'short', timeStyle: 'short' })}
+                   </div>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, fontSize: '0.75rem' }}>
+                     <span style={{ color: '#60a5fa', fontWeight: 600 }}>
+                       {hist.moeda} ($ {fmt(hist.cotacao, 2)})
+                     </span>
+                     <span style={{ color: '#94a3b8' }}>
+                       Frete: R$ {fmt(hist.valorFrete, 0)}
+                     </span>
+                   </div>
+                   <button 
+                     className="history-delete-btn"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       if (hist.id) handleDeleteHistory(hist.id);
+                     }}
+                     title="Excluir do histórico"
+                   >
+                     <Trash2 size={14} />
+                   </button>
+                 </div>
+               ))}
+               {history.length === 0 && (
+                 <div style={{ textAlign: 'center', padding: 20, color: '#64748b', fontSize: '0.85rem' }}>
+                   Nenhum histórico.
+                 </div>
+               )}
+             </div>
+           )}
+        </div>
         
         {/* Left: Search and Add */}
         <div className="card" style={{ padding: 16 }}>

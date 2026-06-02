@@ -37,6 +37,8 @@ public class AppDbContext : DbContext
     // Versionamento
     public DbSet<VersaoSistema> VersoesDoSistema => Set<VersaoSistema>();
 
+    public DbSet<ListaEmitida> ListasEmitidas => Set<ListaEmitida>();
+
     // EDC (Estimativa de Custos) - Schema: edc
     public DbSet<Ncm> Ncms => Set<Ncm>();
     public DbSet<Importador> Importadores => Set<Importador>();
@@ -243,6 +245,14 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("clientes");
             entity.Property(x => x.PortoDestino).HasColumnName("porto_destinatario");
+        });
+
+        // Lista Emitida
+        modelBuilder.Entity<ListaEmitida>(entity =>
+        {
+            entity.ToTable("lista_emitida");
+            entity.Property(x => x.Cotacao).HasColumnType("numeric(18,4)");
+            entity.Property(x => x.ValorFrete).HasColumnType("numeric(18,2)");
         });
 
         // ===== Proforma Invoice =====

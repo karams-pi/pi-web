@@ -804,6 +804,58 @@ namespace Pi.Api.Migrations
                     b.ToTable("frete_item", "pi");
                 });
 
+            modelBuilder.Entity("Pi.Api.Models.ListaEmitida", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Cotacao")
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("cotacao");
+
+                    b.Property<DateTimeOffset>("DataEmissao")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_emissao");
+
+                    b.Property<string>("ItensJson")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("itens_json");
+
+                    b.Property<string>("Moeda")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("moeda");
+
+                    b.Property<string>("NomeReferencia")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("nome_referencia");
+
+                    b.Property<string>("TipoRateio")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("tipo_rateio");
+
+                    b.Property<int>("ValidadeDias")
+                        .HasColumnType("integer")
+                        .HasColumnName("validade_dias");
+
+                    b.Property<decimal>("ValorFrete")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("valor_frete");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("lista_emitida", "pi");
+                });
+
             modelBuilder.Entity("Pi.Api.Models.ListaPreco", b =>
                 {
                     b.Property<long>("Id")

@@ -187,9 +187,32 @@ public class ExcelImportService
                 // --- DYNAMIC HEADER MAPPING ---
                 var currentMapping = new Dictionary<string, int>();
                 int colCount = worksheet.Dimension.Columns;
+                int rowCount = worksheet.Dimension.Rows;
+
+                // Auto-detect Koyo header row (scan first 10 rows for "G0")
+                int headerRow = 1; // default fallback for Koyo
+                for (int r = 1; r <= Math.Min(10, rowCount); r++)
+                {
+                    bool hasG0 = false;
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        var cellVal = worksheet.Cells[r, col].Text?.Trim();
+                        if (cellVal != null && cellVal.Equals("G0", StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasG0 = true;
+                            break;
+                        }
+                    }
+                    if (hasG0)
+                    {
+                        headerRow = r;
+                        break;
+                    }
+                }
+
                 for (int col = 1; col <= colCount; col++)
                 {
-                    var header = worksheet.Cells[1, col].Text?.Trim().ToUpper();
+                    var header = worksheet.Cells[headerRow, col].Text?.Trim().ToUpper();
                     if (string.IsNullOrEmpty(header)) continue;
                     
                     if (fabricCodes.Any(code => code.Equals(header, StringComparison.OrdinalIgnoreCase)))
@@ -198,9 +221,7 @@ public class ExcelImportService
                     }
                 }
 
-                int rowCount = worksheet.Dimension.Rows;
-                // Start from row 2 if row 1 is headers, but Koyo usually has data scatter. 
-                // We'll process from row 1 but skip rows that match headers.
+                string lastMarca = "GERAL";
                 for (int row = 1; row <= rowCount; row++)
                 {
                     var cellDesc = worksheet.Cells[row, 2].Text?.Trim();
@@ -211,22 +232,39 @@ public class ExcelImportService
                     if (cellLargText != null && cellLargText.Equals("Larg", StringComparison.OrdinalIgnoreCase)) continue;
 
                     var nomeMarca = worksheet.Cells[row, 1].Text?.Trim();
-                    if (string.IsNullOrEmpty(nomeMarca) || nomeMarca.Equals("Marca", StringComparison.OrdinalIgnoreCase))
-                        nomeMarca = "GERAL";
+                    bool isNote = string.IsNullOrEmpty(nomeMarca) || 
+                                  nomeMarca.Equals("Marca", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("OBS:", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("PEÇA", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("DESIGN", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("LÂMINA", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("PINTURA", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("ASSINADA", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("DISPONÍVEIS", StringComparison.OrdinalIgnoreCase) || 
+                                  nomeMarca.Contains("CORES", StringComparison.OrdinalIgnoreCase) ||
+                                  nomeMarca.Contains("JOÃO", StringComparison.OrdinalIgnoreCase);
 
-                    if (!marcas.TryGetValue(nomeMarca.ToLower(), out var idMarca))
+                    if (!isNote)
                     {
-                        var novaMarca = new Marca { Nome = nomeMarca };
+                        lastMarca = nomeMarca;
+                    }
+
+                    if (!marcas.TryGetValue(lastMarca.ToLower(), out var idMarca))
+                    {
+                        var novaMarca = new Marca { Nome = lastMarca };
                         _context.Marcas.Add(novaMarca);
                         await _context.SaveChangesAsync();
                         idMarca = novaMarca.Id;
-                        marcas[nomeMarca.ToLower()] = idMarca;
+                        marcas[lastMarca.ToLower()] = idMarca;
                     }
 
                     string descricao = cellDesc;
                     decimal largura = UniversalParseDecimal(worksheet.Cells[row, 3].Value);
                     decimal profundidade = UniversalParseDecimal(worksheet.Cells[row, 4].Value);
                     decimal altura = UniversalParseDecimal(worksheet.Cells[row, 5].Value);
+
+                    if (largura <= 0 || profundidade <= 0 || altura <= 0) continue;
+
                     decimal pa = 0; 
 
                     string largKey = largura.ToString("F2", CultureInfo.InvariantCulture);
@@ -273,10 +311,11 @@ public class ExcelImportService
                         // Skip if value is the header itself
                         if (cellVal == null || cellVal.ToString()!.Trim().Equals(tecidoNome, StringComparison.OrdinalIgnoreCase)) continue;
 
-                        decimal valor = UniversalParseDecimal(cellVal);
+                        decimal rawValor = UniversalParseDecimal(cellVal);
                         
-                        if (valor > 0 && tecidos.TryGetValue(tecidoNome.ToLower(), out var idTecido))
+                        if (rawValor > 0 && tecidos.TryGetValue(tecidoNome.ToLower(), out var idTecido))
                         {
+                            decimal valor = Math.Round(rawValor, 0, MidpointRounding.AwayFromZero);
                             var novoModTecido = new ModuloTecido
                             {
                                 IdModulo = modulo.Id,
@@ -595,11 +634,51 @@ public class ExcelImportService
 
                 var rowCount = worksheet.Dimension.Rows;
 
-                var tecidoMappings = new Dictionary<string, int>
+                var fabricCodes = new[] { "G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8" };
+                var tecidoMappings = new Dictionary<string, int>();
+
+                // Auto-detect header row (scan first 10 rows for "G0")
+                int headerRow = 5; // default fallback
+                for (int r = 1; r <= Math.Min(10, rowCount); r++)
                 {
-                { "G0", 8 }, { "G1", 9 }, { "G2", 10 }, { "G3", 11 }, { "G4", 12 },
-                { "G5", 13 }, { "G6", 14 }, { "G7", 15 }, { "G8", 16 }
-                };
+                    bool hasG0 = false;
+                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                    {
+                        var cellVal = worksheet.Cells[r, col].Text?.Trim();
+                        if (cellVal != null && cellVal.Equals("G0", StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasG0 = true;
+                            break;
+                        }
+                    }
+                    if (hasG0)
+                    {
+                        headerRow = r;
+                        break;
+                    }
+                }
+
+                // Map columns dynamically
+                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                {
+                    var header = worksheet.Cells[headerRow, col].Text?.Trim().ToUpper();
+                    if (string.IsNullOrEmpty(header)) continue;
+
+                    if (fabricCodes.Any(code => code.Equals(header, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        tecidoMappings[header] = col;
+                    }
+                }
+
+                // Safe fallback if mapping failed to find any fabric columns
+                if (tecidoMappings.Count == 0)
+                {
+                    tecidoMappings = new Dictionary<string, int>
+                    {
+                        { "G0", 8 }, { "G1", 9 }, { "G2", 10 }, { "G3", 11 }, { "G4", 12 },
+                        { "G5", 13 }, { "G6", 14 }, { "G7", 15 }, { "G8", 16 }
+                    };
+                }
 
                 // Ensure Tecidos G0-G8 exist in cache
                 foreach (var tecidoName in tecidoMappings.Keys)
@@ -612,17 +691,34 @@ public class ExcelImportService
                     }
                 }
 
+                string lastMarca = "GERAL";
                 for (int row = 2; row <= rowCount; row++)
                 {
                     // === Reads ===
                     var marcaNome = worksheet.Cells[row, 1].Text?.Trim();
+                    bool isNote = string.IsNullOrEmpty(marcaNome) || 
+                                  marcaNome.Equals("Marca", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("OBS:", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("PEÇA", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("DESIGN", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("LÂMINA", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("PINTURA", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("ASSINADA", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("DISPONÍVEIS", StringComparison.OrdinalIgnoreCase) || 
+                                  marcaNome.Contains("CORES", StringComparison.OrdinalIgnoreCase) ||
+                                  marcaNome.Contains("JOÃO", StringComparison.OrdinalIgnoreCase);
+
+                    if (!isNote)
+                    {
+                        lastMarca = marcaNome;
+                    }
+
                     var descricaoRaw = worksheet.Cells[row, 2].Text?.Trim();
                     var largText = worksheet.Cells[row, 3].Text?.Trim();
                     var profText = worksheet.Cells[row, 4].Text?.Trim();
                     var altText = worksheet.Cells[row, 6].Text?.Trim();
                     var paText = worksheet.Cells[row, 5].Text?.Trim();
 
-                    if (string.IsNullOrEmpty(marcaNome) || marcaNome == "Marca") continue;
                     if (string.IsNullOrEmpty(descricaoRaw) || descricaoRaw == "Descrição") continue;
 
                     var descricao = NormalizeString(descricaoRaw);
@@ -631,13 +727,14 @@ public class ExcelImportService
                     var alt = UniversalParseDecimal(worksheet.Cells[row, 6].Value);
                     var pa = UniversalParseDecimal(worksheet.Cells[row, 5].Value);
 
+                    if (larg <= 0 || prof <= 0 || alt <= 0) continue;
+
                     // Get/Create Marca
-                    var marcaToUse = string.IsNullOrEmpty(marcaNome) ? "GERAL" : marcaNome;
-                    if (!marcasMap.TryGetValue(marcaToUse, out var marca))
+                    if (!marcasMap.TryGetValue(lastMarca, out var marca))
                     {
-                        marca = new Marca { Nome = marcaToUse };
+                        marca = new Marca { Nome = lastMarca };
                         _context.Marcas.Add(marca);
-                        marcasMap[marcaToUse] = marca;
+                        marcasMap[lastMarca] = marca;
                     }
 
                     // Get/Create Modulo
@@ -705,9 +802,10 @@ public class ExcelImportService
                         if (cellVal == null || cellVal.ToString()!.Trim() == tecName || cellVal.ToString()!.Trim() == "Tecido")
                             continue;
 
-                        var price = UniversalParseDecimal(cellVal);
-                        if (price > 0)
+                        var rawPrice = UniversalParseDecimal(cellVal);
+                        if (rawPrice > 0)
                         {
+                            var price = Math.Round(rawPrice, 0, MidpointRounding.AwayFromZero);
                             var mt = new ModuloTecido
                             {
                                 Modulo = modulo,

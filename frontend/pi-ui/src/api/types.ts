@@ -206,3 +206,16 @@ export type SubModulo = {
   };
 };
 
+export type ListaEmitida = {
+  id?: number;
+  nomeReferencia?: string | null;
+  dataEmissao?: string;
+  moeda: string;
+  cotacao: number;
+  valorFrete: number;
+  tipoRateio: string;
+  validadeDias: number;
+  itensJson: string; // JSON string containing item list: { moduloId: number, valorFreteRateadoUSD: number }[]
+};
+
+

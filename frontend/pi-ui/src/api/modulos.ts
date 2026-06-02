@@ -30,6 +30,10 @@ export async function listModulos(
   );
 }
 
+export async function getModulo(id: number) {
+  return apiGet<Modulo>(`/api/modulos/${id}`);
+}
+
 export async function createModulo(input: Omit<Modulo, "id" | "m3">) {
   // m3 é calculado no backend
   return apiPost<Modulo>("/api/modulos", input);

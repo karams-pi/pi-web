@@ -335,7 +335,12 @@ public class ModulosController : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<Modulo>> GetById(long id)
     {
-        var item = await _db.Modulos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var item = await _db.Modulos
+            .AsNoTracking()
+            .Include(m => m.ModulosTecidos)
+                .ThenInclude(mt => mt.Tecido)
+            .Include(m => m.Marca)
+            .FirstOrDefaultAsync(x => x.Id == id);
         return item is null ? NotFound() : item;
     }
 

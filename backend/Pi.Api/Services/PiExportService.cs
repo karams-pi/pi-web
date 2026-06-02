@@ -518,7 +518,7 @@ public class PiExportService
                 if (currency == "BRL") unitPriceBase *= (decimal)pi.CotacaoRisco;
                 
                 decimal rowFreight = freightUnit * item.Quantidade;
-                decimal rowUnitEXW = (unitPriceBase + rowFreight) * item.Quantidade;
+                decimal rowUnitEXW = (unitPriceBase + freightUnit) * item.Quantidade;
                 
                 ws.Cells[currentRow, colIndividualEXW].Value = rowUnitEXW;
                 ws.Cells[currentRow, colIndividualEXW].Style.Border.BorderAround(ExcelBorderStyle.Thin);
