@@ -1,6 +1,7 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using System.IO;
 using Pi.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Data;
@@ -627,10 +628,7 @@ public class PiExportService
 
             if (brand?.Imagem != null)
             {
-                using var ms = new MemoryStream(brand.Imagem);
-                var pic = ws.Drawings.AddPicture($"Pic_{brand.Id}_{groupStartRow}", ms);
-                pic.SetPosition(groupStartRow - 1, 5, 0, 5);
-                pic.SetSize(60, 60);
+                AddCenteredImage(ws, groupStartRow, currentRow - 1, brand.Imagem, $"Pic_{brand.Id}_{groupStartRow}");
             }
             // Set row height if merged photo needs space
             if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 65;
@@ -942,10 +940,7 @@ public class PiExportService
 
             if (brand?.Imagem != null)
             {
-                using var ms = new MemoryStream(brand.Imagem);
-                var pic = ws.Drawings.AddPicture($"PicF_{brand.Id}_{groupStartRow}", ms);
-                pic.SetPosition(groupStartRow - 1, 5, 0, 5);
-                pic.SetSize(60, 60);
+                AddCenteredImage(ws, groupStartRow, groupEndRow, brand.Imagem, $"PicF_{brand.Id}_{groupStartRow}");
             }
             if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 65;
         }
@@ -972,6 +967,11 @@ public class PiExportService
 
         ws.Cells[startRow + 1, 13, currentRow - 1, 17].Style.Numberformat.Format = currency == "BRL" ? "_-R$* #,##0.00_-" : "_-$* #,##0.00_-";
         ws.Cells[startRow + 1, 5, currentRow - 1, 9].Style.Numberformat.Format = "#,##0.00";
+
+        // Centralização do conteúdo (Ferguile)
+        var dataRange = ws.Cells[startRow + 1, 1, currentRow - 1, totalCol];
+        dataRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        dataRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
         ws.Column(3).Width = 35;
         ws.Column(10).Width = 20;
@@ -1027,4 +1027,45 @@ public class PiExportService
         }
         return baseNum;
     }
+
+#pragma warning disable CA1416
+    private void AddCenteredImage(ExcelWorksheet ws, int startRow, int endRow, byte[] imageBytes, string pictureName)
+    {
+        try
+        {
+            using var ms = new MemoryStream(imageBytes);
+            using var img = Image.FromStream(ms);
+            
+            float imgWidth = img.Width;
+            float imgHeight = img.Height;
+
+            int totalRows = endRow - startRow + 1;
+            float cellHeightPoints = (totalRows == 1) ? 65 : (totalRows * 25);
+            float cellHeightPixels = cellHeightPoints * 1.333f;
+            float cellWidthPixels = 10 * 7.5f; // column width is 10
+
+            float availableWidth = cellWidthPixels - 6; // 3px padding on left/right
+            float availableHeight = cellHeightPixels - 6; // 3px padding on top/bottom
+
+            float scale = Math.Min(availableWidth / imgWidth, availableHeight / imgHeight);
+            
+            int newWidth = (int)(imgWidth * scale);
+            int newHeight = (int)(imgHeight * scale);
+
+            int leftOffset = (int)((cellWidthPixels - newWidth) / 2);
+            int topOffset = (int)((cellHeightPixels - newHeight) / 2);
+
+            if (leftOffset < 0) leftOffset = 0;
+            if (topOffset < 0) topOffset = 0;
+
+            var pic = ws.Drawings.AddPicture(pictureName, ms);
+            pic.SetPosition(startRow - 1, topOffset, 0, leftOffset);
+            pic.SetSize(newWidth, newHeight);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding image: {ex.Message}");
+        }
+    }
+#pragma warning restore CA1416
 }

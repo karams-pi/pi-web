@@ -246,7 +246,7 @@ public class ExcelImportService
 
                     if (!isNote)
                     {
-                        lastMarca = nomeMarca;
+                        lastMarca = nomeMarca!;
                     }
 
                     if (!marcas.TryGetValue(lastMarca.ToLower(), out var idMarca))
@@ -710,7 +710,7 @@ public class ExcelImportService
 
                     if (!isNote)
                     {
-                        lastMarca = marcaNome;
+                        lastMarca = marcaNome!;
                     }
 
                     var descricaoRaw = worksheet.Cells[row, 2].Text?.Trim();

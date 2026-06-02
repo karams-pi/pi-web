@@ -1,4 +1,4 @@
-import { apiPostFormData } from './api';
+import { apiPostFormData, apiPost } from './api';
 
 export const importTable = async (file: File, idFornecedor: number, dtRevisao?: string) => {
   const formData = new FormData();
@@ -51,6 +51,5 @@ export const resetSequences = async () => {
 };
 
 export const sincronizarItens = async (request: any) => {
-  const { apiPost } = await import('./api');
   return apiPost<any>('/api/Import/sincronizar', request);
 };

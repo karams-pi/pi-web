@@ -180,20 +180,21 @@ public class ModuloExportService
 
                 if (brand?.Imagem != null)
                 {
-                    using var ms = new MemoryStream(brand.Imagem);
-                    var pic = ws.Drawings.AddPicture($"PicB_{brand.Id}_{brandStartRow}", ms);
-                    pic.SetPosition(brandStartRow - 1, 5, 0, 5); 
-                    pic.SetSize(70, 70); 
-                    
+                    AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicB_{brand.Id}_{brandStartRow}", hasText: true);
                     if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 85;
                 }
 
                 // Final Borders and formatting for the brand table
                 var tableRange = ws.Cells[brandStartRow, 1, brandEndRow, maxCols];
-                foreach (var cell in tableRange) { cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); }
-                ws.Cells[brandStartRow, 2, brandEndRow, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                ws.Cells[brandStartRow, 3, brandEndRow, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                ws.Cells[brandStartRow, fabricStartCol, brandEndRow, maxCols].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                foreach (var cell in tableRange) 
+                { 
+                    cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); 
+                }
+                tableRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                tableRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                
+                // Keep the brand name text at the bottom of column 1 so it doesn't get covered by the image
+                ws.Cells[brandStartRow, 1, brandEndRow, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
 
                 currentRow++; // Gap
             }
@@ -362,18 +363,20 @@ public class ModuloExportService
 
                 if (brand?.Imagem != null)
                 {
-                    using var ms = new MemoryStream(brand.Imagem);
-                    var pic = ws.Drawings.AddPicture($"PicPL_{brand.Id}_{brandStartRow}", ms);
-                    pic.SetPosition(brandStartRow - 1, 5, 0, 5); 
-                    pic.SetSize(70, 70); 
+                    AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicPL_{brand.Id}_{brandStartRow}", hasText: true);
                     if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 85;
                 }
 
                 var tableRange = ws.Cells[brandStartRow, 1, brandEndRow, maxCols];
-                foreach (var cell in tableRange) { cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); }
-                ws.Cells[brandStartRow, 2, brandEndRow, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                ws.Cells[brandStartRow, 3, brandEndRow, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                ws.Cells[brandStartRow, fabricStartCol, brandEndRow, maxCols].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                foreach (var cell in tableRange) 
+                { 
+                    cell.Style.Border.BorderAround(ExcelBorderStyle.Thin); 
+                }
+                tableRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                tableRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                
+                // Keep the brand name text at the bottom of column 1 so it doesn't get covered by the image
+                ws.Cells[brandStartRow, 1, brandEndRow, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
 
                 currentRow++;
             }
@@ -425,4 +428,45 @@ public class ModuloExportService
 
         return Math.Round(valorBase + comissao + gordura, 2);
     }
+
+#pragma warning disable CA1416
+    private void AddCenteredImage(ExcelWorksheet ws, int startRow, int endRow, byte[] imageBytes, string pictureName, bool hasText = true)
+    {
+        try
+        {
+            using var ms = new MemoryStream(imageBytes);
+            using var img = Image.FromStream(ms);
+            
+            float imgWidth = img.Width;
+            float imgHeight = img.Height;
+
+            int totalRows = endRow - startRow + 1;
+            float cellHeightPoints = (totalRows == 1) ? 85 : (totalRows * 25);
+            float cellHeightPixels = cellHeightPoints * 1.333f;
+            float cellWidthPixels = 22 * 7.5f; // column width is 22
+
+            float availableWidth = cellWidthPixels - 12; // 6px padding on left/right
+            float availableHeight = cellHeightPixels - (hasText ? 24 : 8); // margin for text/padding
+
+            float scale = Math.Min(availableWidth / imgWidth, availableHeight / imgHeight);
+            
+            int newWidth = (int)(imgWidth * scale);
+            int newHeight = (int)(imgHeight * scale);
+
+            int leftOffset = (int)((cellWidthPixels - newWidth) / 2);
+            int topOffset = (int)((availableHeight - newHeight) / 2) + 2;
+
+            if (leftOffset < 0) leftOffset = 0;
+            if (topOffset < 0) topOffset = 0;
+
+            var pic = ws.Drawings.AddPicture(pictureName, ms);
+            pic.SetPosition(startRow - 1, topOffset, 0, leftOffset);
+            pic.SetSize(newWidth, newHeight);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding image: {ex.Message}");
+        }
+    }
+#pragma warning restore CA1416
 }

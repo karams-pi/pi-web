@@ -325,6 +325,7 @@ a {
   padding: 24px 0;
 }
 
+.card {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
