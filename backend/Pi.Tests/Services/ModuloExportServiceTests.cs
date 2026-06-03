@@ -80,4 +80,82 @@ public class ModuloExportServiceTests
         result.Should().NotBeNull();
         result.Length.Should().BeGreaterThan(0);
     }
+
+    [Fact]
+    public void ExportPriceListToExcel_ShouldAllowDuplicateModulesAndReturnNonEmptyByteArray()
+    {
+        // Arrange
+        var module = new Modulo 
+        { 
+            Id = 1, 
+            Descricao = "Teste Duplicado", 
+            Fornecedor = new Fornecedor { Nome = "Karams" },
+            Categoria = new Categoria { Nome = "Sofa" },
+            Marca = new Marca { Nome = "Brand" },
+            ModulosTecidos = new List<ModuloTecido>
+            {
+                new ModuloTecido { IdTecido = 1, ValorTecido = 100, Tecido = new Tecido { Id = 1, Nome = "G1" } }
+            }
+        };
+
+        var items = new List<ModuloExportService.PriceListItemDto>
+        {
+            new ModuloExportService.PriceListItemDto { Modulo = module, ValorFreteRateadoUSD = 10 },
+            new ModuloExportService.PriceListItemDto { Modulo = module, ValorFreteRateadoUSD = 10 }
+        };
+
+        var configs = new List<Configuracao> { new Configuracao { PercentualComissao = 10, PercentualGordura = 5, ValorReducaoDolar = 0.1m } };
+
+        // Act
+        var result = _service.ExportPriceListToExcel(items, "BRL", 5.0m, configs);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Length.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public void ExportPriceListToExcel_ShouldGroupDuplicatesAndMultiplyPrices()
+    {
+        // Arrange
+        var module = new Modulo 
+        { 
+            Id = 1, 
+            Descricao = "Teste Grouping", 
+            Fornecedor = new Fornecedor { Nome = "Karams" },
+            Categoria = new Categoria { Nome = "Sofa" },
+            Marca = new Marca { Nome = "Brand" },
+            ModulosTecidos = new List<ModuloTecido>
+            {
+                new ModuloTecido { IdTecido = 1, ValorTecido = 100, Tecido = new Tecido { Id = 1, Nome = "G1" } }
+            }
+        };
+
+        var items = new List<ModuloExportService.PriceListItemDto>
+        {
+            new ModuloExportService.PriceListItemDto { Modulo = module, ValorFreteRateadoUSD = 10 },
+            new ModuloExportService.PriceListItemDto { Modulo = module, ValorFreteRateadoUSD = 10 }
+        };
+
+        var configs = new List<Configuracao> { new Configuracao { PercentualComissao = 10, PercentualGordura = 5, ValorReducaoDolar = 0.1m } };
+
+        // Act
+        var result = _service.ExportPriceListToExcel(items, "BRL", 5.0m, configs);
+
+        // Assert
+        using var stream = new System.IO.MemoryStream(result);
+        using var package = new ExcelPackage(stream);
+        var ws = package.Workbook.Worksheets[0];
+
+        var qty = ws.Cells[8, 3].Value; // Column 3: Módulo (Quantity)
+        var price = ws.Cells[8, 8].Value; // Column 8: G1 Price
+
+        qty.Should().Be(2); // Sum of 2 duplicate selections
+
+        // basePrice = mt.ValorTecido (100) + 10% comissao (10) + 5% gordura (5) = 115.00
+        // freightUSD = 10.00 -> BRL freightDisp = 10.00 * 5.0m = 50.00
+        // Total single value = 115.00 + 50.00 = 165.00
+        // Multiplied by Quantity (2) = 330.00
+        price.Should().Be(330.00m);
+    }
 }

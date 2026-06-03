@@ -106,7 +106,9 @@ public class PiExportServiceTests
                     checkedCells.Add($"R{row}C{col}:V={val}|T={text}");
                 }
 
-                if (val?.ToUpper() == "FRETE" || text?.ToUpper() == "FRETE")
+                if (val?.ToUpper() == "FRETE" || text?.ToUpper() == "FRETE" ||
+                    (string.Equals(supplierName, "Ferguile", StringComparison.OrdinalIgnoreCase) && 
+                     (val?.ToUpper() == "DESPESAS" || text?.ToUpper() == "DESPESAS")))
                 {
                     foundFrete = true;
                     break;

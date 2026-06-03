@@ -81,17 +81,27 @@ public class ModulosController : ControllerBase
                 .ThenInclude(mt => mt.Tecido)
             .Where(m => moduleIds.Contains(m.Id))
             .ToListAsync();
+
+        var modulesDict = modules.ToDictionary(m => m.Id);
+
+        var itemsDto = new List<Services.ModuloExportService.PriceListItemDto>();
+        foreach (var item in request.Items)
+        {
+            if (modulesDict.TryGetValue(item.ModuloId, out var mod))
+            {
+                itemsDto.Add(new Services.ModuloExportService.PriceListItemDto
+                {
+                    Modulo = mod,
+                    ValorFreteRateadoUSD = item.ValorFreteRateadoUSD
+                });
+            }
+        }
         
         var configs = await _db.Configuracoes
             .OrderByDescending(c => c.DataConfig)
             .ToListAsync();
 
-        // Create a mapping of ModuloId -> Freight
-        var freightMap = request.Items
-            .GroupBy(i => i.ModuloId)
-            .ToDictionary(g => g.Key, g => g.First().ValorFreteRateadoUSD);
-
-        var fileBytes = _exportService.ExportPriceListToExcel(modules, request.Currency, request.Cotacao, configs, freightMap, request.ValidityDays);
+        var fileBytes = _exportService.ExportPriceListToExcel(itemsDto, request.Currency, request.Cotacao, configs, request.ValidityDays);
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ListaDePrecos.xlsx");
     }
 

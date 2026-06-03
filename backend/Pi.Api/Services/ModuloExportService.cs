@@ -9,6 +9,13 @@ namespace Pi.Api.Services;
 
 public class ModuloExportService
 {
+    public class PriceListItemDto
+    {
+        public Modulo Modulo { get; set; } = null!;
+        public decimal ValorFreteRateadoUSD { get; set; }
+        public int Quantidade { get; set; } = 1;
+    }
+
     public byte[] ExportToExcel(List<Modulo> modules, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30)
     {
         using var package = new ExcelPackage();
@@ -227,13 +234,32 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    public byte[] ExportPriceListToExcel(List<Modulo> modules, string currency, decimal cotacao, List<Configuracao> configs, Dictionary<long, decimal> freightMap, int validityDays = 30)
+    public byte[] ExportPriceListToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30)
     {
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Lista de Preços");
 
         ws.Cells.Style.Font.Name = "Segoe UI";
         ws.Cells.Style.Font.Size = 9;
+
+        // Set column widths first so image scaling calculations are correct
+        ws.Column(1).Width = 30; // Foto
+        ws.Column(2).Width = 35; // Modelo
+        ws.Column(3).Width = 10; // Módulo
+        ws.Column(4).Width = 7;
+        ws.Column(5).Width = 7;
+        ws.Column(6).Width = 7;
+        ws.Column(7).Width = 7;
+
+        var groupedItems = items
+            .GroupBy(i => i.Modulo.Id)
+            .Select(g => new PriceListItemDto
+            {
+                Modulo = g.First().Modulo,
+                ValorFreteRateadoUSD = g.First().ValorFreteRateadoUSD,
+                Quantidade = g.Sum(i => i.Quantidade)
+            })
+            .ToList();
 
         string title = $"Lista de Preços - {(currency == "BRL" ? "Valores em Reais (R$)" : "Valores em Dólar (EXW)")}";
         ws.Cells["A1"].Value = title;
@@ -250,8 +276,8 @@ public class ModuloExportService
         ws.Cells["F1"].Style.Font.Bold = true;
         ws.Cells["F1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-        var uniqueFabrics = modules
-            .SelectMany(m => m.ModulosTecidos)
+        var uniqueFabrics = groupedItems
+            .SelectMany(i => i.Modulo.ModulosTecidos)
             .Select(mt => mt.Tecido)
             .Where(t => t != null)
             .GroupBy(t => t!.Id)
@@ -266,10 +292,10 @@ public class ModuloExportService
         int maxCols = fabricStartCol + uniqueFabrics.Count - 1;
 
         int currentRow = 5;
-        var groups = modules
-            .GroupBy(m => new { 
-                Forn = m.Fornecedor?.Nome ?? "N/A", 
-                Cat = m.Categoria?.Nome ?? "N/A" 
+        var groups = groupedItems
+            .GroupBy(i => new { 
+                Forn = i.Modulo.Fornecedor?.Nome ?? "N/A", 
+                Cat = i.Modulo.Categoria?.Nome ?? "N/A" 
             })
             .OrderBy(g => g.Key.Forn).ThenBy(g => g.Key.Cat);
 
@@ -285,11 +311,11 @@ public class ModuloExportService
             ws.Row(currentRow).Height = 25;
             currentRow++;
 
-            var brandGroups = group.GroupBy(m => m.Marca).OrderBy(b => b.Key?.Nome);
+            var brandGroups = group.GroupBy(i => i.Modulo.Marca).OrderBy(b => b.Key?.Nome);
             foreach (var brandGroup in brandGroups)
             {
                 var brand = brandGroup.Key;
-                var brandItems = brandGroup.OrderBy(m => m.Descricao).ToList();
+                var brandItems = brandGroup.OrderBy(i => i.Modulo.Descricao).ToList();
 
                 ws.Cells[currentRow, 1, currentRow + 1, 1].Merge = true; ws.Cells[currentRow, 1].Value = "Foto";
                 ws.Cells[currentRow, 2, currentRow + 1, 2].Merge = true; ws.Cells[currentRow, 2].Value = "Modelo";
@@ -319,16 +345,17 @@ public class ModuloExportService
                 currentRow += 2;
 
                 int brandStartRow = currentRow;
-                foreach (var mod in brandItems)
+                foreach (var item in brandItems)
                 {
+                    var mod = item.Modulo;
                     ws.Cells[currentRow, 2].Value = mod.Descricao;
-                    ws.Cells[currentRow, 3].Value = mod.Pa;
+                    ws.Cells[currentRow, 3].Value = item.Quantidade;
                     ws.Cells[currentRow, 4].Value = mod.Largura;
                     ws.Cells[currentRow, 5].Value = mod.Profundidade;
                     ws.Cells[currentRow, 6].Value = mod.Altura;
                     ws.Cells[currentRow, 7].Value = mod.M3;
 
-                    decimal freightUSD = freightMap.ContainsKey(mod.Id) ? freightMap[mod.Id] : 0;
+                    decimal freightUSD = item.ValorFreteRateadoUSD;
                     
                     var modConfig = configs.FirstOrDefault(c => c.IdFornecedor == mod.IdFornecedor) 
                                     ?? configs.FirstOrDefault(c => c.IdFornecedor == null);
@@ -368,7 +395,7 @@ public class ModuloExportService
                                     basePrice = Math.Round(valorBase + comissao + gordura, 2);
                                 }
                             }
-                            ws.Cells[currentRow, fabricStartCol + i].Value = basePrice + freightDisp;
+                            ws.Cells[currentRow, fabricStartCol + i].Value = (basePrice + freightDisp) * item.Quantidade;
                         }
                         else
                         {
@@ -420,15 +447,9 @@ public class ModuloExportService
 
         string curSymbol = currency == "BRL" ? "R$ " : "$ ";
         ws.Cells[5, fabricStartCol, currentRow, maxCols].Style.Numberformat.Format = $"\"{curSymbol}\"#,##0.00";
-        ws.Cells[5, 3, currentRow, 7].Style.Numberformat.Format = "#,##0.00";
+        ws.Cells[5, 3, currentRow, 3].Style.Numberformat.Format = "#,##0";
+        ws.Cells[5, 4, currentRow, 7].Style.Numberformat.Format = "#,##0.00";
 
-        ws.Column(1).Width = 30; // Foto
-        ws.Column(2).Width = 35; // Modelo
-        ws.Column(3).Width = 10; // Módulo
-        ws.Column(4).Width = 7;
-        ws.Column(5).Width = 7;
-        ws.Column(6).Width = 7;
-        ws.Column(7).Width = 7;
         for (int i = 0; i < uniqueFabrics.Count; i++) ws.Column(fabricStartCol + i).Width = 12;
 
         return package.GetAsByteArray();
