@@ -52,6 +52,7 @@ builder.Services.AddScoped<Pi.Api.Services.IEdcCalculationService, Pi.Api.Servic
 builder.Services.AddScoped<Pi.Api.Services.ExcelImportService>();
 builder.Services.AddScoped<Pi.Api.Services.PiExportService>();
 builder.Services.AddScoped<Pi.Api.Services.ModuloExportService>();
+builder.Services.AddScoped<Pi.Api.Services.EdcExportService>();
 
 builder.Services.AddCors(options =>
 {

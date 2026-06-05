@@ -200,8 +200,8 @@ const DetalheEstudoEdcPage: React.FC = () => {
         </div>
         <div className="page-header-line" style={{ background: 'linear-gradient(90deg, #10b981, transparent)' }}></div>
         <div className="action-buttons" style={{ marginLeft: 'auto' }}>
-          <button className="btn btn-secondary" onClick={() => window.print()}><Printer size={18} /><span>Imprimir</span></button>
-          <button className="btn btn-primary"><Download size={18} /><span>Exportar EDC</span></button>
+          <button className="btn btn-secondary" onClick={() => window.open(`/print-edc/${id}`, '_blank')}><Printer size={18} /><span>Imprimir</span></button>
+          <button className="btn btn-primary" onClick={() => { window.location.href = `/api/edc/simulacoes/${id}/excel`; }}><Download size={18} /><span>Exportar EDC</span></button>
         </div>
       </div>
 

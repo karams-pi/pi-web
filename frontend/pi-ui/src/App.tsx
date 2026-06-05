@@ -26,6 +26,7 @@ import ConfiguracoesFiscaisPage from "./pages/edc/ConfiguracoesFiscaisPage";
 import EstudosEdcPage from "./pages/edc/EstudosEdcPage";
 import NovoEstudoEdcPage from "./pages/edc/NovoEstudoEdcPage";
 import DetalheEstudoEdcPage from "./pages/edc/DetalheEstudoEdcPage";
+import PrintEdcPage from "./pages/edc/PrintEdcPage";
 
 
 // function ProdutosPage() {
@@ -66,7 +67,7 @@ export default function App() {
   const location = useLocation();
 
   const isSelectionPage = location.pathname === "/";
-  const isPrintRoute = location.pathname.startsWith("/print-pi");
+  const isPrintRoute = location.pathname.startsWith("/print-pi") || location.pathname.startsWith("/print-edc");
 
   // Esconder UI global em telas de seleção ou impressão
   const showGlobalUI = !isPrintRoute && !isSelectionPage;
@@ -123,6 +124,7 @@ export default function App() {
             {/* Rotas de Impressão (Mantidas na raiz por simplicidade de link externo) */}
             <Route path="/print-pi/:id" element={<PrintPiPage />} />
             <Route path="/print-pi-ferguile/:id" element={<PrintPiFerguilePage />} />
+            <Route path="/print-edc/:id" element={<PrintEdcPage />} />
 
             <Route path="/sobre" element={<SobrePage />} />
             <Route path="*" element={<NotFound />} />

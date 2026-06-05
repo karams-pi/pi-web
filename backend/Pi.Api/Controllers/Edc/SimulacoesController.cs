@@ -13,11 +13,13 @@ public class SimulacoesController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IEdcCalculationService _calculationService;
+    private readonly EdcExportService _exportService;
 
-    public SimulacoesController(AppDbContext context, IEdcCalculationService calculationService)
+    public SimulacoesController(AppDbContext context, IEdcCalculationService calculationService, EdcExportService exportService)
     {
         _context = context;
         _calculationService = calculationService;
+        _exportService = exportService;
     }
 
     [HttpGet]
@@ -49,6 +51,29 @@ public class SimulacoesController : ControllerBase
         if (simulacao == null) return NotFound();
 
         return simulacao;
+    }
+
+    [HttpGet("{id}/excel")]
+    public async Task<IActionResult> ExportExcel(int id)
+    {
+        var simulacao = await _context.SimulacoesEdc
+            .Include(s => s.Importador!)
+            .Include(s => s.Exportador!)
+            .Include(s => s.PortoOrigem!)
+            .Include(s => s.PortoDestino!)
+            .Include(s => s.Itens!)
+                .ThenInclude(i => i.Modelo!)
+            .Include(s => s.Itens!)
+                .ThenInclude(i => i.Produto!)
+                    .ThenInclude(p => p.Ncm!)
+            .Include(s => s.Despesas!)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (simulacao == null) return NotFound();
+
+        var bytes = _exportService.ExportToExcel(simulacao);
+        string fileName = $"EDC_{simulacao.NumeroReferencia}.xlsx";
+        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
     [HttpPost("preview")]
