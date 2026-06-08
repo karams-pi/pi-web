@@ -27,7 +27,7 @@ export default function PiHomeMenu() {
           <MenuButton to="/pi/clientes" label="Cadastro de Clientes" />
           <MenuButton to="/pi/modulos" label="Cadastro de Produtos" />
           <MenuButton to="/pi/submodulos" label="Cadastro de SubMódulos" />
-          <MenuButton to="/pi/proforma-invoice" label="Criar Proforma Invoice" />
+          <MenuButton to="/pi/proforma-invoice-v2" label="Criar Proforma Invoice" />
           <MenuButton to="/pi/config" label="Configurações" />
           <MenuButton to="/pi/emissao-lista-preco" label="Emissão de Lista de Preços" />
         </div>
