@@ -46,6 +46,38 @@ public class SubModulosController : ControllerBase
         return Ok(list);
     }
 
+    [HttpGet("modulos")]
+    public async Task<ActionResult<IEnumerable<object>>> GetByModulos([FromQuery] string ids)
+    {
+        if (string.IsNullOrWhiteSpace(ids))
+            return Ok(new List<object>());
+
+        var idList = ids.Split(',')
+            .Select(x => long.TryParse(x, out var id) ? id : (long?)null)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .ToList();
+
+        var list = await _db.SubModulos
+            .Where(x => x.FlAtivo && idList.Contains(x.IdModulo))
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.Id,
+                x.IdModulo,
+                x.IdTecidoBase,
+                x.Codigo,
+                x.DescricaoProduto,
+                x.TecidoEspecifico,
+                x.VolumeM3,
+                TecidoBase = x.TecidoBase != null ? new { x.TecidoBase.Id, x.TecidoBase.Nome } : null
+            })
+            .OrderBy(x => x.TecidoEspecifico)
+            .ToListAsync();
+
+        return Ok(list);
+    }
+
     [HttpGet("modulo/{idModulo:long}")]
     public async Task<ActionResult<IEnumerable<object>>> GetByModulo(long idModulo)
     {

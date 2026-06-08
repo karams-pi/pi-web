@@ -11,6 +11,11 @@ export async function listSubModulosByModulo(idModulo: number) {
   return apiGet<SubModulo[]>(`/api/submodulos/modulo/${idModulo}`);
 }
 
+export async function listSubModulosByModulos(ids: number[]) {
+  if (ids.length === 0) return [];
+  return apiGet<SubModulo[]>(`/api/submodulos/modulos?ids=${ids.join(",")}`);
+}
+
 export async function buscarSubModulo(idModulo: number, tecidoEspecifico: string) {
   const query = new URLSearchParams({
     idModulo: String(idModulo),

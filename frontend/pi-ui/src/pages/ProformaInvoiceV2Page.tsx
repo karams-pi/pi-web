@@ -22,7 +22,7 @@ import { listModelos } from "../api/modelos";
 import { listMarcas } from "../api/marcas";
 import { listCategorias } from "../api/categorias";
 import { listTecidos } from "../api/tecidos";
-import { listSubModulosByModulo } from "../api/submodulos";
+import { listSubModulosByModulo, listSubModulosByModulos } from "../api/submodulos";
 import type { ModuloTecido, Configuracao, ProformaInvoice, PiItemPeca, Fornecedor, Frete, Modelo, Cliente, Marca, Categoria, Tecido, SubModulo } from "../api/types";
 import { Save, Plus, Trash2, Search, Printer, FileSpreadsheet, FileText, Pencil } from "lucide-react";
 import { SearchableSelect } from "../components/SearchableSelect";
@@ -221,15 +221,16 @@ export default function ProformaInvoiceV2Page() {
       return next;
     });
 
-    missingIds.forEach(moduloId => {
-      listSubModulosByModulo(moduloId).then(res => {
-        setSubModulosMap(prev => ({
-          ...prev,
-          [moduloId]: res || []
-        }));
-      }).catch(err => {
-        console.error(`Erro ao carregar submódulos para módulo ${moduloId}:`, err);
+    listSubModulosByModulos(missingIds).then(res => {
+      setSubModulosMap(prev => {
+        const next = { ...prev };
+        missingIds.forEach(id => {
+          next[id] = (res || []).filter(sm => sm.idModulo === id);
+        });
+        return next;
       });
+    }).catch(err => {
+      console.error(`Erro ao carregar submódulos para os módulos ${missingIds.join(",")}:`, err);
     });
   }, [itens, modulosTecidos, isFerguile, subModulosMap]);
 
