@@ -1554,65 +1554,89 @@ export default function ProformaInvoiceV2Page() {
                                        const moduloId = mtInfo?.modulo?.id;
                                        const list = moduloId ? (subModulosMap[moduloId] || []) : [];
                                        const filteredList = list.filter(sm => sm.idTecidoBase === mtInfo?.idTecido);
-                                       
-                                       return (
-                                         <div style={{ position: "relative", width: "100%", height: "28px" }}>
-                                           <div style={{
-                                             position: "absolute",
-                                             top: 0,
-                                             left: 0,
-                                             width: "100%",
-                                             height: "100%",
-                                             display: "flex",
-                                             alignItems: "center",
-                                             paddingLeft: "8px",
-                                             fontSize: "12px",
-                                             color: "#fff",
-                                             pointerEvents: "none"
-                                           }}>
-                                             {item.subModulo?.codigo || "Selecione..."}
-                                           </div>
-                                           <select
-                                             className="cl-select"
-                                             style={{
-                                               width: "100%",
-                                               height: "28px",
-                                               padding: "2px",
-                                               fontSize: "11px",
-                                               background: "transparent",
-                                               border: "1px solid rgba(255,255,255,0.1)",
-                                               color: "transparent",
-                                               cursor: "pointer"
-                                             }}
-                                             value={item.idSubModulo || ""}
-                                             onChange={e => {
-                                               const subId = Number(e.target.value) || undefined;
-                                               const selectedSm = filteredList.find(sm => sm.id === subId);
-                                               const defaultM3 = mtInfo ? ((mtInfo.modulo?.largura || 0) * (mtInfo.modulo?.profundidade || 0) * (mtInfo.modulo?.altura || 0)) / 1000000 : item.m3;
-                                               
-                                               setItens(prev => prev.map(it => {
-                                                 if (it.tempId === item.tempId) {
-                                                   return {
-                                                     ...it,
-                                                     idSubModulo: subId,
-                                                     subModulo: selectedSm || undefined,
-                                                     codigoModuloTecido: selectedSm ? selectedSm.codigo : "",
-                                                     m3: selectedSm ? selectedSm.volumeM3 : defaultM3
-                                                   };
-                                                 }
-                                                 return it;
-                                               }));
-                                             }}
-                                           >
-                                             <option value="" style={{ background: "#1e293b", color: "#fff" }}>Selecione...</option>
-                                             {filteredList.map(sm => (
-                                               <option key={sm.id} value={sm.id} style={{ background: "#1e293b", color: "#fff" }}>
-                                                 {sm.codigo} - {sm.tecidoEspecifico}
-                                               </option>
-                                             ))}
-                                           </select>
-                                         </div>
-                                       );
+                                       if (filteredList.length === 0) {
+                                        return (
+                                          <input 
+                                            className="cl-input" 
+                                            style={{ width: "100%", height: "28px", padding: "4px", fontSize: "12px", background: "transparent" }} 
+                                            value={item.codigoModuloTecido || ""} 
+                                            onChange={e => {
+                                              const val = e.target.value;
+                                              setItens(prev => prev.map(it => {
+                                                if (it.tempId === item.tempId) {
+                                                  return {
+                                                    ...it,
+                                                    idSubModulo: undefined,
+                                                    subModulo: undefined,
+                                                    codigoModuloTecido: val
+                                                  };
+                                                }
+                                                return it;
+                                              }));
+                                            }}
+                                            placeholder="Código..."
+                                          />
+                                        );
+                                      }
+                                      
+                                      return (
+                                        <div style={{ position: "relative", width: "100%", height: "28px" }}>
+                                          <div style={{
+                                            position: "absolute",
+                                            top: 0,
+                                            left: 0,
+                                            width: "100%",
+                                            height: "100%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            paddingLeft: "8px",
+                                            fontSize: "12px",
+                                            color: "#fff",
+                                            pointerEvents: "none"
+                                          }}>
+                                            {item.subModulo?.codigo || (item.codigoModuloTecido ? item.codigoModuloTecido : "Selecione...")}
+                                          </div>
+                                          <select
+                                            className="cl-select"
+                                            style={{
+                                              width: "100%",
+                                              height: "28px",
+                                              padding: "2px",
+                                              fontSize: "11px",
+                                              background: "transparent",
+                                              border: "1px solid rgba(255,255,255,0.1)",
+                                              color: "transparent",
+                                              cursor: "pointer"
+                                            }}
+                                            value={item.idSubModulo || ""}
+                                            onChange={e => {
+                                              const subId = Number(e.target.value) || undefined;
+                                              const selectedSm = filteredList.find(sm => sm.id === subId);
+                                              const defaultM3 = mtInfo ? ((mtInfo.modulo?.largura || 0) * (mtInfo.modulo?.profundidade || 0) * (mtInfo.modulo?.altura || 0)) / 1000000 : item.m3;
+                                              
+                                              setItens(prev => prev.map(it => {
+                                                if (it.tempId === item.tempId) {
+                                                  return {
+                                                    ...it,
+                                                    idSubModulo: subId,
+                                                    subModulo: selectedSm || undefined,
+                                                    codigoModuloTecido: selectedSm ? selectedSm.codigo : "",
+                                                    m3: selectedSm ? selectedSm.volumeM3 : defaultM3
+                                                  };
+                                                }
+                                                return it;
+                                              }));
+                                            }}
+                                          >
+                                            <option value="" style={{ background: "#1e293b", color: "#fff" }}>Selecione...</option>
+                                            {filteredList.map(sm => (
+                                              <option key={sm.id} value={sm.id} style={{ background: "#1e293b", color: "#fff" }}>
+                                                {sm.codigo} - {sm.tecidoEspecifico}
+                                              </option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                      );
                                      })()
                                    ) : (
                                      <input 
