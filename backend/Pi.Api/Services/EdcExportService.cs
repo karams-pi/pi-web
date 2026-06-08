@@ -104,9 +104,10 @@ public class EdcExportService
         ws.Cells["E8"].Style.Font.Bold = true;
         
         decimal icmsPadrao = simulacao.Importador?.AliquotaIcmsPadrao ?? 0.19m;
-        if (simulacao.Itens != null && simulacao.Itens.Any() && simulacao.Itens.First().Produto?.Ncm != null)
+        var firstNcm = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm;
+        if (firstNcm != null)
         {
-            icmsPadrao = simulacao.Itens.First().Produto.Ncm.AliquotaIcmsPadrao;
+            icmsPadrao = firstNcm.AliquotaIcmsPadrao;
         }
         ws.Cells["G8"].Value = $"CONSIDERAR ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
