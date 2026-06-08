@@ -1578,29 +1578,96 @@ export default function ProformaInvoiceV2Page() {
                                           />
                                         );
                                       }
-                                      
+
+                                      // Sub-modules exist — if no sub-module is selected, show text input for free typing + dropdown trigger
+                                      if (!item.idSubModulo) {
+                                        return (
+                                          <div style={{ position: "relative", width: "100%", display: "flex", alignItems: "center", gap: "2px" }}>
+                                            <input
+                                              className="cl-input"
+                                              style={{ flex: 1, height: "28px", padding: "4px", fontSize: "12px", background: "transparent" }}
+                                              value={item.codigoModuloTecido || ""}
+                                              onChange={e => {
+                                                const val = e.target.value;
+                                                setItens(prev => prev.map(it => {
+                                                  if (it.tempId === item.tempId) {
+                                                    return { ...it, idSubModulo: undefined, subModulo: undefined, codigoModuloTecido: val };
+                                                  }
+                                                  return it;
+                                                }));
+                                              }}
+                                              placeholder="Código..."
+                                            />
+                                            {/* Dropdown trigger — narrow select to pick a sub-module */}
+                                            <select
+                                              className="cl-select"
+                                              style={{
+                                                width: "18px",
+                                                height: "28px",
+                                                padding: "0",
+                                                fontSize: "10px",
+                                                background: "rgba(30,41,59,0.9)",
+                                                border: "1px solid rgba(255,255,255,0.15)",
+                                                color: "#93c5fd",
+                                                cursor: "pointer",
+                                                flexShrink: 0
+                                              }}
+                                              value=""
+                                              onChange={e => {
+                                                const subId = Number(e.target.value) || undefined;
+                                                const selectedSm = filteredList.find(sm => sm.id === subId);
+                                                const defaultM3 = mtInfo ? ((mtInfo.modulo?.largura || 0) * (mtInfo.modulo?.profundidade || 0) * (mtInfo.modulo?.altura || 0)) / 1000000 : item.m3;
+                                                setItens(prev => prev.map(it => {
+                                                  if (it.tempId === item.tempId) {
+                                                    return {
+                                                      ...it,
+                                                      idSubModulo: subId,
+                                                      subModulo: selectedSm || undefined,
+                                                      codigoModuloTecido: selectedSm ? selectedSm.codigo : it.codigoModuloTecido,
+                                                      m3: selectedSm ? selectedSm.volumeM3 : defaultM3
+                                                    };
+                                                  }
+                                                  return it;
+                                                }));
+                                              }}
+                                            >
+                                              <option value="" style={{ background: "#1e293b", color: "#fff" }}>▼</option>
+                                              {filteredList.map(sm => (
+                                                <option key={sm.id} value={sm.id} style={{ background: "#1e293b", color: "#fff" }}>
+                                                  {sm.codigo} - {sm.tecidoEspecifico}
+                                                </option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        );
+                                      }
+
+                                      // Sub-module is selected — show code + clear (✕) button to go back to free-typing
                                       return (
-                                        <div style={{ position: "relative", width: "100%", height: "28px" }}>
+                                        <div style={{ position: "relative", width: "100%", height: "28px", display: "flex", alignItems: "center" }}>
                                           <div style={{
-                                            position: "absolute",
-                                            top: 0,
-                                            left: 0,
-                                            width: "100%",
+                                            flex: 1,
                                             height: "100%",
                                             display: "flex",
                                             alignItems: "center",
                                             paddingLeft: "8px",
                                             fontSize: "12px",
                                             color: "#fff",
-                                            pointerEvents: "none"
+                                            pointerEvents: "none",
+                                            overflow: "hidden",
+                                            whiteSpace: "nowrap"
                                           }}>
-                                            {item.subModulo?.codigo || (item.codigoModuloTecido ? item.codigoModuloTecido : "Selecione...")}
+                                            {item.subModulo?.codigo || item.codigoModuloTecido || "Selecione..."}
                                           </div>
+                                          {/* Transparent select overlay to change selection */}
                                           <select
                                             className="cl-select"
                                             style={{
-                                              width: "100%",
-                                              height: "28px",
+                                              position: "absolute",
+                                              top: 0,
+                                              left: 0,
+                                              width: "calc(100% - 22px)",
+                                              height: "100%",
                                               padding: "2px",
                                               fontSize: "11px",
                                               background: "transparent",
@@ -1613,7 +1680,6 @@ export default function ProformaInvoiceV2Page() {
                                               const subId = Number(e.target.value) || undefined;
                                               const selectedSm = filteredList.find(sm => sm.id === subId);
                                               const defaultM3 = mtInfo ? ((mtInfo.modulo?.largura || 0) * (mtInfo.modulo?.profundidade || 0) * (mtInfo.modulo?.altura || 0)) / 1000000 : item.m3;
-                                              
                                               setItens(prev => prev.map(it => {
                                                 if (it.tempId === item.tempId) {
                                                   return {
@@ -1635,6 +1701,33 @@ export default function ProformaInvoiceV2Page() {
                                               </option>
                                             ))}
                                           </select>
+                                          {/* ✕ button: clears sub-module selection → free-typing mode */}
+                                          <button
+                                            title="Limpar seleção e digitar código manualmente"
+                                            onClick={() => {
+                                              setItens(prev => prev.map(it => {
+                                                if (it.tempId === item.tempId) {
+                                                  return { ...it, idSubModulo: undefined, subModulo: undefined, codigoModuloTecido: "" };
+                                                }
+                                                return it;
+                                              }));
+                                            }}
+                                            style={{
+                                              flexShrink: 0,
+                                              width: "20px",
+                                              height: "28px",
+                                              background: "transparent",
+                                              border: "none",
+                                              color: "#f87171",
+                                              fontSize: "13px",
+                                              cursor: "pointer",
+                                              display: "flex",
+                                              alignItems: "center",
+                                              justifyContent: "center",
+                                              padding: "0",
+                                              lineHeight: 1
+                                            }}
+                                          >✕</button>
                                         </div>
                                       );
                                      })()

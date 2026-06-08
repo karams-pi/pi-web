@@ -128,6 +128,7 @@ public class PisController : ControllerBase
                         i.Finishing,
                         i.IdPiItemPeca,
                         i.IdSubModulo,
+                        i.TempCodigoModuloTecido,
                         SubModulo = i.SubModulo != null ? new {
                             i.SubModulo.Id,
                             i.SubModulo.Codigo,
@@ -176,6 +177,7 @@ public class PisController : ControllerBase
                     i.Finishing,
                     i.IdPiItemPeca,
                     i.IdSubModulo,
+                    i.TempCodigoModuloTecido,
                     SubModulo = i.SubModulo != null ? new {
                         i.SubModulo.Id,
                         i.SubModulo.Codigo,
@@ -322,7 +324,8 @@ public class PisController : ControllerBase
                 i.ValorFinalItemUSDRisco,
                 i.Observacao,
                 i.Feet,
-                i.Finishing
+                i.Finishing,
+                i.TempCodigoModuloTecido
             })
         });
     }
@@ -471,6 +474,7 @@ public class PisController : ControllerBase
         target.Feet = source.Feet;
         target.Finishing = source.Finishing;
         target.IdSubModulo = source.IdSubModulo;
+        target.TempCodigoModuloTecido = source.TempCodigoModuloTecido;
     }
 
     [HttpDelete("{id}")]

@@ -908,7 +908,7 @@ public class PiExportService
                         var tecEsp = item.SubModulo.TecidoEspecifico;
                         telaCode = tecEsp.Contains("-") ? tecEsp.Split('-')[^1].Trim() : tecEsp;
                     }
-                    string descVol = item.SubModulo?.Codigo ?? item.PiItemPeca?.Descricao ?? "";
+                    string descVol = item.SubModulo?.Codigo ?? item.TempCodigoModuloTecido ?? item.PiItemPeca?.Descricao ?? "";
                     string fabricacion = item.ModuloTecido?.Tecido?.Nome ?? "";
                     string descripcion = item.SubModulo?.DescricaoProduto ?? item.ModuloTecido?.Modulo?.Descricao ?? "";
                     if (item.SubModulo == null && !string.IsNullOrEmpty(codigoVal) && !descripcion.Contains(codigoVal))
