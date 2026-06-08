@@ -109,6 +109,7 @@ export default function ProformaInvoiceV2Page() {
   });
 
   const [itens, setItens] = useState<ItemGrid[]>([]);
+  const [subModulosMap, setSubModulosMap] = useState<Record<number, SubModulo[]>>({});
   const [saving, setSaving] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
@@ -143,27 +144,27 @@ export default function ProformaInvoiceV2Page() {
       PT: {
         FOTO: "FOTO", REF: "REF", MARCA: "NOME", DESC: "DESCRIÇÃO", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", 
         QTD: "QTD UNID", QTD_PECA: "QTD SOFÁ", M3: "TOTAL VOLUME M³", 
-        TECIDO: "TECIDO", TELA: "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", 
+        TECIDO: "TECIDO", TELA: isFerguile ? "CÓDIGO" : "TELA N", OBS: "OBS...", PES: "PÉS", ACAB: "ACABAMENTO", EXW: "EXW UNIT", FRETE: "FRETE UNIT", 
         UNIT_FINAL: "PREÇO UNIT. MÓDULO", UNIT: `UNIT ${isBRLMod ? "REAIS" : "DOLAR"}`, TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condição de Pagamento"
       },
       ES: {
         FOTO: "FOTO", REF: "REF", MARCA: "NOMBRE", DESC: "DESCRIPCIÓN", LARG: "LARG.", PROF: "PROF.", ALT: "ALT.", PA: "P.A.", 
         QTD: "CANT UNID", QTD_PECA: "CANT SOFÁ", M3: "TOTAL VOLUMEN M³", 
-        TECIDO: "TELA", TELA: "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", 
+        TECIDO: "TELA", TELA: isFerguile ? "CÓDIGO" : "TELA N", OBS: "OBS...", PES: "PIES", ACAB: "ACABADO", EXW: "EXW UNIT", FRETE: "FLETE UNIT", 
         UNIT_FINAL: "PRECIO UNIT. MODULO", UNIT: `UNIT ${isBRLMod ? "REAIS" : "DOLAR"}`, TOTAL: "TOTAL USD",
         IDIOMA: "Idioma", COND_PAG: "Condición de Pago"
       },
       EN: {
         FOTO: "PHOTO", REF: "REF", MARCA: "NAME", DESC: "DESCRIPTION", LARG: "WIDTH", PROF: "DEPTH", ALT: "HEIGHT", PA: "P.A.", 
         QTD: "UNIT QTY", QTD_PECA: "SOFA QTY", M3: "TOTAL VOLUME M³", 
-        TECIDO: "FABRIC", TELA: "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", 
+        TECIDO: "FABRIC", TELA: isFerguile ? "CODE" : "FABRIC N", OBS: "OBS...", PES: "FEET", ACAB: "FINISHING", EXW: "EXW UNIT", FRETE: "FREIGHT UNIT", 
         UNIT_FINAL: "UNIT PRICE MODULE", UNIT: `${isBRLMod ? "REAL" : "USD"} UNIT`, TOTAL: "TOTAL USD",
         IDIOMA: "Language", COND_PAG: "Payment Condition"
       }
     };
     return dicts[lang]?.[key] || key;
-  }, [form.idioma, form.moedaExibicao]);
+  }, [form.idioma, form.moedaExibicao, isFerguile]);
 
   // Filters for Item Selection Modal
   const [filterFornecedor, setFilterFornecedor] = useState("");
@@ -198,6 +199,39 @@ export default function ProformaInvoiceV2Page() {
       setSelSubModuloId("");
     }
   }, [selModuloTecido, isFerguile, modulosTecidos]);
+
+  useEffect(() => {
+    if (!isFerguile || itens.length === 0 || modulosTecidos.length === 0) return;
+    
+    const uniqueModuloIds = Array.from(new Set(
+      itens.map(item => {
+        const mt = modulosTecidos.find(x => x.id === item.idModuloTecido);
+        return mt?.modulo?.id;
+      }).filter(Boolean) as number[]
+    ));
+
+    const missingIds = uniqueModuloIds.filter(id => !subModulosMap[id]);
+    if (missingIds.length === 0) return;
+
+    setSubModulosMap(prev => {
+      const next = { ...prev };
+      missingIds.forEach(id => {
+        if (!next[id]) next[id] = [];
+      });
+      return next;
+    });
+
+    missingIds.forEach(moduloId => {
+      listSubModulosByModulo(moduloId).then(res => {
+        setSubModulosMap(prev => ({
+          ...prev,
+          [moduloId]: res || []
+        }));
+      }).catch(err => {
+        console.error(`Erro ao carregar submódulos para módulo ${moduloId}:`, err);
+      });
+    });
+  }, [itens, modulosTecidos, isFerguile, subModulosMap]);
 
   useEffect(() => {
     loadInitialData();
@@ -533,7 +567,7 @@ export default function ProformaInvoiceV2Page() {
 
   useEffect(() => {
     recalcularRateio();
-  }, [recalcularRateio]);
+  }, [itens, recalcularRateio]);
 
   const fornecedorOptions = useMemo(() => fornecedores.map(f => ({ value: String(f.id), label: f.nome })), [fornecedores]);
   const clienteOptions = useMemo(() => clientes.map(c => ({ value: String(c.id), label: c.empresa ? `${c.nome} - ${c.empresa}` : c.nome })), [clientes]);
@@ -1505,23 +1539,90 @@ export default function ProformaInvoiceV2Page() {
                                        {group.fabricName}
                                     </td>
                                   ) : (
-                                    isFerguile && (
-                                      <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
-                                        {item.subModulo?.tecidoEspecifico || mtInfo?.tecido?.nome || "-"}
-                                      </td>
-                                    )
-                                  )}
+                                     isFerguile && (
+                                       <td style={{ ...tdStyle, color: "#93c5fd", fontWeight: "600" }}>
+                                         {mtInfo?.tecido?.nome || "-"}
+                                       </td>
+                                     )
+                                   )}
 
                                  {/* Pés / Tela N */}
                                  <td style={tdStyle}>
+                                   {isFerguile ? (
+                                     (() => {
+                                       const moduloId = mtInfo?.modulo?.id;
+                                       const list = moduloId ? (subModulosMap[moduloId] || []) : [];
+                                       const filteredList = list.filter(sm => sm.idTecidoBase === mtInfo?.idTecido);
+                                       
+                                       return (
+                                         <div style={{ position: "relative", width: "100%", height: "28px" }}>
+                                           <div style={{
+                                             position: "absolute",
+                                             top: 0,
+                                             left: 0,
+                                             width: "100%",
+                                             height: "100%",
+                                             display: "flex",
+                                             alignItems: "center",
+                                             paddingLeft: "8px",
+                                             fontSize: "12px",
+                                             color: "#fff",
+                                             pointerEvents: "none"
+                                           }}>
+                                             {item.subModulo?.codigo || "Selecione..."}
+                                           </div>
+                                           <select
+                                             className="cl-select"
+                                             style={{
+                                               width: "100%",
+                                               height: "28px",
+                                               padding: "2px",
+                                               fontSize: "11px",
+                                               background: "transparent",
+                                               border: "1px solid rgba(255,255,255,0.1)",
+                                               color: "transparent",
+                                               cursor: "pointer"
+                                             }}
+                                             value={item.idSubModulo || ""}
+                                             onChange={e => {
+                                               const subId = Number(e.target.value) || undefined;
+                                               const selectedSm = filteredList.find(sm => sm.id === subId);
+                                               const defaultM3 = mtInfo ? ((mtInfo.modulo?.largura || 0) * (mtInfo.modulo?.profundidade || 0) * (mtInfo.modulo?.altura || 0)) / 1000000 : item.m3;
+                                               
+                                               setItens(prev => prev.map(it => {
+                                                 if (it.tempId === item.tempId) {
+                                                   return {
+                                                     ...it,
+                                                     idSubModulo: subId,
+                                                     subModulo: selectedSm || undefined,
+                                                     codigoModuloTecido: selectedSm ? selectedSm.codigo : "",
+                                                     m3: selectedSm ? selectedSm.volumeM3 : defaultM3
+                                                   };
+                                                 }
+                                                 return it;
+                                               }));
+                                             }}
+                                           >
+                                             <option value="" style={{ background: "#1e293b", color: "#fff" }}>Selecione...</option>
+                                             {filteredList.map(sm => (
+                                               <option key={sm.id} value={sm.id} style={{ background: "#1e293b", color: "#fff" }}>
+                                                 {sm.codigo} - {sm.tecidoEspecifico}
+                                               </option>
+                                             ))}
+                                           </select>
+                                         </div>
+                                       );
+                                     })()
+                                   ) : (
                                      <input 
                                        className="cl-input" 
                                        style={{ width: "100%", height: "28px", padding: "4px", fontSize: "12px", background: "transparent" }} 
-                                       value={isFerguile ? (item.codigoModuloTecido || "") : (item.feet || "")} 
-                                       onChange={e => updateItem(item.tempId, isFerguile ? "codigoModuloTecido" : "feet", e.target.value)}
-                                       placeholder={isFerguile ? "Tela..." : "Pés..."}
+                                       value={item.feet || ""} 
+                                       onChange={e => updateItem(item.tempId, "feet", e.target.value)}
+                                       placeholder="Pés..."
                                      />
-                                  </td>
+                                   )}
+                                 </td>
 
                                   {!isFerguile && (
                                     <td style={tdStyle}>

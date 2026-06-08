@@ -876,7 +876,7 @@ public class PiExportService
             var modelGroups = brandGroup.Items
                 .GroupBy(i => i.ModuloTecido?.Modulo?.Id ?? 0)
                 .Select(g => new {
-                    ModelName = g.First().SubModulo?.DescricaoProduto
+                    ModelName = g.First().ModuloTecido?.Modulo?.Marca?.Nome
                                 ?? g.First().PiItemPeca?.Descricao
                                 ?? g.First().ModuloTecido?.Modulo?.Descricao
                                 ?? "",
@@ -901,16 +901,27 @@ public class PiExportService
                     totalM3  += itemM3Total;
                     totalFinalPI += rowTotal;
 
-                    string codigoVal = item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
+                    string codigoVal = item.SubModulo?.Codigo ?? item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
                     string telaCode = codigoVal.Contains("-") ? codigoVal.Split('-')[^1].Trim() : codigoVal;
+                    if (item.SubModulo != null && !string.IsNullOrEmpty(item.SubModulo.TecidoEspecifico))
+                    {
+                        var tecEsp = item.SubModulo.TecidoEspecifico;
+                        telaCode = tecEsp.Contains("-") ? tecEsp.Split('-')[^1].Trim() : tecEsp;
+                    }
                     string descVol = item.SubModulo?.Codigo ?? item.PiItemPeca?.Descricao ?? "";
                     string fabricacion = item.ModuloTecido?.Tecido?.Nome ?? "";
-                    string descripcion = item.ModuloTecido?.Modulo?.Descricao ?? "";
-                    if (!string.IsNullOrEmpty(codigoVal) && !descripcion.Contains(codigoVal))
+                    string descripcion = item.SubModulo?.DescricaoProduto ?? item.ModuloTecido?.Modulo?.Descricao ?? "";
+                    if (item.SubModulo == null && !string.IsNullOrEmpty(codigoVal) && !descripcion.Contains(codigoVal))
                         descripcion = (descripcion + " " + codigoVal).Trim();
 
                     ws.Cells[currentRow, 3].Value = codigoVal;
+                    
                     ws.Cells[currentRow, 4].Value = descripcion;
+                    ws.Cells[currentRow, 4].Style.Font.Bold = true;
+                    ws.Cells[currentRow, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    ws.Cells[currentRow, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    ws.Cells[currentRow, 4].Style.WrapText = true;
+
                     ws.Cells[currentRow, 5].Value = descVol;
                     ws.Cells[currentRow, 7].Value = item.Largura;
                     ws.Cells[currentRow, 8].Value = item.Altura;
