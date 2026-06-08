@@ -1634,7 +1634,7 @@ export default function ProformaInvoiceV2Page() {
                                               <option value="" style={{ background: "#1e293b", color: "#fff" }}>▼</option>
                                               {filteredList.map(sm => (
                                                 <option key={sm.id} value={sm.id} style={{ background: "#1e293b", color: "#fff" }}>
-                                                  {sm.codigo} - {sm.tecidoEspecifico}
+                                                  {sm.codigo} - {sm.tecidoEspecifico} - {sm.descricaoProduto}
                                                 </option>
                                               ))}
                                             </select>
@@ -1644,7 +1644,10 @@ export default function ProformaInvoiceV2Page() {
 
                                       // Sub-module is selected — show code + clear (✕) button to go back to free-typing
                                       return (
-                                        <div style={{ position: "relative", width: "100%", height: "28px", display: "flex", alignItems: "center" }}>
+                                        <div 
+                                          style={{ position: "relative", width: "100%", height: "28px", display: "flex", alignItems: "center" }}
+                                          title={item.subModulo?.descricaoProduto || ""}
+                                        >
                                           <div style={{
                                             flex: 1,
                                             height: "100%",
@@ -1662,6 +1665,7 @@ export default function ProformaInvoiceV2Page() {
                                           {/* Transparent select overlay to change selection */}
                                           <select
                                             className="cl-select"
+                                            title={item.subModulo?.descricaoProduto || ""}
                                             style={{
                                               position: "absolute",
                                               top: 0,
@@ -1697,7 +1701,7 @@ export default function ProformaInvoiceV2Page() {
                                             <option value="" style={{ background: "#1e293b", color: "#fff" }}>Selecione...</option>
                                             {filteredList.map(sm => (
                                               <option key={sm.id} value={sm.id} style={{ background: "#1e293b", color: "#fff" }}>
-                                                {sm.codigo} - {sm.tecidoEspecifico}
+                                                {sm.codigo} - {sm.tecidoEspecifico} - {sm.descricaoProduto}
                                               </option>
                                             ))}
                                           </select>
