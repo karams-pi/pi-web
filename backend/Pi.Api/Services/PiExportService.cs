@@ -26,6 +26,7 @@ public class PiExportService
         public string Brand { get; set; } = "";
         public BankDetails Bank { get; set; } = new();
         public string Origin { get; set; } = "Hecho en Brasil";
+        public string? LogoPath { get; set; }
     }
 
     private class BankDetails
@@ -55,6 +56,7 @@ public class PiExportService
                 City = "TERRA RICA", Zip = "87890-000", State = "PARANÁ",
                 Email = "KOYO@KOYO.COM.BR", Website = "https://karams.com.br/", Phone = "(44) 3441-8400",
                 Brand = "Koyo",
+                LogoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "logo-koyo.jpeg"),
                 Bank = new BankDetails {
                     Intermediary = "BANK OF AMERICA, N.A.", IntermediaryAddress = "NEW YORK - US", IntermediarySwift = "BOFAUS3N", IntermediaryAccount = "6550925836",
                     Beneficiary = "BANCO RENDIMENTO S/A", BeneficiaryAddress = "SÃO PAULO - BR", BeneficiarySwift = "RENDBRSP", BeneficiaryIban = "BR4468900810000010025069901i1", BeneficiaryAccount = "00250699000148", BeneficiaryName = "KOYO INDUSTRIA E COMERCIO DE ESTOFADOS LTDA"
@@ -71,6 +73,7 @@ public class PiExportService
                 City = "ARAPONGAS", Zip = "86703-797", State = "PARANÁ",
                 Email = "comercial@livintus.com.br", Website = "www.livintus.com.br", Phone = "(43) 3252-1234",
                 Brand = "Livintus",
+                LogoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "logo-livintus.png"),
                 Bank = new BankDetails {
                     Beneficiary = "SICREDI 748", BeneficiarySwift = "BCSIBRRS748", BeneficiaryIban = "BR7001181521007230000003252C1", BeneficiaryAccount = "0723/032524", BeneficiaryName = "LIVINTUS ESTOFADOS LTDA"
                 }
@@ -86,6 +89,7 @@ public class PiExportService
                 City = "ARAPONGAS", Zip = "86703-797", State = "PARANÁ",
                 Email = "financeiro@ferguile.com.br", Website = "www.ferguile.com.br", Phone = "(43) 3252-1234",
                 Brand = "Ferguile",
+                LogoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "logo-ferguile_.png"),
                 Bank = new BankDetails {
                     Beneficiary = "SICREDI 748", BeneficiarySwift = "BCSIBRRS748", BeneficiaryIban = "BR7001181521007230000003252C1", BeneficiaryAccount = "0723/032524", BeneficiaryName = "FERGUILE ESTOFADOS LTDA"
                 }
@@ -99,11 +103,53 @@ public class PiExportService
             City = "TERRA RICA", Zip = "87890-000", State = "PARANÁ",
             Email = "KARAMS@KARAMS.COM.BR", Website = "https://karams.com.br/", Phone = "(44) 3441-8400 | (44) 3441-1908",
             Brand = "Karams",
+            LogoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "logo-karams.png"),
             Bank = new BankDetails {
                 Intermediary = "BANK OF AMERICA, N.A.", IntermediaryAddress = "NEW YORK - US", IntermediarySwift = "BOFAUS3N", IntermediaryAccount = "6550925836",
                 Beneficiary = "BANCO RENDIMENTO S/A", BeneficiaryAddress = "SÃO PAULO - BR", BeneficiarySwift = "RENDBRSP", BeneficiaryIban = "BR4468900810000010025069901i1", BeneficiaryAccount = "00250699000148", BeneficiaryName = "KARAM'S INDUSTRIA E COMERCIO DE ESTOFADOS LTDA"
             }
         };
+    }
+
+    /// <summary>Insere a logo do fornecedor centralizada em um bloco de células.</summary>
+    private void InsertSupplierLogo(ExcelWorksheet ws, string? logoPath, int fromRow, int toRow, int fromCol, int toCol, string picName)
+    {
+        if (string.IsNullOrEmpty(logoPath) || !File.Exists(logoPath)) return;
+        try
+        {
+            byte[] imgBytes = File.ReadAllBytes(logoPath);
+            using var ms = new MemoryStream(imgBytes);
+
+            var (imgW, imgH) = GetImageDimensions(imgBytes);
+            if (imgW <= 0 || imgH <= 0) return;
+
+            // Calcular dimensões do bloco em pixels
+            float blockHeightPts = 0;
+            for (int r = fromRow; r <= toRow; r++)
+                blockHeightPts += (float)(ws.Row(r).Height > 0 ? ws.Row(r).Height : 15);
+            float blockHeightPx = blockHeightPts * 1.333f;
+
+            float blockWidthPx = 0;
+            for (int c = fromCol; c <= toCol; c++)
+                blockWidthPx += (float)(ws.Column(c).Width > 0 ? ws.Column(c).Width : 8) * 7.5f;
+
+            // Sem padding: imagem preenche o bloco todo (contain)
+            float scale = Math.Min(blockWidthPx / imgW, blockHeightPx / imgH);
+            int newW = (int)(imgW * scale);
+            int newH = (int)(imgH * scale);
+
+            // Centralizar dentro do bloco
+            int leftOff = Math.Max(0, (int)((blockWidthPx - newW) / 2));
+            int topOff  = Math.Max(0, (int)((blockHeightPx - newH) / 2));
+
+            var pic = ws.Drawings.AddPicture(picName, ms);
+            pic.SetPosition(fromRow - 1, topOff, fromCol - 1, leftOff);
+            pic.SetSize(newW, newH);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logo insert error: {ex.Message}");
+        }
     }
 
     public PiExportService(AppDbContext context)
@@ -149,7 +195,7 @@ public class PiExportService
 
         // Configuração global da planilha
         ws.Cells.Style.Font.Name = "Arial";
-        ws.Cells.Style.Font.Size = 10;
+        ws.Cells.Style.Font.Size = 12;
 
         var supplierName = pi.Fornecedor?.Nome ?? "";
         var metadata = GetSupplierMetadata(supplierName);
@@ -231,28 +277,31 @@ public class PiExportService
         ws.Cells["A2:Q2"].Merge = true;
         ws.Cells["A2"].Value = metadata.Name;
         ws.Cells["A2"].Style.Font.Bold = true;
-        ws.Cells["A2"].Style.Font.Size = 13;
+        ws.Cells["A2"].Style.Font.Size = 15;
         ws.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
         ws.Cells["A3:Q3"].Merge = true;
         ws.Cells["A3"].Value = $"CNPJ {metadata.Cnpj} | {metadata.Address} {metadata.Zip} {metadata.City} - {metadata.State}";
-        ws.Cells["A3"].Style.Font.Size = 8;
+        ws.Cells["A3"].Style.Font.Size = 10;
         ws.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         
         ws.Cells["A4:Q4"].Merge = true;
         ws.Cells["A4"].Value = $"{metadata.Email} - {metadata.Website} | {metadata.Phone}";
-        ws.Cells["A4"].Style.Font.Size = 8;
+        ws.Cells["A4"].Style.Font.Size = 10;
         ws.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
 
         ws.Cells["A5:Q5"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-        
+
         ws.Row(1).Height = 5;
-        ws.Row(2).Height = 25;
-        ws.Row(3).Height = 15;
-        ws.Row(4).Height = 15;
-        ws.Row(5).Height = 10;
-        for (int r = 6; r <= 13; r++) ws.Row(r).Height = 18;
+        ws.Row(2).Height = 65;
+        ws.Row(3).Height = 20;
+        ws.Row(4).Height = 20;
+        ws.Row(5).Height = 12;
+        for (int r = 6; r <= 13; r++) ws.Row(r).Height = 22;
+
+        // Logo no cabeçalho genérico: sobreposta à esquerda na linha 2
+        InsertSupplierLogo(ws, metadata.LogoPath, 2, 2, 1, 2, "LogoHeaderGeneric");
 
         // ═══════════════ IMPORTER & PI DETAILS GRID ═══════════════
         int gridRow = 6;
@@ -285,7 +334,7 @@ public class PiExportService
         ws.Cells[gridRow + 6, rightCol + 1].Value = $"{pi.Frete?.Nome} {pi.Configuracoes?.PortoEmbarque ?? ""}";
         ws.Cells[gridRow + 7, rightCol].Value = t("PAYMENT_CONDITION", lang);
         ws.Cells[gridRow + 7, rightCol + 1].Value = !string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "T/T");
-        ws.Cells[gridRow, 1, gridRow + 7, 17].Style.Font.Size = 8;
+        ws.Cells[gridRow, 1, gridRow + 7, 17].Style.Font.Size = 10;
 
         // ═══════════════ TABLE HEADER ═══════════════
         int startRow = 14;
@@ -456,6 +505,7 @@ public class PiExportService
             for (int i = 0; i < sortedItems.Count; i++)
             {
                 var item = sortedItems[i];
+                ws.Row(currentRow).Height = 28;
                 bool isFirstOfGroup = spanFabric[i] > 0;
 
                 if (isFirstOfGroup) {
@@ -609,7 +659,7 @@ public class PiExportService
                     range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
                 
-                ws.Row(currentRow).Height = 25;
+                ws.Row(currentRow).Height = 32;
                 
                 currentRow++;
             }
@@ -632,7 +682,7 @@ public class PiExportService
                 AddCenteredImage(ws, groupStartRow, currentRow - 1, brand.Imagem, $"Pic_{brand.Id}_{groupStartRow}");
             }
             // Set row height if merged photo needs space
-            if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 65;
+            if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 80;
         }
 
         // Summary Row Generic
@@ -684,7 +734,7 @@ public class PiExportService
         ws.Cells[currentRow + offset, 1].Value = $"{t("ADDRESS", lang)} {metadata.Bank.BeneficiaryAddress} | SWIFT: {metadata.Bank.BeneficiarySwift}";
         ws.Cells[currentRow + offset + 1, 1].Value = $"IBAN: {metadata.Bank.BeneficiaryIban} | CUENTA/ACCOUNT: {metadata.Bank.BeneficiaryAccount}";
         ws.Cells[currentRow + offset + 2, 1].Value = t("NAME", lang) + ": " + metadata.Bank.BeneficiaryName;
-        ws.Cells[currentRow, 1, currentRow + 10, 7].Style.Font.Size = 8;
+        ws.Cells[currentRow, 1, currentRow + 10, 7].Style.Font.Size = 10;
 
         ws.Cells[currentRow, 8, currentRow + 10, totalCol].Style.Border.BorderAround(ExcelBorderStyle.Thin);
         ws.Cells[currentRow, 8].Value = t("PRODUCT_DATA", lang);
@@ -702,14 +752,14 @@ public class PiExportService
         ws.Cells[currentRow + 11, 1, currentRow + 11, totalCol].Merge = true;
         ws.Cells[currentRow + 11, 1].Value = string.Format(t("VALIDITY_NOTE", lang), validity);
         ws.Cells[currentRow + 11, 1].Style.Font.Italic = true;
-        ws.Cells[currentRow + 11, 1].Style.Font.Size = 8;
+        ws.Cells[currentRow + 11, 1].Style.Font.Size = 10;
 
-        ws.Cells[currentRow, 8, currentRow + 10, totalCol].Style.Font.Size = 8;
+        ws.Cells[currentRow, 8, currentRow + 10, totalCol].Style.Font.Size = 10;
 
-        ws.Column(1).Width = 15;
-        ws.Column(2).Width = 15;
-        ws.Column(3).Width = 35;
-        ws.Column(10).Width = 20;
+        ws.Column(1).Width = 18;
+        ws.Column(2).Width = 18;
+        ws.Column(3).Width = 42;
+        ws.Column(10).Width = 24;
     }
 
     private void BuildFerguileLayout(ExcelWorksheet ws, ProformaInvoice pi, string currency, int validity, SupplierMetadata metadata, string lang)
@@ -718,13 +768,15 @@ public class PiExportService
         var dateObj = pi.DataPi.DateTime;
 
         // ═══════════════ HEADER ═══════════════
-        var supplierRange = ws.Cells["A1:I9"];
+        // Bloco fornecedor: A1:F9 (esquerda)
+        var supplierRange = ws.Cells["A1:F9"];
         supplierRange.Merge = true;
         supplierRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
         supplierRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
         supplierRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
         supplierRange.Style.WrapText = true;
-        supplierRange.Style.Font.Size = 9;
+        supplierRange.Style.Font.Size = 11;
+        for (int r = 1; r <= 9; r++) ws.Row(r).Height = 17;
 
         string supplierText = $"{metadata.Name}\n" +
                               $"CNPJ: {metadata.Cnpj}\n" +
@@ -737,13 +789,21 @@ public class PiExportService
                               $"PAYMENT TERM: {(!string.IsNullOrWhiteSpace(pi.CondicaoPagamento) ? pi.CondicaoPagamento : (pi.Configuracoes?.CondicoesPagamento ?? "AT SIGHT"))}";
         ws.Cells["A1"].Value = supplierText;
 
+        // Bloco logo: G1:I9 (à direita do fornecedor)
+        var logoBlock = ws.Cells["G1:I9"];
+        logoBlock.Merge = true;
+        logoBlock.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+        logoBlock.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        logoBlock.Style.VerticalAlignment   = ExcelVerticalAlignment.Center;
+        InsertSupplierLogo(ws, metadata.LogoPath, 1, 9, 7, 9, "LogoHeader");
+
         var importerRange = ws.Cells["J1:Q9"];
         importerRange.Merge = true;
         importerRange.Style.Border.BorderAround(ExcelBorderStyle.Thin);
         importerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
         importerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
         importerRange.Style.WrapText = true;
-        importerRange.Style.Font.Size = 9;
+        importerRange.Style.Font.Size = 11;
 
         string importerText = $"PROFORMA INVOICE: {piNumber}\n" +
                               $"DATE: {dateObj:dd/MM/yyyy}\n" +
@@ -874,7 +934,7 @@ public class PiExportService
             int brandStartRow = currentRow;
 
             var modelGroups = brandGroup.Items
-                .GroupBy(i => i.ModuloTecido?.Modulo?.Id ?? 0)
+                .GroupBy(i => i.ModuloTecido?.Modulo?.Marca?.Id ?? 0L)
                 .Select(g => new {
                     ModelName = g.First().ModuloTecido?.Modulo?.Marca?.Nome
                                 ?? g.First().PiItemPeca?.Descricao
@@ -901,18 +961,23 @@ public class PiExportService
                     totalM3  += itemM3Total;
                     totalFinalPI += rowTotal;
 
-                    string codigoVal = item.SubModulo?.Codigo ?? item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "";
+                    // CÓDIGO: só preenche quando há submódulo selecionado
+                    string codigoVal = item.SubModulo != null
+                        ? (item.SubModulo.Codigo ?? item.TempCodigoModuloTecido ?? item.ModuloTecido?.CodigoModuloTecido ?? "")
+                        : "";
+
                     string telaCode = codigoVal.Contains("-") ? codigoVal.Split('-')[^1].Trim() : codigoVal;
                     if (item.SubModulo != null && !string.IsNullOrEmpty(item.SubModulo.TecidoEspecifico))
                     {
                         var tecEsp = item.SubModulo.TecidoEspecifico;
                         telaCode = tecEsp.Contains("-") ? tecEsp.Split('-')[^1].Trim() : tecEsp;
                     }
-                    string descVol = item.SubModulo?.Codigo ?? item.TempCodigoModuloTecido ?? item.PiItemPeca?.Descricao ?? "";
+
+                    // DESC/VOL: descrição do módulo no banco de dados
+                    string descVol = item.ModuloTecido?.Modulo?.Descricao ?? item.SubModulo?.Codigo ?? item.PiItemPeca?.Descricao ?? "";
+
                     string fabricacion = item.ModuloTecido?.Tecido?.Nome ?? "";
                     string descripcion = item.SubModulo?.DescricaoProduto ?? item.ModuloTecido?.Modulo?.Descricao ?? "";
-                    if (item.SubModulo == null && !string.IsNullOrEmpty(codigoVal) && !descripcion.Contains(codigoVal))
-                        descripcion = (descripcion + " " + codigoVal).Trim();
 
                     ws.Cells[currentRow, 3].Value = codigoVal;
                     
@@ -954,13 +1019,17 @@ public class PiExportService
                     ws.Cells[currentRow, 16].Style.Numberformat.Format = moneyFmt;
                     ws.Cells[currentRow, 17].Style.Numberformat.Format = moneyFmt;
 
-                    ws.Cells[currentRow, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                    ws.Cells[currentRow, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                    // Centralizar colunas CÓDIGO (3) até OBSERVACIÓN (14)
+                    for (int c = 3; c <= 14; c++)
+                    {
+                        ws.Cells[currentRow, c].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        ws.Cells[currentRow, c].Style.VerticalAlignment   = ExcelVerticalAlignment.Center;
+                    }
                     ws.Cells[currentRow, 15].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                     ws.Cells[currentRow, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                     ws.Cells[currentRow, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-                    ws.Row(currentRow).Height = 25;
+                    ws.Row(currentRow).Height = 32;
                     currentRow++;
                 }
 
@@ -989,7 +1058,7 @@ public class PiExportService
             ws.Cells[brandStartRow, 1, brandEndRow, 1].Merge = true;
             ws.Cells[brandStartRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
             if (brand?.Imagem != null) AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicF_{brand.Id}_{brandStartRow}");
-            if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 65;
+            if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 80;
         }
 
         // ═══════════════ SUMMARY ROW ═══════════════
@@ -1013,16 +1082,24 @@ public class PiExportService
         ws.Cells[currentRow, 1, currentRow, 17].Style.Fill.BackgroundColor.SetColor(totalRowBgColor);
         ws.Cells[currentRow, 1, currentRow, 17].Style.Font.Color.SetColor(Color.White);
         for (int i = 1; i <= 17; i++) ws.Cells[currentRow, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-        ws.Row(currentRow).Height = 20;
+        ws.Row(currentRow).Height = 26;
         currentRow++;
 
-        // Column widths
-        ws.Column(1).Width = 12; ws.Column(2).Width = 13; ws.Column(3).Width = 11;
-        ws.Column(4).Width = 25; ws.Column(5).Width = 15; ws.Column(6).Width = 8;
-        ws.Column(7).Width = 7;  ws.Column(8).Width = 7;  ws.Column(9).Width = 6.5;
-        ws.Column(10).Width = 7; ws.Column(11).Width = 11; ws.Column(12).Width = 13;
-        ws.Column(13).Width = 10; ws.Column(14).Width = 20; ws.Column(15).Width = 10;
-        ws.Column(16).Width = 13; ws.Column(17).Width = 14;
+        // Auto-fit: ajusta largura pelo maior texto, com limites mínimo e máximo
+        // (AutoFitColumns não funciona bem em células mescladas — os dados de texto ficam em cols 3-14)
+        ws.Cells[startRow, 3, currentRow - 1, 14].AutoFitColumns(8, 45);
+
+        // Colunas fixas: foto, referência, dimensões, preços
+        ws.Column(1).Width = 15;  // FOTO
+        ws.Column(2).Width = 16;  // REFERENCIA
+        ws.Column(7).Width = 9;   // LARG.
+        ws.Column(8).Width = 9;   // ALT.
+        ws.Column(9).Width = 9;   // PROF.
+        ws.Column(10).Width = 9;  // CANT.
+        ws.Column(11).Width = 14; // TOTAL M3
+        ws.Column(15).Width = 14; // DESPESAS
+        ws.Column(16).Width = 17; // UNIT
+        ws.Column(17).Width = 19; // TOTAL
 
         ws.Cells[startRow + 1, 1, currentRow - 1, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -1037,7 +1114,7 @@ public class PiExportService
         bankRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
         bankRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
         bankRange.Style.WrapText = true;
-        bankRange.Style.Font.Size = 9;
+        bankRange.Style.Font.Size = 11;
         string bankText = $"{t("BANK_DETAILS", lang)}\n" +
                           $"Beneficiary: {metadata.Bank.BeneficiaryName}\n" +
                           $"CNPJ: {metadata.Cnpj}\n" +
@@ -1053,7 +1130,7 @@ public class PiExportService
         prodRange.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
         prodRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
         prodRange.Style.WrapText = true;
-        prodRange.Style.Font.Size = 9;
+        prodRange.Style.Font.Size = 11;
         string brandDisplay = string.Equals(metadata.Brand, "Ferguile", StringComparison.OrdinalIgnoreCase) ? "Ferguile/Livintus" : metadata.Brand;
         string prodText = $"{t("PRODUCT_DATA", lang)}\n" +
                           $"{t("BRAND", lang)}: {brandDisplay}\n" +
@@ -1072,7 +1149,7 @@ public class PiExportService
         validityRange.Merge = true;
         validityRange.Value = string.Format(t("VALIDITY_NOTE", lang), validity);
         validityRange.Style.Font.Italic = true;
-        validityRange.Style.Font.Size = 8;
+        validityRange.Style.Font.Size = 10;
         validityRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
     }
 
@@ -1155,28 +1232,24 @@ public class PiExportService
         {
             using var ms = new MemoryStream(imageBytes);
             var (imgWidth, imgHeight) = GetImageDimensions(imageBytes);
-            
+
+            // Altura total do bloco de células em pixels
             float cellHeightPoints = 0;
             for (int r = startRow; r <= endRow; r++)
-            {
                 cellHeightPoints += (float)(ws.Row(r).Height > 0 ? ws.Row(r).Height : 15);
-            }
             float cellHeightPixels = cellHeightPoints * 1.333f;
+
+            // Largura da coluna FOTO (coluna 1) em pixels
             float cellWidthPixels = (float)(ws.Column(1).Width > 0 ? ws.Column(1).Width : 10) * 7.5f;
 
-            float availableWidth = cellWidthPixels - 6; // 3px padding on left/right
-            float availableHeight = cellHeightPixels - 6; // 3px padding on top/bottom
-
-            float scale = Math.Min(availableWidth / imgWidth, availableHeight / imgHeight);
-            
-            int newWidth = (int)(imgWidth * scale);
+            // Contain fit: preenche a célula toda sem cortar, sem padding
+            float scale = Math.Min(cellWidthPixels / imgWidth, cellHeightPixels / imgHeight);
+            int newWidth  = (int)(imgWidth  * scale);
             int newHeight = (int)(imgHeight * scale);
 
-            int leftOffset = (int)((cellWidthPixels - newWidth) / 2);
-            int topOffset = (int)((cellHeightPixels - newHeight) / 2);
-
-            if (leftOffset < 0) leftOffset = 0;
-            if (topOffset < 0) topOffset = 0;
+            // Centralizar
+            int leftOffset = Math.Max(0, (int)((cellWidthPixels  - newWidth)  / 2));
+            int topOffset  = Math.Max(0, (int)((cellHeightPixels - newHeight) / 2));
 
             var pic = ws.Drawings.AddPicture(pictureName, ms);
             pic.SetPosition(startRow - 1, topOffset, 0, leftOffset);
