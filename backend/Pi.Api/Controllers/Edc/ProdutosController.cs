@@ -22,6 +22,19 @@ public class ProdutosController : ControllerBase
             .OrderBy(p => p.Referencia)
             .ToListAsync();
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ProdutoEdc>> GetProduto(int id)
+    {
+        var produto = await _context.ProdutosEdc
+            .Include(p => p.Ncm)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        if (produto == null)
+        {
+            return NotFound();
+        }
+        return produto;
+    }
+
     [HttpPost]
     public async Task<ActionResult<ProdutoEdc>> PostProduto(ProdutoEdc produto)
     {
@@ -40,7 +53,7 @@ public class ProdutosController : ControllerBase
         _context.ModelosEdc.Add(modeloPadrao);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetProdutos), new { id = produto.Id }, produto);
+        return CreatedAtAction(nameof(GetProduto), new { id = produto.Id }, produto);
     }
 
     [HttpPut("{id}")]

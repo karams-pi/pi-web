@@ -18,12 +18,23 @@ public class NcmsController : ControllerBase
     public async Task<ActionResult<IEnumerable<Ncm>>> GetNcms() 
         => await _context.Ncms.Where(n => n.FlAtivo).OrderBy(n => n.Codigo).ToListAsync();
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Ncm>> GetNcm(int id)
+    {
+        var ncm = await _context.Ncms.FindAsync(id);
+        if (ncm == null)
+        {
+            return NotFound();
+        }
+        return ncm;
+    }
+
     [HttpPost]
     public async Task<ActionResult<Ncm>> PostNcm(Ncm ncm)
     {
         _context.Ncms.Add(ncm);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetNcms), new { id = ncm.Id }, ncm);
+        return CreatedAtAction(nameof(GetNcm), new { id = ncm.Id }, ncm);
     }
 
     [HttpPut("{id}")]

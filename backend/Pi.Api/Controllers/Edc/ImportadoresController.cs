@@ -18,11 +18,67 @@ public class ImportadoresController : ControllerBase
     public async Task<ActionResult<IEnumerable<Importador>>> GetImportadores() 
         => await _context.Importadores.Where(i => i.FlAtivo).OrderBy(i => i.RazaoSocial).ToListAsync();
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Importador>> GetImportador(int id)
+    {
+        var importador = await _context.Importadores.FindAsync(id);
+        if (importador == null)
+        {
+            return NotFound();
+        }
+        return importador;
+    }
+
     [HttpPost]
     public async Task<ActionResult<Importador>> PostImportador(Importador importador)
     {
         _context.Importadores.Add(importador);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetImportadores), new { id = importador.Id }, importador);
+        return CreatedAtAction(nameof(GetImportador), new { id = importador.Id }, importador);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutImportador(int id, Importador importador)
+    {
+        if (id != importador.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(importador).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Importadores.Any(i => i.Id == id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteImportador(int id)
+    {
+        var importador = await _context.Importadores.FindAsync(id);
+        if (importador == null)
+        {
+            return NotFound();
+        }
+
+        // Soft delete
+        importador.FlAtivo = false;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }

@@ -247,7 +247,10 @@ const ProdutosEdcPage: React.FC = () => {
                 <tr><td colSpan={7} style={{ textAlign: 'center' }}>Sincronizando catálogo...</td></tr>
               ) : produtos.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign: 'center' }}>Nenhum produto cadastrado.</td></tr>
-              ) : produtos.filter(p => p.referencia.toLowerCase().includes(searchTerm.toLowerCase())).map(p => (
+              ) : produtos.filter(p => 
+                  p.referencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  p.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map(p => (
                 <tr key={p.id}>
                   <td><strong style={{ color: '#fff' }}>{p.referencia}</strong></td>
                   <td style={{ maxWidth: '350px' }}>{p.descricao}</td>

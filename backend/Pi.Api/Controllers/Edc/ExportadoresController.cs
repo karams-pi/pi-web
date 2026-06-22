@@ -18,12 +18,23 @@ public class ExportadoresController : ControllerBase
     public async Task<ActionResult<IEnumerable<Exportador>>> GetExportadores() 
         => await _context.Exportadores.Where(e => e.FlAtivo).OrderBy(e => e.Nome).ToListAsync();
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Exportador>> GetExportador(int id)
+    {
+        var exportador = await _context.Exportadores.FindAsync(id);
+        if (exportador == null)
+        {
+            return NotFound();
+        }
+        return exportador;
+    }
+
     [HttpPost]
     public async Task<ActionResult<Exportador>> PostExportador(Exportador exportador)
     {
         _context.Exportadores.Add(exportador);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetExportadores), new { id = exportador.Id }, exportador);
+        return CreatedAtAction(nameof(GetExportador), new { id = exportador.Id }, exportador);
     }
 
     [HttpPut("{id}")]

@@ -137,7 +137,10 @@ const ExportadoresPage: React.FC = () => {
                 <tr><td colSpan={6} style={{ textAlign: 'center' }}>Carregando dados globais...</td></tr>
               ) : exportadores.length === 0 ? (
                 <tr><td colSpan={6} style={{ textAlign: 'center' }}>Nenhum fornecedor cadastrado.</td></tr>
-              ) : exportadores.filter(e => e.nome.toLowerCase().includes(searchTerm.toLowerCase())).map(e => (
+              ) : exportadores.filter(e => 
+                  e.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  e.pais.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map(e => (
                 <tr key={e.id}>
                   <td><strong style={{ color: '#fff' }}>{e.nome}</strong></td>
                   <td>

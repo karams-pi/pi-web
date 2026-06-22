@@ -111,7 +111,11 @@ const EstudosEdcPage: React.FC = () => {
                     <p>Nenhuma simulação encontrada. Comece criando um novo estudo.</p>
                   </div>
                 </td></tr>
-              ) : estudos.filter(e => e.numeroReferencia.toLowerCase().includes(searchTerm.toLowerCase())).map(e => (
+              ) : estudos.filter(e => 
+                  e.numeroReferencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  (e.importador?.razaoSocial || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  (e.exportador?.nome || '').toLowerCase().includes(searchTerm.toLowerCase())
+                ).map(e => (
                 <tr key={e.id}>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>

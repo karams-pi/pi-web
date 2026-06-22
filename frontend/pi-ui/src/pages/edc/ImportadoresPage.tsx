@@ -19,6 +19,7 @@ const ImportadoresPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [formData, setFormData] = useState({
+    id: undefined as number | undefined,
     razaoSocial: '',
     cnpj: '',
     inscricaoEstadual: '',
@@ -26,6 +27,7 @@ const ImportadoresPage: React.FC = () => {
     regimeTributario: 'Lucro Real',
     aliquotaIcmsPadrao: 0.19
   });
+  const [editingImportador, setEditingImportador] = useState<Importador | null>(null);
 
   useEffect(() => { fetchImportadores(); }, []);
 
@@ -38,16 +40,73 @@ const ImportadoresPage: React.FC = () => {
     finally { setLoading(false); }
   };
 
+  const handleNewImportador = () => {
+    setFormData({
+      id: undefined,
+      razaoSocial: '',
+      cnpj: '',
+      inscricaoEstadual: '',
+      uf: 'PR',
+      regimeTributario: 'Lucro Real',
+      aliquotaIcmsPadrao: 0.19
+    });
+    setEditingImportador(null);
+    setShowModal(true);
+  };
+
+  const handleEditImportador = (i: Importador) => {
+    setFormData({
+      id: i.id,
+      razaoSocial: i.razaoSocial,
+      cnpj: i.cnpj,
+      inscricaoEstadual: i.inscricaoEstadual || '',
+      uf: i.uf,
+      regimeTributario: i.regimeTributario,
+      aliquotaIcmsPadrao: i.aliquotaIcmsPadrao
+    });
+    setEditingImportador(i);
+    setShowModal(true);
+  };
+
+  const handleDeleteImportador = async (id: number) => {
+    if (window.confirm('Deseja realmente inativar este importador?')) {
+      try {
+        const response = await fetch(`/api/edc/importadores/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          fetchImportadores();
+        } else {
+          alert('Erro ao inativar importador.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao inativar importador.');
+      }
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/edc/importadores', {
-        method: 'POST',
+      const isEdit = formData.id !== undefined;
+      const url = isEdit ? `/api/edc/importadores/${formData.id}` : '/api/edc/importadores';
+      const method = isEdit ? 'PUT' : 'POST';
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      if (response.ok) { fetchImportadores(); setShowModal(false); }
-    } catch (error) { console.error(error); }
+      if (response.ok) { 
+        fetchImportadores(); 
+        setShowModal(false); 
+      } else {
+        alert('Erro ao salvar importador.');
+      }
+    } catch (error) { 
+      console.error(error); 
+      alert('Erro ao salvar importador.');
+    }
   };
 
   return (
@@ -61,7 +120,7 @@ const ImportadoresPage: React.FC = () => {
           <p className="page-description">Cadastre e gerencie as empresas brasileiras responsáveis pela nacionalização.</p>
         </div>
         <div className="page-header-line"></div>
-        <button className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={() => setShowModal(true)}>
+        <button className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={handleNewImportador}>
           <Plus size={18} />
           <span>Novo Cliente</span>
         </button>
@@ -93,7 +152,10 @@ const ImportadoresPage: React.FC = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan={6} style={{ textAlign: 'center' }}>Carregando importadores...</td></tr>
-              ) : importadores.filter(i => i.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase())).map(i => (
+              ) : importadores.filter(i => 
+                  i.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  i.cnpj.includes(searchTerm)
+                ).map(i => (
                 <tr key={i.id}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -109,8 +171,8 @@ const ImportadoresPage: React.FC = () => {
                   <td><span className="badge badge-success">{(i.aliquotaIcmsPadrao * 100).toFixed(0)}%</span></td>
                   <td style={{ textAlign: 'right' }}>
                     <div className="action-buttons" style={{ justifyContent: 'flex-end' }}>
-                      <button className="btn-icon"><Edit2 size={16} /></button>
-                      <button className="btn-icon btn-icon-danger"><Trash2 size={16} /></button>
+                      <button className="btn-icon" onClick={() => handleEditImportador(i)} title="Editar Importador"><Edit2 size={16} /></button>
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDeleteImportador(i.id)} title="Inativar Importador"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -124,7 +186,7 @@ const ImportadoresPage: React.FC = () => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '600px' }}>
             <div className="modal-header">
-              <h3>Novo Importador</h3>
+              <h3>{formData.id ? 'Editar Importador' : 'Novo Importador'}</h3>
               <button className="btn-icon" onClick={() => setShowModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body">
