@@ -200,7 +200,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
         </div>
         <div className="page-header-line" style={{ background: 'linear-gradient(90deg, #10b981, transparent)' }}></div>
         <div className="action-buttons" style={{ marginLeft: 'auto' }}>
-          <button className="btn btn-secondary" onClick={() => window.open(`/print-edc/${id}`, '_blank')}><Printer size={18} /><span>Imprimir</span></button>
+          <button className="btn btn-secondary" onClick={() => window.open(`/#/print-edc/${id}`, '_blank')}><Printer size={18} /><span>Imprimir</span></button>
           <button className="btn btn-primary" onClick={() => { window.location.href = `/api/edc/simulacoes/${id}/excel`; }}><Download size={18} /><span>Exportar EDC</span></button>
         </div>
       </div>
@@ -375,6 +375,61 @@ const DetalheEstudoEdcPage: React.FC = () => {
               <p style={{ fontSize: '0.9rem', color: 'var(--muted)', margin: '0' }}>
                 Este estudo foi gerado com base nas alíquotas vigentes na data de hoje ({new Date().toLocaleDateString()}) para o estado de {estudo.importador?.uf || 'PR'}.
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Seção Informativa: Fórmulas de Cálculo */}
+      <div className="card" style={{ marginTop: '2rem', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          <div className="page-header-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', flexShrink: 0 }}>
+            <Calculator size={20} />
+          </div>
+          <div style={{ flexGrow: 1 }}>
+            <h4 style={{ margin: '0 0 12px 0', color: '#fff', fontSize: '1.1rem' }}>Como são calculados os valores?</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', fontSize: '0.85rem', color: 'var(--muted)', lineHeight: '1.6' }}>
+              <div>
+                <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Base Aduaneira e Rateio:</strong>
+                O valor de <strong>Frete c/ PTAX</strong> e <strong>Seguro</strong> é rateado proporcionalmente ao valor FOB de cada item do estudo.
+                <div style={{ marginTop: '12px' }}>
+                  <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Imposto de Importação (II):</strong>
+                  <code>Valor II = Base Aduaneira × Alíquota II</code>
+                </div>
+                <div style={{ marginTop: '12px' }}>
+                  <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>IPI (Imposto sobre Produto Industrializado):</strong>
+                  <code>Valor IPI = (Base Aduaneira + II) × Alíquota IPI</code>
+                </div>
+              </div>
+              <div>
+                <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>PIS & COFINS:</strong>
+                {estudo.metodoCalculoFederais === 'SimplificadoExcel' ? (
+                  <span>
+                    <strong>Método Simplificado (Excel) ativo:</strong><br/>
+                    <code>Base PIS/COF = (Base Aduaneira + II) × Alíquota</code>
+                  </span>
+                ) : (
+                  <span>
+                    <strong>Método Legal (Cascata Real) ativo:</strong><br/>
+                    <code>Base PIS/COF = Base Aduaneira × Alíquota</code>
+                  </span>
+                )}
+                <div style={{ marginTop: '12px' }}>
+                  <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>ICMS (Cálculo por Dentro):</strong>
+                  {estudo.metodoCalculoIcms === 'SimplificadoExcel' ? (
+                    <span>
+                      <strong>Método Simplificado (Excel) ativo:</strong><br/>
+                      <code>Valor ICMS = Base Aduaneira × Alíquota ICMS</code>
+                    </span>
+                  ) : (
+                    <span>
+                      <strong>Método Legal (Cálculo por Dentro) ativo:</strong><br/>
+                      <code>Base ICMS = (Base Aduaneira + II + IPI + PIS + COFINS + Taxas Port.) ÷ (1 - Alíquota ICMS)</code><br/>
+                      <code>Valor ICMS = Base ICMS × Alíquota ICMS</code>
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

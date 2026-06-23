@@ -316,6 +316,124 @@ const NovoEstudoEdcPage: React.FC = () => {
               </table>
             </div>
           </div>
+
+          {/* Seção 3: Taxas e Despesas Aduaneiras */}
+          <div className="card">
+            <div className="card-header">
+              <h3 className="card-title">3. Taxas e Despesas Aduaneiras do Estudo</h3>
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    despesas: [
+                      ...prev.despesas,
+                      { nomeDespesa: '', valor: 0, moeda: 'BRL', metodoRateio: 'Valor FOB' }
+                    ]
+                  }));
+                }}
+              >
+                <Plus size={16} /> Adicionar Taxa
+              </button>
+            </div>
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Descrição da Despesa</th>
+                    <th style={{ width: '150px' }}>Moeda</th>
+                    <th style={{ width: '180px' }}>Valor</th>
+                    <th style={{ width: '220px' }}>Método de Rateio</th>
+                    <th style={{ width: '50px' }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.despesas.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: 'center', opacity: 0.5, padding: '20px' }}>
+                        Nenhuma taxa aduaneira cadastrada. Clique em "Adicionar Taxa" para configurar.
+                      </td>
+                    </tr>
+                  ) : (
+                    formData.despesas.map((despesa, idx) => (
+                      <tr key={idx}>
+                        <td>
+                          <input 
+                            type="text" 
+                            className="premium-input"
+                            value={despesa.nomeDespesa || ''} 
+                            required
+                            placeholder="Ex: TAXA SISCOMEX, T.H.C., AFRMM, etc."
+                            onChange={e => {
+                              const newDespesas = [...formData.despesas];
+                              newDespesas[idx].nomeDespesa = e.target.value;
+                              setFormData(prev => ({ ...prev, despesas: newDespesas }));
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <select 
+                            className="premium-select"
+                            value={despesa.moeda || 'BRL'} 
+                            onChange={e => {
+                              const newDespesas = [...formData.despesas];
+                              newDespesas[idx].moeda = e.target.value;
+                              setFormData(prev => ({ ...prev, despesas: newDespesas }));
+                            }}
+                          >
+                            <option value="BRL">BRL (R$)</option>
+                            <option value="USD">USD ($)</option>
+                          </select>
+                        </td>
+                        <td>
+                          <input 
+                            type="number" 
+                            step="0.01" 
+                            value={despesa.valor} 
+                            onChange={e => {
+                              const newDespesas = [...formData.despesas];
+                              newDespesas[idx].valor = parseFloat(e.target.value) || 0;
+                              setFormData(prev => ({ ...prev, despesas: newDespesas }));
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <select 
+                            className="premium-select"
+                            value={despesa.metodoRateio || 'Valor FOB'} 
+                            onChange={e => {
+                              const newDespesas = [...formData.despesas];
+                              newDespesas[idx].metodoRateio = e.target.value;
+                              setFormData(prev => ({ ...prev, despesas: newDespesas }));
+                            }}
+                          >
+                            <option value="Valor FOB">Valor FOB (Proporcional)</option>
+                            <option value="Quantidade">Quantidade</option>
+                            <option value="Peso">Peso</option>
+                            <option value="Volume">Volume / Cubagem</option>
+                          </select>
+                        </td>
+                        <td>
+                          <button 
+                            type="button" 
+                            className="btn-icon btn-icon-danger" 
+                            onClick={() => {
+                              const newDespesas = [...formData.despesas];
+                              newDespesas.splice(idx, 1);
+                              setFormData(prev => ({ ...prev, despesas: newDespesas }));
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar Fixa de Resumo e Ações */}
