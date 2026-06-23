@@ -124,10 +124,45 @@ const NovoEstudoEdcPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    // Validações básicas obrigatórias
+    if (!formData.idImportador || formData.idImportador === 0) {
+      alert('Por favor, selecione o Importador (Cliente).');
+      return;
+    }
+    if (!formData.idExportador || formData.idExportador === 0) {
+      alert('Por favor, selecione o Exportador (Fornecedor).');
+      return;
+    }
+    if (formData.itens.length === 0) {
+      alert('Adicione pelo menos um produto ao estudo.');
+      return;
+    }
+    for (let i = 0; i < formData.itens.length; i++) {
+      const item = formData.itens[i];
+      if (!item.idProduto || item.idProduto === 0) {
+        alert(`O item na linha ${i + 1} não possui um modelo/produto selecionado.`);
+        return;
+      }
+    }
+
     try {
+      // Sanitização de IDs nulos (converter 0 para null para chaves estrangeiras opcionais)
+      const sanitizedItens = formData.itens.map(item => ({
+        ...item,
+        idModelo: item.idModelo === 0 ? null : item.idModelo
+      }));
+
+      const sanitizedPayload = {
+        ...formData,
+        idPortoOrigem: formData.idPortoOrigem === 0 ? null : formData.idPortoOrigem,
+        idPortoDestino: formData.idPortoDestino === 0 ? null : formData.idPortoDestino,
+        itens: sanitizedItens
+      };
+
       const url = id ? `/api/edc/simulacoes/${id}` : '/api/edc/simulacoes';
       const method = id ? 'PUT' : 'POST';
-      const payload = id ? { ...formData, id: parseInt(id) } : formData;
+      const payload = id ? { ...sanitizedPayload, id: parseInt(id) } : sanitizedPayload;
+
       const response = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
@@ -136,11 +171,13 @@ const NovoEstudoEdcPage: React.FC = () => {
       if (response.ok) {
         navigate('/edc/estudos');
       } else {
-        alert('Erro ao salvar simulação.');
+        const errorText = await response.text();
+        console.error('Erro retornado pelo servidor:', errorText);
+        alert(`Erro ao salvar simulação: ${errorText || 'Erro interno do servidor.'}`);
       }
     } catch (error) { 
       console.error(error); 
-      alert('Erro ao salvar simulação.');
+      alert('Erro de conexão ao salvar simulação.');
     }
   };
 
