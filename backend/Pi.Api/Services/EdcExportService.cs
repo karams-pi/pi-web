@@ -627,7 +627,7 @@ public class EdcExportService
                 ws.Cells[r, 41].Formula = $"=SUM(Y{r}:AN{r})"; // TOTAL TAXAS DESEMBARAÇO
                 ws.Cells[r, 42].Formula = $"=AO{r}+W{r}+P{r}"; // TOTAL BRL
                 ws.Cells[r, 43].Formula = $"=AO{r}+X{r}+P{r}"; // TOTAL sub BRL
-                ws.Cells[r, 44].Formula = $"=AP{r}"; // Total duplicate
+                ws.Cells[r, 44].Formula = $"=AQ{r}"; // Total duplicate (pointing to AQ: TOTAL sub BRL)
 
                 ws.Cells[r, 45].Formula = $"=(AP{r}/H{r})"; // MÉTODO ANTIGO (Custo unitário BRL)
                 ws.Cells[r, 46].Formula = $"=AR{r}/H{r}"; // MÉTODO ANTIGO (sub)

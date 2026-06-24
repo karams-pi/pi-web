@@ -187,6 +187,27 @@ const DetalheEstudoEdcPage: React.FC = () => {
   const totalIcms = itensCalculados.reduce((acc: number, i: any) => acc + i.icms, 0);
   const totalNacionalizado = itensCalculados.reduce((acc: number, i: any) => acc + i.totalNacItem, 0) + comissaoValBrl;
 
+  const handleExportExcel = async () => {
+    try {
+      const apiBase = (import.meta.env.VITE_API_BASE ?? "http://localhost:5000").replace(/\/+$/, "");
+      const response = await fetch(`${apiBase}/api/edc/simulacoes/${id}/excel`);
+      if (!response.ok) {
+        throw new Error("Erro ao exportar Excel");
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `EDC_${estudo?.numeroReferencia || id}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      console.error(error);
+      alert("Falha ao exportar o arquivo Excel.");
+    }
+  };
+
   return (
     <div className="animate-fadeIn">
       <div className="page-header">
@@ -201,7 +222,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
         <div className="page-header-line" style={{ background: 'linear-gradient(90deg, #10b981, transparent)' }}></div>
         <div className="action-buttons" style={{ marginLeft: 'auto' }}>
           <button className="btn btn-secondary" onClick={() => window.open(`/#/print-edc/${id}`, '_blank')}><Printer size={18} /><span>Imprimir</span></button>
-          <button className="btn btn-primary" onClick={() => { window.location.href = `/api/edc/simulacoes/${id}/excel`; }}><Download size={18} /><span>Exportar EDC</span></button>
+          <button className="btn btn-primary" onClick={handleExportExcel}><Download size={18} /><span>Exportar EDC</span></button>
         </div>
       </div>
 
@@ -251,6 +272,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
                 <th>PIS/COF</th>
                 <th>Taxas Port.</th>
                 <th style={{ color: 'var(--primary)' }}>ICMS</th>
+                <th style={{ textAlign: 'right' }}>Unit. Nac.</th>
                 <th style={{ paddingRight: '24px', textAlign: 'right' }}>Total Nac.</th>
               </tr>
             </thead>
@@ -281,6 +303,9 @@ const DetalheEstudoEdcPage: React.FC = () => {
                   <td>R$ {item.pisCofins.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td>R$ {item.taxasPort.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td style={{ color: 'var(--primary)', fontWeight: '600' }}>R$ {item.icms.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td style={{ textAlign: 'right', fontWeight: '600', color: '#fff' }}>
+                    R$ {(item.quantidade > 0 ? item.totalNacItem / item.quantidade : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
                   <td style={{ paddingRight: '24px', textAlign: 'right' }}>
                     <strong style={{ color: '#fff' }}>R$ {item.totalNacItem.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                   </td>
@@ -289,7 +314,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
             </tbody>
             <tfoot style={{ background: 'rgba(79, 158, 255, 0.05)' }}>
                <tr>
-                 <td colSpan={7} style={{ padding: '24px', textAlign: 'right', fontWeight: '700', fontSize: '1.1rem', color: 'var(--muted)' }}>
+                 <td colSpan={8} style={{ padding: '24px', textAlign: 'right', fontWeight: '700', fontSize: '1.1rem', color: 'var(--muted)' }}>
                     VALOR FINAL DA IMPORTAÇÃO:
                  </td>
                  <td style={{ padding: '24px', textAlign: 'right', fontSize: '1.4rem', fontWeight: '800', color: 'var(--primary)' }}>
