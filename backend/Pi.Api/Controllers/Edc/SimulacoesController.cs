@@ -122,7 +122,7 @@ public class SimulacoesController : ControllerBase
 
         // Atualiza campos do cabeçalho
         dbSimulacao.NumeroReferencia = simulacao.NumeroReferencia;
-        dbSimulacao.DataEstudo = simulacao.DataEstudo;
+        // dbSimulacao.DataEstudo = simulacao.DataEstudo; // Mantém a data original do estudo
         dbSimulacao.IdImportador = simulacao.IdImportador;
         dbSimulacao.IdExportador = simulacao.IdExportador;
         dbSimulacao.IdPortoOrigem = simulacao.IdPortoOrigem;

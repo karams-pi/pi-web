@@ -14,7 +14,7 @@ public class SimulacaoEdc
     [MaxLength(50)]
     public string NumeroReferencia { get; set; } = string.Empty;
 
-    public DateTime DataEstudo { get; set; } = DateTime.Now;
+    public DateTime DataEstudo { get; set; } = DateTime.UtcNow;
 
     [Required]
     public int IdImportador { get; set; }
