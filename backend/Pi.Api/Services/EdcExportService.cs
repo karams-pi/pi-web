@@ -91,11 +91,44 @@ public class EdcExportService
         ws.Cells.Style.Font.Size = 10;
         ws.View.ShowGridLines = true;
 
-        // Title
-        ws.Cells["B3"].Value = "Estimativa de Custo 100%";
-        ws.Cells["B3"].Style.Font.Size = 20;
-        ws.Cells["B3"].Style.Font.Bold = true;
-        ws.Cells["B3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
+        // Title and Logo
+        string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "logo-seawise.png");
+        if (!File.Exists(logoPath))
+        {
+            logoPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "logo-seawise.png");
+        }
+
+        if (File.Exists(logoPath))
+        {
+            try
+            {
+                var fileInfo = new FileInfo(logoPath);
+                var picture = ws.Drawings.AddPicture("LogoSeawise", fileInfo);
+                picture.SetPosition(2, 0, 1, 0); // Row 3, Column B (B3)
+                picture.SetSize(110, 45); // Width 110px, Height 45px
+                
+                // Move title to column D to prevent overlap
+                ws.Cells["D3"].Value = "Estimativa de Custo 100%";
+                ws.Cells["D3"].Style.Font.Size = 20;
+                ws.Cells["D3"].Style.Font.Bold = true;
+                ws.Cells["D3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
+            }
+            catch
+            {
+                // Fallback if picture addition fails (e.g. system drawing driver issues)
+                ws.Cells["B3"].Value = "Estimativa de Custo 100%";
+                ws.Cells["B3"].Style.Font.Size = 20;
+                ws.Cells["B3"].Style.Font.Bold = true;
+                ws.Cells["B3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
+            }
+        }
+        else
+        {
+            ws.Cells["B3"].Value = "Estimativa de Custo 100%";
+            ws.Cells["B3"].Style.Font.Size = 20;
+            ws.Cells["B3"].Style.Font.Bold = true;
+            ws.Cells["B3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
+        }
 
         // General Info
         ws.Cells["C8"].Value = $"REGIME TRIBUTÁRIO: {(simulacao.Importador?.RegimeTributario ?? "SIMPLES NACIONAL").ToUpper()}";
@@ -103,11 +136,15 @@ public class EdcExportService
         ws.Cells["E8"].Value = "USO: REVENDA";
         ws.Cells["E8"].Style.Font.Bold = true;
         
-        decimal icmsPadrao = simulacao.Importador?.AliquotaIcmsPadrao ?? 0.19m;
+        decimal icmsPadrao = 0.18m;
         var firstNcm = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm;
-        if (firstNcm != null)
+        if (firstNcm != null && firstNcm.AliquotaIcmsPadrao > 0m)
         {
             icmsPadrao = firstNcm.AliquotaIcmsPadrao;
+        }
+        else if (simulacao.Importador?.AliquotaIcmsPadrao > 0m)
+        {
+            icmsPadrao = simulacao.Importador.AliquotaIcmsPadrao;
         }
         ws.Cells["G8"].Value = $"CONSIDERAR ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
@@ -173,7 +210,8 @@ public class EdcExportService
         // Row 15: Products Sum
         ws.Cells["B15"].Value = "PRODUTO";
         ws.Cells["D15"].Formula = "='LISTA DE COMPRAS'!J4"; // Total quantity
-        ws.Cells["E15"].Value = "-";
+        ws.Cells["E15"].Formula = "=IF(D15>0,F15/D15,0)"; // Unit price
+        ws.Cells["E15"].Style.Numberformat.Format = "$ #,##0.00";
         ws.Cells["F15"].Formula = "='LISTA DE COMPRAS'!M4"; // Total FOB USD
         ws.Cells["G15"].Formula = "=F15*D12";
         ws.Cells["D15:G15"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -181,6 +219,10 @@ public class EdcExportService
         // Row 16: Total FOB
         ws.Cells["B16"].Value = "TOTAL FOB";
         ws.Cells["B16"].Style.Font.Bold = true;
+        ws.Cells["E16"].Formula = "=IF(D15>0,F16/D15,0)"; // Unit price
+        ws.Cells["E16"].Style.Font.Bold = true;
+        ws.Cells["E16"].Style.Numberformat.Format = "$ #,##0.00";
+        ws.Cells["E16"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         ws.Cells["F16"].Formula = "=SUM(F15:F15)";
         ws.Cells["F16"].Style.Font.Bold = true;
         ws.Cells["F16"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -440,7 +482,16 @@ public class EdcExportService
                 ws.Cells[r, 6].Value = item.Produto?.Ncm?.AliquotaIPI ?? 0m;
                 ws.Cells[r, 7].Value = item.Produto?.Ncm?.AliquotaPis ?? 0m;
                 ws.Cells[r, 8].Value = item.Produto?.Ncm?.AliquotaCofins ?? 0m;
-                ws.Cells[r, 9].Value = item.Produto?.Ncm?.AliquotaIcmsPadrao ?? 0m;
+                decimal itemIcms = item.Produto?.Ncm?.AliquotaIcmsPadrao ?? 0m;
+                if (itemIcms <= 0m)
+                {
+                    itemIcms = simulacao.Importador?.AliquotaIcmsPadrao ?? 0m;
+                }
+                if (itemIcms <= 0m)
+                {
+                    itemIcms = 0.18m;
+                }
+                ws.Cells[r, 9].Value = itemIcms;
                 ws.Cells[r, 10].Value = item.Quantidade;
                 ws.Cells[r, 11].Value = item.ValorFobUnitario;
 
@@ -555,7 +606,12 @@ public class EdcExportService
         ws.Cells["S5"].Value = ncm?.AliquotaIPI ?? 0.0306m;
         ws.Cells["T5"].Value = ncm?.AliquotaPis ?? 0.0312m;
         ws.Cells["U5"].Value = ncm?.AliquotaCofins ?? 0.1437m;
-        ws.Cells["V5"].Value = simulacao.Importador?.AliquotaIcmsPadrao ?? 0.19m;
+        decimal defaultIcms = 0.18m;
+        if (simulacao.Importador?.AliquotaIcmsPadrao > 0m)
+        {
+            defaultIcms = simulacao.Importador.AliquotaIcmsPadrao;
+        }
+        ws.Cells["V5"].Value = defaultIcms;
         ws.Cells["R5:V5"].Style.Numberformat.Format = "0.00%";
         ws.Cells["R5:V5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         ws.Cells["R5:V5"].Style.Fill.PatternType = ExcelFillStyle.Solid;

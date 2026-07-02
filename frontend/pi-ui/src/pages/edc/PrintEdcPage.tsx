@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, FileText } from "lucide-react";
 
 export default function PrintEdcPage() {
   const { id } = useParams();
@@ -31,6 +31,25 @@ export default function PrintEdcPage() {
     load();
   }, [id]);
 
+  useEffect(() => {
+    if (!loading && estudo) {
+      const query = new URLSearchParams(window.location.search);
+      if (query.get("color") === "true") {
+        document.body.classList.add("print-keep-colors");
+        
+        const handleAfterPrint = () => {
+          document.body.classList.remove("print-keep-colors");
+          window.removeEventListener("afterprint", handleAfterPrint);
+        };
+        window.addEventListener("afterprint", handleAfterPrint);
+        
+        setTimeout(() => {
+          window.print();
+        }, 500);
+      }
+    }
+  }, [loading, estudo]);
+
   if (loading) return <div style={{ padding: 40, fontFamily: "Segoe UI, sans-serif" }}>Calculando impostos e taxas para impressão...</div>;
   if (!estudo) return <div style={{ padding: 40, fontFamily: "Segoe UI, sans-serif" }}>Estudo não localizado.</div>;
 
@@ -44,11 +63,13 @@ export default function PrintEdcPage() {
     const isAfrmm = d.nomeDespesa.toUpperCase() === "AFRMM";
     let valorBrl = 0;
     let detalheTipo = "Fixo";
+    let valorOriginal = d.valor;
 
     if (isAfrmm) {
       const percentual = d.valor > 1 ? d.valor : d.valor * 100;
-      detalheTipo = `${percentual.toFixed(0)}%`;
+      detalheTipo = `${percentual.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`;
       valorBrl = freteBrl * (percentual / 100);
+      valorOriginal = valorBrl;
     } else {
       valorBrl = d.moeda === "USD" ? d.valor * estudo.cotacaoDolar : d.valor;
     }
@@ -56,7 +77,7 @@ export default function PrintEdcPage() {
     return {
       nomeDespesa: d.nomeDespesa,
       moeda: d.moeda,
-      valorOriginal: d.valor,
+      valorOriginal,
       detalheTipo,
       valorBrl,
       isAfrmm
@@ -78,7 +99,7 @@ export default function PrintEdcPage() {
   const despesasFinalParaResumo = [...despesasDetalhadas];
   if (estudo.flExibirComissao && estudo.comissaoPercentual > 0) {
     despesasFinalParaResumo.push({
-      nomeDespesa: `COMISSÃO COMERCIAL (${estudo.comissaoPercentual.toFixed(2)}%)`,
+      nomeDespesa: `COMISSÃO COMERCIAL (${estudo.comissaoPercentual.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%)`,
       moeda: "USD",
       valorOriginal: totalFobUSD * (estudo.comissaoPercentual / 100),
       detalheTipo: "Percentual",
@@ -116,7 +137,13 @@ export default function PrintEdcPage() {
     const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0;
     const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
     const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
-    const aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao || 0;
+    let aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao;
+    if (!aliqIcms || aliqIcms <= 0) {
+      aliqIcms = estudo.importador?.aliquotaIcmsPadrao;
+    }
+    if (!aliqIcms || aliqIcms <= 0) {
+      aliqIcms = 0.18;
+    }
 
     const ii = baseCalculoAduaneiro * aliqII;
     const ipi = (baseCalculoAduaneiro + ii) * aliqIPI;
@@ -128,18 +155,14 @@ export default function PrintEdcPage() {
       pisCofins = baseCalculoAduaneiro * (aliqPis + aliqCof);
     }
 
-    // Rateio despesas portuárias
+    // Rateio despesas portuárias (incluindo comissão)
     let taxasPort = 0;
-    if (estudo.despesas) {
-      estudo.despesas.forEach((d: any) => {
-        const isAfrmm = d.nomeDespesa.toUpperCase() === "AFRMM";
-        let valorDespesaBrl = 0;
-        if (isAfrmm) {
-          const percentual = d.valor > 1 ? d.valor : d.valor * 100;
-          valorDespesaBrl = freteBrl * (percentual / 100);
-        } else {
-          valorDespesaBrl = d.moeda === "USD" ? d.valor * estudo.cotacaoDolar : d.valor;
-        }
+    if (despesasFinalParaResumo) {
+      despesasFinalParaResumo.forEach((d: any) => {
+        // Ignorar frete internacional pois ele já entra na base aduaneira
+        if (d.nomeDespesa.toUpperCase() === "FRETE") return;
+
+        const valorDespesaBrl = d.valorBrl;
 
         let fatorDespesa = 0;
         if (d.metodoRateio === "Quantidade") {
@@ -190,16 +213,32 @@ export default function PrintEdcPage() {
   const totalIcms = itensCalculados.reduce((acc: number, i: any) => acc + i.icms, 0);
   const totalTributos = totalII + totalIPI + totalPisCofins + totalIcms;
   
-  const totalGeralNacionalizado = totalFobBrl + freteBrl + seguroBrl + totalTributos + totalDespesasPortuariasSemFreteBrl + comissaoValBrl;
+  const totalGeralNacionalizado = totalFobBrl + freteBrl + seguroBrl + totalTributos + totalDespesasPortuariasSemFreteBrl;
 
   // Formatação
   const fmtBrl = (val: number) => "R$ " + (val || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtUsd = (val: number) => "$ " + (val || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtPct = (val: number) => (val * 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+  const fmtPct = (val: number) => ((val || 0) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + "%";
 
   const ncmPadrao = estudo.itens && estudo.itens[0]?.produto?.ncm?.codigo ? estudo.itens[0].produto.ncm.codigo : "87088000";
   const descNcm = estudo.itens && estudo.itens[0]?.produto?.descricao ? estudo.itens[0].produto.descricao : "AMORTECEDORES";
-  const icmsPadrao = estudo.itens && estudo.itens[0]?.produto?.ncm?.aliquotaIcmsPadrao ? estudo.itens[0].produto.ncm.aliquotaIcmsPadrao : 0.18;
+  let icmsPadrao = estudo.itens && estudo.itens[0]?.produto?.ncm?.aliquotaIcmsPadrao;
+  if (!icmsPadrao || icmsPadrao <= 0) {
+    icmsPadrao = estudo.importador?.aliquotaIcmsPadrao;
+  }
+  if (!icmsPadrao || icmsPadrao <= 0) {
+    icmsPadrao = 0.18;
+  }
+
+  const handlePrintColors = () => {
+    document.body.classList.add("print-keep-colors");
+    const handleAfterPrint = () => {
+      document.body.classList.remove("print-keep-colors");
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+    window.addEventListener("afterprint", handleAfterPrint);
+    window.print();
+  };
 
   return (
     <div className="print-edc-wrapper">
@@ -305,18 +344,19 @@ export default function PrintEdcPage() {
             margin: 1.2cm;
             size: portrait;
           }
-          body, html {
+          /* Normal Print (Light mode for saving ink) */
+          body:not(.print-keep-colors), html:not(.print-keep-colors) {
             background: #fff !important;
             color: #000 !important;
           }
-          .print-edc-wrapper {
+          body:not(.print-keep-colors) .print-edc-wrapper {
             background: #fff !important;
             color: #000 !important;
             padding: 0 !important;
             min-height: 0 !important;
             display: block !important;
           }
-          .print-page-container {
+          body:not(.print-keep-colors) .print-page-container {
             box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
@@ -324,37 +364,99 @@ export default function PrintEdcPage() {
             max-width: 100% !important;
             width: 100% !important;
           }
-          .no-print {
-            display: none !important;
-          }
-          .sheet-header-box {
+          body:not(.print-keep-colors) .sheet-header-box {
             border: 1px solid #000 !important;
             background: #f1f5f9 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          .section-title {
+          body:not(.print-keep-colors) .section-title {
             color: #0f172a !important;
             border-bottom: 2px solid #000 !important;
             font-weight: bold;
           }
-          .custom-table th {
+          body:not(.print-keep-colors) .custom-table th {
             background: #f1f5f9 !important;
             color: #0f172a !important;
             border: 1px solid #000 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          .custom-table td {
+          body:not(.print-keep-colors) .custom-table td {
             border: 1px solid #000 !important;
             color: #000 !important;
           }
-          .total-highlight {
+          body:not(.print-keep-colors) .total-highlight {
             background: #fef08a !important;
             color: #000 !important;
             font-weight: bold;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+          }
+
+          /* Color PDF Print (Exact Screen Styling) */
+          body.print-keep-colors, html.print-keep-colors {
+            background: #0f172a !important;
+            color: #f8fafc !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .print-edc-wrapper {
+            background: #0f172a !important;
+            color: #f8fafc !important;
+            padding: 0 !important;
+            min-height: 0 !important;
+            display: block !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .print-page-container {
+            background-color: #1e293b !important;
+            box-shadow: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .sheet-header-box {
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+            color: #f8fafc !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .section-title {
+            color: #38bdf8 !important;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.2) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .custom-table th {
+            background: rgba(255, 255, 255, 0.04) !important;
+            color: #94a3b8 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .custom-table td {
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: #f8fafc !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .total-highlight {
+            background: rgba(245, 158, 11, 0.1) !important;
+            color: #fbbf24 !important;
+            font-weight: 700 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .no-print {
+            display: none !important;
           }
           .page-break-print {
             page-break-before: always;
@@ -414,6 +516,76 @@ export default function PrintEdcPage() {
           gap: 30px;
           margin-top: 20px;
         }
+        .commission-warning-text {
+          font-size: 0.8rem;
+          font-weight: 600;
+          font-style: italic;
+          line-height: 1.4;
+          max-width: 420px;
+          text-align: justify;
+          color: #ca8a04 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        @media screen {
+          .commission-warning-text {
+            color: #fbbf24 !important;
+          }
+        }
+        @media print {
+          body.print-keep-colors .commission-warning-text {
+            color: #fbbf24 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
+        .simulation-warning-text {
+          font-size: 0.72rem;
+          font-weight: 500;
+          font-style: italic;
+          line-height: 1.4;
+          max-width: 420px;
+          text-align: justify;
+          color: #ca8a04 !important;
+          margin-bottom: 8px;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        @media screen {
+          .simulation-warning-text {
+            color: #fbbf24 !important;
+          }
+        }
+        @media print {
+          body.print-keep-colors .simulation-warning-text {
+            color: #fbbf24 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
+        .grand-total-card {
+          width: 100%;
+          max-width: 460px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 10px;
+          padding: 8px 12px;
+          overflow: hidden;
+        }
+        @media print {
+          .grand-total-card {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          body.print-keep-colors .grand-total-card {
+            background: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
         .subtotal-table {
           width: 100%;
           border-collapse: collapse;
@@ -436,43 +608,49 @@ export default function PrintEdcPage() {
           <ArrowLeft size={18} />
           <span>Voltar para Detalhes</span>
         </button>
-        <button className="btn-action btn-print" onClick={() => window.print()}>
-          <Printer size={18} />
-          <span>Imprimir Relatório</span>
-        </button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button className="btn-action btn-print" onClick={handlePrintColors} style={{ backgroundColor: "#7c3aed" }}>
+            <FileText size={18} />
+            <span>Exportar PDF Colorido</span>
+          </button>
+          <button className="btn-action btn-print" onClick={() => window.print()}>
+            <Printer size={18} />
+            <span>Imprimir Relatório</span>
+          </button>
+        </div>
       </div>
 
       <div className="print-page-container">
         {/* ================= PAGE 1: ESTIMATIVA DE CUSTOS GERAL ================= */}
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <h1 style={{ margin: "0 0 5px 0", fontSize: "1.8rem", fontWeight: "800" }}>Estimativa de Custo 100%</h1>
-          <p style={{ margin: 0, fontSize: "0.9rem", color: "#94a3b8" }} className="no-print">
-            Estudo de Nacionalização e Tributos Aduaneiros - Referência {estudo.numeroReferencia}
-          </p>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "30px", gap: "20px" }}>
+          <div style={{ flexShrink: 0 }}>
+            <img src="/logo-seawise.png" alt="SEAWISE" style={{ height: "55px", objectFit: "contain" }} />
+          </div>
+          <div style={{ flexGrow: 1, textAlign: "center", marginRight: "75px" }}>
+            <h1 style={{ margin: "0 0 5px 0", fontSize: "1.8rem", fontWeight: "800" }}>Estimativa de Custo 100%</h1>
+            <p style={{ margin: 0, fontSize: "0.9rem", color: "#94a3b8" }}>
+              Estudo de Nacionalização e Tributos Aduaneiros - Referência {estudo.numeroReferencia}
+            </p>
+          </div>
         </div>
 
         <div className="sheet-header-box">
           <div className="header-grid">
             <div className="header-cell">
-              <div><strong>REGIME TRIBUTÁRIO:</strong> {(estudo.importador?.regimeTributario || "SIMPLES NACIONAL").toUpperCase()}</div>
               <div><strong>IMPORTADOR:</strong> {estudo.importador?.razaoSocial} (CNPJ: {estudo.importador?.cnpj})</div>
+              <div><strong>REGIME TRIBUTÁRIO:</strong> {(estudo.importador?.regimeTributario || "SIMPLES NACIONAL").toUpperCase()}</div>
               <div><strong>PRODUTO:</strong> {descNcm.toUpperCase()}</div>
-              <div><strong>TIPO DE FRETE:</strong> {estudo.tipoFrete || "1x40"}</div>
+              <div><strong>INCOTERM:</strong> {estudo.tipoFrete || "1x40"}</div>
+              <div><strong>TAXA DE CÂMBIO UTILIZADA:</strong> {fmtBrl(estudo.cotacaoDolar)}</div>
             </div>
             <div className="header-cell" style={{ paddingLeft: "20px", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
-              <div><strong>CONSIDERAR ICMS:</strong> {fmtPct(icmsPadrao)}</div>
+              <div><strong>ICMS:</strong> {fmtPct(icmsPadrao)}</div>
               <div><strong>PORTO ORIGEM / SAÍDA:</strong> {estudo.portoOrigem?.nome || "SHANGHAI"}</div>
               <div><strong>PORTO DESTINO / ENTRADA:</strong> {estudo.portoDestino?.nome || "PARANAGUÁ"}</div>
-              <div><strong>DATA DO ESTUDO:</strong> {new Date(estudo.dataEstudo).toLocaleDateString("pt-BR")}</div>
+              <div><strong>DATA:</strong> {new Date(estudo.dataEstudo).toLocaleDateString("pt-BR")}</div>
+              <div><strong>NCM:</strong> {ncmPadrao}</div>
             </div>
           </div>
-        </div>
-
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "20px", fontSize: "0.9rem" }}>
-          <span style={{ fontWeight: "bold" }}>REFERÊNCIA CÁLCULO BASE:</span>
-          <span>Dólar (USD): <strong>{fmtBrl(estudo.cotacaoDolar)}</strong></span>
-          <span style={{ margin: "0 10px" }}>|</span>
-          <span>NCM Predominante: <strong>{ncmPadrao}</strong></span>
         </div>
 
         {/* VALORES ADUANEIROS */}
@@ -491,14 +669,14 @@ export default function PrintEdcPage() {
             <tr>
               <td>PRODUTO</td>
               <td className="text-center">{totalQuantidade}</td>
-              <td className="text-right">-</td>
+              <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
               <td className="text-right">{fmtUsd(totalFobUSD)}</td>
               <td className="text-right">{fmtBrl(totalFobBrl)}</td>
             </tr>
             <tr className="bold" style={{ background: "rgba(255,255,255,0.01)" }}>
               <td>TOTAL FOB</td>
               <td className="text-center">{totalQuantidade}</td>
-              <td className="text-right">-</td>
+              <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
               <td className="text-right">{fmtUsd(totalFobUSD)}</td>
               <td className="text-right">{fmtBrl(totalFobBrl)}</td>
             </tr>
@@ -603,13 +781,8 @@ export default function PrintEdcPage() {
         </table>
 
         {/* GRAND TOTAL */}
-        <div className="summary-blocks">
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <div style={{ color: "#ef4444", fontSize: "0.8rem", fontStyle: "italic", lineHeight: "1.4" }}>
-              * FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.
-            </div>
-          </div>
-          <div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "25px", marginBottom: "25px" }}>
+          <div className="grand-total-card">
             <table className="subtotal-table">
               <tbody>
                 <tr>
@@ -621,8 +794,8 @@ export default function PrintEdcPage() {
                   <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - totalFobBrl)}</td>
                 </tr>
                 <tr className="total-highlight" style={{ fontSize: "1.1rem" }}>
-                  <td className="bold">CUSTO TOTAL NACIONALIZADO</td>
-                  <td className="text-right bold">{fmtBrl(totalGeralNacionalizado)}</td>
+                  <td className="bold" style={{ borderBottom: "none", borderRadius: "0 0 0 8px" }}>CUSTO TOTAL NACIONALIZADO</td>
+                  <td className="text-right bold" style={{ borderBottom: "none", borderRadius: "0 0 8px 0" }}>{fmtBrl(totalGeralNacionalizado)}</td>
                 </tr>
               </tbody>
             </table>
@@ -633,18 +806,22 @@ export default function PrintEdcPage() {
         <div className="page-break-print"></div>
 
         {/* ================= PAGE 2: MEMÓRIA DE CÁLCULO E LISTA DE COMPRAS ================= */}
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <h1 style={{ margin: "0 0 5px 0", fontSize: "1.8rem", fontWeight: "800" }}>Memória de Nacionalização por Item</h1>
-          <p style={{ margin: 0, fontSize: "0.9rem", color: "#94a3b8" }}>
-            Detalhamento de Tributação, Rateio de Custos e Preço Unitário Nacionalizado
-          </p>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "30px", gap: "20px" }}>
+          <div style={{ flexShrink: 0 }}>
+            <img src="/logo-seawise.png" alt="SEAWISE" style={{ height: "55px", objectFit: "contain" }} />
+          </div>
+          <div style={{ flexGrow: 1, textAlign: "center", marginRight: "75px" }}>
+            <h1 style={{ margin: "0" /* removed bottom margin as there is no subtitle now */, fontSize: "1.8rem", fontWeight: "800" }}>Custo Nacionalizado Por Item</h1>
+          </div>
         </div>
 
         <table className="custom-table" style={{ fontSize: "0.75rem", width: "100%" }}>
           <thead>
             <tr>
-              <th>Item / NCM</th>
+              <th>Prod.</th>
+              <th className="text-center">NCM</th>
               <th className="text-center">Qtd</th>
+              <th className="text-center">U.M.</th>
               <th className="text-right">FOB Unit (USD)</th>
               <th className="text-right">Aduaneiro (R$)</th>
               <th className="text-right">II (R$)</th>
@@ -659,15 +836,12 @@ export default function PrintEdcPage() {
           <tbody>
             {itensCalculados.map((item: any, idx: number) => (
               <tr key={idx}>
-                <td>
-                  <div style={{ fontWeight: "bold" }}>
-                    {item.modelo ? item.modelo.codigo : item.produto?.referencia}
-                  </div>
-                  <div style={{ fontSize: "0.7rem", color: "#94a3b8" }} className="no-print">
-                    NCM: {item.produto?.ncm?.codigo}
-                  </div>
+                <td style={{ fontWeight: "bold" }}>
+                  {item.modelo ? item.modelo.codigo : item.produto?.referencia}
                 </td>
+                <td className="text-center">{item.produto?.ncm?.codigo}</td>
                 <td className="text-center">{item.quantidade}</td>
+                <td className="text-center">{item.produto?.unidadeMedida || "UN"}</td>
                 <td className="text-right">{fmtUsd(item.valorFobUnitario)}</td>
                 <td className="text-right">{fmtBrl(item.itemValorAduaneiro)}</td>
                 <td className="text-right">{fmtBrl(item.ii)}</td>
@@ -681,7 +855,9 @@ export default function PrintEdcPage() {
             ))}
             <tr className="bold" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
               <td>TOTAIS / MÉDIAS</td>
+              <td className="text-center">-</td>
               <td className="text-center">{totalQuantidade}</td>
+              <td className="text-center">-</td>
               <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
               <td className="text-right">{fmtBrl(totalFobBrl + freteBrl + seguroBrl)}</td>
               <td className="text-right">{fmtBrl(totalII)}</td>
@@ -689,8 +865,8 @@ export default function PrintEdcPage() {
               <td className="text-right">{fmtBrl(totalPisCofins)}</td>
               <td className="text-right">{fmtBrl(totalDespesasPortuariasSemFreteBrl)}</td>
               <td className="text-right">{fmtBrl(totalIcms)}</td>
-              <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - comissaoValBrl)}</td>
-              <td className="text-right bold">{fmtBrl((totalGeralNacionalizado - comissaoValBrl) / (totalQuantidade || 1))}</td>
+              <td className="text-right bold">{fmtBrl(totalGeralNacionalizado)}</td>
+              <td className="text-right bold">{fmtBrl(totalGeralNacionalizado / (totalQuantidade || 1))}</td>
             </tr>
           </tbody>
         </table>
@@ -702,13 +878,15 @@ export default function PrintEdcPage() {
             <div>Método de Cálculo ICMS: {estudo.metodoCalculoIcms === "SimplificadoExcel" ? "Simplificado (Excel)" : "Por Dentro (Legal)"}</div>
             <div>Método de Cálculo Federais: {estudo.metodoCalculoFederais === "SimplificadoExcel" ? "Simplificado (Excel)" : "Cascata Real"}</div>
             {estudo.flSimularSubfaturamento && (
-              <div>Subfaturamento Simulado: {estudo.percentualSubfaturamento}%</div>
+              <div>Subfaturamento Simulado: {estudo.percentualSubfaturamento?.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%</div>
             )}
           </div>
-          <div style={{ textAlign: "right" }}>
-            <strong>Assinatura / Responsabilidade:</strong>
-            <div style={{ marginTop: "40px", borderTop: "1px solid #64748b", display: "inline-block", width: "250px", paddingTop: "5px" }}>
-              Analista de Importação
+          <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "flex-end", paddingBottom: "5px" }}>
+            <div className="simulation-warning-text">
+              * ESTE DOCUMENTO TRATA-SE DE UMA SIMULAÇÃO PRELIMINAR DE CUSTOS E TRIBUTOS. OS VALORES APRESENTADOS SÃO ESTIMATIVOS E PODEM SOFRER ALTERAÇÕES DE ACORDO COM A OSCILAÇÃO CAMBIAL, LEGISLAÇÃO FISCAL OU VARIAÇÕES OPERACIONAIS NA DATA DO DESEMBARAÇO EFETIVO.
+            </div>
+            <div className="commission-warning-text">
+              * FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.
             </div>
           </div>
         </div>

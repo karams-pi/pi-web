@@ -47,7 +47,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
 
     if (isAfrmm) {
       const percentual = d.valor > 1 ? d.valor : d.valor * 100;
-      detalheTipo = `${percentual.toFixed(0)}%`;
+      detalheTipo = `${percentual.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`;
       valorBrl = freteBrl * (percentual / 100);
     } else {
       valorBrl = d.moeda === 'USD' ? d.valor * estudo.cotacaoDolar : d.valor;
@@ -58,7 +58,8 @@ const DetalheEstudoEdcPage: React.FC = () => {
       moeda: d.moeda,
       detalheTipo,
       valorBrl,
-      isAfrmm
+      isAfrmm,
+      metodoRateio: d.metodoRateio
     };
   }) : [];
 
@@ -74,7 +75,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
 
   if (estudo.flExibirComissao && estudo.comissaoPercentual > 0) {
     despesasDetalhadas.push({
-      nomeDespesa: `COMISSÃO COMERCIAL (${estudo.comissaoPercentual.toFixed(2)}%)`,
+      nomeDespesa: `COMISSÃO COMERCIAL (${estudo.comissaoPercentual.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%)`,
       moeda: 'USD',
       detalheTipo: 'Percentual',
       valorBrl: comissaoValBrl,
@@ -113,7 +114,13 @@ const DetalheEstudoEdcPage: React.FC = () => {
     const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0;
     const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
     const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
-    const aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao || 0;
+    let aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao;
+    if (!aliqIcms || aliqIcms <= 0) {
+      aliqIcms = estudo.importador?.aliquotaIcmsPadrao;
+    }
+    if (!aliqIcms || aliqIcms <= 0) {
+      aliqIcms = 0.18;
+    }
 
     const ii = baseCalculoAduaneiro * aliqII;
     const ipi = (baseCalculoAduaneiro + ii) * aliqIPI;
@@ -127,16 +134,12 @@ const DetalheEstudoEdcPage: React.FC = () => {
 
     // Rateio avançado de taxas portuárias por item
     let taxasPort = 0;
-    if (estudo.despesas) {
-      estudo.despesas.forEach((d: any) => {
-        const isAfrmm = d.nomeDespesa.toUpperCase() === 'AFRMM';
-        let valorDespesaBrl = 0;
-        if (isAfrmm) {
-          const percentual = d.valor > 1 ? d.valor : d.valor * 100;
-          valorDespesaBrl = freteBrl * (percentual / 100);
-        } else {
-          valorDespesaBrl = d.moeda === 'USD' ? d.valor * estudo.cotacaoDolar : d.valor;
-        }
+    if (despesasDetalhadas) {
+      despesasDetalhadas.forEach((d: any) => {
+        // Ignorar frete internacional
+        if (d.nomeDespesa.toUpperCase() === 'FRETE') return;
+
+        const valorDespesaBrl = d.valorBrl;
 
         let fatorDespesa = 0;
         if (d.metodoRateio === 'Quantidade') {
@@ -185,7 +188,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
   const totalIPI = itensCalculados.reduce((acc: number, i: any) => acc + i.ipi, 0);
   const totalPisCofins = itensCalculados.reduce((acc: number, i: any) => acc + i.pisCofins, 0);
   const totalIcms = itensCalculados.reduce((acc: number, i: any) => acc + i.icms, 0);
-  const totalNacionalizado = itensCalculados.reduce((acc: number, i: any) => acc + i.totalNacItem, 0) + comissaoValBrl;
+  const totalNacionalizado = itensCalculados.reduce((acc: number, i: any) => acc + i.totalNacItem, 0);
 
   const handleExportExcel = async () => {
     try {
@@ -220,9 +223,19 @@ const DetalheEstudoEdcPage: React.FC = () => {
           <p className="page-description">Análise detalhada de custos e carga tributária do estudo {estudo.numeroReferencia}.</p>
         </div>
         <div className="page-header-line" style={{ background: 'linear-gradient(90deg, #10b981, transparent)' }}></div>
-        <div className="action-buttons" style={{ marginLeft: 'auto' }}>
-          <button className="btn btn-secondary" onClick={() => window.open(`/#/print-edc/${id}`, '_blank')}><Printer size={18} /><span>Imprimir</span></button>
-          <button className="btn btn-primary" onClick={handleExportExcel}><Download size={18} /><span>Exportar EDC</span></button>
+        <div className="action-buttons" style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+          <button className="btn btn-secondary" onClick={() => window.open(`/#/print-edc/${id}?color=true`, '_blank')} style={{ borderColor: '#7c3aed', color: '#a78bfa' }}>
+            <FileText size={18} />
+            <span>PDF Colorido</span>
+          </button>
+          <button className="btn btn-secondary" onClick={() => window.open(`/#/print-edc/${id}`, '_blank')}>
+            <Printer size={18} />
+            <span>Imprimir</span>
+          </button>
+          <button className="btn btn-primary" onClick={handleExportExcel}>
+            <Download size={18} />
+            <span>Exportar EDC</span>
+          </button>
         </div>
       </div>
 
@@ -243,10 +256,10 @@ const DetalheEstudoEdcPage: React.FC = () => {
             R$ {totalNacionalizado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <span>Câmbio: R$ {estudo.cotacaoDolar.toFixed(2)} | PTAX: {estudo.spreadCambio}%</span>
+            <span>Câmbio: R$ {estudo.cotacaoDolar.toFixed(2)} | PTAX: {estudo.spreadCambio?.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%</span>
             {estudo.flSimularSubfaturamento && (
               <span style={{ color: '#a78bfa', fontWeight: '600' }}>
-                ⚡ Subfaturamento: {estudo.percentualSubfaturamento}% Ativo
+                ⚡ Subfaturamento: {estudo.percentualSubfaturamento?.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}% Ativo
               </span>
             )}
             <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
