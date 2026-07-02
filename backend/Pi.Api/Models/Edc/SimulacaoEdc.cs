@@ -43,6 +43,9 @@ public class SimulacaoEdc
     [MaxLength(20)]
     public string TipoFrete { get; set; } = "FOB"; // FOB, CIF, CFR
 
+    [MaxLength(50)]
+    public string? ModalidadeFrete { get; set; } = "1x40";
+
     [Column(TypeName = "numeric(18,2)")]
     public decimal ValorFreteInternacional { get; set; }
 

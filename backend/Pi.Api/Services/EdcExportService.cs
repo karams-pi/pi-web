@@ -133,7 +133,7 @@ public class EdcExportService
         // General Info
         ws.Cells["C8"].Value = $"REGIME TRIBUTÁRIO: {(simulacao.Importador?.RegimeTributario ?? "SIMPLES NACIONAL").ToUpper()}";
         ws.Cells["C8"].Style.Font.Bold = true;
-        ws.Cells["E8"].Value = "USO: REVENDA";
+        ws.Cells["E8"].Value = $"INCOTERM: {(simulacao.TipoFrete ?? "FOB").ToUpper()}";
         ws.Cells["E8"].Style.Font.Bold = true;
         
         decimal icmsPadrao = 0.18m;
@@ -146,7 +146,7 @@ public class EdcExportService
         {
             icmsPadrao = simulacao.Importador.AliquotaIcmsPadrao;
         }
-        ws.Cells["G8"].Value = $"CONSIDERAR ICMS {(icmsPadrao * 100):N0}%";
+        ws.Cells["G8"].Value = $"ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
 
         ws.Cells["C9"].Value = $"PRODUTO: {(simulacao.Itens?.FirstOrDefault()?.Produto?.Descricao ?? "AMORTECEDORES").ToUpper()}";
@@ -157,7 +157,7 @@ public class EdcExportService
         ws.Cells["G9"].Style.Numberformat.Format = "dd/MM/yyyy";
         ws.Cells["G9"].Style.Font.Bold = true;
 
-        ws.Cells["C10"].Value = $"FRETE: {(simulacao.TipoFrete ?? "1x40").ToUpper()}";
+        ws.Cells["C10"].Value = $"TIPO DE FRETE: {(simulacao.ModalidadeFrete ?? "1x40").ToUpper()}";
         ws.Cells["C10"].Style.Font.Bold = true;
         ws.Cells["E10"].Value = $"PORTO ENTRADA: {(simulacao.PortoDestino?.Nome ?? "PARANAGUÁ").ToUpper()}";
         ws.Cells["E10"].Style.Font.Bold = true;

@@ -248,7 +248,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
         <div className="card" style={{ borderLeft: '4px solid #a78bfa' }}>
           <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--muted)', letterSpacing: '1px' }}>Exportador</span>
           <p style={{ fontWeight: '700', fontSize: '1.2rem', margin: '8px 0 0' }}>{estudo.exportador?.nome}</p>
-          <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>País: {estudo.exportador?.pais} | Frete: {estudo.tipoFrete || 'N/A'}</span>
+          <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>País: {estudo.exportador?.pais} | Incoterm: {estudo.tipoFrete || 'N/A'} | Frete: {estudo.modalidadeFrete || '1x40'}</span>
         </div>
         <div className="card" style={{ background: 'linear-gradient(135deg, rgba(79, 158, 255, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)', border: '1px solid rgba(79, 158, 255, 0.2)' }}>
           <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--muted)', letterSpacing: '1px' }}>Custo Total Nacionalizado</span>

@@ -637,14 +637,16 @@ export default function PrintEdcPage() {
         <div className="sheet-header-box">
           <div className="header-grid">
             <div className="header-cell">
-              <div><strong>IMPORTADOR:</strong> {estudo.importador?.razaoSocial} (CNPJ: {estudo.importador?.cnpj})</div>
+              <div><strong>IMPORTADOR:</strong> {estudo.importador?.razaoSocial}</div>
+              <div><strong>CNPJ:</strong> {estudo.importador?.cnpj}</div>
               <div><strong>REGIME TRIBUTÁRIO:</strong> {(estudo.importador?.regimeTributario || "SIMPLES NACIONAL").toUpperCase()}</div>
               <div><strong>PRODUTO:</strong> {descNcm.toUpperCase()}</div>
-              <div><strong>INCOTERM:</strong> {estudo.tipoFrete || "1x40"}</div>
+              <div><strong>INCOTERM:</strong> {estudo.tipoFrete || "FOB"}</div>
               <div><strong>TAXA DE CÂMBIO UTILIZADA:</strong> {fmtBrl(estudo.cotacaoDolar)}</div>
             </div>
             <div className="header-cell" style={{ paddingLeft: "20px", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
               <div><strong>ICMS:</strong> {fmtPct(icmsPadrao)}</div>
+              <div><strong>TIPO DE FRETE:</strong> {(estudo.modalidadeFrete || "1x40").toUpperCase()}</div>
               <div><strong>PORTO ORIGEM / SAÍDA:</strong> {estudo.portoOrigem?.nome || "SHANGHAI"}</div>
               <div><strong>PORTO DESTINO / ENTRADA:</strong> {estudo.portoDestino?.nome || "PARANAGUÁ"}</div>
               <div><strong>DATA:</strong> {new Date(estudo.dataEstudo).toLocaleDateString("pt-BR")}</div>
@@ -668,13 +670,6 @@ export default function PrintEdcPage() {
           <tbody>
             <tr>
               <td>PRODUTO</td>
-              <td className="text-center">{totalQuantidade}</td>
-              <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
-              <td className="text-right">{fmtUsd(totalFobUSD)}</td>
-              <td className="text-right">{fmtBrl(totalFobBrl)}</td>
-            </tr>
-            <tr className="bold" style={{ background: "rgba(255,255,255,0.01)" }}>
-              <td>TOTAL FOB</td>
               <td className="text-center">{totalQuantidade}</td>
               <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
               <td className="text-right">{fmtUsd(totalFobUSD)}</td>

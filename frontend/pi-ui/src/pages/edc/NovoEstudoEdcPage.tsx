@@ -26,6 +26,7 @@ const NovoEstudoEdcPage: React.FC = () => {
     cotacaoDolar: 5.25,
     spreadCambio: 0.05,
     tipoFrete: 'FOB',
+    modalidadeFrete: '1x40',
     valorFreteInternacional: 0,
     valorSeguroInternacional: 0,
     comissaoPercentual: 0,
@@ -66,6 +67,7 @@ const NovoEstudoEdcPage: React.FC = () => {
             cotacaoDolar: sim.cotacaoDolar || 5.25,
             spreadCambio: sim.spreadCambio || 0.05,
             tipoFrete: sim.tipoFrete || 'FOB',
+            modalidadeFrete: sim.modalidadeFrete || '1x40',
             valorFreteInternacional: sim.valorFreteInternacional || 0,
             valorSeguroInternacional: sim.valorSeguroInternacional || 0,
             comissaoPercentual: sim.comissaoPercentual || 0,
@@ -505,14 +507,33 @@ const NovoEstudoEdcPage: React.FC = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label>Frete (Informativo)</label>
+                <label>Incoterm</label>
+                <select 
+                  className="premium-select"
+                  value={formData.tipoFrete} 
+                  onChange={e => setFormData({...formData, tipoFrete: e.target.value})}
+                >
+                  <option value="FOB">FOB</option>
+                  <option value="CIF">CIF</option>
+                  <option value="CFR">CFR</option>
+                  <option value="EXW">EXW</option>
+                  <option value="FCA">FCA</option>
+                  <option value="CPT">CPT</option>
+                  <option value="CIP">CIP</option>
+                  <option value="DAP">DAP</option>
+                  <option value="DPU">DPU</option>
+                  <option value="DDP">DDP</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Tipo de Frete (Informativo)</label>
                 <input 
                   type="text" 
                   className="premium-input" 
-                  value={formData.tipoFrete} 
-                  onChange={e => setFormData({...formData, tipoFrete: e.target.value})} 
-                  placeholder="Ex: 1x40, 1x20, LCL, FOB..." 
-                  maxLength={20}
+                  value={formData.modalidadeFrete || ''} 
+                  onChange={e => setFormData({...formData, modalidadeFrete: e.target.value})} 
+                  placeholder="Ex: 1x40, LCL, Aéreo..." 
+                  maxLength={50}
                 />
               </div>
               <div className="form-group">
