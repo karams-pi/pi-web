@@ -1004,6 +1004,7 @@ export default function ProformaInvoiceV2Page() {
   async function salvar() {
     try {
       if (!form.idCliente) { alert("Selecione um cliente"); return; }
+      if (!form.piSequencia || !form.piSequencia.trim()) { alert("A sequência da PI não pode estar em branco."); return; }
       setSaving(true);
       
       const groupedItems = processedData.groups;

@@ -569,6 +569,11 @@ export default function ProformaInvoicePage() {
         return;
       }
 
+      if (!form.piSequencia || !form.piSequencia.trim()) {
+        alert("A sequência da PI não pode estar em branco.");
+        return;
+      }
+
       if (itens.length === 0) {
         alert("Adicione pelo menos um item");
         return;
