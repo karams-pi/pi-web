@@ -12,7 +12,7 @@ Este guia descreve como restaurar o banco de dados `pi_db` a partir do arquivo d
 ### 1. Copiar o arquivo para o Container
 Abra um terminal (PowerShell ou Prompt de Comando) na pasta raiz do projeto e execute:
 ```powershell
-docker cp .\Docs\render.backup pi-postgres:/tmp/render.backup
+docker cp .\db\bkp\render.backup pi-postgres:/tmp/render.backup
 ```
 
 ### 2. Encerrar conexões ativas
