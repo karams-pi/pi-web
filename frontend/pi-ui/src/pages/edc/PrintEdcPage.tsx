@@ -219,8 +219,15 @@ export default function PrintEdcPage() {
   const fmtUsd = (val: number) => "$ " + (val || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtPct = (val: number) => ((val || 0) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + "%";
 
-  const ncmPadrao = estudo.itens && estudo.itens[0]?.produto?.ncm?.codigo ? estudo.itens[0].produto.ncm.codigo : "87088000";
-  const descNcm = estudo.itens && estudo.itens[0]?.produto?.descricao ? estudo.itens[0].produto.descricao : "AMORTECEDORES";
+  const uniqueNcms = estudo.itens 
+    ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.ncm?.codigo).filter(Boolean))) as string[]
+    : [];
+  const ncmPadrao = uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "87088000";
+
+  const uniqueProducts = estudo.itens 
+    ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.descricao).filter(Boolean))) as string[]
+    : [];
+  const descNcm = uniqueProducts.length > 0 ? uniqueProducts.join(", ") : "AMORTECEDORES";
   let icmsPadrao = 0.18;
   if (estudo.itens && estudo.itens[0]?.produto?.ncm) {
     icmsPadrao = estudo.itens[0].produto.ncm.aliquotaIcmsPadrao;

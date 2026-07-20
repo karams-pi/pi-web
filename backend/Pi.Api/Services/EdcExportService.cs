@@ -149,7 +149,14 @@ public class EdcExportService
         ws.Cells["G8"].Value = $"ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
 
-        ws.Cells["C9"].Value = $"PRODUTO: {(simulacao.Itens?.FirstOrDefault()?.Produto?.Descricao ?? "AMORTECEDORES").ToUpper()}";
+        var uniqueProducts = simulacao.Itens?
+            .Select(i => i.Produto?.Descricao)
+            .Where(d => !string.IsNullOrEmpty(d))
+            .Select(d => d!)
+            .Distinct()
+            .ToList() ?? new List<string>();
+        string produtoText = uniqueProducts.Count > 0 ? string.Join(", ", uniqueProducts) : "AMORTECEDORES";
+        ws.Cells["C9"].Value = $"PRODUTO: {produtoText.ToUpper()}";
         ws.Cells["C9"].Style.Font.Bold = true;
         ws.Cells["E9"].Value = $"PORTO SAÍDA: {(simulacao.PortoOrigem?.Nome ?? "SHANGHAI").ToUpper()}";
         ws.Cells["E9"].Style.Font.Bold = true;
@@ -184,7 +191,14 @@ public class EdcExportService
         ws.Cells["E12"].Style.Font.Bold = true;
         ws.Cells["E12"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-        ws.Cells["F12"].Value = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm?.Codigo ?? "";
+        var uniqueNcms = simulacao.Itens?
+            .Select(i => i.Produto?.Ncm?.Codigo)
+            .Where(c => !string.IsNullOrEmpty(c))
+            .Select(c => c!)
+            .Distinct()
+            .ToList() ?? new List<string>();
+        string ncmText = uniqueNcms.Count > 0 ? string.Join(", ", uniqueNcms) : "";
+        ws.Cells["F12"].Value = ncmText;
         ws.Cells["F12"].Style.Font.Bold = true;
         ws.Cells["F12"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
