@@ -137,12 +137,11 @@ export default function PrintEdcPage() {
     const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0;
     const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
     const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
-    let aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao;
-    if (!aliqIcms || aliqIcms <= 0) {
-      aliqIcms = estudo.importador?.aliquotaIcmsPadrao;
-    }
-    if (!aliqIcms || aliqIcms <= 0) {
-      aliqIcms = 0.18;
+    let aliqIcms = 0.18;
+    if (item.produto?.ncm) {
+      aliqIcms = item.produto.ncm.aliquotaIcmsPadrao;
+    } else if (estudo.importador) {
+      aliqIcms = estudo.importador.aliquotaIcmsPadrao;
     }
 
     const ii = baseCalculoAduaneiro * aliqII;
@@ -222,12 +221,11 @@ export default function PrintEdcPage() {
 
   const ncmPadrao = estudo.itens && estudo.itens[0]?.produto?.ncm?.codigo ? estudo.itens[0].produto.ncm.codigo : "87088000";
   const descNcm = estudo.itens && estudo.itens[0]?.produto?.descricao ? estudo.itens[0].produto.descricao : "AMORTECEDORES";
-  let icmsPadrao = estudo.itens && estudo.itens[0]?.produto?.ncm?.aliquotaIcmsPadrao;
-  if (!icmsPadrao || icmsPadrao <= 0) {
-    icmsPadrao = estudo.importador?.aliquotaIcmsPadrao;
-  }
-  if (!icmsPadrao || icmsPadrao <= 0) {
-    icmsPadrao = 0.18;
+  let icmsPadrao = 0.18;
+  if (estudo.itens && estudo.itens[0]?.produto?.ncm) {
+    icmsPadrao = estudo.itens[0].produto.ncm.aliquotaIcmsPadrao;
+  } else if (estudo.importador) {
+    icmsPadrao = estudo.importador.aliquotaIcmsPadrao;
   }
 
   const handlePrintColors = () => {

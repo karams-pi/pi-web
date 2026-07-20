@@ -138,11 +138,11 @@ public class EdcExportService
         
         decimal icmsPadrao = 0.18m;
         var firstNcm = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm;
-        if (firstNcm != null && firstNcm.AliquotaIcmsPadrao > 0m)
+        if (firstNcm != null)
         {
             icmsPadrao = firstNcm.AliquotaIcmsPadrao;
         }
-        else if (simulacao.Importador?.AliquotaIcmsPadrao > 0m)
+        else if (simulacao.Importador != null)
         {
             icmsPadrao = simulacao.Importador.AliquotaIcmsPadrao;
         }
@@ -482,14 +482,14 @@ public class EdcExportService
                 ws.Cells[r, 6].Value = item.Produto?.Ncm?.AliquotaIPI ?? 0m;
                 ws.Cells[r, 7].Value = item.Produto?.Ncm?.AliquotaPis ?? 0m;
                 ws.Cells[r, 8].Value = item.Produto?.Ncm?.AliquotaCofins ?? 0m;
-                decimal itemIcms = item.Produto?.Ncm?.AliquotaIcmsPadrao ?? 0m;
-                if (itemIcms <= 0m)
+                decimal itemIcms = 0.18m;
+                if (item.Produto?.Ncm != null)
                 {
-                    itemIcms = simulacao.Importador?.AliquotaIcmsPadrao ?? 0m;
+                    itemIcms = item.Produto.Ncm.AliquotaIcmsPadrao;
                 }
-                if (itemIcms <= 0m)
+                else if (simulacao.Importador != null)
                 {
-                    itemIcms = 0.18m;
+                    itemIcms = simulacao.Importador.AliquotaIcmsPadrao;
                 }
                 ws.Cells[r, 9].Value = itemIcms;
                 ws.Cells[r, 10].Value = item.Quantidade;
@@ -607,7 +607,7 @@ public class EdcExportService
         ws.Cells["T5"].Value = ncm?.AliquotaPis ?? 0.0312m;
         ws.Cells["U5"].Value = ncm?.AliquotaCofins ?? 0.1437m;
         decimal defaultIcms = 0.18m;
-        if (simulacao.Importador?.AliquotaIcmsPadrao > 0m)
+        if (simulacao.Importador != null)
         {
             defaultIcms = simulacao.Importador.AliquotaIcmsPadrao;
         }

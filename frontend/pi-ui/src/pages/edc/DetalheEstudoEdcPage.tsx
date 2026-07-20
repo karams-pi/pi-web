@@ -114,12 +114,11 @@ const DetalheEstudoEdcPage: React.FC = () => {
     const aliqIPI = item.produto?.ncm?.aliquotaIPI || 0;
     const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
     const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
-    let aliqIcms = item.produto?.ncm?.aliquotaIcmsPadrao;
-    if (!aliqIcms || aliqIcms <= 0) {
-      aliqIcms = estudo.importador?.aliquotaIcmsPadrao;
-    }
-    if (!aliqIcms || aliqIcms <= 0) {
-      aliqIcms = 0.18;
+    let aliqIcms = 0.18;
+    if (item.produto?.ncm) {
+      aliqIcms = item.produto.ncm.aliquotaIcmsPadrao;
+    } else if (estudo.importador) {
+      aliqIcms = estudo.importador.aliquotaIcmsPadrao;
     }
 
     const ii = baseCalculoAduaneiro * aliqII;
