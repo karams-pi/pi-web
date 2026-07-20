@@ -228,6 +228,11 @@ export default function PrintEdcPage() {
     icmsPadrao = estudo.importador.aliquotaIcmsPadrao;
   }
 
+  const mainNcm = estudo.itens && estudo.itens[0]?.produto?.ncm;
+  const aliqPis = mainNcm?.aliquotaPis ?? 0.0312;
+  const aliqCof = mainNcm?.aliquotaCofins ?? 0.1437;
+  const aliqSum = aliqPis + aliqCof;
+
   const handlePrintColors = () => {
     document.body.classList.add("print-keep-colors");
     const handleAfterPrint = () => {
@@ -714,23 +719,23 @@ export default function PrintEdcPage() {
           <tbody>
             <tr>
               <td>IMPOSTO DE IMPORTAÇÃO (II)</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaII || 0.18)}</td>
+              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaII ?? 0.18)}</td>
               <td className="text-right">{fmtBrl(totalII)}</td>
             </tr>
             <tr>
               <td>IPI</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaIPI || 0.0306)}</td>
+              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaIPI ?? 0.0306)}</td>
               <td className="text-right">{fmtBrl(totalIPI)}</td>
             </tr>
             <tr>
               <td>PIS</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaPis || 0.0312)}</td>
-              <td className="text-right">{fmtBrl(totalPisCofins * (0.0312 / (0.0312 + 0.1437)))}</td>
+              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaPis ?? 0.0312)}</td>
+              <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqPis / aliqSum : 0))}</td>
             </tr>
             <tr>
               <td>COFINS</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaCofins || 0.1437)}</td>
-              <td className="text-right">{fmtBrl(totalPisCofins * (0.1437 / (0.0312 + 0.1437)))}</td>
+              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaCofins ?? 0.1437)}</td>
+              <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqCof / aliqSum : 0))}</td>
             </tr>
             <tr>
               <td>ICMS</td>
