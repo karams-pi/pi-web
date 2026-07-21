@@ -325,6 +325,10 @@ export default function PrintEdcPage() {
           .custom-table td {
             border: 1px solid rgba(255, 255, 255, 0.08);
           }
+          .help-tooltip {
+            cursor: help;
+            text-decoration: underline dashed rgba(255, 255, 255, 0.3);
+          }
           .total-highlight {
             background: rgba(245, 158, 11, 0.1);
             color: #fbbf24;
@@ -474,6 +478,9 @@ export default function PrintEdcPage() {
           }
           .page-break-indicator {
             display: none !important;
+          }
+          .help-tooltip {
+            text-decoration: none !important;
           }
         }
 
@@ -863,7 +870,19 @@ export default function PrintEdcPage() {
               <td className="text-center">-</td>
               <td className="text-center">{totalQuantidade}</td>
               <td className="text-center">-</td>
-              <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
+              <td 
+                className="text-right help-tooltip" 
+                title={`Média ponderada do preço unitário (FOB) em dólar.
+Calculado dividindo o valor total de todas as mercadorias pela quantidade total.
+
+Fórmula:
+(Valor Total em Dólar) / (Quantidade Total)
+
+Cálculo:
+$ ${totalFobUSD.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / ${totalQuantidade.toLocaleString("pt-BR")} = $ ${(totalFobUSD / (totalQuantidade || 1)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} por unidade.`}
+              >
+                {fmtUsd(totalFobUSD / (totalQuantidade || 1))}
+              </td>
               <td className="text-right">{fmtBrl(totalFobBrl + freteBrl + seguroBrl)}</td>
               <td className="text-right">{fmtBrl(totalII)}</td>
               <td className="text-right">{fmtBrl(totalIPI)}</td>
@@ -871,7 +890,19 @@ export default function PrintEdcPage() {
               <td className="text-right">{fmtBrl(totalDespesasPortuariasSemFreteBrl)}</td>
               <td className="text-right">{fmtBrl(totalIcms)}</td>
               <td className="text-right bold">{fmtBrl(totalGeralNacionalizado)}</td>
-              <td className="text-right bold">{fmtBrl(totalGeralNacionalizado / (totalQuantidade || 1))}</td>
+              <td 
+                className="text-right bold help-tooltip" 
+                title={`Média ponderada do custo unitário nacionalizado final em reais.
+Calculado dividindo o custo total nacionalizado do lote pela quantidade total de itens.
+
+Fórmula:
+(Custo Total Nacionalizado em Reais) / (Quantidade Total)
+
+Cálculo:
+R$ ${totalGeralNacionalizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / ${totalQuantidade.toLocaleString("pt-BR")} = R$ ${(totalGeralNacionalizado / (totalQuantidade || 1)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} por unidade.`}
+              >
+                {fmtBrl(totalGeralNacionalizado / (totalQuantidade || 1))}
+              </td>
             </tr>
           </tbody>
         </table>
