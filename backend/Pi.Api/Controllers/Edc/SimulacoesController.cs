@@ -130,6 +130,7 @@ public class SimulacoesController : ControllerBase
         dbSimulacao.CotacaoDolar = simulacao.CotacaoDolar;
         dbSimulacao.SpreadCambio = simulacao.SpreadCambio;
         dbSimulacao.TipoFrete = simulacao.TipoFrete;
+        dbSimulacao.ModalidadeFrete = simulacao.ModalidadeFrete;
         dbSimulacao.ValorFreteInternacional = simulacao.ValorFreteInternacional;
         dbSimulacao.ValorSeguroInternacional = simulacao.ValorSeguroInternacional;
         dbSimulacao.ComissaoPercentual = simulacao.ComissaoPercentual;

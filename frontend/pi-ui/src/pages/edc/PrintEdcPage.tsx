@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer, FileText } from "lucide-react";
 
@@ -86,6 +86,16 @@ export default function PrintEdcPage() {
 
   const totalFobUSD = estudo.itens ? estudo.itens.reduce((acc: number, i: any) => acc + (i.quantidade * i.valorFobUnitario), 0) : 0;
   const totalFobBrl = totalFobUSD * estudo.cotacaoDolar;
+  const totalFobSubUSD = estudo.itens ? estudo.itens.reduce((acc: number, item: any) => {
+    const valorFobUnitarioSub = item.valorFobSubfaturado !== null && item.valorFobSubfaturado !== undefined
+      ? item.valorFobSubfaturado
+      : (estudo.flSimularSubfaturamento 
+          ? (item.valorFobUnitario * (estudo.percentualSubfaturamento / 100)) 
+          : item.valorFobUnitario);
+    return acc + (item.quantidade * valorFobUnitarioSub);
+  }, 0) : 0;
+  const totalFobSubBrl = totalFobSubUSD * estudo.cotacaoDolar;
+  const totalFobPorForaBrl = totalFobBrl - totalFobSubBrl;
 
   const totalQuantidade = estudo.itens ? estudo.itens.reduce((acc: number, i: any) => acc + i.quantidade, 0) : 0;
   const totalPeso = estudo.itens ? estudo.itens.reduce((acc: number, i: any) => acc + (i.pesoLiquidoTotal > 0 ? i.pesoLiquidoTotal : ((i.produto?.pesoLiquido * i.quantidade) || 0)), 0) : 0;
@@ -225,7 +235,8 @@ export default function PrintEdcPage() {
   const ncmPadrao = uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "87088000";
 
   const uniqueProducts = estudo.itens 
-    ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.descricao).filter(Boolean))) as string[]
+    ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.descricao).filter(Boolean)))
+        .filter((d: any) => !/^\d+([\.\-]\d+)*$/.test(d.trim())) as string[]
     : [];
   const descNcm = uniqueProducts.length > 0 ? uniqueProducts.join(", ") : "AMORTECEDORES";
   let icmsPadrao = 0.18;
@@ -644,7 +655,11 @@ export default function PrintEdcPage() {
             <img src="/logo-seawise.png" alt="SEAWISE" style={{ height: "55px", objectFit: "contain" }} />
           </div>
           <div style={{ flexGrow: 1, textAlign: "center", marginRight: "75px" }}>
-            <h1 style={{ margin: "0 0 5px 0", fontSize: "1.8rem", fontWeight: "800" }}>Estimativa de Custo 100%</h1>
+            <h1 style={{ margin: "0 0 5px 0", fontSize: "1.8rem", fontWeight: "800" }}>
+              Estimativa de Custo {estudo.flSimularSubfaturamento && estudo.percentualSubfaturamento 
+                ? `${estudo.percentualSubfaturamento.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%` 
+                : "100%"}
+            </h1>
             <p style={{ margin: 0, fontSize: "0.9rem", color: "#94a3b8" }}>
               Estudo de Nacionalização e Tributos Aduaneiros - Referência {estudo.numeroReferencia}
             </p>
@@ -688,7 +703,7 @@ export default function PrintEdcPage() {
             <tr>
               <td>PRODUTO</td>
               <td className="text-center">{totalQuantidade}</td>
-              <td className="text-right">{fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
+              <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
               <td className="text-right">{fmtUsd(totalFobUSD)}</td>
               <td className="text-right">{fmtBrl(totalFobBrl)}</td>
             </tr>
@@ -801,6 +816,18 @@ export default function PrintEdcPage() {
                   <td className="bold">TOTAL FOB DO LOTE (BRL)</td>
                   <td className="text-right bold">{fmtBrl(totalFobBrl)}</td>
                 </tr>
+                {estudo.flSimularSubfaturamento && (
+                  <>
+                    <tr>
+                      <td style={{ paddingLeft: "20px", fontStyle: "italic", fontSize: "0.8rem", color: "#94a3b8", borderTop: "none" }}>↳ Valor Declarado (Por Dentro)</td>
+                      <td className="text-right" style={{ fontStyle: "italic", fontSize: "0.8rem", color: "#94a3b8", borderTop: "none" }}>{fmtBrl(totalFobSubBrl)}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingLeft: "20px", fontStyle: "italic", fontSize: "0.8rem", color: "#94a3b8", borderTop: "none" }}>↳ Valor Complementar (Por Fora)</td>
+                      <td className="text-right" style={{ fontStyle: "italic", fontSize: "0.8rem", color: "#94a3b8", borderTop: "none" }}>{fmtBrl(totalFobPorForaBrl)}</td>
+                    </tr>
+                  </>
+                )}
                 <tr>
                   <td className="bold">TOTAL DESPESAS + TRIBUTOS</td>
                   <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - totalFobBrl)}</td>

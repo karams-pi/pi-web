@@ -91,6 +91,10 @@ public class EdcExportService
         ws.Cells.Style.Font.Size = 10;
         ws.View.ShowGridLines = true;
 
+        string estimativaTitle = "Estimativa de Custo " + (simulacao.FlSimularSubfaturamento 
+            ? $"{simulacao.PercentualSubfaturamento:0.##}%" 
+            : "100%");
+
         // Title and Logo
         string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "logo-seawise.png");
         if (!File.Exists(logoPath))
@@ -108,7 +112,7 @@ public class EdcExportService
                 picture.SetSize(110, 45); // Width 110px, Height 45px
                 
                 // Move title to column D to prevent overlap
-                ws.Cells["D3"].Value = "Estimativa de Custo 100%";
+                ws.Cells["D3"].Value = estimativaTitle;
                 ws.Cells["D3"].Style.Font.Size = 20;
                 ws.Cells["D3"].Style.Font.Bold = true;
                 ws.Cells["D3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
@@ -116,7 +120,7 @@ public class EdcExportService
             catch
             {
                 // Fallback if picture addition fails (e.g. system drawing driver issues)
-                ws.Cells["B3"].Value = "Estimativa de Custo 100%";
+                ws.Cells["B3"].Value = estimativaTitle;
                 ws.Cells["B3"].Style.Font.Size = 20;
                 ws.Cells["B3"].Style.Font.Bold = true;
                 ws.Cells["B3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
@@ -124,7 +128,7 @@ public class EdcExportService
         }
         else
         {
-            ws.Cells["B3"].Value = "Estimativa de Custo 100%";
+            ws.Cells["B3"].Value = estimativaTitle;
             ws.Cells["B3"].Style.Font.Size = 20;
             ws.Cells["B3"].Style.Font.Bold = true;
             ws.Cells["B3"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120)); // Navy #1F4E78
@@ -152,7 +156,8 @@ public class EdcExportService
         var uniqueProducts = simulacao.Itens?
             .Select(i => i.Produto?.Descricao)
             .Where(d => !string.IsNullOrEmpty(d))
-            .Select(d => d!)
+            .Select(d => d!.Trim())
+            .Where(d => !System.Text.RegularExpressions.Regex.IsMatch(d, @"^\d+([\.\-]\d+)*$"))
             .Distinct()
             .ToList() ?? new List<string>();
         string produtoText = uniqueProducts.Count > 0 ? string.Join(", ", uniqueProducts) : "AMORTECEDORES";
@@ -168,7 +173,9 @@ public class EdcExportService
         ws.Cells["C10"].Style.Font.Bold = true;
         ws.Cells["E10"].Value = $"PORTO ENTRADA: {(simulacao.PortoDestino?.Nome ?? "PARANAGUÁ").ToUpper()}";
         ws.Cells["E10"].Style.Font.Bold = true;
-        ws.Cells["G10"].Value = "SIMULAÇÃO 100%";
+        ws.Cells["G10"].Value = "SIMULAÇÃO " + (simulacao.FlSimularSubfaturamento 
+            ? $"{simulacao.PercentualSubfaturamento:0.##}%" 
+            : "100%");
         ws.Cells["G10"].Style.Font.Bold = true;
 
         // Calculation Base References
@@ -224,7 +231,14 @@ public class EdcExportService
         // Row 15: Products Sum
         ws.Cells["B15"].Value = "PRODUTO";
         ws.Cells["D15"].Formula = "='LISTA DE COMPRAS'!J4"; // Total quantity
-        ws.Cells["E15"].Formula = "=IF(D15>0,F15/D15,0)"; // Unit price
+        if (simulacao.Itens?.Count > 1)
+        {
+            ws.Cells["E15"].Value = "-";
+        }
+        else
+        {
+            ws.Cells["E15"].Formula = "=IF(D15>0,F15/D15,0)"; // Unit price
+        }
         ws.Cells["E15"].Style.Numberformat.Format = "$ #,##0.00";
         ws.Cells["F15"].Formula = "='LISTA DE COMPRAS'!M4"; // Total FOB USD
         ws.Cells["G15"].Formula = "=F15*D12";
@@ -233,7 +247,14 @@ public class EdcExportService
         // Row 16: Total FOB
         ws.Cells["B16"].Value = "TOTAL FOB";
         ws.Cells["B16"].Style.Font.Bold = true;
-        ws.Cells["E16"].Formula = "=IF(D15>0,F16/D15,0)"; // Unit price
+        if (simulacao.Itens?.Count > 1)
+        {
+            ws.Cells["E16"].Value = "-";
+        }
+        else
+        {
+            ws.Cells["E16"].Formula = "=IF(D15>0,F16/D15,0)"; // Unit price
+        }
         ws.Cells["E16"].Style.Font.Bold = true;
         ws.Cells["E16"].Style.Numberformat.Format = "$ #,##0.00";
         ws.Cells["E16"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -413,8 +434,25 @@ public class EdcExportService
         ws.Cells[totalBlockRow + 6, 3].Style.Font.Bold = true;
         ws.Cells[totalBlockRow + 6, 3].Style.Numberformat.Format = "R$ #,##0.00";
 
-        // Legal note
         int noteRow = totalBlockRow + 8;
+        if (simulacao.FlSimularSubfaturamento)
+        {
+            int subBlockRow = totalBlockRow + 8;
+            ws.Cells[subBlockRow, 2].Value = "FOB DECLARADO (POR DENTRO)";
+            ws.Cells[subBlockRow, 2].Style.Font.Bold = true;
+            ws.Cells[subBlockRow, 3].Formula = $"=SUM('Est. Cust. Naci.'!M6:M{lastRow})";
+            ws.Cells[subBlockRow, 3].Style.Font.Bold = true;
+            ws.Cells[subBlockRow, 3].Style.Numberformat.Format = "R$ #,##0.00";
+
+            ws.Cells[subBlockRow + 1, 2].Value = "FOB COMPLEMENTAR (POR FORA)";
+            ws.Cells[subBlockRow + 1, 2].Style.Font.Bold = true;
+            ws.Cells[subBlockRow + 1, 3].Formula = $"=C{totalBlockRow + 4}-C{subBlockRow}";
+            ws.Cells[subBlockRow + 1, 3].Style.Font.Bold = true;
+            ws.Cells[subBlockRow + 1, 3].Style.Numberformat.Format = "R$ #,##0.00";
+            
+            noteRow = totalBlockRow + 11;
+        }
+
         ws.Cells[noteRow, 2].Value = "FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.";
         ws.Cells[noteRow, 2].Style.Font.Italic = true;
         ws.Cells[noteRow, 2].Style.Font.Size = 8;
@@ -451,9 +489,12 @@ public class EdcExportService
         ws.Cells["A1"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120));
 
         // Headers (Row 3)
+        string pctSub = simulacao.FlSimularSubfaturamento 
+            ? $"{simulacao.PercentualSubfaturamento:0.##}%" 
+            : "50%";
         string[] headers = {
             "Item", "Estimativa de Custo 100%", "Produto", "NCM", "II", "IPI", "PIS", "COFINS", "ICMS",
-            "Quantidade ", "Preço Unitário", "Preço Unitário Sub 50%", "Preço total por produto",
+            "Quantidade ", "Preço Unitário", $"Preço Unitário Sub {pctSub}", "Preço total por produto",
             "Preço total por produto (BRL)", "Preço total por produto Sub", "% Rateio Quantidade", "% Rateio Preço",
             "Preço R$ nacionalizado"
         };
@@ -510,14 +551,22 @@ public class EdcExportService
                 ws.Cells[r, 11].Value = item.ValorFobUnitario;
 
                 // Formulas
-                decimal subfator = (100m - simulacao.PercentualSubfaturamento) / 100m;
-                ws.Cells[r, 12].Formula = $"=K{r}*{subfator.ToString("0.0000", System.Globalization.CultureInfo.InvariantCulture)}"; // Preço Unitário Sub
+                if (item.ValorFobSubfaturado.HasValue)
+                {
+                    ws.Cells[r, 12].Value = item.ValorFobSubfaturado.Value;
+                }
+                else
+                {
+                    decimal subfator = (simulacao.FlSimularSubfaturamento ? simulacao.PercentualSubfaturamento : 50m) / 100m;
+                    ws.Cells[r, 12].Formula = $"=K{r}*{subfator.ToString("0.0000", System.Globalization.CultureInfo.InvariantCulture)}"; // Preço Unitário Sub
+                }
                 ws.Cells[r, 13].Formula = $"=K{r}*J{r}"; // Preço total USD
                 ws.Cells[r, 14].Formula = $"=M{r}*$N$4"; // Preço total BRL
                 ws.Cells[r, 15].Formula = $"=L{r}*J{r}*$N$4"; // Preço total Sub BRL
                 ws.Cells[r, 16].Formula = $"=(J{r}*$P$4)/$J$4"; // % Rateio Quantidade
                 ws.Cells[r, 17].Formula = $"=(K{r}*$Q$4)/$K$4"; // % Rateio Preço (Unitário)
-                ws.Cells[r, 18].Formula = $"='Est. Cust. Naci.'!AS{r + 1}"; // Preço R$ nacionalizado (links to AS row of Est. Cust. Naci., note row index offset of +1 because Est. Cust. Naci. starts at row 6 instead of row 5)
+                string colToUse = simulacao.FlSimularSubfaturamento ? "AT" : "AS";
+                ws.Cells[r, 18].Formula = $"='Est. Cust. Naci.'!{colToUse}{r + 1}"; // Preço R$ nacionalizado (links to AS/AT row of Est. Cust. Naci., note row index offset of +1 because Est. Cust. Naci. starts at row 6 instead of row 5)
 
                 // Alignments & Number Formats
                 ws.Cells[r, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -649,8 +698,7 @@ public class EdcExportService
 
                 ws.Cells[r, 11].Formula = $"=H{r}*J{r}"; // Qty * Price unit USD
                 ws.Cells[r, 12].Formula = $"=K{r}*$L$4"; // BRL Total
-                decimal subfator = (100m - simulacao.PercentualSubfaturamento) / 100m;
-                ws.Cells[r, 13].Formula = $"=L{r}*{subfator.ToString("0.0000", System.Globalization.CultureInfo.InvariantCulture)}"; // BRL sub Total
+                ws.Cells[r, 13].Formula = $"='LISTA DE COMPRAS'!O{incomingListRow}"; // BRL sub Total
                 ws.Cells[r, 14].Formula = $"=$N$4*I{r}"; // THC BRL
                 ws.Cells[r, 15].Formula = $"='Rateio Custos Fixos'!E{r + 6}"; // Frete rateado BRL (links to Rateio row, which starts at row 12, so r=6 links to 6+6=12)
 

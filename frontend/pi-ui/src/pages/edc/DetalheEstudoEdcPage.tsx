@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Printer, FileText, Download, 
-  Calculator, Info, ShieldCheck, Ship, 
-  TrendingUp, DollarSign, Package, CheckCircle2
+  Calculator, ShieldCheck, 
+  TrendingUp, Package, CheckCircle2
 } from 'lucide-react';
 
 const DetalheEstudoEdcPage: React.FC = () => {
@@ -63,10 +63,17 @@ const DetalheEstudoEdcPage: React.FC = () => {
     };
   }) : [];
 
-  const totalDespesasPortuariasBrl = despesasDetalhadas.reduce((acc: number, d: any) => acc + d.valorBrl, 0);
-
   // Calcular itens com rateio de frete e despesas
   const totalFobBrl = estudo.itens.reduce((acc: number, i: any) => acc + (i.quantidade * i.valorFobUnitario), 0) * estudo.cotacaoDolar;
+  const totalFobSubBrl = estudo.itens.reduce((acc: number, i: any) => {
+    const valorFobUnitarioSub = i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined
+      ? i.valorFobSubfaturado
+      : (estudo.flSimularSubfaturamento 
+          ? (i.valorFobUnitario * (estudo.percentualSubfaturamento / 100)) 
+          : i.valorFobUnitario);
+    return acc + (i.quantidade * valorFobUnitarioSub);
+  }, 0) * estudo.cotacaoDolar;
+  const totalFobPorForaBrl = totalFobBrl - totalFobSubBrl;
 
   // Se ativado no estudo, acrescentar a comissão comercial na visualização da tabela de despesas
   const comissaoValBrl = (estudo.flExibirComissao && estudo.comissaoPercentual > 0)
@@ -257,9 +264,17 @@ const DetalheEstudoEdcPage: React.FC = () => {
           <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <span>Câmbio: R$ {estudo.cotacaoDolar.toFixed(2)} | PTAX: {estudo.spreadCambio?.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%</span>
             {estudo.flSimularSubfaturamento && (
-              <span style={{ color: '#a78bfa', fontWeight: '600' }}>
-                ⚡ Subfaturamento: {estudo.percentualSubfaturamento?.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}% Ativo
-              </span>
+              <>
+                <span style={{ color: '#a78bfa', fontWeight: '600' }}>
+                  ⚡ Subfaturamento: {estudo.percentualSubfaturamento?.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}% Ativo
+                </span>
+                <span style={{ fontSize: '0.75rem', opacity: 0.9, color: '#e9d5ff' }}>
+                  • FOB Declarado (Por Dentro): R$ {totalFobSubBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+                <span style={{ fontSize: '0.75rem', opacity: 0.9, color: '#e9d5ff' }}>
+                  • FOB Complementar (Por Fora): R$ {totalFobPorForaBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </>
             )}
             <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
               ICMS: {estudo.metodoCalculoIcms === 'SimplificadoExcel' ? 'Excel' : 'Legal'} | 
