@@ -91,9 +91,20 @@ public class EdcExportService
         ws.Cells.Style.Font.Size = 10;
         ws.View.ShowGridLines = true;
 
-        string estimativaTitle = "Estimativa de Custo " + (simulacao.FlSimularSubfaturamento 
-            ? $"{simulacao.PercentualSubfaturamento:0.##}%" 
-            : "100%");
+        string pct = "100%";
+        if (simulacao.FlSimularSubfaturamento)
+        {
+            pct = $"{simulacao.PercentualSubfaturamento:0.##}%";
+        }
+        else if (!string.IsNullOrEmpty(simulacao.NumeroReferencia))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(simulacao.NumeroReferencia, @"(\d+)\s*%");
+            if (match.Success)
+            {
+                pct = match.Groups[1].Value + "%";
+            }
+        }
+        string estimativaTitle = "Estimativa de Custo " + pct;
 
         // Title and Logo
         string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "logo-seawise.png");
@@ -489,11 +500,25 @@ public class EdcExportService
         ws.Cells["A1"].Style.Font.Color.SetColor(Color.FromArgb(31, 78, 120));
 
         // Headers (Row 3)
+        string pct = "100%";
+        if (simulacao.FlSimularSubfaturamento)
+        {
+            pct = $"{simulacao.PercentualSubfaturamento:0.##}%";
+        }
+        else if (!string.IsNullOrEmpty(simulacao.NumeroReferencia))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(simulacao.NumeroReferencia, @"(\d+)\s*%");
+            if (match.Success)
+            {
+                pct = match.Groups[1].Value + "%";
+            }
+        }
+
         string pctSub = simulacao.FlSimularSubfaturamento 
             ? $"{simulacao.PercentualSubfaturamento:0.##}%" 
             : "50%";
         string[] headers = {
-            "Item", "Estimativa de Custo 100%", "Produto", "NCM", "II", "IPI", "PIS", "COFINS", "ICMS",
+            "Item", $"Estimativa de Custo {pct}", "Produto", "NCM", "II", "IPI", "PIS", "COFINS", "ICMS",
             "Quantidade ", "Preço Unitário", $"Preço Unitário Sub {pctSub}", "Preço total por produto",
             "Preço total por produto (BRL)", "Preço total por produto Sub", "% Rateio Quantidade", "% Rateio Preço",
             "Preço R$ nacionalizado"

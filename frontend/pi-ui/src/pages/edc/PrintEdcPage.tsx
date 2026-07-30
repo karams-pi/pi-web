@@ -97,6 +97,41 @@ export default function PrintEdcPage() {
   const totalFobSubBrl = totalFobSubUSD * estudo.cotacaoDolar;
   const totalFobPorForaBrl = totalFobBrl - totalFobSubBrl;
 
+  // Subfaturamento / Pago por fora calculations
+  let pctVal = 100;
+  let hasCustomPct = false;
+  if (estudo.flSimularSubfaturamento && estudo.percentualSubfaturamento) {
+    pctVal = estudo.percentualSubfaturamento;
+    hasCustomPct = true;
+  } else if (estudo.numeroReferencia) {
+    const match = estudo.numeroReferencia.match(/(\d+)\s*%/);
+    if (match) {
+      pctVal = parseFloat(match[1]);
+      if (pctVal < 100) {
+        hasCustomPct = true;
+      }
+    }
+  }
+
+  let prodTotalUSD = totalFobUSD;
+  let prodTotalBrl = totalFobBrl;
+  let pagoPorForaUSD = 0;
+  let pagoPorForaBrl = 0;
+
+  if (hasCustomPct) {
+    if (estudo.flSimularSubfaturamento) {
+      prodTotalUSD = totalFobSubUSD;
+      prodTotalBrl = totalFobSubBrl;
+      pagoPorForaUSD = totalFobUSD - totalFobSubUSD;
+      pagoPorForaBrl = totalFobPorForaBrl;
+    } else {
+      prodTotalUSD = totalFobUSD;
+      prodTotalBrl = totalFobBrl;
+      pagoPorForaUSD = totalFobUSD * (100 / pctVal - 1);
+      pagoPorForaBrl = totalFobBrl * (100 / pctVal - 1);
+    }
+  }
+
   const totalQuantidade = estudo.itens ? estudo.itens.reduce((acc: number, i: any) => acc + i.quantidade, 0) : 0;
   const totalPeso = estudo.itens ? estudo.itens.reduce((acc: number, i: any) => acc + (i.pesoLiquidoTotal > 0 ? i.pesoLiquidoTotal : ((i.produto?.pesoLiquido * i.quantidade) || 0)), 0) : 0;
   const totalVolume = estudo.itens ? estudo.itens.reduce((acc: number, i: any) => acc + (i.cubagemTotal > 0 ? i.cubagemTotal : ((i.produto?.cubagemM3 * i.quantidade) || 0)), 0) : 0;
@@ -676,9 +711,18 @@ export default function PrintEdcPage() {
           </div>
           <div style={{ flexGrow: 1, textAlign: "center", marginRight: "75px" }}>
             <h1 style={{ margin: "0 0 5px 0", fontSize: "1.8rem", fontWeight: "800" }}>
-              Estimativa de Custo {estudo.flSimularSubfaturamento && estudo.percentualSubfaturamento 
-                ? `${estudo.percentualSubfaturamento.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%` 
-                : "100%"}
+              Estimativa de Custo {(() => {
+                if (estudo.flSimularSubfaturamento && estudo.percentualSubfaturamento) {
+                  return `${estudo.percentualSubfaturamento.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`;
+                }
+                if (estudo.numeroReferencia) {
+                  const match = estudo.numeroReferencia.match(/(\d+)\s*%/);
+                  if (match) {
+                    return `${match[1]}%`;
+                  }
+                }
+                return "100%";
+              })()}
             </h1>
             <p style={{ margin: 0, fontSize: "0.9rem", color: "#94a3b8" }}>
               Estudo de Nacionalização e Tributos Aduaneiros - Referência {estudo.numeroReferencia}
@@ -723,10 +767,19 @@ export default function PrintEdcPage() {
             <tr>
               <td>PRODUTO</td>
               <td className="text-center">{totalQuantidade}</td>
-              <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(totalFobUSD / (totalQuantidade || 1))}</td>
-              <td className="text-right">{fmtUsd(totalFobUSD)}</td>
-              <td className="text-right">{fmtBrl(totalFobBrl)}</td>
+              <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(prodTotalUSD / (totalQuantidade || 1))}</td>
+              <td className="text-right">{fmtUsd(prodTotalUSD)}</td>
+              <td className="text-right">{fmtBrl(prodTotalBrl)}</td>
             </tr>
+            {hasCustomPct && (
+              <tr>
+                <td>PAGO POR FORA</td>
+                <td className="text-center">-</td>
+                <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(pagoPorForaUSD / (totalQuantidade || 1))}</td>
+                <td className="text-right">{fmtUsd(pagoPorForaUSD)}</td>
+                <td className="text-right">{fmtBrl(pagoPorForaBrl)}</td>
+              </tr>
+            )}
             <tr>
               <td>PRODUTO + FRETE</td>
               <td className="text-center">-</td>
