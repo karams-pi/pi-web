@@ -104,6 +104,7 @@ public class EdcCalculationService : IEdcCalculationService
             
             // 4. Rateio das Despesas Aduaneiras (Local port taxes)
             decimal taxasItemBrl = 0;
+            decimal afrmmItemBrl = 0;
             if (simulacao.Despesas != null)
             {
                 foreach (var d in simulacao.Despesas)
@@ -141,7 +142,13 @@ public class EdcCalculationService : IEdcCalculationService
                         fatorDespesa = fatorRateioFob;
                     }
 
-                    taxasItemBrl += valorDespesaBrl * fatorDespesa;
+                    decimal valorRateado = valorDespesaBrl * fatorDespesa;
+                    taxasItemBrl += valorRateado;
+
+                    if (d.NomeDespesa.ToUpper() == "AFRMM")
+                    {
+                        afrmmItemBrl = valorRateado;
+                    }
                 }
             }
 
@@ -159,8 +166,8 @@ public class EdcCalculationService : IEdcCalculationService
             
             if (simulacao.MetodoCalculoIcms == "SimplificadoExcel")
             {
-                // Planilha do cliente calcula: Valor Aduaneiro * Alíquota ICMS
-                icms = Math.Round(baseCalculoAduaneiro * aliquotaIcms, 2);
+                // Planilha do cliente calcula: (Valor Aduaneiro + II + PIS + COFINS + AFRMM) * Alíquota ICMS
+                icms = Math.Round((baseCalculoAduaneiro + ii + pis + cofins + afrmmItemBrl) * aliquotaIcms, 2);
             }
             else
             {

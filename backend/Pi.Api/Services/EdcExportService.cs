@@ -165,7 +165,7 @@ public class EdcExportService
         ws.Cells["C9"].Style.Font.Bold = true;
         ws.Cells["E9"].Value = $"PORTO SAÍDA: {(simulacao.PortoOrigem?.Nome ?? "SHANGHAI").ToUpper()}";
         ws.Cells["E9"].Style.Font.Bold = true;
-        ws.Cells["G9"].Value = DateTime.Now;
+        ws.Cells["G9"].Value = simulacao.DataEstudo.ToLocalTime();
         ws.Cells["G9"].Style.Numberformat.Format = "dd/MM/yyyy";
         ws.Cells["G9"].Style.Font.Bold = true;
 
@@ -723,7 +723,7 @@ public class EdcExportService
 
                 if (simulacao.MetodoCalculoIcms == "SimplificadoExcel")
                 {
-                    ws.Cells[r, 22].Formula = $"=$P{r}*'LISTA DE COMPRAS'!I{incomingListRow}"; // ICMS Simplificado
+                    ws.Cells[r, 22].Formula = $"=(P{r}+R{r}+T{r}+U{r}+AG{r})*'LISTA DE COMPRAS'!I{incomingListRow}"; // ICMS Simplificado
                 }
                 else
                 {

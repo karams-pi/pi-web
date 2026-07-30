@@ -166,8 +166,28 @@ const DetalheEstudoEdcPage: React.FC = () => {
 
     // ICMS
     let icms = 0;
+    let afrmmItemBrl = 0;
+    if (despesasDetalhadas) {
+      const afrmmDespesa = despesasDetalhadas.find((d: any) => d.nomeDespesa.toUpperCase() === 'AFRMM');
+      if (afrmmDespesa) {
+        let fatorDespesa = 0;
+        if (afrmmDespesa.metodoRateio === 'Quantidade') {
+          fatorDespesa = totalQuantidade > 0 ? item.quantidade / totalQuantidade : 0;
+        } else if (afrmmDespesa.metodoRateio === 'Peso') {
+          const itemPeso = item.pesoLiquidoTotal > 0 ? item.pesoLiquidoTotal : ((item.produto?.pesoLiquido * item.quantidade) || 0);
+          fatorDespesa = totalPeso > 0 ? itemPeso / totalPeso : 0;
+        } else if (afrmmDespesa.metodoRateio === 'Volume') {
+          const itemVolume = item.cubagemTotal > 0 ? item.cubagemTotal : ((item.produto?.cubagemM3 * item.quantidade) || 0);
+          fatorDespesa = totalVolume > 0 ? itemVolume / totalVolume : 0;
+        } else {
+          fatorDespesa = fatorRateio;
+        }
+        afrmmItemBrl = afrmmDespesa.valorBrl * fatorDespesa;
+      }
+    }
+
     if (estudo.metodoCalculoIcms === 'SimplificadoExcel') {
-      icms = baseCalculoAduaneiro * aliqIcms;
+      icms = (baseCalculoAduaneiro + ii + pisCofins + afrmmItemBrl) * aliqIcms;
     } else {
       const baseIcmsSemIcms = baseCalculoAduaneiro + ii + ipi + pisCofins + taxasPort;
       icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
@@ -471,7 +491,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
                   {estudo.metodoCalculoIcms === 'SimplificadoExcel' ? (
                     <span>
                       <strong>Método Simplificado (Excel) ativo:</strong><br/>
-                      <code>Valor ICMS = Base Aduaneira × Alíquota ICMS</code>
+                      <code>Valor ICMS = (Base Aduaneira + II + PIS + COFINS + AFRMM) × Alíquota ICMS</code>
                     </span>
                   ) : (
                     <span>
