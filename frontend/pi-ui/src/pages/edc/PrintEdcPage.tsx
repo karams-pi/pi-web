@@ -778,11 +778,11 @@ export default function PrintEdcPage() {
               <td className="text-right">{fmtBrl(prodTotalBrl)}</td>
             </tr>
             <tr>
-              <td>PRODUTO + FRETE</td>
+              <td>Frete Internacional</td>
               <td className="text-center">-</td>
+              <td className="text-right">{fmtUsd(estudo.valorFreteInternacional)}</td>
               <td className="text-right">-</td>
-              <td className="text-right">-</td>
-              <td className="text-right">{fmtBrl(totalFobBrl + freteBrl)}</td>
+              <td className="text-right">{fmtBrl(freteBrl)}</td>
             </tr>
             <tr>
               <td>Seguro Internacional</td>
@@ -792,11 +792,11 @@ export default function PrintEdcPage() {
               <td className="text-right">{fmtBrl(seguroBrl)}</td>
             </tr>
             <tr>
-              <td>Frete Internacional</td>
+              <td>PRODUTO + FRETE</td>
               <td className="text-center">-</td>
-              <td className="text-right">{fmtUsd(estudo.valorFreteInternacional)}</td>
               <td className="text-right">-</td>
-              <td className="text-right">{fmtBrl(freteBrl)}</td>
+              <td className="text-right">-</td>
+              <td className="text-right">{fmtBrl(totalFobBrl + freteBrl)}</td>
             </tr>
             <tr className="total-highlight">
               <td colSpan={4}>TOTAL VALOR ADUANEIRO</td>

@@ -291,29 +291,29 @@ public class EdcExportService
         ws.Cells["G16"].Style.Font.Bold = true;
         ws.Cells["G16"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-        // Row 17: Product + Freight
-        ws.Cells["B17"].Value = "PRODUTO + FRETE";
-        ws.Cells["G17"].Formula = "=G16+G19";
-        ws.Cells["G17"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        // Row 17: Freight
+        ws.Cells["B17"].Value = "Frete Internacional";
+        ws.Cells["F17"].Formula = "='Rateio Custos Fixos'!G5"; // Freight in USD
+        ws.Cells["G17"].Formula = "=F17*D12";
+        ws.Cells["F17:G17"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
         // Row 18: Insurance
-        ws.Cells["B18"].Value = "Seguro";
+        ws.Cells["B18"].Value = "Seguro Internacional";
         ws.Cells["F18"].Value = simulacao.ValorSeguroInternacional;
         ws.Cells["G18"].Formula = "=F18*D12";
         ws.Cells["F18:G18"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-        // Row 19: Freight
-        ws.Cells["B19"].Value = "Frete";
-        ws.Cells["F19"].Formula = "='Rateio Custos Fixos'!G5"; // Freight in USD
-        ws.Cells["G19"].Formula = "=F19*D12";
-        ws.Cells["F19:G19"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        // Row 19: Product + Freight
+        ws.Cells["B19"].Value = "PRODUTO + FRETE";
+        ws.Cells["G19"].Formula = "=G16+G17";
+        ws.Cells["G19"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
         // Row 20: Total Valor Aduaneiro
         ws.Cells["B20"].Value = "TOTAL VALOR ADUANEIRO";
         ws.Cells["B20"].Style.Font.Bold = true;
         ws.Cells["B20"].Style.Fill.PatternType = ExcelFillStyle.Solid;
         ws.Cells["B20"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(180, 198, 231));
-        ws.Cells["G20"].Formula = "=G17+G18";
+        ws.Cells["G20"].Formula = "=G19+G18";
         ws.Cells["G20"].Style.Font.Bold = true;
         ws.Cells["G20"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         ws.Cells["G20"].Style.Fill.PatternType = ExcelFillStyle.Solid;

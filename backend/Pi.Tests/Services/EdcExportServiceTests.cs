@@ -97,5 +97,16 @@ public class EdcExportServiceTests
         package.Workbook.Worksheets[1].Name.Should().Be("LISTA DE COMPRAS");
         package.Workbook.Worksheets[2].Name.Should().Be("Est. Cust. Naci.");
         package.Workbook.Worksheets[3].Name.Should().Be("Rateio Custos Fixos");
+
+        var sheet = package.Workbook.Worksheets[0];
+        sheet.Cells["B15"].Value.Should().Be("PRODUTO");
+        sheet.Cells["B16"].Value.Should().Be("TOTAL FOB");
+        sheet.Cells["B17"].Value.Should().Be("Frete Internacional");
+        sheet.Cells["B18"].Value.Should().Be("Seguro Internacional");
+        sheet.Cells["B19"].Value.Should().Be("PRODUTO + FRETE");
+        sheet.Cells["B20"].Value.Should().Be("TOTAL VALOR ADUANEIRO");
+
+        sheet.Cells["G19"].Formula.Should().Be("G16+G17");
+        sheet.Cells["G20"].Formula.Should().Be("G19+G18");
     }
 }
