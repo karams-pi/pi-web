@@ -183,7 +183,7 @@ export default function PrintEdcPage() {
     const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
     const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
     let aliqIcms = 0.18;
-    if (item.produto?.ncm) {
+    if (item.produto?.ncm && item.produto.ncm.aliquotaIcmsPadrao > 0) {
       aliqIcms = item.produto.ncm.aliquotaIcmsPadrao;
     } else if (estudo.importador) {
       aliqIcms = estudo.importador.aliquotaIcmsPadrao;
@@ -301,7 +301,7 @@ export default function PrintEdcPage() {
     : [];
   const descNcm = uniqueProducts.length > 3 ? "DIVERSOS CONFORME DETALHAMENTO" : (uniqueProducts.length > 0 ? uniqueProducts.join(", ") : "AMORTECEDORES");
   let icmsPadrao = 0.18;
-  if (estudo.itens && estudo.itens[0]?.produto?.ncm) {
+  if (estudo.itens && estudo.itens[0]?.produto?.ncm && estudo.itens[0].produto.ncm.aliquotaIcmsPadrao > 0) {
     icmsPadrao = estudo.itens[0].produto.ncm.aliquotaIcmsPadrao;
   } else if (estudo.importador) {
     icmsPadrao = estudo.importador.aliquotaIcmsPadrao;

@@ -162,7 +162,7 @@ public class EdcExportService
         
         decimal icmsPadrao = 0.18m;
         var firstNcm = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm;
-        if (firstNcm != null)
+        if (firstNcm != null && firstNcm.AliquotaIcmsPadrao > 0)
         {
             icmsPadrao = firstNcm.AliquotaIcmsPadrao;
         }
@@ -599,7 +599,7 @@ public class EdcExportService
                 ws.Cells[r, 7].Value = item.Produto?.Ncm?.AliquotaPis ?? 0m;
                 ws.Cells[r, 8].Value = item.Produto?.Ncm?.AliquotaCofins ?? 0m;
                 decimal itemIcms = 0.18m;
-                if (item.Produto?.Ncm != null)
+                if (item.Produto?.Ncm != null && item.Produto.Ncm.AliquotaIcmsPadrao > 0)
                 {
                     itemIcms = item.Produto.Ncm.AliquotaIcmsPadrao;
                 }

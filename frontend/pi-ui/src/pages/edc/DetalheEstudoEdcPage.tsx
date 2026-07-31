@@ -146,7 +146,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
     const aliqPis = item.produto?.ncm?.aliquotaPis || 0;
     const aliqCof = item.produto?.ncm?.aliquotaCofins || 0;
     let aliqIcms = 0.18;
-    if (item.produto?.ncm) {
+    if (item.produto?.ncm && item.produto.ncm.aliquotaIcmsPadrao > 0) {
       aliqIcms = item.produto.ncm.aliquotaIcmsPadrao;
     } else if (estudo.importador) {
       aliqIcms = estudo.importador.aliquotaIcmsPadrao;

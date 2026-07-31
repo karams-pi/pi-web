@@ -213,6 +213,7 @@ const ImportadoresPage: React.FC = () => {
                     <select value={formData.regimeTributario} onChange={e => setFormData({...formData, regimeTributario: e.target.value})}>
                       <option value="Lucro Real">Lucro Real</option>
                       <option value="Lucro Presumido">Lucro Presumido</option>
+                      <option value="Simples Nacional">Simples Nacional</option>
                     </select>
                   </div>
                   <div className="form-group">
