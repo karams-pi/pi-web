@@ -9,7 +9,8 @@ import {
   TrendingUp,
   ArrowRight,
   Building2,
-  Plus
+  Plus,
+  Anchor
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -130,6 +131,14 @@ const EdcDashboard: React.FC = () => {
             <button className="btn btn-secondary" style={{ height: '80px', justifyContent: 'center' }} onClick={() => navigate('/edc/importadores')}>
               <Building2 size={20} />
               <span>Importadores</span>
+            </button>
+            <button className="btn btn-secondary" style={{ height: '80px', justifyContent: 'center' }} onClick={() => navigate('/edc/exportadores')}>
+              <Globe2 size={20} />
+              <span>Exportadores</span>
+            </button>
+            <button className="btn btn-secondary" style={{ height: '80px', justifyContent: 'center' }} onClick={() => navigate('/edc/portos')}>
+              <Anchor size={20} />
+              <span>Portos</span>
             </button>
             <button className="btn btn-secondary" style={{ height: '80px', justifyContent: 'center' }} onClick={() => navigate('/edc/taxas')}>
               <TrendingUp size={20} />

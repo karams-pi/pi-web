@@ -32,14 +32,14 @@ BEGIN
     SELECT "Id" INTO v_porto_origem_id FROM edc.portos WHERE "Nome" ILIKE '%SHANGHAI%' OR "Sigla" = 'SHA';
     IF v_porto_origem_id IS NULL THEN
         INSERT INTO edc.portos ("Nome", "Sigla", "Pais", "Tipo")
-        VALUES ('PORT OF SHANGHAI', 'SHA', 'CHINA', 'Maritimo')
+        VALUES ('SHANGHAI', 'SHA', 'CHINA', 'Maritimo')
         RETURNING "Id" INTO v_porto_origem_id;
     END IF;
 
     SELECT "Id" INTO v_porto_destino_id FROM edc.portos WHERE "Nome" ILIKE '%NAVEGANTES%' OR "Sigla" = 'NAV';
     IF v_porto_destino_id IS NULL THEN
         INSERT INTO edc.portos ("Nome", "Sigla", "Pais", "Tipo")
-        VALUES ('PORTO DE NAVEGANTES', 'NAV', 'BRASIL', 'Maritimo')
+        VALUES ('NAVEGANTES', 'NAV', 'BRASIL', 'Maritimo')
         RETURNING "Id" INTO v_porto_destino_id;
     END IF;
 

@@ -288,17 +288,18 @@ export default function PrintEdcPage() {
   const fmtBrl = (val: number) => "R$ " + (val || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtUsd = (val: number) => "$ " + (val || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtPct = (val: number) => ((val || 0) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + "%";
+  const cleanPortName = (name: string) => name ? name.replace(/^(PORT OF|PORTO DE)\s+/i, "") : "";
 
   const uniqueNcms = estudo.itens 
     ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.ncm?.codigo).filter(Boolean))) as string[]
     : [];
-  const ncmPadrao = uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "87088000";
+  const ncmPadrao = uniqueNcms.length > 3 ? "DIVERSOS" : (uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "87088000");
 
   const uniqueProducts = estudo.itens 
     ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.descricao).filter(Boolean)))
         .filter((d: any) => !/^\d+([\.\-]\d+)*$/.test(d.trim())) as string[]
     : [];
-  const descNcm = uniqueProducts.length > 0 ? uniqueProducts.join(", ") : "AMORTECEDORES";
+  const descNcm = uniqueProducts.length > 3 ? "DIVERSOS CONFORME DETALHAMENTO" : (uniqueProducts.length > 0 ? uniqueProducts.join(", ") : "AMORTECEDORES");
   let icmsPadrao = 0.18;
   if (estudo.itens && estudo.itens[0]?.produto?.ncm) {
     icmsPadrao = estudo.itens[0].produto.ncm.aliquotaIcmsPadrao;
@@ -748,8 +749,8 @@ export default function PrintEdcPage() {
             <div className="header-cell" style={{ paddingLeft: "20px", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
               <div><strong>ICMS:</strong> {fmtPct(icmsPadrao)}</div>
               <div><strong>TIPO DE FRETE:</strong> {(estudo.modalidadeFrete || "1x40").toUpperCase()}</div>
-              <div><strong>PORTO ORIGEM / SAÍDA:</strong> {estudo.portoOrigem?.nome || "SHANGHAI"}</div>
-              <div><strong>PORTO DESTINO / ENTRADA:</strong> {estudo.portoDestino?.nome || "PARANAGUÁ"}</div>
+              <div><strong>PORTO ORIGEM / SAÍDA:</strong> {cleanPortName(estudo.portoOrigem?.nome || "SHANGHAI").toUpperCase()}</div>
+              <div><strong>PORTO DESTINO / ENTRADA:</strong> {cleanPortName(estudo.portoDestino?.nome || "PARANAGUÁ").toUpperCase()}</div>
               <div><strong>DATA:</strong> {new Date(estudo.dataEstudo).toLocaleDateString("pt-BR")}</div>
               <div><strong>NCM:</strong> {ncmPadrao}</div>
             </div>

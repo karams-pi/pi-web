@@ -27,6 +27,7 @@ import EstudosEdcPage from "./pages/edc/EstudosEdcPage";
 import NovoEstudoEdcPage from "./pages/edc/NovoEstudoEdcPage";
 import DetalheEstudoEdcPage from "./pages/edc/DetalheEstudoEdcPage";
 import PrintEdcPage from "./pages/edc/PrintEdcPage";
+import PortosPage from "./pages/edc/PortosPage";
 
 
 // function ProdutosPage() {
@@ -119,6 +120,7 @@ export default function App() {
               <Route path="exportadores" element={<ExportadoresPage />} />
               <Route path="produtos" element={<ProdutosEdcPage />} />
               <Route path="modelos" element={<ModelosEdcPage />} />
+              <Route path="portos" element={<PortosPage />} />
             </Route>
 
             {/* Rotas de Impressão (Mantidas na raiz por simplicidade de link externo) */}
@@ -141,7 +143,7 @@ import { useLocation } from "react-router-dom";
 import { 
   Menu, X, Home, Users, Truck, Layers, Tag, Scissors, 
   Grid, FileText, Download, Settings, Info, ChevronLeft, ChevronRight,
-  Calculator, ListChecks, BookOpen, Coins, ShieldCheck, Ship, BarChart3, Globe2
+  Calculator, ListChecks, BookOpen, Coins, ShieldCheck, Ship, BarChart3, Globe2, Anchor
 } from "lucide-react";
 
 function NavLinks() {
@@ -196,6 +198,11 @@ function NavLinks() {
         <NavLink to="/edc/modelos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
           <Layers size={18} />
           <span>Modelos</span>
+        </NavLink>
+
+        <NavLink to="/edc/portos" className={({ isActive }) => `navlink ${isActive ? "navlink-active" : ""}`}>
+          <Anchor size={18} />
+          <span>Portos</span>
         </NavLink>
 
         <div className="nav-divider">Sistema</div>

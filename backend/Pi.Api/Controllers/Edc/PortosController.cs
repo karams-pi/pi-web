@@ -24,4 +24,33 @@ public class PortosController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(porto);
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutPorto(int id, Porto porto)
+    {
+        if (id != porto.Id) return BadRequest();
+        _context.Entry(porto).State = EntityState.Modified;
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PortoExists(id)) return NotFound();
+            throw;
+        }
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePorto(int id)
+    {
+        var porto = await _context.Portos.FindAsync(id);
+        if (porto == null) return NotFound();
+        _context.Portos.Remove(porto);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private bool PortoExists(int id) => _context.Portos.Any(e => e.Id == id);
 }

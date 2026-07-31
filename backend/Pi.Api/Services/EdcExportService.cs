@@ -180,10 +180,14 @@ public class EdcExportService
             .Where(d => !System.Text.RegularExpressions.Regex.IsMatch(d, @"^\d+([\.\-]\d+)*$"))
             .Distinct()
             .ToList() ?? new List<string>();
-        string produtoText = uniqueProducts.Count > 0 ? string.Join(", ", uniqueProducts) : "AMORTECEDORES";
+        string produtoText = uniqueProducts.Count > 3 
+            ? "DIVERSOS CONFORME DETALHAMENTO" 
+            : (uniqueProducts.Count > 0 ? string.Join(", ", uniqueProducts) : "AMORTECEDORES");
         ws.Cells["C9"].Value = $"PRODUTO: {produtoText.ToUpper()}";
         ws.Cells["C9"].Style.Font.Bold = true;
-        ws.Cells["E9"].Value = $"PORTO SAÍDA: {(simulacao.PortoOrigem?.Nome ?? "SHANGHAI").ToUpper()}";
+        var portoOrigemNome = simulacao.PortoOrigem?.Nome ?? "SHANGHAI";
+        portoOrigemNome = System.Text.RegularExpressions.Regex.Replace(portoOrigemNome, @"^(PORT OF|PORTO DE)\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        ws.Cells["E9"].Value = $"PORTO SAÍDA: {portoOrigemNome.ToUpper()}";
         ws.Cells["E9"].Style.Font.Bold = true;
         ws.Cells["G9"].Value = simulacao.DataEstudo.ToLocalTime();
         ws.Cells["G9"].Style.Numberformat.Format = "dd/MM/yyyy";
@@ -191,7 +195,9 @@ public class EdcExportService
 
         ws.Cells["C10"].Value = $"TIPO DE FRETE: {(simulacao.ModalidadeFrete ?? "1x40").ToUpper()}";
         ws.Cells["C10"].Style.Font.Bold = true;
-        ws.Cells["E10"].Value = $"PORTO ENTRADA: {(simulacao.PortoDestino?.Nome ?? "PARANAGUÁ").ToUpper()}";
+        var portoDestinoNome = simulacao.PortoDestino?.Nome ?? "PARANAGUÁ";
+        portoDestinoNome = System.Text.RegularExpressions.Regex.Replace(portoDestinoNome, @"^(PORT OF|PORTO DE)\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        ws.Cells["E10"].Value = $"PORTO ENTRADA: {portoDestinoNome.ToUpper()}";
         ws.Cells["E10"].Style.Font.Bold = true;
         ws.Cells["G10"].Value = "SIMULAÇÃO " + (simulacao.FlSimularSubfaturamento 
             ? $"{simulacao.PercentualSubfaturamento:0.##}%" 
@@ -224,7 +230,7 @@ public class EdcExportService
             .Select(c => c!)
             .Distinct()
             .ToList() ?? new List<string>();
-        string ncmText = uniqueNcms.Count > 0 ? string.Join(", ", uniqueNcms) : "";
+        string ncmText = uniqueNcms.Count > 3 ? "DIVERSOS" : (uniqueNcms.Count > 0 ? string.Join(", ", uniqueNcms) : "");
         ws.Cells["F12"].Value = ncmText;
         ws.Cells["F12"].Style.Font.Bold = true;
         ws.Cells["F12"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;

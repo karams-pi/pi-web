@@ -32,14 +32,14 @@ BEGIN
     SELECT "Id" INTO v_porto_origem_id FROM edc.portos WHERE "Nome" ILIKE '%QINGDAO%' OR "Sigla" = 'QIN';
     IF v_porto_origem_id IS NULL THEN
         INSERT INTO edc.portos ("Nome", "Sigla", "Pais", "Tipo")
-        VALUES ('PORT OF QINGDAO', 'QIN', 'CHINA', 'Maritimo')
+        VALUES ('QINGDAO', 'QIN', 'CHINA', 'Maritimo')
         RETURNING "Id" INTO v_porto_origem_id;
     END IF;
 
     SELECT "Id" INTO v_porto_destino_id FROM edc.portos WHERE "Nome" ILIKE '%PARANAGUÁ%' OR "Sigla" = 'PAR';
     IF v_porto_destino_id IS NULL THEN
         INSERT INTO edc.portos ("Nome", "Sigla", "Pais", "Tipo")
-        VALUES ('PORTO DE PARANAGUÁ', 'PAR', 'BRASIL', 'Maritimo')
+        VALUES ('PARANAGUÁ', 'PAR', 'BRASIL', 'Maritimo')
         RETURNING "Id" INTO v_porto_destino_id;
     END IF;
 
