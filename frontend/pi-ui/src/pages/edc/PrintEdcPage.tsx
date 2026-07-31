@@ -254,7 +254,12 @@ export default function PrintEdcPage() {
       icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
     }
     
-    const totalNacItem = itemValorAduaneiroCheio + ii + ipi + pisCofins + taxasPort + icms;
+    let totalNacItem = itemValorAduaneiroCheio + ii + ipi + pisCofins + taxasPort + icms;
+
+    if (hasCustomPct && !estudo.flSimularSubfaturamento) {
+      const itemPagoPorForaBrl = itemFobBrl * (100 / pctVal - 1);
+      totalNacItem += itemPagoPorForaBrl;
+    }
 
     return {
       ...item,
@@ -277,7 +282,7 @@ export default function PrintEdcPage() {
   const totalIcms = itensCalculados.reduce((acc: number, i: any) => acc + i.icms, 0);
   const totalTributos = totalII + totalIPI + totalPisCofins + totalIcms;
   
-  const totalGeralNacionalizado = totalFobBrl + freteBrl + seguroBrl + totalTributos + totalDespesasPortuariasSemFreteBrl;
+  const totalGeralNacionalizado = totalFobBrl + freteBrl + seguroBrl + totalTributos + totalDespesasPortuariasSemFreteBrl + (hasCustomPct && !estudo.flSimularSubfaturamento ? pagoPorForaBrl : 0);
 
   // Formatação
   const fmtBrl = (val: number) => "R$ " + (val || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });

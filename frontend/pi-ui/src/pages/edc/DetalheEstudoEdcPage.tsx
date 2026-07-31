@@ -73,7 +73,31 @@ const DetalheEstudoEdcPage: React.FC = () => {
           : i.valorFobUnitario);
     return acc + (i.quantidade * valorFobUnitarioSub);
   }, 0) * estudo.cotacaoDolar;
-  const totalFobPorForaBrl = totalFobBrl - totalFobSubBrl;
+
+  // Subfaturamento / Pago por fora calculations
+  let pctVal = 100;
+  let hasCustomPct = false;
+  if (estudo.flSimularSubfaturamento && estudo.percentualSubfaturamento) {
+    pctVal = estudo.percentualSubfaturamento;
+    hasCustomPct = true;
+  } else if (estudo.numeroReferencia) {
+    const match = estudo.numeroReferencia.match(/(\d+)\s*%/);
+    if (match) {
+      pctVal = parseFloat(match[1]);
+      if (pctVal < 100) {
+        hasCustomPct = true;
+      }
+    }
+  }
+
+  let totalFobPorForaBrl = 0;
+  if (hasCustomPct) {
+    if (estudo.flSimularSubfaturamento) {
+      totalFobPorForaBrl = totalFobBrl - totalFobSubBrl;
+    } else {
+      totalFobPorForaBrl = totalFobBrl * (100 / pctVal - 1);
+    }
+  }
 
   // Se ativado no estudo, acrescentar a comissão comercial na visualização da tabela de despesas
   const comissaoValBrl = (estudo.flExibirComissao && estudo.comissaoPercentual > 0)
@@ -194,7 +218,12 @@ const DetalheEstudoEdcPage: React.FC = () => {
     }
     
     // O custo final real do item nacionalizado é baseado no aduaneiro cheio + impostos declarados
-    const totalNacItem = itemValorAduaneiroCheio + ii + ipi + pisCofins + taxasPort + icms;
+    let totalNacItem = itemValorAduaneiroCheio + ii + ipi + pisCofins + taxasPort + icms;
+
+    if (hasCustomPct && !estudo.flSimularSubfaturamento) {
+      const itemPagoPorForaBrl = itemFobBrl * (100 / pctVal - 1);
+      totalNacItem += itemPagoPorForaBrl;
+    }
 
     return {
       ...item,

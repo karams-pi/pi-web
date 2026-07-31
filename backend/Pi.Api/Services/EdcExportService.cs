@@ -92,9 +92,13 @@ public class EdcExportService
         ws.View.ShowGridLines = true;
 
         string pct = "100%";
+        decimal pctVal = 100m;
+        bool hasCustomPct = false;
         if (simulacao.FlSimularSubfaturamento)
         {
             pct = $"{simulacao.PercentualSubfaturamento:0.##}%";
+            pctVal = simulacao.PercentualSubfaturamento;
+            hasCustomPct = true;
         }
         else if (!string.IsNullOrEmpty(simulacao.NumeroReferencia))
         {
@@ -102,6 +106,11 @@ public class EdcExportService
             if (match.Success)
             {
                 pct = match.Groups[1].Value + "%";
+                pctVal = decimal.Parse(match.Groups[1].Value);
+                if (pctVal < 100m)
+                {
+                    hasCustomPct = true;
+                }
             }
         }
         string estimativaTitle = "Estimativa de Custo " + pct;
@@ -409,7 +418,14 @@ public class EdcExportService
         ws.Cells[grandTotalRow, 2].Value = "TOTAL   (PARTE 1 + PARTE 2 + PARTE 3) ........................................................:";
         ws.Cells[grandTotalRow, 2].Style.Font.Bold = true;
         ws.Cells[grandTotalRow, 2].Style.Font.Size = 11;
-        ws.Cells[grandTotalRow, 7].Formula = $"=G20+G28+G{totalExpRow}";
+        if (hasCustomPct && !simulacao.FlSimularSubfaturamento)
+        {
+            ws.Cells[grandTotalRow, 7].Formula = $"=G20+G28+G{totalExpRow}+(G16*(100/{pctVal.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture)}-1))";
+        }
+        else
+        {
+            ws.Cells[grandTotalRow, 7].Formula = $"=G20+G28+G{totalExpRow}";
+        }
         ws.Cells[grandTotalRow, 7].Style.Font.Bold = true;
         ws.Cells[grandTotalRow, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         ws.Cells[grandTotalRow, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -429,7 +445,14 @@ public class EdcExportService
 
         ws.Cells[totalBlockRow + 4, 2].Value = "PREÇO FOB";
         ws.Cells[totalBlockRow + 4, 2].Style.Font.Bold = true;
-        ws.Cells[totalBlockRow + 4, 3].Formula = $"=SUM('Est. Cust. Naci.'!L6:L{lastRow})";
+        if (hasCustomPct && !simulacao.FlSimularSubfaturamento)
+        {
+            ws.Cells[totalBlockRow + 4, 3].Formula = $"=SUM('Est. Cust. Naci.'!L6:L{lastRow})*(100/{pctVal.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture)})";
+        }
+        else
+        {
+            ws.Cells[totalBlockRow + 4, 3].Formula = $"=SUM('Est. Cust. Naci.'!L6:L{lastRow})";
+        }
         ws.Cells[totalBlockRow + 4, 3].Style.Font.Bold = true;
         ws.Cells[totalBlockRow + 4, 3].Style.Numberformat.Format = "R$ #,##0.00";
 
@@ -446,12 +469,19 @@ public class EdcExportService
         ws.Cells[totalBlockRow + 6, 3].Style.Numberformat.Format = "R$ #,##0.00";
 
         int noteRow = totalBlockRow + 8;
-        if (simulacao.FlSimularSubfaturamento)
+        if (hasCustomPct)
         {
             int subBlockRow = totalBlockRow + 8;
             ws.Cells[subBlockRow, 2].Value = "FOB DECLARADO (POR DENTRO)";
             ws.Cells[subBlockRow, 2].Style.Font.Bold = true;
-            ws.Cells[subBlockRow, 3].Formula = $"=SUM('Est. Cust. Naci.'!M6:M{lastRow})";
+            if (simulacao.FlSimularSubfaturamento)
+            {
+                ws.Cells[subBlockRow, 3].Formula = $"=SUM('Est. Cust. Naci.'!M6:M{lastRow})";
+            }
+            else
+            {
+                ws.Cells[subBlockRow, 3].Formula = $"=SUM('Est. Cust. Naci.'!L6:L{lastRow})";
+            }
             ws.Cells[subBlockRow, 3].Style.Font.Bold = true;
             ws.Cells[subBlockRow, 3].Style.Numberformat.Format = "R$ #,##0.00";
 
@@ -641,6 +671,26 @@ public class EdcExportService
         ws.Cells.Style.Font.Size = 10;
         ws.View.ShowGridLines = true;
 
+        decimal pctVal = 100m;
+        bool hasCustomPct = false;
+        if (simulacao.FlSimularSubfaturamento)
+        {
+            pctVal = simulacao.PercentualSubfaturamento;
+            hasCustomPct = true;
+        }
+        else if (!string.IsNullOrEmpty(simulacao.NumeroReferencia))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(simulacao.NumeroReferencia, @"(\d+)\s*%");
+            if (match.Success)
+            {
+                pctVal = decimal.Parse(match.Groups[1].Value);
+                if (pctVal < 100m)
+                {
+                    hasCustomPct = true;
+                }
+            }
+        }
+
         // Group headers (Row 2)
         ws.Cells["C2:K2"].Merge = true; ws.Cells["C2"].Value = "DETALHES DO PRODUTO";
         ws.Cells["L2:Q2"].Merge = true; ws.Cells["L2"].Value = "VALOR ADUANEIRO";
@@ -768,7 +818,14 @@ public class EdcExportService
                 }
 
                 ws.Cells[r, 41].Formula = $"=SUM(Y{r}:AN{r})"; // TOTAL TAXAS DESEMBARAÇO
-                ws.Cells[r, 42].Formula = $"=AO{r}+W{r}+P{r}"; // TOTAL BRL
+                if (hasCustomPct && !simulacao.FlSimularSubfaturamento)
+                {
+                    ws.Cells[r, 42].Formula = $"=AO{r}+W{r}+P{r}+(L{r}*(100/{pctVal.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture)}-1))"; // TOTAL BRL + PAGO POR FORA
+                }
+                else
+                {
+                    ws.Cells[r, 42].Formula = $"=AO{r}+W{r}+P{r}"; // TOTAL BRL
+                }
                 ws.Cells[r, 43].Formula = $"=AO{r}+X{r}+P{r}"; // TOTAL sub BRL
                 ws.Cells[r, 44].Formula = $"=AQ{r}"; // Total duplicate (pointing to AQ: TOTAL sub BRL)
 
