@@ -1,0 +1,22 @@
+-- SCRIPT PARA LIMPEZA DE ESTUDOS/SIMULAÇÕES (EDC)
+--
+-- Descrição:
+--   Este script limpa todas as tabelas de simulações/estudos de testes cadastrados no sistema,
+--   deixando o módulo limpo para o início do uso oficial.
+--
+-- Tabelas Limpas:
+--   - edc.simulacao_despesas (via CASCADE)
+--   - edc.simulacao_itens (via CASCADE)
+--   - edc.simulacoes
+--
+-- Tabelas Preservadas (Parte Cadastral):
+--   - edc.importadores (Clientes)
+--   - edc.exportadores (Fornecedores)
+--   - edc.ncms
+--   - edc.produtos
+--   - edc.portos
+--   - edc.taxas_aduaneiras
+--   - edc.modelos
+--   - edc.configuracoes_fiscais
+
+TRUNCATE edc.simulacoes RESTART IDENTITY CASCADE;
