@@ -776,15 +776,6 @@ export default function PrintEdcPage() {
               <td className="text-right">{fmtUsd(prodTotalUSD)}</td>
               <td className="text-right">{fmtBrl(prodTotalBrl)}</td>
             </tr>
-            {hasCustomPct && (
-              <tr>
-                <td>PAGO POR FORA</td>
-                <td className="text-center">-</td>
-                <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(pagoPorForaUSD / (totalQuantidade || 1))}</td>
-                <td className="text-right">{fmtUsd(pagoPorForaUSD)}</td>
-                <td className="text-right">{fmtBrl(pagoPorForaBrl)}</td>
-              </tr>
-            )}
             <tr>
               <td>PRODUTO + FRETE</td>
               <td className="text-center">-</td>
@@ -908,8 +899,14 @@ export default function PrintEdcPage() {
                 )}
                 <tr>
                   <td className="bold">TOTAL DESPESAS + TRIBUTOS</td>
-                  <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - totalFobBrl)}</td>
+                  <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - totalFobBrl - (hasCustomPct && !estudo.flSimularSubfaturamento ? pagoPorForaBrl : 0))}</td>
                 </tr>
+                {hasCustomPct && !estudo.flSimularSubfaturamento && (
+                  <tr>
+                    <td className="bold">PAGO POR FORA</td>
+                    <td className="text-right bold">{fmtBrl(pagoPorForaBrl)}</td>
+                  </tr>
+                )}
                 <tr className="total-highlight" style={{ fontSize: "1.1rem" }}>
                   <td className="bold" style={{ borderBottom: "none", borderRadius: "0 0 0 8px" }}>CUSTO TOTAL NACIONALIZADO</td>
                   <td className="text-right bold" style={{ borderBottom: "none", borderRadius: "0 0 8px 0" }}>{fmtBrl(totalGeralNacionalizado)}</td>

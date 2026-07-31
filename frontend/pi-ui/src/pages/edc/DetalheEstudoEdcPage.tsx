@@ -325,6 +325,11 @@ const DetalheEstudoEdcPage: React.FC = () => {
                 </span>
               </>
             )}
+            {hasCustomPct && !estudo.flSimularSubfaturamento && (
+              <span style={{ fontSize: '0.75rem', opacity: 0.9, color: '#e9d5ff' }}>
+                • Pago por Fora ({pctVal}%): R$ {totalFobPorForaBrl.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            )}
             <span style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
               ICMS: {estudo.metodoCalculoIcms === 'SimplificadoExcel' ? 'Excel' : 'Legal'} | 
               Federais: {estudo.metodoCalculoFederais === 'SimplificadoExcel' ? 'Excel' : 'Legal'}
