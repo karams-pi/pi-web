@@ -35,8 +35,8 @@ public class ExcelImportService
 
         var deactivateSql = @"
             UPDATE modulo_tecido 
-            SET fl_ativo = false 
-            WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+            SET fl_ativo = false, data_hora_inativacao = NOW() 
+            WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0}) AND fl_ativo = true";
         await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
         // 2. Parse Headers to find Price Columns (starting from col 8 / 'H')
@@ -122,8 +122,8 @@ public class ExcelImportService
 
             var deactivateSql = @"
                 UPDATE modulo_tecido 
-                SET fl_ativo = false 
-                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+                SET fl_ativo = false, data_hora_inativacao = NOW() 
+                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0}) AND fl_ativo = true";
             await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
             // Pre-carregar dados para evitar N+1 queries (Cache)
@@ -596,8 +596,8 @@ public class ExcelImportService
 
             var deactivateSql = @"
                 UPDATE modulo_tecido 
-                SET fl_ativo = false 
-                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+                SET fl_ativo = false, data_hora_inativacao = NOW() 
+                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0}) AND fl_ativo = true";
             await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
             // === PRE-LOADING CACHES ===
@@ -853,8 +853,8 @@ public class ExcelImportService
 
             var deactivateSql = @"
                 UPDATE modulo_tecido 
-                SET fl_ativo = false 
-                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+                SET fl_ativo = false, data_hora_inativacao = NOW() 
+                WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0}) AND fl_ativo = true";
             await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
 
             // === CACHES ===
@@ -1083,8 +1083,8 @@ public class ExcelImportService
             {
                 var deactivateSql = @"
                     UPDATE modulo_tecido 
-                    SET fl_ativo = false 
-                    WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0})";
+                    SET fl_ativo = false, data_hora_inativacao = NOW() 
+                    WHERE id_modulo IN (SELECT id FROM modulo WHERE id_fornecedor = {0}) AND fl_ativo = true";
                 await _context.Database.ExecuteSqlRawAsync(deactivateSql, idFornecedor);
             }
 

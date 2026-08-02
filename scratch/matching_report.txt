@@ -1,0 +1,163 @@
+=== MATCHED MODULES ===
+Sheet: Row=  6 | Desc=Módulo (1Ass:080 - S/br)            | W=0.80 | D=1.08  <--->  DB: ID=3222 | Desc=Módulo (1Ass:080 - S/br)            | W=0.80 | D=1.08
+Sheet: Row=  7 | Desc=Módulo (1Ass:090 - S/br)            | W=0.90 | D=1.08  <--->  DB: ID=3223 | Desc=Módulo (1Ass:090 - S/br)            | W=0.90 | D=1.08
+Sheet: Row=  8 | Desc=Módulo (1Ass:100 - S/br)            | W=1.00 | D=1.08  <--->  DB: ID=3224 | Desc=Módulo (1Ass:100 - S/br)            | W=1.00 | D=1.08
+Sheet: Row=  9 | Desc=Módulo (1Ass:110 - S/br)            | W=1.10 | D=1.08  <--->  DB: ID=3225 | Desc=Módulo (1Ass:110 - S/br)            | W=1.10 | D=1.08
+Sheet: Row= 11 | Desc=Módulo (1Ass:080 - 1Br:020)         | W=1.00 | D=1.08  <--->  DB: ID=3226 | Desc=Módulo (1Ass:080 - 1Br:020)         | W=1.00 | D=1.08
+Sheet: Row= 12 | Desc=Módulo (1Ass:090 - 1Br:020)         | W=1.10 | D=1.08  <--->  DB: ID=3227 | Desc=Módulo (1Ass:090 - 1Br:020)         | W=1.10 | D=1.08
+Sheet: Row= 13 | Desc=Módulo (1Ass:100 - 1Br:020)         | W=1.20 | D=1.08  <--->  DB: ID=3228 | Desc=Módulo (1Ass:100 - 1Br:020)         | W=1.20 | D=1.08
+Sheet: Row= 14 | Desc=Módulo (1Ass:110 - 1Br:020)         | W=1.30 | D=1.08  <--->  DB: ID=3229 | Desc=Módulo (1Ass:110 - 1Br:020)         | W=1.30 | D=1.08
+Sheet: Row= 16 | Desc=Módulo (2Ass:080 - 1Br:020)         | W=1.80 | D=1.08  <--->  DB: ID=3230 | Desc=Módulo (2Ass:080 - 1Br:020)         | W=1.80 | D=1.08
+Sheet: Row= 17 | Desc=Módulo (2Ass:090 - 1Br:020)         | W=2.00 | D=1.08  <--->  DB: ID=3231 | Desc=Módulo (2Ass:090 - 1Br:020)         | W=2.00 | D=1.08
+Sheet: Row= 18 | Desc=Módulo (2Ass:100 - 1Br:020)         | W=2.20 | D=1.08  <--->  DB: ID=3232 | Desc=Módulo (2Ass:100 - 1Br:020)         | W=2.20 | D=1.08
+Sheet: Row= 19 | Desc=Módulo (2Ass:110 - 1Br:020)         | W=2.40 | D=1.08  <--->  DB: ID=3233 | Desc=Módulo (2Ass:110 - 1Br:020)         | W=2.40 | D=1.08
+Sheet: Row= 21 | Desc=Módulo (1Ass:080 - 1Me:055)         | W=1.35 | D=1.08  <--->  DB: ID=3234 | Desc=Módulo (1Ass:080 - 1Me:055)         | W=1.35 | D=1.08
+Sheet: Row= 22 | Desc=Módulo (1Ass:090 - 1Me:055)         | W=1.45 | D=1.08  <--->  DB: ID=3235 | Desc=Módulo (1Ass:090 - 1Me:055)         | W=1.45 | D=1.08
+Sheet: Row= 23 | Desc=Módulo (1Ass:100 - 1Me:055)         | W=1.55 | D=1.08  <--->  DB: ID=3236 | Desc=Módulo (1Ass:100 - 1Me:055)         | W=1.55 | D=1.08
+Sheet: Row= 24 | Desc=Módulo (1Ass:110 - 1Me:055)         | W=1.65 | D=1.08  <--->  DB: ID=3237 | Desc=Módulo (1Ass:110 - 1Me:055)         | W=1.65 | D=1.08
+Sheet: Row= 25 | Desc=Módulo (1Ass:120 - 1Me:055)         | W=1.75 | D=1.08  <--->  DB: ID=3238 | Desc=Módulo (1Ass:120 - 1Me:055)         | W=1.75 | D=1.08
+Sheet: Row= 26 | Desc=Módulo (1Ass:130 - 1Me:055)         | W=1.85 | D=1.08  <--->  DB: ID=3239 | Desc=Módulo (1Ass:130 - 1Me:055)         | W=1.85 | D=1.08
+Sheet: Row= 27 | Desc=Módulo (1Ass:140 - 1Me:055)         | W=1.95 | D=1.08  <--->  DB: ID=3240 | Desc=Módulo (1Ass:140 - 1Me:055)         | W=1.95 | D=1.08
+Sheet: Row= 29 | Desc=Módulo (2Ass:080 - 1Me:055)         | W=2.15 | D=1.08  <--->  DB: ID=3241 | Desc=Módulo (2Ass:080 - 1Me:055)         | W=2.15 | D=1.08
+Sheet: Row= 30 | Desc=Módulo (2Ass:090 - 1Me:055)         | W=2.35 | D=1.08  <--->  DB: ID=3242 | Desc=Módulo (2Ass:090 - 1Me:055)         | W=2.35 | D=1.08
+Sheet: Row= 31 | Desc=Módulo (2Ass:100 - 1Me:055)         | W=2.55 | D=1.08  <--->  DB: ID=3243 | Desc=Módulo (2Ass:100 - 1Me:055)         | W=2.55 | D=1.08
+Sheet: Row= 32 | Desc=Módulo (2Ass:110 - 1Me:055)         | W=2.75 | D=1.08  <--->  DB: ID=3244 | Desc=Módulo (2Ass:110 - 1Me:055)         | W=2.75 | D=1.08
+Sheet: Row= 34 | Desc=Canto 1,04x1,04                     | W=1.04 | D=1.04  <--->  DB: ID=3245 | Desc=Canto 1,04x1,04                     | W=1.04 | D=1.04
+Sheet: Row= 36 | Desc=Chaise (1Ass:090 - 1Br:020)         | W=1.10 | D=1.80  <--->  DB: ID=3246 | Desc=Chaise (1Ass:090 - 1Br:020)         | W=1.10 | D=1.80
+Sheet: Row= 37 | Desc=Chaise (1Ass:100 - 1Br:020)         | W=1.20 | D=1.80  <--->  DB: ID=3247 | Desc=Chaise (1Ass:100 - 1Br:020)         | W=1.20 | D=1.80
+Sheet: Row= 38 | Desc=Chaise (1Ass:110 - 1Br:020)         | W=1.30 | D=1.80  <--->  DB: ID=3248 | Desc=Chaise (1Ass:110 - 1Br:020)         | W=1.30 | D=1.80
+Sheet: Row= 40 | Desc=Puff 104x104                        | W=1.04 | D=1.04  <--->  DB: ID=3249 | Desc=Puff 104x104                        | W=1.04 | D=1.04
+Sheet: Row= 55 | Desc=Sumie Sem Canto 200                 | W=2.00 | D=1.08  <--->  DB: ID=3250 | Desc=Sumie Sem Canto 200                 | W=2.00 | D=1.08
+Sheet: Row= 56 | Desc=Sumie Sem Canto 220                 | W=2.20 | D=1.08  <--->  DB: ID=3251 | Desc=Sumie Sem Canto 220                 | W=2.20 | D=1.08
+Sheet: Row= 57 | Desc=Sumie Sem Canto 240                 | W=2.40 | D=1.08  <--->  DB: ID=3252 | Desc=Sumie Sem Canto 240                 | W=2.40 | D=1.08
+Sheet: Row= 76 | Desc=Módulo Curvo 250                    | W=2.50 | D=1.15  <--->  DB: ID=3885 | Desc=Módulo Curvo 250                    | W=2.50 | D=1.15
+Sheet: Row=138 | Desc=Canto 120x120                       | W=1.20 | D=1.20  <--->  DB: ID=4710 | Desc=Canto 120x120                       | W=1.20 | D=1.20
+Sheet: Row=140 | Desc=Chaise (1Ass:100 - 1Br:015)         | W=1.15 | D=1.45  <--->  DB: ID=4711 | Desc=Chaise (1Ass:100 - 1Br:015)         | W=1.15 | D=1.45
+Sheet: Row=141 | Desc=Chaise (1Ass:110 - 1Br:015)         | W=1.25 | D=1.45  <--->  DB: ID=4712 | Desc=Chaise (1Ass:110 - 1Br:015)         | W=1.25 | D=1.45
+Sheet: Row=142 | Desc=Chaise (1Ass:120 - 1Br:015)         | W=1.35 | D=1.45  <--->  DB: ID=4713 | Desc=Chaise (1Ass:120 - 1Br:015)         | W=1.35 | D=1.45
+Sheet: Row=195 | Desc=Módulo (1Ass:090 - S/br)            | W=0.90 | D=1.04  <--->  DB: ID=4733 | Desc=Módulo (1Ass:090 - S/br)            | W=0.90 | D=1.04
+Sheet: Row=196 | Desc=Módulo (1Ass:100 - S/br)            | W=1.00 | D=1.04  <--->  DB: ID=4734 | Desc=Módulo (1Ass:100 - S/br)            | W=1.00 | D=1.04
+Sheet: Row=197 | Desc=Módulo (1Ass:110 - S/br)            | W=1.10 | D=1.04  <--->  DB: ID=4735 | Desc=Módulo (1Ass:110 - S/br)            | W=1.10 | D=1.04
+Sheet: Row=199 | Desc=Braço 012                           | W=0.12 | D=1.00  <--->  DB: ID=4736 | Desc=Braço 012                           | W=0.12 | D=1.00
+Sheet: Row=201 | Desc=MECANISMO 1 ASS                     | W=1.00 | D=1.00  <--->  DB: ID=4737 | Desc=MECANISMO 1 ASS                     | W=1.00 | D=1.00
+Sheet: Row=202 | Desc=MECANISMO 2 ASS                     | W=1.00 | D=1.00  <--->  DB: ID=4738 | Desc=MECANISMO 2 ASS                     | W=1.00 | D=1.00
+Sheet: Row=203 | Desc=MECANISMO 3 ASS                     | W=1.00 | D=1.00  <--->  DB: ID=4739 | Desc=MECANISMO 3 ASS                     | W=1.00 | D=1.00
+Sheet: Row=  6 | Desc=Poltrona                            | W=0.90 | D=0.93  <--->  DB: ID=4740 | Desc=Poltrona                            | W=0.90 | D=0.93
+Sheet: Row=  6 | Desc=Banco                               | W=1.60 | D=0.45  <--->  DB: ID=4596 | Desc=Banco                               | W=1.60 | D=0.45
+Sheet: Row=  8 | Desc=Puff                                | W=0.58 | D=0.50  <--->  DB: ID=4597 | Desc=Puff                                | W=0.58 | D=0.50
+
+=== UNMATCHED (NEW) MODULES ===
+Sheet: Row= 42 | Model=ESTOFADO ANKUR       | Desc=Puff 0,80 x 0,80                    | W=0.80 | D=0.80 | Reason=No dimension or description match
+Sheet: Row= 43 | Model=ESTOFADO ANKUR       | Desc=Puff 0,90 x 0,80                    | W=0.90 | D=0.80 | Reason=No dimension or description match
+Sheet: Row= 44 | Model=ESTOFADO ANKUR       | Desc=Puff 1,00 x 0,80                    | W=1.00 | D=0.80 | Reason=No dimension or description match
+Sheet: Row= 45 | Model=ESTOFADO ANKUR       | Desc=Puff 1,10 x 0,80                    | W=1.10 | D=0.80 | Reason=No dimension or description match
+Sheet: Row= 47 | Model=ESTOFADO ANKUR       | Desc=Puff 1,00 com mesa 0,55             | W=1.55 | D=0.80 | Reason=No dimension or description match
+Sheet: Row= 48 | Model=ESTOFADO ANKUR       | Desc=Puff 1,10 com mesa 0,55             | W=1.65 | D=0.80 | Reason=No dimension or description match
+Sheet: Row= 50 | Model=ESTOFADO ANKUR       | Desc=Almofada de Encosto                 | W=0.80 | D=0.20 | Reason=No dimension or description match
+Sheet: Row= 51 | Model=ESTOFADO ANKUR       | Desc=Almofada de Encosto                 | W=0.90 | D=0.20 | Reason=No dimension or description match
+Sheet: Row= 52 | Model=ESTOFADO ANKUR       | Desc=Almofada de Encosto                 | W=1.00 | D=0.20 | Reason=No dimension or description match
+Sheet: Row= 53 | Model=ESTOFADO ANKUR       | Desc=Almofada de Encosto                 | W=1.10 | D=0.20 | Reason=No dimension or description match
+Sheet: Row= 60 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:115 - S/br)            | W=1.15 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 61 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:135 - S/br)            | W=1.35 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 62 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:155 - S/br)            | W=1.55 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 63 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:175 - S/br)            | W=1.75 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 64 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:195 - S/br)            | W=1.95 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 65 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:215 - S/br)            | W=2.15 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 66 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:235 - S/br)            | W=2.35 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 68 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:115 - 1Me:030)         | W=1.45 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 69 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:135 - 1Me:030)         | W=1.65 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 70 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:155 - 1Me:030)         | W=1.85 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 71 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:175 - 1Me:030)         | W=2.05 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 72 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:195 - 1Me:030)         | W=2.25 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 73 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:215 - 1Me:030)         | W=2.45 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 74 | Model=ESTOFADO LASSO       | Desc=Módulo (1Ass:235 - 1Me:030)         | W=2.65 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 78 | Model=ESTOFADO LASSO       | Desc=Puff 09x090                         | W=0.90 | D=0.90 | Reason=No dimension or description match
+Sheet: Row= 80 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:115 - S/br)       | W=1.15 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 81 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:135 - S/br)       | W=1.35 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 82 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:155 - S/br)       | W=1.55 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 83 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:175 - S/br)       | W=1.75 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 84 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:195 - S/br)       | W=1.95 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 85 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:215 - S/br)       | W=2.15 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 86 | Model=ESTOFADO LASSO       | Desc=Módulo Reto (1Ass:235 - S/br)       | W=2.35 | D=0.94 | Reason=No dimension or description match
+Sheet: Row= 88 | Model=ESTOFADO LASSO       | Desc=Chaise                              | W=1.15 | D=1.75 | Reason=No dimension or description match
+Sheet: Row= 89 | Model=ESTOFADO LASSO       | Desc=Chaise                              | W=1.35 | D=1.75 | Reason=No dimension or description match
+Sheet: Row= 91 | Model=ESTOFADO LASSO       | Desc=Braço solto                         | W=0.30 | D=0.60 | Reason=No dimension or description match
+Sheet: Row= 94 | Model=ESTOFADO MIWA        | Desc=Tapeçado - Bipartido (1Ass:166 - 2Br:20) - 6 Almofadas | W=2.06 | D=0.98 | Reason=Brand not in DB
+Sheet: Row= 95 | Model=ESTOFADO MIWA        | Desc=Tapeçado - Bipartido (1Ass:186 - 2Br:20) - 6 Almofadas | W=2.26 | D=0.98 | Reason=Brand not in DB
+Sheet: Row= 96 | Model=ESTOFADO MIWA        | Desc=Tapeçado - Bipartido (1Ass:206 - 2Br:20) - 6 Almofadas | W=2.46 | D=0.98 | Reason=Brand not in DB
+Sheet: Row= 97 | Model=ESTOFADO MIWA        | Desc=Tapeçado - Bipartido (1Ass:226 - 2Br:20) - 8 Almofadas | W=2.66 | D=0.98 | Reason=Brand not in DB
+Sheet: Row= 98 | Model=ESTOFADO MIWA        | Desc=Tapeçado - Bipartido (1Ass:246 - 2Br:20) - 8 Almofadas | W=2.86 | D=0.98 | Reason=Brand not in DB
+Sheet: Row= 99 | Model=ESTOFADO MIWA        | Desc=Tapeçado - Bipartido (1Ass:266 - 2Br:20) - 8 Almofadas | W=3.06 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=101 | Model=ESTOFADO MIWA        | Desc=Algodão - Bipartido (1Ass:166 - 2Br:20) - 6 Almofadas | W=2.06 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=102 | Model=ESTOFADO MIWA        | Desc=Algodão - Bipartido (1Ass:186 - 2Br:20) - 6 Almofadas | W=2.26 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=103 | Model=ESTOFADO MIWA        | Desc=Algodão - Bipartido (1Ass:206 - 2Br:20) - 6 Almofadas | W=2.46 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=104 | Model=ESTOFADO MIWA        | Desc=Algodão - Bipartido (1Ass:226 - 2Br:20) - 8 Almofadas | W=2.66 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=105 | Model=ESTOFADO MIWA        | Desc=Algodão - Bipartido (1Ass:246 - 2Br:20) - 8 Almofadas | W=2.86 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=106 | Model=ESTOFADO MIWA        | Desc=Algodão - Bipartido (1Ass:266 - 2Br:20) - 8 Almofadas | W=3.06 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=108 | Model=ESTOFADO MIWA        | Desc=Capa Inteira (1Ass:166 - 2Br:20) - 6 Almofadas | W=2.06 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=109 | Model=ESTOFADO MIWA        | Desc=Capa Inteira (1Ass:186 - 2Br:20) - 6 Almofadas | W=2.26 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=110 | Model=ESTOFADO MIWA        | Desc=Capa Inteira (1Ass:206 - 2Br:20) - 6 Almofadas | W=2.46 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=111 | Model=ESTOFADO MIWA        | Desc=Capa Inteira (1Ass:226 - 2Br:20) - 8 Almofadas | W=2.66 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=112 | Model=ESTOFADO MIWA        | Desc=Capa Inteira (1Ass:246 - 2Br:20) - 8 Almofadas | W=2.86 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=113 | Model=ESTOFADO MIWA        | Desc=Capa Inteira (1Ass:266 - 2Br:20) - 8 Almofadas | W=3.06 | D=0.98 | Reason=Brand not in DB
+Sheet: Row=117 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:090 - 1Br:015)      | W=1.95 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=118 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:100 - 1Br:015)      | W=2.15 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=119 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:110 - 1Br:015)      | W=2.35 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=120 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:120 - 1Br:015)      | W=2.55 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=121 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:130 - 1Br:015)      | W=2.75 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=122 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:140 - 1Br:015)      | W=2.95 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=124 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:090 - 2Br:015)      | W=2.10 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=125 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:100 - 2Br:015)      | W=2.30 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=126 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:110 - 2Br:015)      | W=2.50 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=127 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:120 - 2Br:015)      | W=2.70 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=128 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:130 - 2Br:015)      | W=2.90 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=129 | Model=ESTOFADO MOA         | Desc=Bipartido (2Ass:140 - 2Br:015)      | W=3.10 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=131 | Model=ESTOFADO MOA         | Desc=Bipartido (1Ass:090 - 1Puff:090 - 1Br:015) | W=1.95 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=132 | Model=ESTOFADO MOA         | Desc=Bipartido (1Ass:100 - 1Puff:100 - 1Br:015) | W=2.15 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=133 | Model=ESTOFADO MOA         | Desc=Bipartido (1Ass:110 - 1Puff:110 - 1Br:015) | W=2.35 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=134 | Model=ESTOFADO MOA         | Desc=Bipartido (1Ass:120 - 1Puff:120 - 1Br:015) | W=2.55 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=135 | Model=ESTOFADO MOA         | Desc=Bipartido (1Ass:130 - 1Puff:130 - 1Br:015) | W=2.75 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=136 | Model=ESTOFADO MOA         | Desc=Bipartido (1Ass:140 - 1Puff:140 - 1Br:015) | W=2.95 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=144 | Model=ESTOFADO MOA         | Desc=Puff 095x095                        | W=0.95 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=145 | Model=ESTOFADO MOA         | Desc=Puff 105x095                        | W=1.05 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=146 | Model=ESTOFADO MOA         | Desc=Puff 115x095                        | W=1.15 | D=1.02 | Reason=No dimension or description match
+Sheet: Row=149 | Model=ESTOFADO NINHO       | Desc=Modulo (1Ass:087 - 1Br:023)         | W=1.10 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=150 | Model=ESTOFADO NINHO       | Desc=Modulo (1Ass:097 - 1Br:023)         | W=1.20 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=151 | Model=ESTOFADO NINHO       | Desc=Modulo (1Ass:107 - 1Br:023)         | W=1.30 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=152 | Model=ESTOFADO NINHO       | Desc=Modulo (1Ass:117 - 1Br:023)         | W=1.40 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=153 | Model=ESTOFADO NINHO       | Desc=Modulo (1Ass:127 - 1Br:023)         | W=1.50 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=154 | Model=ESTOFADO NINHO       | Desc=Modulo (1Ass:137 - 1Br:023)         | W=1.60 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=156 | Model=ESTOFADO NINHO       | Desc=Poltrona                            | W=1.14 | D=1.02 | Reason=Brand not in DB
+Sheet: Row=166 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:085 - S/Br)            | W=0.85 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=167 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:095 - S/Br)            | W=0.95 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=168 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:105 - S/Br)            | W=1.05 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=169 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:115 - S/Br)            | W=1.15 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=170 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:125 - S/Br)            | W=1.25 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=172 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:085 - 1Br:25)          | W=1.10 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=173 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:095 - 1Br:25)          | W=1.20 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=174 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:105 - 1Br:25)          | W=1.30 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=175 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:115 - 1Br:25)          | W=1.40 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=176 | Model=ESTOFADO TIBAGI      | Desc=Modulo (1Ass:125 - 1Br:25)          | W=1.50 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=178 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:085 - S/Br)            | W=1.70 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=179 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:095 - S/Br)            | W=1.90 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=180 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:105 - S/Br)            | W=2.10 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=181 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:115 - S/Br)            | W=2.30 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=182 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:125 - S/Br)            | W=2.50 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=184 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:085 - 1Br:025)         | W=1.95 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=185 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:095 - 1Br:025)         | W=2.15 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=186 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:105 - 1Br:025)         | W=2.35 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=187 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:115 - 1Br:025)         | W=2.55 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=188 | Model=ESTOFADO TIBAGI      | Desc=Modulo (2Ass:125 - 1Br:025)         | W=2.75 | D=0.95 | Reason=Brand not in DB
+Sheet: Row=190 | Model=ESTOFADO TIBAGI      | Desc=Modulo Curvo                        | W=1.90 | D=1.14 | Reason=Brand not in DB
+Sheet: Row=191 | Model=ESTOFADO TIBAGI      | Desc=Modulo Curvo                        | W=2.10 | D=1.14 | Reason=Brand not in DB
+Sheet: Row=192 | Model=ESTOFADO TIBAGI      | Desc=Modulo Curvo                        | W=2.30 | D=1.14 | Reason=Brand not in DB
+Sheet: Row= 15 | Model=POLTRONA DENGO       | Desc=Poltrona                            | W=1.16 | D=1.05 | Reason=Brand not in DB
+Sheet: Row= 24 | Model=POLTRONA KENJI       | Desc=Poltrona                            | W=0.94 | D=0.87 | Reason=Brand not in DB
+Sheet: Row= 33 | Model=POLTRONA MUSH        | Desc=Poltrona Giratória                  | W=0.85 | D=0.92 | Reason=No dimension or description match
+Sheet: Row= 42 | Model=POLTRONA MUSH (MALHA) | Desc=Poltrona Giratória                  | W=0.85 | D=0.92 | Reason=Brand not in DB
+Sheet: Row= 51 | Model=POLTRONA SEMENTE     | Desc=Poltrona                            | W=0.84 | D=0.93 | Reason=Brand not in DB
+Sheet: Row= 15 | Model=BANCO TORUS          | Desc=Banco                               | W=1.70 | D=0.60 | Reason=Brand not in DB
+Sheet: Row= 16 | Model=BANCO TORUS          | Desc=Banco                               | W=1.80 | D=0.60 | Reason=Brand not in DB
+Sheet: Row= 17 | Model=BANCO TORUS          | Desc=Banco                               | W=1.90 | D=0.60 | Reason=Brand not in DB
+Sheet: Row=  6 | Model=CAMA KAORI           | Desc=King Size                           | W=2.80 | D=2.18 | Reason=Brand not in DB
+Sheet: Row=  9 | Model=CAMA KAORI           | Desc=Mini totem                          | W=1.00 | D=1.00 | Reason=Brand not in DB

@@ -38,4 +38,7 @@ public class ModuloTecido
 
     [Column("dt_ultima_revisao")]
     public DateTime? DtUltimaRevisao { get; set; }
+
+    [Column("data_hora_inativacao")]
+    public DateTime? DataHoraInativacao { get; set; }
 }

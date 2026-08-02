@@ -1124,6 +1124,10 @@ namespace Pi.Api.Migrations
                         .HasColumnType("character varying(10)")
                         .HasColumnName("codigo_modulo_tecido");
 
+                    b.Property<DateTime?>("DataHoraInativacao")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_hora_inativacao");
+
                     b.Property<DateTime?>("DtUltimaRevisao")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("dt_ultima_revisao");
