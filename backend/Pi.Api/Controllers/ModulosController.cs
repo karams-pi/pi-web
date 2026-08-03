@@ -106,8 +106,12 @@ public class ModulosController : ControllerBase
             .OrderByDescending(c => c.DataConfig)
             .ToListAsync();
 
-        var fileBytes = _exportService.ExportPriceListToExcel(itemsDto, request.Currency, request.Cotacao, configs, request.ValidityDays, request.FreightType);
-        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ListaDePrecos.xlsx");
+        var fileBytes = request.IsColinha
+            ? _exportService.ExportColinhaToExcel(itemsDto, request.Currency, request.Cotacao, configs, request.ValidityDays, request.FreightType)
+            : _exportService.ExportPriceListToExcel(itemsDto, request.Currency, request.Cotacao, configs, request.ValidityDays, request.FreightType);
+
+        string fileName = request.IsColinha ? "ColinhaAbimad.xlsx" : "ListaDePrecos.xlsx";
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
     public class ModuloExportRequest
@@ -131,6 +135,7 @@ public class ModulosController : ControllerBase
         public decimal Cotacao { get; set; }
         public int ValidityDays { get; set; } = 30;
         public string? FreightType { get; set; }
+        public bool IsColinha { get; set; }
     }
 
     public class PriceListItemRequest

@@ -400,6 +400,41 @@ export default function EmissaoListaPrecosPage() {
     }
   };
 
+  const handleExcelColinha = async () => {
+    if (itemsWithCalculations.length === 0) return alert("Selecione itens primeiro.");
+    setExportLoading(true);
+    try {
+      const payload = {
+        items: itemsWithCalculations.map(si => ({
+          moduloId: si.modulo.id,
+          valorFreteRateadoUSD: si.freightUSD
+        })),
+        currency,
+        cotacao,
+        validityDays,
+        freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW",
+        isColinha: true
+      };
+
+      const blob = await exportPriceListExcel(payload);
+      
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ColinhaAbimad_${currency}_${new Date().getTime()}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      await handleSaveEmission();
+    } catch (e) {
+      alert("Erro ao exportar Excel da Colinha");
+      console.error(e);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   // Helper for grid display
   const calcPriceWithFreight = useCallback((mod: Modulo, valorTecido: number, freightUSD: number) => {
     const c = configsMap.get(mod.idFornecedor) || configsMap.get(null);
@@ -471,6 +506,9 @@ export default function EmissaoListaPrecosPage() {
           </button>
           <button className="btn btn-secondary" onClick={handleExcel} disabled={exportLoading}>
             <FileSpreadsheet size={18} /> Exportar Excel
+          </button>
+          <button className="btn btn-secondary" onClick={handleExcelColinha} disabled={exportLoading} style={{ background: '#107c41', color: '#fff', border: '1px solid #107c41' }}>
+            <FileSpreadsheet size={18} /> Excel Colinha
           </button>
           <button className="btn btn-danger" onClick={clearSelection} title="Limpar Lista">
             <Trash2 size={18} />
