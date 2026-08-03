@@ -643,7 +643,7 @@ public class ModuloExportService
         {
             var brand = brandGroup.Key;
             var brandName = brand?.Nome ?? "Outros";
-            var brandItems = brandGroup.OrderBy(i => i.Modulo.Descricao).ToList();
+            var brandItems = brandGroup.ToList();
 
             var details = GetColinhaDetails(brandName);
             string displayGroup = details.DisplayGroup;
