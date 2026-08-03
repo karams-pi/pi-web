@@ -37,7 +37,12 @@ public class ModulosController : ControllerBase
         {
             // Apply same filters as GetAll if no IDs provided
             if (!string.IsNullOrEmpty(request.Search))
-                query = query.Where(m => m.Descricao.Contains(request.Search));
+            {
+                var lower = request.Search.ToLower();
+                query = query.Where(m => m.Descricao.ToLower().Contains(lower) ||
+                                         m.Id.ToString().Contains(lower) ||
+                                         (m.Marca != null && m.Marca.Nome.ToLower().Contains(lower)));
+            }
             
             if (request.IdFornecedor.HasValue)
                 query = query.Where(m => m.IdFornecedor == request.IdFornecedor);
@@ -251,7 +256,9 @@ public class ModulosController : ControllerBase
         if (!string.IsNullOrEmpty(search))
         {
             var lower = search.ToLower();
-            query = query.Where(x => x.Descricao.ToLower().Contains(lower) || x.Id.ToString().Contains(lower));
+            query = query.Where(x => x.Descricao.ToLower().Contains(lower) || 
+                                     x.Id.ToString().Contains(lower) ||
+                                     (x.Marca != null && x.Marca.Nome.ToLower().Contains(lower)));
         }
         if (idFornecedor.HasValue) query = query.Where(x => x.IdFornecedor == idFornecedor.Value);
         if (idCategoria.HasValue) query = query.Where(x => x.IdCategoria == idCategoria.Value);
