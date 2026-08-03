@@ -453,6 +453,7 @@ public class ModuloExportService
 
         for (int i = 0; i < uniqueFabrics.Count; i++) ws.Column(fabricStartCol + i).Width = 12;
 
+        package.Workbook.Calculate();
         return package.GetAsByteArray();
     }
 
@@ -612,6 +613,7 @@ public class ModuloExportService
             BuildColinhaSheet(ws, complementos, currency, cotacao, configs, validityDays, freightType, isModular: false);
         }
         
+        package.Workbook.Calculate();
         return package.GetAsByteArray();
     }
 
