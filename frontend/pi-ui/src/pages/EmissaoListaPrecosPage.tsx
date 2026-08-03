@@ -176,7 +176,7 @@ export default function EmissaoListaPrecosPage() {
   const loadModules = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await listModulos(search, 1, 100, 
+      const res = await listModulos(search, 1, 5000, 
         filterFornecedor ? Number(filterFornecedor) : undefined,
         filterCategoria ? Number(filterCategoria) : undefined,
         filterMarca ? Number(filterMarca) : undefined,
