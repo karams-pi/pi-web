@@ -377,7 +377,8 @@ export default function EmissaoListaPrecosPage() {
         })),
         currency,
         cotacao,
-        validityDays
+        validityDays,
+        freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW"
       };
 
       const blob = await exportPriceListExcel(payload);

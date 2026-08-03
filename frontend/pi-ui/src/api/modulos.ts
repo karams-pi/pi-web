@@ -115,6 +115,7 @@ export async function exportPriceListExcel(params: {
   currency: "BRL" | "EXW";
   cotacao: number;
   validityDays?: number;
+  freightType?: string;
 }) {
   const res = await fetch(`${API_BASE}/api/pi/modulos/excel-price-list`, {
     method: "POST",

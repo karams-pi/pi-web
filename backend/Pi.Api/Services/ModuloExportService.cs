@@ -234,7 +234,7 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    public byte[] ExportPriceListToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30)
+    public byte[] ExportPriceListToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30, string? freightType = null)
     {
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Lista de Preços");
@@ -261,7 +261,8 @@ public class ModuloExportService
             })
             .ToList();
 
-        string title = $"Lista de Preços - {(currency == "BRL" ? "Valores em Reais (R$)" : "Valores em Dólar (EXW)")}";
+        string typeLabel = string.IsNullOrEmpty(freightType) ? "EXW" : freightType.ToUpper();
+        string title = $"Lista de Preços - {(currency == "BRL" ? "Valores em Reais (R$)" : $"Valores em Dólar ({typeLabel})")}";
         ws.Cells["A1"].Value = title;
         ws.Cells["A1"].Style.Font.Bold = true;
         ws.Cells["A1"].Style.Font.Size = 14;
@@ -326,7 +327,7 @@ public class ModuloExportService
                 ws.Cells[currentRow, 7, currentRow + 1, 7].Merge = true; ws.Cells[currentRow, 7].Value = "M³";
 
                 ws.Cells[currentRow, fabricStartCol, currentRow, maxCols].Merge = true;
-                ws.Cells[currentRow, fabricStartCol].Value = $"Valor Final ({(currency == "BRL" ? "Reais" : "EXW")})";
+                ws.Cells[currentRow, fabricStartCol].Value = $"Valor Final ({(currency == "BRL" ? "Reais" : typeLabel)})";
 
                 for (int i = 0; i < uniqueFabrics.Count; i++)
                 {

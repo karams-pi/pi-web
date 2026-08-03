@@ -101,7 +101,7 @@ public class ModulosController : ControllerBase
             .OrderByDescending(c => c.DataConfig)
             .ToListAsync();
 
-        var fileBytes = _exportService.ExportPriceListToExcel(itemsDto, request.Currency, request.Cotacao, configs, request.ValidityDays);
+        var fileBytes = _exportService.ExportPriceListToExcel(itemsDto, request.Currency, request.Cotacao, configs, request.ValidityDays, request.FreightType);
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ListaDePrecos.xlsx");
     }
 
@@ -125,6 +125,7 @@ public class ModulosController : ControllerBase
         public string Currency { get; set; } = "BRL";
         public decimal Cotacao { get; set; }
         public int ValidityDays { get; set; } = 30;
+        public string? FreightType { get; set; }
     }
 
     public class PriceListItemRequest
