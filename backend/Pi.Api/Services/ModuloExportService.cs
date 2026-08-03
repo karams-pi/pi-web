@@ -955,9 +955,10 @@ public class ModuloExportService
         { "PUFF TOAD", new ColinhaModelDetails { ModelName = "PUFF TOAD", DisplayGroup = "G1" } }
     };
 
-    private static ColinhaModelDetails GetColinhaDetails(string brandName)
+    private static string NormalizeString(string input)
     {
-        var cleaned = brandName.ToUpper()
+        if (string.IsNullOrEmpty(input)) return "";
+        var normalized = input.ToUpper()
             .Replace("ESTOFADO ", "")
             .Replace("POLTRONA ", "")
             .Replace("CAMA ", "")
@@ -965,29 +966,37 @@ public class ModuloExportService
             .Replace("BANCO ", "")
             .Replace("MESA ", "")
             .Replace("CADEIRA ", "")
-            .Replace("CHAISE ", "")
-            .Replace("Õ", "O")
-            .Trim();
+            .Replace("CHAISE ", "");
+
+        string normalizedString = normalized.Normalize(System.Text.NormalizationForm.FormD);
+        var stringBuilder = new System.Text.StringBuilder();
+
+        foreach (char c in normalizedString)
+        {
+            var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+        }
+
+        string result = stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        if (result == "ONKUR") return "ANKUR";
+        return result;
+    }
+
+    private static ColinhaModelDetails GetColinhaDetails(string brandName)
+    {
+        string cleaned = NormalizeString(brandName);
 
         foreach (var kvp in ColinhaDetails)
         {
-            var keyClean = kvp.Key.ToUpper()
-                .Replace("ESTOFADO ", "")
-                .Replace("POLTRONA ", "")
-                .Replace("CAMA ", "")
-                .Replace("PUFF ", "")
-                .Replace("BANCO ", "")
-                .Replace("MESA ", "")
-                .Replace("CADEIRA ", "")
-                .Replace("CHAISE ", "")
-                .Replace("Õ", "O")
-                .Trim();
+            string keyClean = NormalizeString(kvp.Key);
 
-            if (cleaned.Contains(keyClean) || keyClean.Contains(cleaned) || 
-                (cleaned == "ONKUR" && keyClean == "ANKUR") ||
-                (cleaned == "ANKUR" && keyClean == "ONKUR") ||
-                (cleaned == "MOA" && keyClean == "MOA") ||
-                (cleaned == "MÕA" && keyClean == "MOA"))
+            if (cleaned.Contains(keyClean) || keyClean.Contains(cleaned))
             {
                 return kvp.Value;
             }
