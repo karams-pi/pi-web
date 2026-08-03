@@ -721,7 +721,7 @@ public class ModuloExportService
                 ws.Cells[currentRow, 3, currentRow, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 ws.Cells[currentRow, 6, currentRow, 9].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-                ws.Row(currentRow).Height = 22;
+                ws.Row(currentRow).Height = isModular ? 22 : 90;
                 currentRow++;
             }
 
@@ -790,22 +790,27 @@ public class ModuloExportService
 
             int endBlockRow = currentRow - 1;
 
-            // Merge Column A
-            ws.Cells[startRow, 1, endBlockRow, 1].Merge = true;
+            // Write brand name in the header row A{startRow}
             ws.Cells[startRow, 1].Value = brandName.ToUpper();
             ws.Cells[startRow, 1].Style.Font.Bold = true;
-            ws.Cells[startRow, 1].Style.Font.Size = 12;
+            ws.Cells[startRow, 1].Style.Font.Size = 10;
             ws.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             ws.Cells[startRow, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             ws.Cells[startRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            for (int r = startRow + 1; r <= endBlockRow; r++)
+
+            // Merge Column A for the image starting from row below header to end of block
+            if (endBlockRow >= startRow + 1)
             {
-                ws.Cells[r, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                ws.Cells[startRow + 1, 1, endBlockRow, 1].Merge = true;
+                for (int r = startRow + 1; r <= endBlockRow; r++)
+                {
+                    ws.Cells[r, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
             }
 
-            if (brand?.Imagem != null)
+            if (brand?.Imagem != null && endBlockRow >= startRow + 1)
             {
-                AddCenteredImageColinha(ws, startRow, endBlockRow, brand.Imagem, $"PicC_{brand.Id}_{startRow}");
+                AddCenteredImageColinha(ws, startRow + 1, endBlockRow, brand.Imagem, $"PicC_{brand.Id}_{startRow}");
             }
 
             // Write notes
