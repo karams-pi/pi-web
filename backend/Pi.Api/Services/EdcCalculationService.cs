@@ -155,13 +155,13 @@ public class EdcCalculationService : IEdcCalculationService
             // 5. Calcular ICMS
             decimal icms = 0;
             decimal aliquotaIcms = 0.18m; // Default fallback to 18%
-            if (item.Produto?.Ncm != null && item.Produto.Ncm.AliquotaIcmsPadrao > 0)
-            {
-                aliquotaIcms = item.Produto.Ncm.AliquotaIcmsPadrao;
-            }
-            else if (simulacao.Importador != null)
+            if (simulacao.Importador != null && simulacao.Importador.AliquotaIcmsPadrao > 0)
             {
                 aliquotaIcms = simulacao.Importador.AliquotaIcmsPadrao;
+            }
+            else if (item.Produto?.Ncm != null && item.Produto.Ncm.AliquotaIcmsPadrao > 0)
+            {
+                aliquotaIcms = item.Produto.Ncm.AliquotaIcmsPadrao;
             }
             
             if (simulacao.MetodoCalculoIcms == "SimplificadoExcel")

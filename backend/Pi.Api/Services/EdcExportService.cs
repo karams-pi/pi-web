@@ -161,14 +161,13 @@ public class EdcExportService
         ws.Cells["E8"].Style.Font.Bold = true;
         
         decimal icmsPadrao = 0.18m;
-        var firstNcm = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm;
-        if (firstNcm != null && firstNcm.AliquotaIcmsPadrao > 0)
-        {
-            icmsPadrao = firstNcm.AliquotaIcmsPadrao;
-        }
-        else if (simulacao.Importador != null)
+        if (simulacao.Importador != null && simulacao.Importador.AliquotaIcmsPadrao > 0)
         {
             icmsPadrao = simulacao.Importador.AliquotaIcmsPadrao;
+        }
+        else if (simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm?.AliquotaIcmsPadrao > 0)
+        {
+            icmsPadrao = simulacao.Itens.FirstOrDefault()?.Produto?.Ncm?.AliquotaIcmsPadrao ?? 0.18m;
         }
         ws.Cells["G8"].Value = $"ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
@@ -599,13 +598,13 @@ public class EdcExportService
                 ws.Cells[r, 7].Value = item.Produto?.Ncm?.AliquotaPis ?? 0m;
                 ws.Cells[r, 8].Value = item.Produto?.Ncm?.AliquotaCofins ?? 0m;
                 decimal itemIcms = 0.18m;
-                if (item.Produto?.Ncm != null && item.Produto.Ncm.AliquotaIcmsPadrao > 0)
-                {
-                    itemIcms = item.Produto.Ncm.AliquotaIcmsPadrao;
-                }
-                else if (simulacao.Importador != null)
+                if (simulacao.Importador != null && simulacao.Importador.AliquotaIcmsPadrao > 0)
                 {
                     itemIcms = simulacao.Importador.AliquotaIcmsPadrao;
+                }
+                else if (item.Produto?.Ncm != null && item.Produto.Ncm.AliquotaIcmsPadrao > 0)
+                {
+                    itemIcms = item.Produto.Ncm.AliquotaIcmsPadrao;
                 }
                 ws.Cells[r, 9].Value = itemIcms;
                 ws.Cells[r, 10].Value = item.Quantidade;
