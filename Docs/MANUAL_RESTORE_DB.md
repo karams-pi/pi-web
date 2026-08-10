@@ -29,11 +29,11 @@ docker exec -i pi-postgres psql -U pi -d postgres -c "CREATE DATABASE pi_db OWNE
 ```
 
 ### 4. Executar a Restauração
-Execute o comando de restauração:
+Execute o comando de restauração utilizando as flags `-O` (para não restaurar proprietários originais de objetos) e `-x` (para não restaurar privilégios/permissões de papéis/roles inexistentes localmente, como `supabase_admin` ou `postgres`):
 ```powershell
-docker exec -i pi-postgres pg_restore -U pi -d pi_db -v /tmp/render.backup
+docker exec -i pi-postgres pg_restore -U pi -d pi_db -O -x -v /tmp/render.backup
 ```
-*Nota: É normal aparecerem alguns avisos de "error" sobre permissões ou constraints menores ao final da execução. Se o passo seguinte mostrar dados, a restauração foi bem-sucedida.*
+*Nota: Mesmo com `-O` e `-x`, podem surgir algumas mensagens secundárias relacionadas a Event Triggers ou extensões específicas, mas as tabelas e dados serão restaurados com sucesso. Se o passo seguinte mostrar dados, a restauração foi bem-sucedida.*
 
 ### 5. Verificar a Restauração
 Execute um comando simples para ver se as tabelas foram criadas e populadas:

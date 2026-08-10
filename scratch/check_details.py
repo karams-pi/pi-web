@@ -4,14 +4,20 @@ def check_details():
     conn = psycopg2.connect("host=localhost port=5432 dbname=pi_db user=pi password=pi123")
     cur = conn.cursor()
     
-    cur.execute("""
-        SELECT id, id_modulo, id_tecido, valor_tecido, codigo_modulo_tecido, fl_ativo, dt_ultima_revisao
-        FROM pi.modulo_tecido
-        WHERE id_modulo = 3173 AND id_tecido = 1;
-    """)
+    print("=== PI 13 DETAILS ===")
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_schema = 'pi' AND table_name = 'pi'")
+    cols = [r[0] for r in cur.fetchall()]
+    cur.execute("SELECT * FROM pi.pi WHERE id = 13")
     for r in cur.fetchall():
-        print(r)
+        print(dict(zip(cols, r)))
         
+    print("\n=== PI 13 ITEMS ===")
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_schema = 'pi' AND table_name = 'pi_item'")
+    cols = [r[0] for r in cur.fetchall()]
+    cur.execute("SELECT * FROM pi.pi_item WHERE id_pi = 13")
+    for r in cur.fetchall():
+        print(dict(zip(cols, r)))
+
     cur.close()
     conn.close()
 
