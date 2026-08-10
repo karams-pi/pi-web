@@ -115,19 +115,16 @@ export default function PrintEdcPage() {
 
   let prodTotalUSD = totalFobUSD;
   let prodTotalBrl = totalFobBrl;
-  let pagoPorForaUSD = 0;
   let pagoPorForaBrl = 0;
 
   if (hasCustomPct) {
     if (estudo.flSimularSubfaturamento) {
       prodTotalUSD = totalFobSubUSD;
       prodTotalBrl = totalFobSubBrl;
-      pagoPorForaUSD = totalFobUSD - totalFobSubUSD;
       pagoPorForaBrl = totalFobPorForaBrl;
     } else {
       prodTotalUSD = totalFobUSD;
       prodTotalBrl = totalFobBrl;
-      pagoPorForaUSD = totalFobUSD * (100 / pctVal - 1);
       pagoPorForaBrl = totalFobBrl * (100 / pctVal - 1);
     }
   }
@@ -336,14 +333,19 @@ export default function PrintEdcPage() {
             flex-direction: column;
             align-items: center;
           }
+          .print-page-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 30px;
+          }
           .print-page-container {
             background-color: #1e293b;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             width: 100%;
-            max-width: 1100px;
             padding: 40px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            box-sizing: border-box;
           }
           .top-bar-actions {
             max-width: 1100px;
@@ -423,17 +425,60 @@ export default function PrintEdcPage() {
             font-size: 0.75rem;
             color: #64748b;
           }
+          .flex-tables-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+          }
+          .flex-table-col {
+            min-width: 0;
+          }
+          @media (max-width: 768px) {
+            .flex-tables-row {
+              grid-template-columns: 1fr;
+            }
+          }
         }
 
         @media print {
           @page {
-            margin: 1.2cm;
-            size: portrait;
+            margin: 0;
+            size: landscape;
           }
-          /* Normal Print (Light mode for saving ink) */
-          body:not(.print-keep-colors), html:not(.print-keep-colors) {
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: #fff !important;
+          }
+          
+          /* Force page wrappers to match A4 landscape print size */
+          .print-page-wrapper {
+            width: 100vw !important;
+            min-height: 100vh !important;
+            box-sizing: border-box !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+
+          /* Light mode print (default) */
+          body:not(.print-keep-colors) .print-page-wrapper {
+            background: #fff !important;
+            padding: 0 !important;
+          }
+          body:not(.print-keep-colors) .print-page-container {
             background: #fff !important;
             color: #000 !important;
+            width: 100% !important;
+            height: 100% !important;
+            padding: 1.2cm !important;
+            box-sizing: border-box !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
           }
           body:not(.print-keep-colors) .print-edc-wrapper {
             background: #fff !important;
@@ -441,14 +486,6 @@ export default function PrintEdcPage() {
             padding: 0 !important;
             min-height: 0 !important;
             display: block !important;
-          }
-          body:not(.print-keep-colors) .print-page-container {
-            box-shadow: none !important;
-            border: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-            max-width: 100% !important;
-            width: 100% !important;
           }
           body:not(.print-keep-colors) .sheet-header-box {
             border: 1px solid #000 !important;
@@ -480,10 +517,25 @@ export default function PrintEdcPage() {
             print-color-adjust: exact;
           }
 
-          /* Color PDF Print (Exact Screen Styling) */
-          body.print-keep-colors, html.print-keep-colors {
-            background: #0f172a !important;
-            color: #f8fafc !important;
+          /* Color PDF Print (Dark mode) */
+          body.print-keep-colors {
+            background-color: #0f172a !important;
+          }
+          body.print-keep-colors .print-page-wrapper {
+            background-color: #0f172a !important;
+            padding: 1.2cm !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body.print-keep-colors .print-page-container {
+            background-color: #1e293b !important;
+            width: 100% !important;
+            height: 100% !important;
+            padding: 30px !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: none !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
@@ -493,17 +545,6 @@ export default function PrintEdcPage() {
             padding: 0 !important;
             min-height: 0 !important;
             display: block !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          body.print-keep-colors .print-page-container {
-            background-color: #1e293b !important;
-            box-shadow: none !important;
-            border: 1px solid rgba(255, 255, 255, 0.05) !important;
-            border-radius: 12px !important;
-            padding: 20px !important;
-            max-width: 100% !important;
-            width: 100% !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
@@ -541,12 +582,49 @@ export default function PrintEdcPage() {
             print-color-adjust: exact !important;
           }
 
+          /* General print style overrides for compactness */
+          .print-page-container {
+            font-size: 0.72rem !important;
+          }
+          .custom-table {
+            font-size: 0.72rem !important;
+            margin-bottom: 12px !important;
+          }
+          .custom-table th, .custom-table td {
+            padding: 4px 8px !important;
+          }
+          .section-title {
+            font-size: 0.95rem !important;
+            margin-top: 15px !important;
+            margin-bottom: 8px !important;
+            padding-bottom: 4px !important;
+          }
+          .sheet-header-box {
+            padding: 10px !important;
+            margin-bottom: 15px !important;
+          }
+          .header-grid {
+            gap: 15px !important;
+          }
+          .header-cell {
+            font-size: 0.72rem !important;
+          }
+          .summary-blocks {
+            gap: 15px !important;
+            margin-top: 10px !important;
+          }
+          .grand-total-card {
+            padding: 6px 10px !important;
+          }
+          .subtotal-table {
+            font-size: 0.75rem !important;
+          }
+          .subtotal-table td {
+            padding: 4px 8px !important;
+          }
+
           .no-print {
             display: none !important;
-          }
-          .page-break-print {
-            page-break-before: always;
-            break-before: page;
           }
           .page-break-indicator {
             display: none !important;
@@ -709,7 +787,8 @@ export default function PrintEdcPage() {
         </div>
       </div>
 
-      <div className="print-page-container">
+      <div className="print-page-wrapper">
+        <div className="print-page-container page-1">
         {/* ================= PAGE 1: ESTIMATIVA DE CUSTOS GERAL ================= */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: "30px", gap: "20px" }}>
           <div style={{ flexShrink: 0 }}>
@@ -757,97 +836,103 @@ export default function PrintEdcPage() {
           </div>
         </div>
 
-        {/* VALORES ADUANEIROS */}
-        <h2 className="section-title">1. Valores Aduaneiros</h2>
-        <table className="custom-table">
-          <thead>
-            <tr>
-              <th>Discriminação</th>
-              <th className="text-center">Qtd Itens</th>
-              <th className="text-right">Preço USD (FOB)</th>
-              <th className="text-right">FOB Total USD</th>
-              <th className="text-right">FOB Total BRL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>PRODUTO</td>
-              <td className="text-center">{totalQuantidade}</td>
-              <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(prodTotalUSD / (totalQuantidade || 1))}</td>
-              <td className="text-right">{fmtUsd(prodTotalUSD)}</td>
-              <td className="text-right">{fmtBrl(prodTotalBrl)}</td>
-            </tr>
-            <tr>
-              <td>Frete Internacional</td>
-              <td className="text-center">-</td>
-              <td className="text-right">{fmtUsd(estudo.valorFreteInternacional)}</td>
-              <td className="text-right">-</td>
-              <td className="text-right">{fmtBrl(freteBrl)}</td>
-            </tr>
-            <tr>
-              <td>Seguro Internacional</td>
-              <td className="text-center">-</td>
-              <td className="text-right">{fmtUsd(estudo.valorSeguroInternacional)}</td>
-              <td className="text-right">-</td>
-              <td className="text-right">{fmtBrl(seguroBrl)}</td>
-            </tr>
-            <tr>
-              <td>PRODUTO + FRETE</td>
-              <td className="text-center">-</td>
-              <td className="text-right">-</td>
-              <td className="text-right">-</td>
-              <td className="text-right">{fmtBrl(totalFobBrl + freteBrl)}</td>
-            </tr>
-            <tr className="total-highlight">
-              <td colSpan={4}>TOTAL VALOR ADUANEIRO</td>
-              <td className="text-right">{fmtBrl(totalFobBrl + freteBrl + seguroBrl)}</td>
-            </tr>
-          </tbody>
-        </table>
+        {/* TABELAS LADO A LADO */}
+        <div className="flex-tables-row">
+          <div className="flex-table-col">
+            {/* VALORES ADUANEIROS */}
+            <h2 className="section-title">1. Valores Aduaneiros</h2>
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Discriminação</th>
+                  <th className="text-center">Qtd Itens</th>
+                  <th className="text-right">Preço USD (FOB)</th>
+                  <th className="text-right">FOB Total USD</th>
+                  <th className="text-right">FOB Total BRL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>PRODUTO</td>
+                  <td className="text-center">{totalQuantidade}</td>
+                  <td className="text-right">{estudo.itens && estudo.itens.length > 1 ? "-" : fmtUsd(prodTotalUSD / (totalQuantidade || 1))}</td>
+                  <td className="text-right">{fmtUsd(prodTotalUSD)}</td>
+                  <td className="text-right">{fmtBrl(prodTotalBrl)}</td>
+                </tr>
+                <tr>
+                  <td>Frete Internacional</td>
+                  <td className="text-center">-</td>
+                  <td className="text-right">{fmtUsd(estudo.valorFreteInternacional)}</td>
+                  <td className="text-right">-</td>
+                  <td className="text-right">{fmtBrl(freteBrl)}</td>
+                </tr>
+                <tr>
+                  <td>Seguro Internacional</td>
+                  <td className="text-center">-</td>
+                  <td className="text-right">{fmtUsd(estudo.valorSeguroInternacional)}</td>
+                  <td className="text-right">-</td>
+                  <td className="text-right">{fmtBrl(seguroBrl)}</td>
+                </tr>
+                <tr>
+                  <td>PRODUTO + FRETE</td>
+                  <td className="text-center">-</td>
+                  <td className="text-right">-</td>
+                  <td className="text-right">-</td>
+                  <td className="text-right">{fmtBrl(totalFobBrl + freteBrl)}</td>
+                </tr>
+                <tr className="total-highlight">
+                  <td colSpan={4}>TOTAL VALOR ADUANEIRO</td>
+                  <td className="text-right">{fmtBrl(totalFobBrl + freteBrl + seguroBrl)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        {/* IMPOSTOS */}
-        <h2 className="section-title">2. Impostos Nacionalização</h2>
-        <table className="custom-table">
-          <thead>
-            <tr>
-              <th>Impostos</th>
-              <th className="text-center">Alíquota (%)</th>
-              <th className="text-right">Valor em Reais (R$)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>IMPOSTO DE IMPORTAÇÃO (II)</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaII ?? 0.18)}</td>
-              <td className="text-right">{fmtBrl(totalII)}</td>
-            </tr>
-            <tr>
-              <td>IPI</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaIPI ?? 0.0306)}</td>
-              <td className="text-right">{fmtBrl(totalIPI)}</td>
-            </tr>
-            <tr>
-              <td>PIS</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaPis ?? 0.0312)}</td>
-              <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqPis / aliqSum : 0))}</td>
-            </tr>
-            <tr>
-              <td>COFINS</td>
-              <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaCofins ?? 0.1437)}</td>
-              <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqCof / aliqSum : 0))}</td>
-            </tr>
-            <tr>
-              <td>ICMS</td>
-              <td className="text-center">{fmtPct(icmsPadrao)}</td>
-              <td className="text-right">{fmtBrl(totalIcms)}</td>
-            </tr>
-            <tr className="total-highlight">
-              <td colSpan={2}>TOTAL VALOR IMPOSTOS</td>
-              <td className="text-right">{fmtBrl(totalTributos)}</td>
-            </tr>
-          </tbody>
-        </table>
-
+          <div className="flex-table-col">
+            {/* IMPOSTOS */}
+            <h2 className="section-title">2. Impostos Nacionalização</h2>
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Impostos</th>
+                  <th className="text-center">Alíquota (%)</th>
+                  <th className="text-right">Valor em Reais (R$)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>IMPOSTO DE IMPORTAÇÃO (II)</td>
+                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaII ?? 0.18)}</td>
+                  <td className="text-right">{fmtBrl(totalII)}</td>
+                </tr>
+                <tr>
+                  <td>IPI</td>
+                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaIPI ?? 0.0306)}</td>
+                  <td className="text-right">{fmtBrl(totalIPI)}</td>
+                </tr>
+                <tr>
+                  <td>PIS</td>
+                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaPis ?? 0.0312)}</td>
+                  <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqPis / aliqSum : 0))}</td>
+                </tr>
+                <tr>
+                  <td>COFINS</td>
+                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaCofins ?? 0.1437)}</td>
+                  <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqCof / aliqSum : 0))}</td>
+                </tr>
+                <tr>
+                  <td>ICMS</td>
+                  <td className="text-center">{fmtPct(icmsPadrao)}</td>
+                  <td className="text-right">{fmtBrl(totalIcms)}</td>
+                </tr>
+                <tr className="total-highlight">
+                  <td colSpan={2}>TOTAL VALOR IMPOSTOS</td>
+                  <td className="text-right">{fmtBrl(totalTributos)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         {/* DESPESAS ADUANEIRAS */}
         <h2 className="section-title">3. Despesas Portuárias, Aduaneiras e Logísticas</h2>
         <table className="custom-table">
@@ -916,10 +1001,11 @@ export default function PrintEdcPage() {
             </table>
           </div>
         </div>
+        </div>
+      </div>
 
-        <div className="page-break-indicator"></div>
-        <div className="page-break-print"></div>
-
+      <div className="print-page-wrapper">
+        <div className="print-page-container page-2">
         {/* ================= PAGE 2: MEMÓRIA DE CÁLCULO E LISTA DE COMPRAS ================= */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: "30px", gap: "20px" }}>
           <div style={{ flexShrink: 0 }}>
@@ -1029,6 +1115,7 @@ R$ ${totalGeralNacionalizado.toLocaleString("pt-BR", { minimumFractionDigits: 2,
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
