@@ -260,6 +260,11 @@ export default function PrintEdcPage() {
 
     return {
       ...item,
+      aliqII,
+      aliqIPI,
+      aliqPis,
+      aliqCof,
+      aliqIcms,
       itemFobBrl,
       itemValorAduaneiro: itemValorAduaneiroCheio,
       baseCalculoAduaneiro,
@@ -272,6 +277,12 @@ export default function PrintEdcPage() {
       custoUnitarioNacionalizado: item.quantidade > 0 ? totalNacItem / item.quantidade : 0
     };
   }) : [];
+
+  const uniqueIIs = Array.from(new Set(itensCalculados.map((i: any) => i.aliqII || 0))) as number[];
+  const uniqueIPIs = Array.from(new Set(itensCalculados.map((i: any) => i.aliqIPI || 0))) as number[];
+  const uniquePis = Array.from(new Set(itensCalculados.map((i: any) => i.aliqPis || 0))) as number[];
+  const uniqueCofs = Array.from(new Set(itensCalculados.map((i: any) => i.aliqCof || 0))) as number[];
+  const uniqueIcmss = Array.from(new Set(itensCalculados.map((i: any) => i.aliqIcms || 0))) as number[];
 
   const totalII = itensCalculados.reduce((acc: number, i: any) => acc + i.ii, 0);
   const totalIPI = itensCalculados.reduce((acc: number, i: any) => acc + i.ipi, 0);
@@ -902,27 +913,27 @@ export default function PrintEdcPage() {
               <tbody>
                 <tr>
                   <td>IMPOSTO DE IMPORTAÇÃO (II)</td>
-                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaII ?? 0.18)}</td>
+                  <td className="text-center">{uniqueIIs.length === 1 ? fmtPct(uniqueIIs[0]) : "-"}</td>
                   <td className="text-right">{fmtBrl(totalII)}</td>
                 </tr>
                 <tr>
                   <td>IPI</td>
-                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaIPI ?? 0.0306)}</td>
+                  <td className="text-center">{uniqueIPIs.length === 1 ? fmtPct(uniqueIPIs[0]) : "-"}</td>
                   <td className="text-right">{fmtBrl(totalIPI)}</td>
                 </tr>
                 <tr>
                   <td>PIS</td>
-                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaPis ?? 0.0312)}</td>
+                  <td className="text-center">{uniquePis.length === 1 ? fmtPct(uniquePis[0]) : "-"}</td>
                   <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqPis / aliqSum : 0))}</td>
                 </tr>
                 <tr>
                   <td>COFINS</td>
-                  <td className="text-center">{fmtPct(itensCalculados[0]?.produto?.ncm?.aliquotaCofins ?? 0.1437)}</td>
+                  <td className="text-center">{uniqueCofs.length === 1 ? fmtPct(uniqueCofs[0]) : "-"}</td>
                   <td className="text-right">{fmtBrl(totalPisCofins * (aliqSum > 0 ? aliqCof / aliqSum : 0))}</td>
                 </tr>
                 <tr>
                   <td>ICMS</td>
-                  <td className="text-center">{fmtPct(icmsPadrao)}</td>
+                  <td className="text-center">{uniqueIcmss.length === 1 ? fmtPct(uniqueIcmss[0]) : "-"}</td>
                   <td className="text-right">{fmtBrl(totalIcms)}</td>
                 </tr>
                 <tr className="total-highlight">
