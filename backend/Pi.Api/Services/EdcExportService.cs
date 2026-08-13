@@ -499,10 +499,13 @@ public class EdcExportService
             noteRow = totalBlockRow + 11;
         }
 
-        ws.Cells[noteRow, 2].Value = "FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.";
-        ws.Cells[noteRow, 2].Style.Font.Italic = true;
-        ws.Cells[noteRow, 2].Style.Font.Size = 8;
-        ws.Cells[noteRow, 2].Style.Font.Color.SetColor(Color.FromArgb(192, 0, 0));
+        if (!simulacao.FlExibirComissao)
+        {
+            ws.Cells[noteRow, 2].Value = "FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.";
+            ws.Cells[noteRow, 2].Style.Font.Italic = true;
+            ws.Cells[noteRow, 2].Style.Font.Size = 8;
+            ws.Cells[noteRow, 2].Style.Font.Color.SetColor(Color.FromArgb(192, 0, 0));
+        }
 
         // Number Formatting for currency columns (column G)
         ws.Cells["G15:G20"].Style.Numberformat.Format = "R$ #,##0.00";

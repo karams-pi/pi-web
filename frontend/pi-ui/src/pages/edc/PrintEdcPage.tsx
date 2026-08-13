@@ -1121,9 +1121,11 @@ R$ ${totalGeralNacionalizado.toLocaleString("pt-BR", { minimumFractionDigits: 2,
             <div className="simulation-warning-text">
               * ESTE DOCUMENTO TRATA-SE DE UMA SIMULAÇÃO PRELIMINAR DE CUSTOS E TRIBUTOS. OS VALORES APRESENTADOS SÃO ESTIMATIVOS E PODEM SOFRER ALTERAÇÕES DE ACORDO COM A OSCILAÇÃO CAMBIAL, LEGISLAÇÃO FISCAL OU VARIAÇÕES OPERACIONAIS NA DATA DO DESEMBARAÇO EFETIVO.
             </div>
-            <div className="commission-warning-text">
-              * FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.
-            </div>
+            {!estudo.flExibirComissao && (
+              <div className="commission-warning-text">
+                * FAVOR NOTAR QUE A ESTIMATIVA DE CUSTOS NÃO CONTEMPLA VALORES DE COMISSÃO, POIS ELES VARIAM CONFORME CONTRATO.
+              </div>
+            )}
           </div>
         </div>
       </div>
