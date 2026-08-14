@@ -3,13 +3,42 @@ import React, { useState, useEffect } from 'react';
 import { 
   Calculator, Save, X, Plus, Trash2, 
   ArrowLeft, Building, Globe, 
-  DollarSign, TrendingUp, Info
+  DollarSign, TrendingUp, Info,
+  GripVertical
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const NovoEstudoEdcPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragEnabled, setDragEnabled] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newDespesas = [...formData.despesas];
+    const draggedItem = newDespesas[draggedIndex];
+    
+    newDespesas.splice(draggedIndex, 1);
+    newDespesas.splice(index, 0, draggedItem);
+    
+    setDraggedIndex(index);
+    setDragEnabled(index);
+    setFormData(prev => ({ ...prev, despesas: newDespesas }));
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragEnabled(null);
+  };
   
   const [importadores, setImportadores] = useState<any[]>([]);
   const [exportadores, setExportadores] = useState<any[]>([]);
@@ -78,7 +107,10 @@ const NovoEstudoEdcPage: React.FC = () => {
             metodoCalculoFederais: sim.metodoCalculoFederais || 'SimplificadoExcel',
             status: sim.status || 'Rascunho',
             itens: sim.itens || [],
-            despesas: sim.despesas || []
+            despesas: (sim.despesas || []).map((d: any) => ({
+              ...d,
+              tempId: d.id ? d.id.toString() : Math.random().toString(36).substr(2, 9)
+            }))
           });
         } else if (tax.length > 0) {
           setFormData(prev => ({
@@ -87,7 +119,8 @@ const NovoEstudoEdcPage: React.FC = () => {
               nomeDespesa: t.nome,
               valor: t.valorPadrao,
               moeda: t.moeda,
-              metodoRateio: 'Valor FOB'
+              metodoRateio: 'Valor FOB',
+              tempId: Math.random().toString(36).substr(2, 9)
             }))
           }));
         }
@@ -368,7 +401,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                     ...prev,
                     despesas: [
                       ...prev.despesas,
-                      { nomeDespesa: '', valor: 0, moeda: 'BRL', metodoRateio: 'Valor FOB' }
+                      { nomeDespesa: '', valor: 0, moeda: 'BRL', metodoRateio: 'Valor FOB', tempId: Math.random().toString(36).substr(2, 9) }
                     ]
                   }));
                 }}
@@ -380,6 +413,7 @@ const NovoEstudoEdcPage: React.FC = () => {
               <table className="table">
                 <thead>
                   <tr>
+                    <th style={{ width: '40px' }}></th>
                     <th>Descrição da Despesa</th>
                     <th style={{ width: '150px' }}>Moeda</th>
                     <th style={{ width: '180px' }}>Valor</th>
@@ -390,13 +424,30 @@ const NovoEstudoEdcPage: React.FC = () => {
                 <tbody>
                   {formData.despesas.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', opacity: 0.5, padding: '20px' }}>
+                      <td colSpan={6} style={{ textAlign: 'center', opacity: 0.5, padding: '20px' }}>
                         Nenhuma taxa aduaneira cadastrada. Clique em "Adicionar Taxa" para configurar.
                       </td>
                     </tr>
                   ) : (
                     formData.despesas.map((despesa, idx) => (
-                      <tr key={idx}>
+                      <tr 
+                        key={despesa.tempId || idx}
+                        draggable={dragEnabled === idx}
+                        onDragStart={(e) => handleDragStart(e, idx)}
+                        onDragOver={(e) => handleDragOver(e, idx)}
+                        onDragEnd={handleDragEnd}
+                        className={draggedIndex === idx ? 'is-dragging' : ''}
+                      >
+                        <td>
+                          <div 
+                            className="drag-handle"
+                            onMouseDown={() => setDragEnabled(idx)}
+                            onMouseUp={() => setDragEnabled(null)}
+                            title="Arraste para reordenar"
+                          >
+                            <GripVertical size={16} />
+                          </div>
+                        </td>
                         <td>
                           <input 
                             type="text" 

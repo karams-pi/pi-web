@@ -2,6 +2,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Models.Edc;
 
@@ -43,6 +44,11 @@ public class EdcExportService
 
     public byte[] ExportToExcel(SimulacaoEdc simulacao)
     {
+        if (simulacao.Despesas != null)
+        {
+            simulacao.Despesas = simulacao.Despesas.OrderBy(d => d.Ordem).ToList();
+        }
+
         using var package = new ExcelPackage();
         
         // Define fixed list of expenses in columns E to U of Rateio/Nacionalizacao sheets

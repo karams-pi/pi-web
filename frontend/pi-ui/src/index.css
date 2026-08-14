@@ -753,4 +753,36 @@ input:focus, select:focus {
   }
 }
 
+/* Drag and Drop premium styling */
+.drag-handle {
+  cursor: grab;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drag-handle:hover {
+  color: var(--primary);
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+tr.is-dragging {
+  opacity: 0.4;
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border: 1px dashed var(--primary);
+}
+
+tr.is-drag-over {
+  border-bottom: 2px solid var(--primary);
+  transition: border-bottom 0.1s ease-out;
+}
+
 

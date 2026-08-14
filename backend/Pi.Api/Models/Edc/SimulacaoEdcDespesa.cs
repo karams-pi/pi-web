@@ -29,4 +29,7 @@ public class SimulacaoEdcDespesa
     [Required]
     [MaxLength(50)]
     public string MetodoRateio { get; set; } = "Valor FOB"; // Valor FOB, Quantidade, Peso, Volume
+
+    [Required]
+    public int Ordem { get; set; } = 0;
 }

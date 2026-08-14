@@ -1,4 +1,5 @@
 
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pi.Api.Data;
@@ -50,6 +51,11 @@ public class SimulacoesController : ControllerBase
 
         if (simulacao == null) return NotFound();
 
+        if (simulacao.Despesas != null)
+        {
+            simulacao.Despesas = simulacao.Despesas.OrderBy(d => d.Ordem).ToList();
+        }
+
         return simulacao;
     }
 
@@ -70,6 +76,11 @@ public class SimulacoesController : ControllerBase
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (simulacao == null) return NotFound();
+
+        if (simulacao.Despesas != null)
+        {
+            simulacao.Despesas = simulacao.Despesas.OrderBy(d => d.Ordem).ToList();
+        }
 
         var bytes = _exportService.ExportToExcel(simulacao);
         string fileName = $"EDC_{simulacao.NumeroReferencia}.xlsx";
@@ -96,6 +107,14 @@ public class SimulacoesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SimulacaoEdc>> PostSimulacao(SimulacaoEdc simulacao)
     {
+        if (simulacao.Despesas != null)
+        {
+            for (int i = 0; i < simulacao.Despesas.Count; i++)
+            {
+                simulacao.Despesas[i].Ordem = i;
+            }
+        }
+
         _context.SimulacoesEdc.Add(simulacao);
         await _context.SaveChangesAsync();
 
@@ -163,12 +182,13 @@ public class SimulacoesController : ControllerBase
         {
             _context.RemoveRange(dbSimulacao.Despesas);
         }
-        dbSimulacao.Despesas = simulacao.Despesas?.Select(d => new SimulacaoEdcDespesa
+        dbSimulacao.Despesas = simulacao.Despesas?.Select((d, idx) => new SimulacaoEdcDespesa
         {
             NomeDespesa = d.NomeDespesa,
             Valor = d.Valor,
             Moeda = d.Moeda,
-            MetodoRateio = d.MetodoRateio
+            MetodoRateio = d.MetodoRateio,
+            Ordem = idx
         }).ToList() ?? new List<SimulacaoEdcDespesa>();
 
         try
