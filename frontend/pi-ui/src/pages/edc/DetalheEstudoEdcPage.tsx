@@ -498,6 +498,9 @@ const DetalheEstudoEdcPage: React.FC = () => {
               <div>
                 <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Base Aduaneira e Rateio:</strong>
                 O valor de <strong>Frete c/ PTAX</strong> e <strong>Seguro</strong> é rateado proporcionalmente ao valor FOB de cada item do estudo.
+                <div style={{ marginTop: '4px', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                  * Custo do Frete = (Valor Frete USD × (1 + PTAX / 100)) × Cotação Dólar
+                </div>
                 <div style={{ marginTop: '12px' }}>
                   <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Imposto de Importação (II):</strong>
                   <code>Valor II = Base Aduaneira × Alíquota II</code>

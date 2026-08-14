@@ -675,7 +675,18 @@ const NovoEstudoEdcPage: React.FC = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ opacity: 0.7 }}>Frete c/ PTAX:</span>
-                <span style={{ fontWeight: '600' }}>USD {(formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span 
+                  style={{ fontWeight: '600', cursor: 'help', textDecoration: 'underline dashed rgba(255, 255, 255, 0.3)' }}
+                  title={`Cálculo do Frete com PTAX (USD):
+Fórmula:
+Valor do Frete em USD * (1 + PTAX / 100)
+
+Cálculo:
+US$ ${formData.valorFreteInternacional.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} * (1 + ${formData.spreadCambio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}%)
+= US$ ${(formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                >
+                  USD {(formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ opacity: 0.7 }}>Seguro:</span>

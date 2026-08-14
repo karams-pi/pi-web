@@ -875,7 +875,19 @@ export default function PrintEdcPage() {
                   <td className="text-center">-</td>
                   <td className="text-right">{fmtUsd(estudo.valorFreteInternacional)}</td>
                   <td className="text-right">-</td>
-                  <td className="text-right">{fmtBrl(freteBrl)}</td>
+                  <td 
+                    className="text-right help-tooltip"
+                    title={`Cálculo do Frete Internacional em Reais (BRL):
+Fórmula:
+(Valor do Frete em USD * (1 + PTAX / 100)) * Cotação do Dólar
+
+Cálculo:
+(US$ ${estudo.valorFreteInternacional.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} * (1 + ${estudo.spreadCambio.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}%)) * R$ ${estudo.cotacaoDolar.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+= US$ ${(estudo.valorFreteInternacional * ptaxFator).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} * R$ ${estudo.cotacaoDolar.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+= R$ ${freteBrl.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                  >
+                    {fmtBrl(freteBrl)}
+                  </td>
                 </tr>
                 <tr>
                   <td>Seguro Internacional</td>
