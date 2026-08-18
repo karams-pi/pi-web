@@ -91,9 +91,9 @@ public class EdcCalculationService : IEdcCalculationService
             decimal cofins = 0;
             if (simulacao.MetodoCalculoFederais == "SimplificadoExcel")
             {
-                // Excel do cliente calcula PIS/COFINS sobre (Aduaneiro + II)
-                pis = CalcularPisCofins(baseCalculoAduaneiro + ii, item.Produto.Ncm.AliquotaPis);
-                cofins = CalcularPisCofins(baseCalculoAduaneiro + ii, item.Produto.Ncm.AliquotaCofins);
+                // Nathaly apontou: PIS/COFINS vai em cima apenas da base aduaneira, sem o II.
+                pis = CalcularPisCofins(baseCalculoAduaneiro, item.Produto.Ncm.AliquotaPis);
+                cofins = CalcularPisCofins(baseCalculoAduaneiro, item.Produto.Ncm.AliquotaCofins);
             }
             else
             {

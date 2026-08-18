@@ -157,7 +157,7 @@ const DetalheEstudoEdcPage: React.FC = () => {
     
     let pisCofins = 0;
     if (estudo.metodoCalculoFederais === 'SimplificadoExcel') {
-      pisCofins = (baseCalculoAduaneiro + ii) * (aliqPis + aliqCof);
+      pisCofins = baseCalculoAduaneiro * (aliqPis + aliqCof);
     } else {
       pisCofins = baseCalculoAduaneiro * (aliqPis + aliqCof);
     }

@@ -800,8 +800,8 @@ public class EdcExportService
                 if (simulacao.MetodoCalculoFederais == "SimplificadoExcel")
                 {
                     ws.Cells[r, 19].Formula = $"=$Q{r}*'LISTA DE COMPRAS'!F{incomingListRow}"; // IPI
-                    ws.Cells[r, 20].Formula = $"=$Q{r}*'LISTA DE COMPRAS'!G{incomingListRow}"; // PIS
-                    ws.Cells[r, 21].Formula = $"=$Q{r}*'LISTA DE COMPRAS'!H{incomingListRow}"; // COFINS
+                    ws.Cells[r, 20].Formula = $"=$P{r}*'LISTA DE COMPRAS'!G{incomingListRow}"; // PIS
+                    ws.Cells[r, 21].Formula = $"=$P{r}*'LISTA DE COMPRAS'!H{incomingListRow}"; // COFINS
                 }
                 else
                 {
