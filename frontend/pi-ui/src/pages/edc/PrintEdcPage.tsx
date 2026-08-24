@@ -1048,11 +1048,11 @@ Cálculo:
               <th className="text-center">U.M.</th>
               <th className="text-right">FOB Unit (USD)</th>
               <th className="text-right">Aduaneiro (R$)</th>
-              <th className="text-right">II (R$)</th>
-              <th className="text-right">IPI (R$)</th>
-              <th className="text-right">PIS/COF (R$)</th>
+              <th className="text-right">II (%)</th>
+              <th className="text-right">IPI (%)</th>
+              <th className="text-right">PIS/COF (%)</th>
               <th className="text-right">Taxas Port. (R$)</th>
-              <th className="text-right">ICMS (R$)</th>
+              <th className="text-right">ICMS (%)</th>
               <th className="text-right bold">Total Item (R$)</th>
               <th className="text-right bold">Unit. Nac. (R$)</th>
             </tr>
@@ -1068,11 +1068,11 @@ Cálculo:
                 <td className="text-center">{item.produto?.unidadeMedida || "UN"}</td>
                 <td className="text-right">{fmtUsd(item.valorFobUnitario)}</td>
                 <td className="text-right">{fmtBrl(item.itemValorAduaneiro)}</td>
-                <td className="text-right">{fmtBrl(item.ii)}</td>
-                <td className="text-right">{fmtBrl(item.ipi)}</td>
-                <td className="text-right">{fmtBrl(item.pisCofins)}</td>
+                <td className="text-right">{fmtPct(item.aliqII)}</td>
+                <td className="text-right">{fmtPct(item.aliqIPI)}</td>
+                <td className="text-right">{fmtPct(item.aliqPis + item.aliqCof)}</td>
                 <td className="text-right">{fmtBrl(item.taxasPort)}</td>
-                <td className="text-right">{fmtBrl(item.icms)}</td>
+                <td className="text-right">{fmtPct(item.aliqIcms)}</td>
                 <td className="text-right bold">{fmtBrl(item.totalNacItem)}</td>
                 <td className="text-right bold" style={{ background: "rgba(16, 185, 129, 0.05)" }}>{fmtBrl(item.custoUnitarioNacionalizado)}</td>
               </tr>
@@ -1096,11 +1096,11 @@ $ ${totalFobUSD.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFract
                 {fmtUsd(totalFobUSD / (totalQuantidade || 1))}
               </td>
               <td className="text-right">{fmtBrl(totalFobBrl + freteBrl + seguroBrl)}</td>
-              <td className="text-right">{fmtBrl(totalII)}</td>
-              <td className="text-right">{fmtBrl(totalIPI)}</td>
-              <td className="text-right">{fmtBrl(totalPisCofins)}</td>
+              <td className="text-right">-</td>
+              <td className="text-right">-</td>
+              <td className="text-right">-</td>
               <td className="text-right">{fmtBrl(totalDespesasPortuariasSemFreteBrl)}</td>
-              <td className="text-right">{fmtBrl(totalIcms)}</td>
+              <td className="text-right">-</td>
               <td className="text-right bold">{fmtBrl(totalGeralNacionalizado)}</td>
               <td 
                 className="text-right bold help-tooltip" 

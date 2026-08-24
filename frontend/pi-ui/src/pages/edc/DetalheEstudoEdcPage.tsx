@@ -227,6 +227,11 @@ const DetalheEstudoEdcPage: React.FC = () => {
 
     return {
       ...item,
+      aliqII,
+      aliqIPI,
+      aliqPis,
+      aliqCof,
+      aliqIcms,
       itemFobBrl,
       itemValorAduaneiro: itemValorAduaneiroCheio,
       baseCalculoAduaneiro,
@@ -244,6 +249,8 @@ const DetalheEstudoEdcPage: React.FC = () => {
   const totalPisCofins = itensCalculados.reduce((acc: number, i: any) => acc + i.pisCofins, 0);
   const totalIcms = itensCalculados.reduce((acc: number, i: any) => acc + i.icms, 0);
   const totalNacionalizado = itensCalculados.reduce((acc: number, i: any) => acc + i.totalNacItem, 0);
+
+  const fmtPct = (val: number) => ((val || 0) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + "%";
 
   const handleExportExcel = async () => {
     try {
@@ -348,11 +355,11 @@ const DetalheEstudoEdcPage: React.FC = () => {
               <tr>
                 <th style={{ paddingLeft: '24px' }}>Item / NCM</th>
                 <th>V. Aduaneiro</th>
-                <th>II</th>
-                <th>IPI</th>
-                <th>PIS/COF</th>
+                <th>II (%)</th>
+                <th>IPI (%)</th>
+                <th>PIS/COF (%)</th>
                 <th>Taxas Port.</th>
-                <th style={{ color: 'var(--primary)' }}>ICMS</th>
+                <th style={{ color: 'var(--primary)' }}>ICMS (%)</th>
                 <th style={{ textAlign: 'right' }}>Unit. Nac.</th>
                 <th style={{ paddingRight: '24px', textAlign: 'right' }}>Total Nac.</th>
               </tr>
@@ -379,11 +386,11 @@ const DetalheEstudoEdcPage: React.FC = () => {
                     </div>
                   </td>
                   <td>R$ {item.itemValorAduaneiro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td>R$ {item.ii.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td>R$ {item.ipi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td>R$ {item.pisCofins.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>{fmtPct(item.aliqII)}</td>
+                  <td>{fmtPct(item.aliqIPI)}</td>
+                  <td>{fmtPct(item.aliqPis + item.aliqCof)}</td>
                   <td>R$ {item.taxasPort.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td style={{ color: 'var(--primary)', fontWeight: '600' }}>R$ {item.icms.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td style={{ color: 'var(--primary)', fontWeight: '600' }}>{fmtPct(item.aliqIcms)}</td>
                   <td style={{ textAlign: 'right', fontWeight: '600', color: '#fff' }}>
                     R$ {(item.quantidade > 0 ? item.totalNacItem / item.quantidade : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
