@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Download, Trash2, Printer, FileSpreadsheet, History } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import type { Modulo, Configuracao, Categoria, Marca, Fornecedor, Tecido, Frete, ListaEmitida } from "../api/types";
@@ -65,6 +65,7 @@ export default function EmissaoListaPrecosPage() {
   const [configsMap, setConfigsMap] = useState<Map<number | null, Configuracao>>(new Map());
   const [cotacao, setCotacao] = useState<number>(0);
   const [actualDollar, setActualDollar] = useState<number>(0);
+  const isCotacaoEditedRef = useRef(false);
 
   // Freight Settings
   const [selectedFreteId, setSelectedFreteId] = useState("");
@@ -114,13 +115,15 @@ export default function EmissaoListaPrecosPage() {
       setTecidos(t);
       setAllTecidos(t);
 
-      // Set initial cotação de risco based on global config
-      const globalConfig = map.get(null);
-      if (globalConfig) {
-        const initialRisk = calculateCotacaoRisco(undefined, dollar, globalConfig.valorReducaoDolar);
-        setCotacao(initialRisk);
-      } else {
-        setCotacao(dollar);
+      // Set initial cotação de risco based on global config only if not manually edited yet
+      if (!isCotacaoEditedRef.current) {
+        const globalConfig = map.get(null);
+        if (globalConfig) {
+          const initialRisk = calculateCotacaoRisco(undefined, dollar, globalConfig.valorReducaoDolar);
+          setCotacao(initialRisk);
+        } else {
+          setCotacao(dollar);
+        }
       }
     }).catch(console.error);
   }, []);
@@ -133,6 +136,7 @@ export default function EmissaoListaPrecosPage() {
       const supplier = allFornecedores.find(f => f.id === fid);
       if (config) {
         const riskVal = calculateCotacaoRisco(supplier?.nome, actualDollar, config.valorReducaoDolar);
+        isCotacaoEditedRef.current = true;
         setCotacao(riskVal);
       }
     }
@@ -318,6 +322,7 @@ export default function EmissaoListaPrecosPage() {
       
       setSelectedItems(newSelected);
       setCurrency(hist.moeda as "BRL" | "EXW");
+      isCotacaoEditedRef.current = true;
       setCotacao(hist.cotacao);
       setTotalFreteBRL(hist.valorFrete);
       setTipoRateio(hist.tipoRateio as "IGUAL" | "M3");
@@ -483,7 +488,16 @@ export default function EmissaoListaPrecosPage() {
         </div>
         <div style={{ width: 140 }}>
            <label className="label">Cotação de Risco</label>
-           <input className="cl-input" type="number" step="0.0001" value={cotacao} onChange={e => setCotacao(Number(e.target.value))} />
+           <input 
+             className="cl-input" 
+             type="number" 
+             step="0.0001" 
+             value={cotacao} 
+             onChange={e => {
+               isCotacaoEditedRef.current = true;
+               setCotacao(Number(e.target.value));
+             }} 
+           />
         </div>
         <div style={{ width: 90 }}>
            <label className="label">Validade</label>
