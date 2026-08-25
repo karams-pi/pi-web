@@ -991,8 +991,8 @@ Cálculo:
             <table className="subtotal-table">
               <tbody>
                 <tr>
-                  <td className="bold">TOTAL FOB DO LOTE (BRL)</td>
-                  <td className="text-right bold">{fmtBrl(totalFobBrl)}</td>
+                  <td className="bold">TOTAL FOB + FRETE (BRL)</td>
+                  <td className="text-right bold">{fmtBrl(totalFobBrl + freteBrl)}</td>
                 </tr>
                 {estudo.flSimularSubfaturamento && (
                   <>
@@ -1008,7 +1008,7 @@ Cálculo:
                 )}
                 <tr>
                   <td className="bold">TOTAL DESPESAS + TRIBUTOS</td>
-                  <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - totalFobBrl - (hasCustomPct && !estudo.flSimularSubfaturamento ? pagoPorForaBrl : 0))}</td>
+                  <td className="text-right bold">{fmtBrl(totalGeralNacionalizado - totalFobBrl - freteBrl - (hasCustomPct && !estudo.flSimularSubfaturamento ? pagoPorForaBrl : 0))}</td>
                 </tr>
                 {hasCustomPct && !estudo.flSimularSubfaturamento && (
                   <tr>

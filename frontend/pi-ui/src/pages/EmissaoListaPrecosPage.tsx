@@ -76,6 +76,7 @@ export default function EmissaoListaPrecosPage() {
 
   const [loading, setLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const [nomeReferencia, setNomeReferencia] = useState("");
   const [history, setHistory] = useState<ListaEmitida[]>([]);
@@ -125,7 +126,8 @@ export default function EmissaoListaPrecosPage() {
           setCotacao(dollar);
         }
       }
-    }).catch(console.error);
+    }).catch(console.error)
+      .finally(() => setInitialLoading(false));
   }, []);
 
   const handleFornecedorFilterChange = (val: string) => {
@@ -492,7 +494,9 @@ export default function EmissaoListaPrecosPage() {
              className="cl-input" 
              type="number" 
              step="0.0001" 
-             value={cotacao} 
+             value={initialLoading ? "" : cotacao} 
+             disabled={initialLoading}
+             placeholder={initialLoading ? "Carregando..." : ""}
              onChange={e => {
                isCotacaoEditedRef.current = true;
                setCotacao(Number(e.target.value));
