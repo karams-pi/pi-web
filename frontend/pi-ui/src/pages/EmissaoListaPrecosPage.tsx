@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { Download, Trash2, Printer, FileSpreadsheet, History } from "lucide-react";
+import { Download, Trash2, Printer, FileSpreadsheet, History, RefreshCw } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import type { Modulo, Configuracao, Categoria, Marca, Fornecedor, Tecido, Frete, ListaEmitida } from "../api/types";
 import { getModuleFilters, listModulos, exportPriceListExcel, getModulo } from "../api/modulos";
@@ -63,9 +63,35 @@ export default function EmissaoListaPrecosPage() {
   const [allTecidos, setAllTecidos] = useState<Tecido[]>([]);
   const [fretes, setFretes] = useState<Frete[]>([]);
   const [configsMap, setConfigsMap] = useState<Map<number | null, Configuracao>>(new Map());
-  const [cotacao, setCotacao] = useState<number>(0);
+  const [cotacao, setCotacao] = useState<number | "">("");
   const [actualDollar, setActualDollar] = useState<number>(0);
   const isCotacaoEditedRef = useRef(false);
+  const [fetchingDollar, setFetchingDollar] = useState(false);
+
+  const loadDollarRate = useCallback(async () => {
+    try {
+      setFetchingDollar(true);
+      const usd = await getCotacaoUSD();
+      const dollar = usd ? Number(usd.toFixed(2)) : 0;
+      setActualDollar(dollar);
+
+      const fid = filterFornecedor ? Number(filterFornecedor) : null;
+      const config = configsMap.get(fid) || configsMap.get(null);
+      const supplier = allFornecedores.find(f => f.id === fid);
+      
+      if (config) {
+        const riskVal = calculateCotacaoRisco(supplier?.nome, dollar, config.valorReducaoDolar);
+        setCotacao(riskVal);
+      } else {
+        setCotacao(dollar);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar cotação", err);
+      alert("Erro ao carregar a cotação atual do dólar.");
+    } finally {
+      setFetchingDollar(false);
+    }
+  }, [filterFornecedor, configsMap, allFornecedores]);
 
   // Freight Settings
   const [selectedFreteId, setSelectedFreteId] = useState("");
@@ -93,16 +119,12 @@ export default function EmissaoListaPrecosPage() {
     listFretes().then(setFretes).catch(console.error);
 
     Promise.all([
-      getCotacaoUSD(),
       getLatestConfigsAll(),
       listFornecedores(),
       listCategorias(),
       listMarcas(),
       listTecidos()
-    ]).then(([usd, configs, f, c, m, t]) => {
-      const dollar = usd ? Number(usd.toFixed(2)) : 0;
-      setActualDollar(dollar);
-
+    ]).then(([configs, f, c, m, t]) => {
       const map = new Map<number | null, Configuracao>();
       configs.forEach(conf => { if (conf) map.set(conf.idFornecedor ?? null, conf); });
       setConfigsMap(map);
@@ -115,17 +137,6 @@ export default function EmissaoListaPrecosPage() {
       setAllMarcas(m);
       setTecidos(t);
       setAllTecidos(t);
-
-      // Set initial cotação de risco based on global config only if not manually edited yet
-      if (!isCotacaoEditedRef.current) {
-        const globalConfig = map.get(null);
-        if (globalConfig) {
-          const initialRisk = calculateCotacaoRisco(undefined, dollar, globalConfig.valorReducaoDolar);
-          setCotacao(initialRisk);
-        } else {
-          setCotacao(dollar);
-        }
-      }
     }).catch(console.error)
       .finally(() => setInitialLoading(false));
   }, []);
@@ -270,6 +281,10 @@ export default function EmissaoListaPrecosPage() {
   // Handlers for Saving and Loading from History
   const handleSaveEmission = async () => {
     if (itemsWithCalculations.length === 0) return;
+    if (cotacao === "" || cotacao === 0) {
+      alert("Por favor, informe a Cotação de Risco antes de prosseguir.");
+      return;
+    }
     try {
       const itensJson = JSON.stringify(
         itemsWithCalculations.map(si => ({
@@ -281,7 +296,7 @@ export default function EmissaoListaPrecosPage() {
       await createListaEmitida({
         nomeReferencia: refName,
         moeda: currency,
-        cotacao,
+        cotacao: Number(cotacao),
         valorFrete: totalFreteBRL,
         tipoRateio,
         validadeDias: validityDays,
@@ -354,12 +369,15 @@ export default function EmissaoListaPrecosPage() {
   // Handlers for Print/Excel
   const handlePrint = async () => {
     if (itemsWithCalculations.length === 0) return alert("Selecione itens primeiro.");
+    if (cotacao === "" || cotacao === 0) {
+      return alert("Por favor, informe a Cotação de Risco.");
+    }
     
     printPriceListReport({
       modules: itemsWithCalculations.map(si => si.modulo),
       freightMap: new Map(itemsWithCalculations.map(si => [si.modulo.id, si.freightUSD])),
       currency,
-      cotacao,
+      cotacao: Number(cotacao),
       configsMap,
       maps: {
         fornecedor: fornMap,
@@ -375,6 +393,9 @@ export default function EmissaoListaPrecosPage() {
 
   const handleExcel = async () => {
     if (itemsWithCalculations.length === 0) return alert("Selecione itens primeiro.");
+    if (cotacao === "" || cotacao === 0) {
+      return alert("Por favor, informe a Cotação de Risco.");
+    }
     setExportLoading(true);
     try {
       const payload = {
@@ -383,7 +404,7 @@ export default function EmissaoListaPrecosPage() {
           valorFreteRateadoUSD: si.freightUSD
         })),
         currency,
-        cotacao,
+        cotacao: Number(cotacao),
         validityDays,
         freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW"
       };
@@ -409,6 +430,9 @@ export default function EmissaoListaPrecosPage() {
 
   const handleExcelColinha = async () => {
     if (itemsWithCalculations.length === 0) return alert("Selecione itens primeiro.");
+    if (cotacao === "" || cotacao === 0) {
+      return alert("Por favor, informe a Cotação de Risco.");
+    }
     setExportLoading(true);
     try {
       const payload = {
@@ -417,7 +441,7 @@ export default function EmissaoListaPrecosPage() {
           valorFreteRateadoUSD: si.freightUSD
         })),
         currency,
-        cotacao,
+        cotacao: Number(cotacao),
         validityDays,
         freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW",
         isColinha: true
@@ -488,20 +512,37 @@ export default function EmissaoListaPrecosPage() {
              <option value="BRL">BRL (R$)</option>
            </select>
         </div>
-        <div style={{ width: 140 }}>
+        <div style={{ width: 180 }}>
            <label className="label">Cotação de Risco</label>
-           <input 
-             className="cl-input" 
-             type="number" 
-             step="0.0001" 
-             value={initialLoading ? "" : cotacao} 
-             disabled={initialLoading}
-             placeholder={initialLoading ? "Carregando..." : ""}
-             onChange={e => {
-               isCotacaoEditedRef.current = true;
-               setCotacao(Number(e.target.value));
-             }} 
-           />
+           <div style={{ display: 'flex', gap: 6 }}>
+             <input 
+               className="cl-input" 
+               type="number" 
+               step="0.0001" 
+               value={cotacao} 
+               disabled={initialLoading}
+               placeholder={initialLoading ? "Carregando..." : "Digite..."}
+               onChange={e => {
+                 isCotacaoEditedRef.current = true;
+                 setCotacao(e.target.value === "" ? "" : Number(e.target.value));
+               }} 
+               style={{ flex: 1 }}
+             />
+             <button 
+               className="btn btn-secondary" 
+               type="button" 
+               onClick={loadDollarRate} 
+               disabled={fetchingDollar || initialLoading} 
+               title="Carregar cotação atual"
+               style={{ padding: '0 8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+             >
+               {fetchingDollar ? (
+                 <span className="spinner loading-spin" style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.2)', borderTop: '2px solid #3b82f6', borderRadius: '50%', display: 'inline-block' }}></span>
+               ) : (
+                 <RefreshCw size={14} />
+               )}
+             </button>
+           </div>
         </div>
         <div style={{ width: 90 }}>
            <label className="label">Validade</label>
@@ -536,6 +577,13 @@ export default function EmissaoListaPrecosPage() {
 
       {/* Custom styles for modern glassmorphism sidebar, transitions and layout */}
       <style>{`
+        @keyframes spin { 
+          0% { transform: rotate(0deg); } 
+          100% { transform: rotate(360deg); } 
+        }
+        .loading-spin { 
+          animation: spin 1s linear infinite; 
+        }
         .emissao-grid-layout {
           display: grid;
           grid-template-columns: 280px 1fr 1.2fr;
