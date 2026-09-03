@@ -150,29 +150,32 @@ static void SeedFreightData(AppDbContext db)
         db.SaveChanges();
     }
 
-    var hasGlobalDefaults = db.ConfiguracoesFreteItens.Any(c => c.IdFornecedor == null);
-    if (!hasGlobalDefaults)
+    var allFreteItens = db.FreteItens.ToList();
+    bool changed = false;
+    foreach (var fi in allFreteItens)
     {
-        for (int i = 1; i <= 17; i++)
+        if (!db.ConfiguracoesFreteItens.Any(c => c.IdFreteItem == fi.Id && c.IdFornecedor == null))
         {
             db.ConfiguracoesFreteItens.Add(new Pi.Api.Models.ConfiguracoesFreteItem
             {
-                IdFreteItem = i,
+                IdFreteItem = fi.Id,
                 IdFornecedor = null,
-                Valor = i == 5 ? 3610.00m : 0.00m,
+                Valor = fi.Id == 5 ? 3610.00m : 0.00m,
                 FlDesconsidera = false
             });
+            changed = true;
         }
+    }
+    if (changed)
+    {
         db.SaveChanges();
     }
-    else
+
+    var frontierFreight = db.ConfiguracoesFreteItens.FirstOrDefault(c => c.IdFreteItem == 5 && c.IdFornecedor == null);
+    if (frontierFreight != null && (frontierFreight.Valor == 0 || frontierFreight.Valor == 361.00m))
     {
-        var frontierFreight = db.ConfiguracoesFreteItens.FirstOrDefault(c => c.IdFreteItem == 5 && c.IdFornecedor == null);
-        if (frontierFreight != null && (frontierFreight.Valor == 0 || frontierFreight.Valor == 361.00m))
-        {
-            frontierFreight.Valor = 3610.00m;
-            db.SaveChanges();
-        }
+        frontierFreight.Valor = 3610.00m;
+        db.SaveChanges();
     }
 }
 

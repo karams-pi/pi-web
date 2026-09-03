@@ -227,10 +227,20 @@ const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) 
 
   const handleToggleDesconsidera = async (item: ConfiguracoesFreteItem) => {
     try {
-      await updateConfiguracoesFreteItem(item.id, {
-        ...item,
-        flDesconsidera: !item.flDesconsidera,
-      });
+      const currentFornecedorId = selectedFornecedor ? Number(selectedFornecedor) : null;
+      if (item.idFornecedor === currentFornecedorId) {
+        await updateConfiguracoesFreteItem(item.id, {
+          ...item,
+          flDesconsidera: !item.flDesconsidera,
+        });
+      } else {
+        await createConfiguracoesFreteItem({
+          idFreteItem: item.idFreteItem,
+          valor: item.valor,
+          flDesconsidera: !item.flDesconsidera,
+          idFornecedor: currentFornecedorId,
+        });
+      }
       await loadItems();
     } catch (error) {
       console.error("Erro ao atualizar item:", error);
@@ -251,12 +261,13 @@ const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) 
 
   // Delete
   const handleDelete = async (item: ConfiguracoesFreteItem & { freteItem?: { nome: string } }) => {
+      const currentFornecedorId = selectedFornecedor ? Number(selectedFornecedor) : null;
       if (!confirm(`Remover item "${item.freteItem?.nome}"?`)) return;
       try {
-          // Delete Item de Configuração first
-          await deleteConfiguracoesFreteItem(item.id);
-          // Try to delete definition if possible
-          await deleteFreteItem(item.idFreteItem).catch(e => console.warn("Could not delete definition", e));
+          if (item.idFornecedor === currentFornecedorId) {
+              await deleteConfiguracoesFreteItem(item.id);
+          }
+          await deleteFreteItem(item.idFreteItem).catch(() => {});
           
           await loadItems();
       } catch (e) {
@@ -267,6 +278,7 @@ const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) 
 
   // Save Modal
   const onSaveModal = async (nome: string, valor: number) => {
+      const currentFornecedorId = selectedFornecedor ? Number(selectedFornecedor) : null;
       if (editingItem) {
           // Update
           // 1. Update Definition Name if changed
@@ -276,21 +288,30 @@ const FreightGrid = ({ title, color, idFrete, fornecedores }: FreightGridProps) 
                    nome: nome 
                });
           }
-          // 2. Update Value
-          await updateConfiguracoesFreteItem(editingItem.id, {
-              ...editingItem,
-              valor: valor
-          });
+          // 2. Update / Upsert Value
+          if (editingItem.idFornecedor === currentFornecedorId) {
+              await updateConfiguracoesFreteItem(editingItem.id, {
+                  ...editingItem,
+                  valor: valor
+              });
+          } else {
+              await createConfiguracoesFreteItem({
+                  idFreteItem: editingItem.idFreteItem,
+                  valor: valor,
+                  flDesconsidera: editingItem.flDesconsidera,
+                  idFornecedor: currentFornecedorId
+              });
+          }
       } else {
           // Create
-          // 1. Create Definition
+          // 1. Create or get existing Definition
           const newItem = await createFreteItem({ idFrete, nome });
-          // 2. Create Config Value
+          // 2. Create / Upsert Config Value
           await createConfiguracoesFreteItem({
               idFreteItem: newItem.id,
               valor: valor,
               flDesconsidera: false,
-              idFornecedor: selectedFornecedor ? Number(selectedFornecedor) : null
+              idFornecedor: currentFornecedorId
           });
       }
       await loadItems();

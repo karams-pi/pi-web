@@ -30,6 +30,7 @@ public class ConfiguracoesFreteItemController : ControllerBase
     {
         var itemIds = await _db.FreteItens
             .Where(x => x.IdFrete == idFrete)
+            .OrderBy(x => x.Id)
             .Select(x => x.Id)
             .ToListAsync();
 
@@ -116,6 +117,18 @@ public class ConfiguracoesFreteItemController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ConfiguracoesFreteItem>> Create(ConfiguracoesFreteItem item)
     {
+        // Upsert by (IdFreteItem, IdFornecedor) to prevent duplicates
+        var existing = await _db.ConfiguracoesFreteItens
+            .FirstOrDefaultAsync(x => x.IdFreteItem == item.IdFreteItem && x.IdFornecedor == item.IdFornecedor);
+        if (existing != null)
+        {
+            existing.Valor = item.Valor;
+            existing.FlDesconsidera = item.FlDesconsidera;
+            await _db.SaveChangesAsync();
+            return Ok(existing);
+        }
+
+        item.Id = 0;
         _db.ConfiguracoesFreteItens.Add(item);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
@@ -125,7 +138,54 @@ public class ConfiguracoesFreteItemController : ControllerBase
     public async Task<IActionResult> Update(long id, ConfiguracoesFreteItem item)
     {
         if (id != item.Id) return BadRequest();
-        _db.Entry(item).State = EntityState.Modified;
+
+        var existing = await _db.ConfiguracoesFreteItens.FindAsync(id);
+        if (existing == null)
+        {
+            var byKeys = await _db.ConfiguracoesFreteItens
+                .FirstOrDefaultAsync(x => x.IdFreteItem == item.IdFreteItem && x.IdFornecedor == item.IdFornecedor);
+            if (byKeys != null)
+            {
+                byKeys.Valor = item.Valor;
+                byKeys.FlDesconsidera = item.FlDesconsidera;
+                await _db.SaveChangesAsync();
+                return NoContent();
+            }
+            return NotFound();
+        }
+
+        // If the record was global (IdFornecedor == null) but caller wants to save for a specific supplier,
+        // create or update the supplier override without mutating the global default.
+        if (existing.IdFornecedor == null && item.IdFornecedor != null)
+        {
+            var supplierConfig = await _db.ConfiguracoesFreteItens
+                .FirstOrDefaultAsync(x => x.IdFreteItem == item.IdFreteItem && x.IdFornecedor == item.IdFornecedor);
+            if (supplierConfig != null)
+            {
+                supplierConfig.Valor = item.Valor;
+                supplierConfig.FlDesconsidera = item.FlDesconsidera;
+            }
+            else
+            {
+                _db.ConfiguracoesFreteItens.Add(new ConfiguracoesFreteItem
+                {
+                    IdFreteItem = item.IdFreteItem,
+                    IdFornecedor = item.IdFornecedor,
+                    Valor = item.Valor,
+                    FlDesconsidera = item.FlDesconsidera
+                });
+            }
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
+
+        existing.Valor = item.Valor;
+        existing.FlDesconsidera = item.FlDesconsidera;
+        if (item.IdFornecedor.HasValue)
+        {
+            existing.IdFornecedor = item.IdFornecedor;
+        }
+
         await _db.SaveChangesAsync();
         return NoContent();
     }

@@ -188,13 +188,13 @@ public class ConfiguracoesController : ControllerBase
     {
         try 
         {
-            var sql1 = "SELECT setval(pg_get_serial_sequence('frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM frete_item;";
+            var sql1 = "SELECT setval(pg_get_serial_sequence('pi.frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM pi.frete_item;";
             await _context.Database.ExecuteSqlRawAsync(sql1);
             
-            var sql2 = "SELECT setval(pg_get_serial_sequence('configuracoes_frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM configuracoes_frete_item;";
+            var sql2 = "SELECT setval(pg_get_serial_sequence('pi.configuracoes_frete_item', 'id'), COALESCE(max(id),0) + 1, false) FROM pi.configuracoes_frete_item;";
             await _context.Database.ExecuteSqlRawAsync(sql2);
 
-            var sql3 = "SELECT setval(pg_get_serial_sequence('configuracoes', 'id'), COALESCE(max(id),0) + 1, false) FROM configuracoes;";
+            var sql3 = "SELECT setval(pg_get_serial_sequence('pi.configuracoes', 'id'), COALESCE(max(id),0) + 1, false) FROM pi.configuracoes;";
             await _context.Database.ExecuteSqlRawAsync(sql3);
 
             return Ok("Sequences reset successfully");
