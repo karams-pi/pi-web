@@ -166,8 +166,10 @@ public class EdcCalculationService : IEdcCalculationService
             
             if (simulacao.MetodoCalculoIcms == "SimplificadoExcel")
             {
-                // Planilha do cliente calcula: (Valor Aduaneiro + II + PIS + COFINS + AFRMM) * Alíquota ICMS
-                icms = Math.Round((baseCalculoAduaneiro + ii + pis + cofins + afrmmItemBrl) * aliquotaIcms, 2);
+                // Solicitado pela Nathaly (EDC): ICMS integra a própria base (gross-up / cálculo por dentro)
+                // BC_ICMS = (Valor Aduaneiro + II + PIS + COFINS + AFRMM) / (1 - Alíquota ICMS)
+                decimal baseAntesIcms = baseCalculoAduaneiro + ii + pis + cofins + afrmmItemBrl;
+                icms = CalcularIcmsPorDentro(baseAntesIcms, aliquotaIcms);
             }
             else
             {

@@ -812,7 +812,8 @@ public class EdcExportService
 
                 if (simulacao.MetodoCalculoIcms == "SimplificadoExcel")
                 {
-                    ws.Cells[r, 22].Formula = $"=(P{r}+R{r}+T{r}+U{r}+AG{r})*'LISTA DE COMPRAS'!I{incomingListRow}"; // ICMS Simplificado
+                    // Solicitado pela Nathaly (EDC): ICMS integra a sua base (cálculo por dentro)
+                    ws.Cells[r, 22].Formula = $"=((P{r}+R{r}+T{r}+U{r}+AG{r})/(1-'LISTA DE COMPRAS'!I{incomingListRow}))*'LISTA DE COMPRAS'!I{incomingListRow}"; // ICMS Simplificado por dentro
                 }
                 else
                 {

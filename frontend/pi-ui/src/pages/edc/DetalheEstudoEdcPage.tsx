@@ -211,10 +211,11 @@ const DetalheEstudoEdcPage: React.FC = () => {
     }
 
     if (estudo.metodoCalculoIcms === 'SimplificadoExcel') {
-      icms = (baseCalculoAduaneiro + ii + pisCofins + afrmmItemBrl) * aliqIcms;
+      const baseAntesIcms = baseCalculoAduaneiro + ii + pisCofins + afrmmItemBrl;
+      icms = aliqIcms < 1 ? (baseAntesIcms / (1 - aliqIcms)) * aliqIcms : 0;
     } else {
       const baseIcmsSemIcms = baseCalculoAduaneiro + ii + ipi + pisCofins + taxasPort;
-      icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
+      icms = aliqIcms < 1 ? (baseIcmsSemIcms / (1 - aliqIcms)) * aliqIcms : 0;
     }
     
     // O custo final real do item nacionalizado é baseado no aduaneiro cheio + impostos declarados
@@ -535,7 +536,8 @@ const DetalheEstudoEdcPage: React.FC = () => {
                   {estudo.metodoCalculoIcms === 'SimplificadoExcel' ? (
                     <span>
                       <strong>Método Simplificado (Excel) ativo:</strong><br/>
-                      <code>Valor ICMS = (Base Aduaneira + II + PIS + COFINS + AFRMM) × Alíquota ICMS</code>
+                      <code>Base ICMS = (Base Aduaneira + II + PIS + COFINS + AFRMM) ÷ (1 - Alíquota ICMS)</code><br/>
+                      <code>Valor ICMS = Base ICMS × Alíquota ICMS</code>
                     </span>
                   ) : (
                     <span>

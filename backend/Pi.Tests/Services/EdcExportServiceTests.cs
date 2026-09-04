@@ -109,4 +109,64 @@ public class EdcExportServiceTests
         sheet.Cells["G19"].Formula.Should().Be("G16+G17");
         sheet.Cells["G20"].Formula.Should().Be("G19+G18");
     }
+
+    [Fact]
+    public void ExportToExcel_ShouldUseGrossUpIcmsFormula_ForSimplificadoExcel()
+    {
+        // Arrange
+        var importador = new Importador { RazaoSocial = "Test Importador", Cnpj = "123", AliquotaIcmsPadrao = 0.19m };
+        var exportador = new Exportador { Nome = "Test Exportador", Pais = "China" };
+        var portoOrigem = new Porto { Nome = "Shanghai" };
+        var portoDestino = new Porto { Nome = "Paranaguá" };
+
+        var item1 = new SimulacaoEdcItem
+        {
+            Quantidade = 10,
+            ValorFobUnitario = 5.0m,
+            Produto = new ProdutoEdc
+            {
+                Referencia = "REF1",
+                Descricao = "Prod 1",
+                Ncm = new Ncm
+                {
+                    Codigo = "87088000",
+                    AliquotaII = 0.18m,
+                    AliquotaIPI = 0.0306m,
+                    AliquotaPis = 0.0312m,
+                    AliquotaCofins = 0.1437m,
+                    AliquotaIcmsPadrao = 0.19m
+                }
+            }
+        };
+
+        var simulacao = new SimulacaoEdc
+        {
+            NumeroReferencia = "EDC-TEST-02",
+            Importador = importador,
+            Exportador = exportador,
+            PortoOrigem = portoOrigem,
+            PortoDestino = portoDestino,
+            CotacaoDolar = 5.20m,
+            SpreadCambio = 1.0m,
+            TipoFrete = "1x40",
+            ValorFreteInternacional = 1000m,
+            ValorSeguroInternacional = 50m,
+            MetodoCalculoIcms = "SimplificadoExcel",
+            MetodoCalculoFederais = "SimplificadoExcel",
+            Itens = new List<SimulacaoEdcItem> { item1 },
+            Despesas = new List<SimulacaoEdcDespesa>
+            {
+                new SimulacaoEdcDespesa { NomeDespesa = "AFRMM", Valor = 0.08m, Moeda = "BRL", MetodoRateio = "Quantidade" }
+            }
+        };
+
+        // Act
+        var result = _service.ExportToExcel(simulacao);
+
+        // Assert
+        using var stream = new System.IO.MemoryStream(result);
+        using var package = new ExcelPackage(stream);
+        var estCustSheet = package.Workbook.Worksheets["Est. Cust. Naci."];
+        estCustSheet.Cells["V6"].Formula.Should().Be("((P6+R6+T6+U6+AG6)/(1-'LISTA DE COMPRAS'!I5))*'LISTA DE COMPRAS'!I5");
+    }
 }

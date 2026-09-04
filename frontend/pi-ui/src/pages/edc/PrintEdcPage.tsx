@@ -245,10 +245,11 @@ export default function PrintEdcPage() {
     }
 
     if (estudo.metodoCalculoIcms === "SimplificadoExcel") {
-      icms = (baseCalculoAduaneiro + ii + pisCofins + afrmmItemBrl) * aliqIcms;
+      const baseAntesIcms = baseCalculoAduaneiro + ii + pisCofins + afrmmItemBrl;
+      icms = aliqIcms < 1 ? (baseAntesIcms / (1 - aliqIcms)) * aliqIcms : 0;
     } else {
       const baseIcmsSemIcms = baseCalculoAduaneiro + ii + ipi + pisCofins + taxasPort;
-      icms = baseIcmsSemIcms / (1 - aliqIcms) * aliqIcms;
+      icms = aliqIcms < 1 ? (baseIcmsSemIcms / (1 - aliqIcms)) * aliqIcms : 0;
     }
     
     let totalNacItem = itemValorAduaneiroCheio + ii + ipi + pisCofins + taxasPort + icms;
