@@ -141,8 +141,8 @@ export function printModulesReport({
 
   const colGroup = `
     <colgroup>
-        <col style="width: 12%">
-        <col style="width: 18%">
+        <col style="width: 10%">
+        <col style="width: 24%">
         <col style="width: 4%">
         <col style="width: 4%">
         <col style="width: 4%">
@@ -210,7 +210,8 @@ export function printModulesReport({
                   colMarca = `<td rowspan="${marca.items.length}" class="center">${imgHtml}<strong>${marca.marcaName}</strong></td>`;
               }
 
-              const colDesc = `<td class="desc">${mod.descricao}</td>`;
+              const descLimpa = (mod.descricao || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+              const colDesc = `<td class="desc center">${descLimpa}</td>`;
               const colLarg = `<td class="center">${fmtDim(mod.largura)}</td>`;
               const colProf = `<td class="center">${fmtDim(mod.profundidade)}</td>`;
               const colAlt = `<td class="center">${fmtDim(mod.altura)}</td>`;
@@ -315,7 +316,13 @@ export function printModulesReport({
           
           .center { text-align: center; }
           .right { text-align: right; white-space: nowrap; }
-          .desc { max-width: 150px; white-space: normal; } /* Allow desc to wrap if needed */
+          .desc { 
+              text-align: center; 
+              padding: 4px 8px; 
+              white-space: normal; 
+              word-break: normal; 
+              overflow-wrap: break-word; 
+          }
 
           @media print {
             .no-print { display: none; }

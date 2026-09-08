@@ -147,7 +147,7 @@ public class ModuloExportService
                 int brandStartRow = currentRow;
                 foreach (var mod in brandItems)
                 {
-                    ws.Cells[currentRow, 2].Value = mod.Descricao;
+                    ws.Cells[currentRow, 2].Value = CleanDescriptionText(mod.Descricao);
                     ws.Cells[currentRow, 3].Value = mod.Pa;
                     ws.Cells[currentRow, 4].Value = mod.Largura;
                     ws.Cells[currentRow, 5].Value = mod.Profundidade;
@@ -222,8 +222,11 @@ public class ModuloExportService
         ws.Cells[5, 3, currentRow, 7].Style.Numberformat.Format = "#,##0.00";
 
         // Column widths
+        int maxDescLen = modules.Select(m => CleanDescriptionText(m.Descricao).Length).DefaultIfEmpty(35).Max();
+        double modeloColWidth = Math.Max(48.0, maxDescLen + 6.0);
+
         ws.Column(1).Width = 30; // Foto
-        ws.Column(2).Width = 35; // Modelo
+        ws.Column(2).Width = modeloColWidth; // Modelo (com folga suficiente para acomodar e centralizar a descrição)
         ws.Column(3).Width = 10; // Módulo
         ws.Column(4).Width = 7;
         ws.Column(5).Width = 7;
@@ -242,9 +245,12 @@ public class ModuloExportService
         ws.Cells.Style.Font.Name = "Segoe UI";
         ws.Cells.Style.Font.Size = 9;
 
+        int maxPriceListDescLen = items.Select(i => CleanDescriptionText(i.Modulo?.Descricao).Length).DefaultIfEmpty(35).Max();
+        double priceListModeloWidth = Math.Max(48.0, maxPriceListDescLen + 6.0);
+
         // Set column widths first so image scaling calculations are correct
         ws.Column(1).Width = 30; // Foto
-        ws.Column(2).Width = 35; // Modelo
+        ws.Column(2).Width = priceListModeloWidth; // Modelo (com folga suficiente para acomodar e centralizar a descrição)
         ws.Column(3).Width = 10; // Módulo
         ws.Column(4).Width = 7;
         ws.Column(5).Width = 7;
@@ -349,7 +355,7 @@ public class ModuloExportService
                 foreach (var item in brandItems)
                 {
                     var mod = item.Modulo;
-                    ws.Cells[currentRow, 2].Value = mod.Descricao;
+                    ws.Cells[currentRow, 2].Value = CleanDescriptionText(mod.Descricao);
                     ws.Cells[currentRow, 3].Value = item.Quantidade;
                     ws.Cells[currentRow, 4].Value = mod.Largura;
                     ws.Cells[currentRow, 5].Value = mod.Profundidade;
@@ -622,9 +628,12 @@ public class ModuloExportService
         ws.Cells.Style.Font.Name = "Calibri";
         ws.Cells.Style.Font.Size = 9;
 
+        int maxColinhaDescLen = items.Select(i => CleanDescriptionText(i.Modulo?.Descricao).Length).DefaultIfEmpty(35).Max();
+        double colinhaDescWidth = Math.Max(48.0, maxColinhaDescLen + 6.0);
+
         // Column widths
         ws.Column(1).Width = 35; // Model
-        ws.Column(2).Width = 45; // Description
+        ws.Column(2).Width = colinhaDescWidth; // Description (com folga suficiente nas laterais)
         ws.Column(3).Width = 10; // Larg
         ws.Column(4).Width = 10; // Prof
         ws.Column(5).Width = 10; // Alt
@@ -678,7 +687,7 @@ public class ModuloExportService
             foreach (var item in brandItems)
             {
                 var mod = item.Modulo;
-                ws.Cells[currentRow, 2].Value = mod.Descricao;
+                ws.Cells[currentRow, 2].Value = CleanDescriptionText(mod.Descricao);
                 ws.Cells[currentRow, 3].Value = mod.Largura;
                 ws.Cells[currentRow, 4].Value = mod.Profundidade;
                 ws.Cells[currentRow, 5].Value = mod.Altura;
@@ -1005,5 +1014,13 @@ public class ModuloExportService
         }
 
         return new ColinhaModelDetails { ModelName = brandName, DisplayGroup = "G1" };
+    }
+
+    private static string CleanDescriptionText(string? desc)
+    {
+        if (string.IsNullOrWhiteSpace(desc)) return "";
+        var clean = Regex.Replace(desc, @"[\r\n]+", " ");
+        clean = Regex.Replace(clean, @"\s+", " ").Trim();
+        return clean;
     }
 }

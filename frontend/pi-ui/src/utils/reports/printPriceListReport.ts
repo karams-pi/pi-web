@@ -145,8 +145,8 @@ export function printPriceListReport({
   const colGroup = `
     <colgroup>
         <col style="width: 10%">
-        <col style="width: 12%">
-        <col style="width: 18%">
+        <col style="width: 24%">
+        <col style="width: 4%">
         <col style="width: 4%">
         <col style="width: 4%">
         <col style="width: 4%">
@@ -211,7 +211,8 @@ export function printPriceListReport({
                   `;
               }
 
-              const colDesc = `<td class="desc">${mod.descricao}</td>`;
+              const descLimpa = (mod.descricao || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+              const colDesc = `<td class="desc center">${descLimpa}</td>`;
               const colPa = `<td class="center">${fmtDim(mod.pa)}</td>`;
               const colLarg = `<td class="center">${fmtDim(mod.largura)}</td>`;
               const colProf = `<td class="center">${fmtDim(mod.profundidade)}</td>`;
@@ -272,12 +273,18 @@ export function printPriceListReport({
               text-transform: uppercase;
           }
           table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-          th, td { border: 1px solid #000; padding: 2px; vertical-align: middle; }
+          th, td { border: 1px solid #000; padding: 3px 4px; vertical-align: middle; }
           th { background-color: #e0e0e0; font-weight: 700; text-transform: uppercase; font-size: 8px; }
           td { font-size: 8px; }
           .center { text-align: center; }
           .right { text-align: right; white-space: nowrap; }
-          .desc { max-width: 150px; }
+          .desc { 
+              text-align: center; 
+              padding: 4px 8px; 
+              white-space: normal; 
+              word-break: normal; 
+              overflow-wrap: break-word; 
+          }
           @media print {
             @page { margin: 5mm; size: landscape; }
             th, .group-title { background-color: #ccc !important; -webkit-print-color-adjust: exact; }
