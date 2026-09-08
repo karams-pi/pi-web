@@ -207,7 +207,7 @@ export default function PrintPiFerguilePage() {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th style={thStyle}>{t("PHOTO")}</th><th style={thStyle}>{t("REF")}</th><th style={thStyle}>{t("DESC")}</th><th style={thStyle}>{t("QTD")}</th><th style={thStyle}>{t("QTD_PECA")}</th><th style={thStyle}>{t("M3")}</th><th style={thStyle}>{t("TECIDO")}</th><th style={thStyle}>{t("OBS")}</th><th style={thStyle}>{t("UNIT_FINAL")}</th><th style={thStyle}>{t("UNIT")}</th><th style={thStyle}>{t("TOTAL")}</th>
+            <th style={{ ...thStyle, width: "100px", minWidth: "90px" }}>{t("PHOTO")}</th><th style={thStyle}>{t("REF")}</th><th style={thStyle}>{t("DESC")}</th><th style={thStyle}>{t("QTD")}</th><th style={thStyle}>{t("QTD_PECA")}</th><th style={thStyle}>{t("M3")}</th><th style={thStyle}>{t("TECIDO")}</th><th style={thStyle}>{t("OBS")}</th><th style={thStyle}>{t("UNIT_FINAL")}</th><th style={thStyle}>{t("UNIT")}</th><th style={thStyle}>{t("TOTAL")}</th>
           </tr>
         </thead>
         <tbody>
@@ -215,7 +215,23 @@ export default function PrintPiFerguilePage() {
             const bSpan = processedData.brandSpans[index]; const dSpan = processedData.descSpans[index]; const isBR = currency === "BRL";
             return (
               <tr key={index}>
-                {bSpan > 0 && <td rowSpan={bSpan} style={cellStyle}>{row.mt?.modulo?.marca?.imagem && <img src={row.mt.modulo.marca.imagem.startsWith("data:") ? row.mt.modulo.marca.imagem : `data:image/png;base64,${row.mt.modulo.marca.imagem}`} style={{ maxWidth: 50 }} />}</td>}
+                {bSpan > 0 && (
+                  <td rowSpan={bSpan} style={{ ...cellStyle, padding: "4px" }}>
+                    {row.mt?.modulo?.marca?.imagem && (
+                      <img
+                        src={row.mt.modulo.marca.imagem.startsWith("data:") ? row.mt.modulo.marca.imagem : `data:image/png;base64,${row.mt.modulo.marca.imagem}`}
+                        alt="Foto"
+                        style={{
+                          maxWidth: "100px",
+                          maxHeight: bSpan > 1 ? `${Math.min(bSpan * 40, 160)}px` : "75px",
+                          objectFit: "contain",
+                          display: "block",
+                          margin: "0 auto"
+                        }}
+                      />
+                    )}
+                  </td>
+                )}
                 {bSpan > 0 && <td rowSpan={bSpan} style={{ ...cellStyle, background: "#eff6ff" }}>{row.referencia}</td>}
                 {dSpan > 0 && <td rowSpan={dSpan} style={{ ...cellStyle, textAlign: "left" }}>{row.descricao}</td>}
                 <td style={cellStyle}>{row.quantidade}</td>

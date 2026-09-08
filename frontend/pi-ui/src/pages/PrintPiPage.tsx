@@ -298,17 +298,17 @@ export default function PrintPiPage() {
       <table className="print-table">
           <thead>
             <tr>
-              <th rowSpan={2} style={{ width: "6%" }}>{t("PHOTO")}</th>
-              <th rowSpan={2} style={{ width: "8%" }}>{t("NAME")}</th>
+              <th rowSpan={2} style={{ width: "9%", minWidth: "80px" }}>{t("PHOTO")}</th>
+              <th rowSpan={2} style={{ width: "7%" }}>{t("NAME")}</th>
               <th rowSpan={2} style={{ width: "15%" }}>{t("DESCRIPTION")}</th>
               <th colSpan={3} style={{ width: "9%" }}>{t("DIMENSIONS")}</th>
-              <th rowSpan={2} style={{ width: "5%" }}>{t("QTY_UNIT")}</th>
-              <th rowSpan={2} style={{ width: "5%" }}>{t("QTY_SOFA")}</th>
+              <th rowSpan={2} style={{ width: "4%" }}>{t("QTY_UNIT")}</th>
+              <th rowSpan={2} style={{ width: "4%" }}>{t("QTY_SOFA")}</th>
               <th rowSpan={2} style={{ width: "5%" }}>{t("TOTAL_VOLUME")}</th>
               <th rowSpan={2} style={{ width: "8%" }}>{t("FABRIC")}</th>
-              <th rowSpan={2} style={{ width: "6%" }}>{t("FEET")}</th>
-              <th rowSpan={2} style={{ width: "6%" }}>{t("FINISHING")}</th>
-              <th rowSpan={2} style={{ width: "8%" }}>{t("OBSERVATION")}</th>
+              <th rowSpan={2} style={{ width: "5%" }}>{t("FEET")}</th>
+              <th rowSpan={2} style={{ width: "5%" }}>{t("FINISHING")}</th>
+              <th rowSpan={2} style={{ width: "7%" }}>{t("OBSERVATION")}</th>
               <th rowSpan={2} style={{ width: "8%" }}>{t("UNIT_FINAL")}</th>
               <th rowSpan={2} style={{ width: "8%" }}>{currency === "BRL" ? "UNIT R$" : "UNIT DOLAR"}</th>
               <th rowSpan={2} style={{ width: "8%" }}>{currency === "BRL" ? "TOTAL R$" : "TOTAL USD"}</th>
@@ -361,7 +361,21 @@ export default function PrintPiPage() {
                                 <tr key={item.id || index}>
                                     {isFirstInBrand && (
                                         <>
-                                            <td rowSpan={totalBrandRows} style={{ textAlign: "center" }}>{photoUrl && <img src={photoUrl} alt="Marca" style={{ maxWidth: "50px" }} />}</td>
+                                            <td rowSpan={totalBrandRows} style={{ textAlign: "center", verticalAlign: "middle", padding: "4px" }}>
+                                                {photoUrl && (
+                                                    <img
+                                                        src={photoUrl}
+                                                        alt="Marca"
+                                                        style={{
+                                                            maxWidth: "100%",
+                                                            maxHeight: totalBrandRows > 1 ? `${Math.min(totalBrandRows * 45, 180)}px` : "75px",
+                                                            objectFit: "contain",
+                                                            display: "block",
+                                                            margin: "0 auto"
+                                                        }}
+                                                    />
+                                                )}
+                                            </td>
                                             <td rowSpan={totalBrandRows} style={{ fontWeight: "bold", background: "#eff6ff", textAlign: "center" }}>{brandName}</td>
                                         </>
                                     )}

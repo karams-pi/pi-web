@@ -276,6 +276,25 @@ public class PiExportService
         string piNumber = GetFormattedPiNumber(pi);
         var dateObj = pi.DataPi.DateTime;
 
+        // Definir larguras das colunas antecipadamente para cálculo correto de proporção das imagens e logos
+        ws.Column(1).Width = 72; // FOTO
+        ws.Column(2).Width = 72; // NAME/MARCA
+        ws.Column(3).Width = 168; // DESCRIPTION
+        ws.Column(4).Width = 36; // LARG
+        ws.Column(5).Width = 36; // PROF
+        ws.Column(6).Width = 36; // ALT
+        ws.Column(7).Width = 36; // QTY_UNIT
+        ws.Column(8).Width = 36; // QTY_SOFA
+        ws.Column(9).Width = 48; // TOTAL_VOLUME
+        ws.Column(10).Width = 96; // FABRIC
+        ws.Column(11).Width = 36; // FEET
+        ws.Column(12).Width = 36; // FINISHING
+        ws.Column(13).Width = 48; // OBSERVATION
+        ws.Column(14).Width = 56; // FRETE / DESPESAS
+        ws.Column(15).Width = 56; // EXW
+        ws.Column(16).Width = 68; // UNIT
+        ws.Column(17).Width = 76; // TOTAL
+
         // ═══════════════ TOP BAR ═══════════════
         ws.Cells["A1:Q1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
         ws.Cells["A1:Q1"].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(0, 51, 102));
@@ -688,12 +707,13 @@ public class PiExportService
             ws.Cells[groupStartRow, 1, currentRow - 1, 1].Merge = true;
             ws.Cells[groupStartRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
+            // Set row height if merged photo needs space (must be set BEFORE AddCenteredImage)
+            if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 320;
+
             if (brand?.Imagem != null)
             {
                 AddCenteredImage(ws, groupStartRow, currentRow - 1, brand.Imagem, $"Pic_{brand.Id}_{groupStartRow}");
             }
-            // Set row height if merged photo needs space
-            if (currentRow - groupStartRow == 1) ws.Row(groupStartRow).Height = 320;
         }
 
         // Summary Row Generic
@@ -793,6 +813,18 @@ public class PiExportService
     {
         string piNumber = GetFormattedPiNumber(pi);
         var dateObj = pi.DataPi.DateTime;
+
+        // Definir larguras de colunas fixas antecipadamente para cálculo correto de proporção das imagens e logos
+        ws.Column(1).Width = 60;  // FOTO
+        ws.Column(2).Width = 64;  // REFERENCIA
+        ws.Column(7).Width = 36;  // LARG.
+        ws.Column(8).Width = 36;  // ALT.
+        ws.Column(9).Width = 36;  // PROF.
+        ws.Column(10).Width = 36; // CANT.
+        ws.Column(11).Width = 56; // TOTAL M3
+        ws.Column(15).Width = 56; // DESPESAS
+        ws.Column(16).Width = 68; // UNIT
+        ws.Column(17).Width = 76; // TOTAL
 
         // ═══════════════ HEADER ═══════════════
         // Bloco fornecedor: A1:F9 (esquerda)
@@ -1086,8 +1118,8 @@ public class PiExportService
 
             ws.Cells[brandStartRow, 1, brandEndRow, 1].Merge = true;
             ws.Cells[brandStartRow, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-            if (brand?.Imagem != null) AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicF_{brand.Id}_{brandStartRow}");
             if (brandEndRow == brandStartRow) ws.Row(brandStartRow).Height = 320;
+            if (brand?.Imagem != null) AddCenteredImage(ws, brandStartRow, brandEndRow, brand.Imagem, $"PicF_{brand.Id}_{brandStartRow}");
         }
 
         // ═══════════════ SUMMARY ROW ═══════════════
@@ -1264,6 +1296,7 @@ public class PiExportService
         {
             using var ms = new MemoryStream(imageBytes);
             var (imgWidth, imgHeight) = GetImageDimensions(imageBytes);
+            if (imgWidth <= 0 || imgHeight <= 0) return;
 
             // Altura total do bloco de células em pixels
             float cellHeightPoints = 0;
@@ -1272,10 +1305,17 @@ public class PiExportService
             float cellHeightPixels = cellHeightPoints * 1.333f;
 
             // Largura da coluna FOTO (coluna 1) em pixels
-            float cellWidthPixels = (float)(ws.Column(1).Width > 0 ? ws.Column(1).Width : 10) * 7.5f;
+            float colWidth = (float)(ws.Column(1).Width > 15 ? ws.Column(1).Width : 72);
+            float cellWidthPixels = colWidth * 7.5f;
 
-            // Contain fit: preenche a célula toda sem cortar, sem padding
-            float scale = Math.Min(cellWidthPixels / imgWidth, cellHeightPixels / imgHeight);
+            // Padding para respiro visual sem cortar (margem de 16px)
+            float availWidth = cellWidthPixels - 16;
+            float availHeight = cellHeightPixels - 16;
+            if (availWidth <= 0) availWidth = cellWidthPixels;
+            if (availHeight <= 0) availHeight = cellHeightPixels;
+
+            // Contain fit: preenche a célula mantendo proporções sem distorcer nem cortar
+            float scale = Math.Min(availWidth / imgWidth, availHeight / imgHeight);
             int newWidth  = (int)(imgWidth  * scale);
             int newHeight = (int)(imgHeight * scale);
 
@@ -1283,8 +1323,22 @@ public class PiExportService
             int leftOffset = Math.Max(0, (int)((cellWidthPixels  - newWidth)  / 2));
             int topOffset  = Math.Max(0, (int)((cellHeightPixels - newHeight) / 2));
 
+            // Calcular a linha e o offset exatos dentro do bloco mesclado
+            int targetRow = startRow - 1;
+            int remainingTopOffset = topOffset;
+            for (int r = startRow; r <= endRow; r++)
+            {
+                int rHeightPx = (int)((ws.Row(r).Height > 0 ? ws.Row(r).Height : 15) * 1.333f);
+                if (remainingTopOffset < rHeightPx)
+                {
+                    targetRow = r - 1;
+                    break;
+                }
+                remainingTopOffset -= rHeightPx;
+            }
+
             var pic = ws.Drawings.AddPicture(pictureName, ms);
-            pic.SetPosition(startRow - 1, topOffset, 0, leftOffset);
+            pic.SetPosition(targetRow, remainingTopOffset, 0, leftOffset);
             pic.SetSize(newWidth, newHeight);
         }
         catch (Exception ex)
