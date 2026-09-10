@@ -4,7 +4,7 @@ import {
   Calculator, Save, X, Plus, Trash2, 
   ArrowLeft, Building, Globe, 
   DollarSign, TrendingUp, Info,
-  GripVertical
+  GripVertical, Loader2
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -44,6 +44,7 @@ const NovoEstudoEdcPage: React.FC = () => {
   const [exportadores, setExportadores] = useState<any[]>([]);
   const [portos, setPortos] = useState<any[]>([]);
   const [modelos, setModelos] = useState<any[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState(() => ({
     id: undefined as number | undefined,
@@ -159,6 +160,8 @@ const NovoEstudoEdcPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (isSaving) return;
+
     // Validações básicas obrigatórias
     if (!formData.idImportador || formData.idImportador === 0) {
       alert('Por favor, selecione o Importador (Cliente).');
@@ -180,6 +183,7 @@ const NovoEstudoEdcPage: React.FC = () => {
       }
     }
 
+    setIsSaving(true);
     try {
       // Sanitização de IDs nulos (converter 0 para null para chaves estrangeiras opcionais)
       const sanitizedItens = formData.itens.map(item => ({
@@ -213,6 +217,8 @@ const NovoEstudoEdcPage: React.FC = () => {
     } catch (error) { 
       console.error(error); 
       alert('Erro de conexão ao salvar simulação.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -731,11 +737,30 @@ US$ ${formData.valorFreteInternacional.toLocaleString('pt-BR', { minimumFraction
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <button className="btn btn-primary" style={{ width: '100%', height: '54px', fontSize: '1.1rem' }} onClick={handleSave}>
-              <Save size={20} />
-              <span>{id ? 'Salvar Estudo EDC' : 'Gerar Estudo EDC'}</span>
+            <button 
+              className="btn btn-primary" 
+              style={{ width: '100%', height: '54px', fontSize: '1.1rem', opacity: isSaving ? 0.7 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }} 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  <span>Salvando...</span>
+                </>
+              ) : (
+                <>
+                  <Save size={20} />
+                  <span>{id ? 'Salvar Estudo EDC' : 'Gerar Estudo EDC'}</span>
+                </>
+              )}
             </button>
-            <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => navigate('/edc/estudos')}>
+            <button 
+              className="btn btn-secondary" 
+              style={{ width: '100%' }} 
+              onClick={() => navigate('/edc/estudos')}
+              disabled={isSaving}
+            >
               <X size={18} />
               <span>Descartar Simulação</span>
             </button>

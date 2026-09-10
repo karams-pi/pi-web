@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Printer, FileText, Download, 
   Calculator, ShieldCheck, 
-  TrendingUp, Package, CheckCircle2
+  TrendingUp, Package, CheckCircle2, Edit2
 } from 'lucide-react';
 
 const DetalheEstudoEdcPage: React.FC = () => {
@@ -287,6 +287,10 @@ const DetalheEstudoEdcPage: React.FC = () => {
         </div>
         <div className="page-header-line" style={{ background: 'linear-gradient(90deg, #10b981, transparent)' }}></div>
         <div className="action-buttons" style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+          <button className="btn btn-secondary" onClick={() => navigate(`/edc/estudos/editar/${id}`)}>
+            <Edit2 size={18} />
+            <span>Editar Estudo</span>
+          </button>
           <button className="btn btn-secondary" onClick={() => window.open(`/#/print-edc/${id}?color=true`, '_blank')} style={{ borderColor: '#7c3aed', color: '#a78bfa' }}>
             <FileText size={18} />
             <span>PDF Colorido</span>

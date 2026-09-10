@@ -107,6 +107,21 @@ public class SimulacoesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SimulacaoEdc>> PostSimulacao(SimulacaoEdc simulacao)
     {
+        // Prevenção contra múltiplos cliques / duplicações acidentais simultâneas (burst < 5s)
+        var recentCutoff = DateTime.UtcNow.AddSeconds(-5);
+        var duplicateRecent = await _context.SimulacoesEdc
+            .Where(s => s.NumeroReferencia == simulacao.NumeroReferencia
+                     && s.IdImportador == simulacao.IdImportador
+                     && s.IdExportador == simulacao.IdExportador
+                     && s.DataEstudo >= recentCutoff)
+            .OrderByDescending(s => s.Id)
+            .FirstOrDefaultAsync();
+
+        if (duplicateRecent != null)
+        {
+            return CreatedAtAction(nameof(GetSimulacao), new { id = duplicateRecent.Id }, duplicateRecent);
+        }
+
         if (simulacao.Despesas != null)
         {
             for (int i = 0; i < simulacao.Despesas.Count; i++)
