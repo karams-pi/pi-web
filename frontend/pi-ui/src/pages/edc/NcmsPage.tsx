@@ -30,6 +30,8 @@ const NcmsPage: React.FC = () => {
     aliquotaIcmsPadrao: 0.19
   });
 
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => { fetchNcms(); }, []);
 
   const fetchNcms = async () => {
@@ -43,6 +45,9 @@ const NcmsPage: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
+
+    setIsSaving(true);
     const method = editingNcm ? 'PUT' : 'POST';
     const url = editingNcm ? `/api/edc/ncms/${editingNcm.id}` : '/api/edc/ncms';
     const payload = editingNcm ? { ...formData, id: editingNcm.id } : formData;
@@ -56,8 +61,16 @@ const NcmsPage: React.FC = () => {
       if (response.ok) {
         fetchNcms();
         setShowModal(false);
+      } else {
+        const errorText = await response.text();
+        alert(errorText || 'Erro ao salvar o NCM.');
       }
-    } catch (error) { console.error(error); }
+    } catch (error) { 
+      console.error(error); 
+      alert('Erro inesperado ao salvar o NCM.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -210,8 +223,11 @@ const NcmsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="modal-footer" style={{ padding: '20px 0 0 0' }}>
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Descartar</button>
-                  <button type="submit" className="btn btn-primary"><Save size={18} /><span>Salvar Alterações</span></button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)} disabled={isSaving}>Descartar</button>
+                  <button type="submit" className="btn btn-primary" disabled={isSaving} style={{ opacity: isSaving ? 0.7 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }}>
+                    <Save size={18} />
+                    <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
+                  </button>
                 </div>
               </form>
             </div>

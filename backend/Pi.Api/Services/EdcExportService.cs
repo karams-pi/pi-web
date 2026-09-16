@@ -178,16 +178,28 @@ public class EdcExportService
         ws.Cells["G8"].Value = $"ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
 
+        bool IsPureDigits(string? s) => string.IsNullOrWhiteSpace(s) || System.Text.RegularExpressions.Regex.IsMatch(s.Trim(), @"^\d+([\.\-]\d+)*$");
+
+        string GetItemProductName(SimulacaoEdcItem item)
+        {
+            if (!string.IsNullOrWhiteSpace(item.Modelo?.Nome) && !IsPureDigits(item.Modelo.Nome)) return item.Modelo.Nome.Trim();
+            if (!string.IsNullOrWhiteSpace(item.Modelo?.Codigo) && !IsPureDigits(item.Modelo.Codigo)) return item.Modelo.Codigo.Trim();
+            if (!string.IsNullOrWhiteSpace(item.Produto?.Referencia) && !IsPureDigits(item.Produto.Referencia)) return item.Produto.Referencia.Trim();
+            if (!string.IsNullOrWhiteSpace(item.Produto?.Descricao) && !IsPureDigits(item.Produto.Descricao)) return item.Produto.Descricao.Trim();
+            if (!string.IsNullOrWhiteSpace(item.Produto?.Ncm?.Descricao) && !IsPureDigits(item.Produto.Ncm.Descricao)) return item.Produto.Ncm.Descricao.Trim();
+            return item.Produto?.Referencia?.Trim() ?? item.Produto?.Descricao?.Trim() ?? "";
+        }
+
         var uniqueProducts = simulacao.Itens?
-            .Select(i => i.Produto?.Descricao)
-            .Where(d => !string.IsNullOrEmpty(d))
-            .Select(d => d!.Trim())
-            .Where(d => !System.Text.RegularExpressions.Regex.IsMatch(d, @"^\d+([\.\-]\d+)*$"))
+            .Select(GetItemProductName)
+            .Where(d => !string.IsNullOrWhiteSpace(d))
             .Distinct()
             .ToList() ?? new List<string>();
+
+        string fallbackProduto = simulacao.Itens?.FirstOrDefault()?.Produto?.Ncm?.Descricao?.Trim() ?? "DIVERSOS";
         string produtoText = uniqueProducts.Count > 3 
             ? "DIVERSOS CONFORME DETALHAMENTO" 
-            : (uniqueProducts.Count > 0 ? string.Join(", ", uniqueProducts) : "AMORTECEDORES");
+            : (uniqueProducts.Count > 0 ? string.Join(", ", uniqueProducts) : fallbackProduto);
         ws.Cells["C9"].Value = $"PRODUTO: {produtoText.ToUpper()}";
         ws.Cells["C9"].Style.Font.Bold = true;
         var portoOrigemNome = simulacao.PortoOrigem?.Nome ?? "SHANGHAI";

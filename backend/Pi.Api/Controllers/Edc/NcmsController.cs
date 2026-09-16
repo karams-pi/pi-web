@@ -32,6 +32,21 @@ public class NcmsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Ncm>> PostNcm(Ncm ncm)
     {
+        var codigoFormatado = ncm.Codigo?.Trim() ?? "";
+        if (string.IsNullOrEmpty(codigoFormatado))
+        {
+            return BadRequest("O código do NCM é obrigatório.");
+        }
+
+        var existing = await _context.Ncms
+            .FirstOrDefaultAsync(n => n.FlAtivo && n.Codigo.Trim() == codigoFormatado);
+
+        if (existing != null)
+        {
+            return Conflict("Já existe um NCM ativo cadastrado com este código.");
+        }
+
+        ncm.Codigo = codigoFormatado;
         _context.Ncms.Add(ncm);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetNcm), new { id = ncm.Id }, ncm);

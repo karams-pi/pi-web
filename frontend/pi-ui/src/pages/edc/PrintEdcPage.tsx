@@ -302,13 +302,24 @@ export default function PrintEdcPage() {
   const uniqueNcms = estudo.itens 
     ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.ncm?.codigo).filter(Boolean))) as string[]
     : [];
-  const ncmPadrao = uniqueNcms.length > 3 ? "DIVERSOS" : (uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "87088000");
+  const ncmPadrao = uniqueNcms.length > 3 ? "DIVERSOS" : (uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "-");
+
+  const getItemProductName = (item: any): string => {
+    const isPureDigits = (s?: string) => !s || /^\d+([\.\-]\d+)*$/.test(s.trim());
+    if (item.modelo?.nome && !isPureDigits(item.modelo.nome)) return item.modelo.nome.trim();
+    if (item.modelo?.codigo && !isPureDigits(item.modelo.codigo)) return item.modelo.codigo.trim();
+    if (item.produto?.referencia && !isPureDigits(item.produto.referencia)) return item.produto.referencia.trim();
+    if (item.produto?.descricao && !isPureDigits(item.produto.descricao)) return item.produto.descricao.trim();
+    if (item.produto?.ncm?.descricao && !isPureDigits(item.produto.ncm.descricao)) return item.produto.ncm.descricao.trim();
+    return item.produto?.referencia?.trim() || item.produto?.descricao?.trim() || "";
+  };
 
   const uniqueProducts = estudo.itens 
-    ? Array.from(new Set(estudo.itens.map((i: any) => i.produto?.descricao).filter(Boolean)))
-        .filter((d: any) => !/^\d+([\.\-]\d+)*$/.test(d.trim())) as string[]
+    ? Array.from(new Set(estudo.itens.map(getItemProductName).filter(Boolean))) as string[]
     : [];
-  const descNcm = uniqueProducts.length > 3 ? "DIVERSOS CONFORME DETALHAMENTO" : (uniqueProducts.length > 0 ? uniqueProducts.join(", ") : "AMORTECEDORES");
+  const descNcm = uniqueProducts.length > 3 
+    ? "DIVERSOS CONFORME DETALHAMENTO" 
+    : (uniqueProducts.length > 0 ? uniqueProducts.join(", ") : (estudo.itens?.[0]?.produto?.ncm?.descricao?.trim() || "DIVERSOS"));
   let icmsPadrao = 0.18;
   if (estudo.importador && estudo.importador.aliquotaIcmsPadrao > 0) {
     icmsPadrao = estudo.importador.aliquotaIcmsPadrao;
