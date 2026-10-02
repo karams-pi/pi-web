@@ -93,12 +93,13 @@ export default function EmissaoListaPrecosPage() {
     }
   }, [filterFornecedor, configsMap, allFornecedores]);
 
-  // Freight Settings
+  // Freight & Price Settings
   const [selectedFreteId, setSelectedFreteId] = useState("");
   const [totalFreteBRL, setTotalFreteBRL] = useState<number>(0);
   const [tipoRateio, setTipoRateio] = useState<"IGUAL" | "M3">("IGUAL");
   const [currency, setCurrency] = useState<"BRL" | "EXW">("EXW");
   const [validityDays, setValidityDays] = useState(30);
+  const [percentualAcrescimo, setPercentualAcrescimo] = useState<number | "">("");
 
   const [loading, setLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
@@ -286,12 +287,14 @@ export default function EmissaoListaPrecosPage() {
       return;
     }
     try {
-      const itensJson = JSON.stringify(
-        itemsWithCalculations.map(si => ({
+      const emissionData = {
+        percentualAcrescimo: typeof percentualAcrescimo === "number" ? percentualAcrescimo : 0,
+        items: itemsWithCalculations.map(si => ({
           moduloId: si.modulo.id,
           valorFreteRateadoUSD: si.freightUSD
         }))
-      );
+      };
+      const itensJson = JSON.stringify(emissionData);
       const refName = nomeReferencia.trim() || `Lista de Preços ${new Date().toLocaleString("pt-BR")}`;
       await createListaEmitida({
         nomeReferencia: refName,
@@ -312,7 +315,16 @@ export default function EmissaoListaPrecosPage() {
   const handleLoadFromHistory = async (hist: ListaEmitida) => {
     try {
       setLoading(true);
-      const parsedItems = JSON.parse(hist.itensJson) as Array<{ moduloId: number; valorFreteRateadoUSD: number }>;
+      const parsed = JSON.parse(hist.itensJson);
+      const parsedItems: Array<{ moduloId: number; valorFreteRateadoUSD: number }> = Array.isArray(parsed)
+        ? parsed
+        : (parsed.items || []);
+
+      if (!Array.isArray(parsed) && parsed.percentualAcrescimo !== undefined) {
+        setPercentualAcrescimo(parsed.percentualAcrescimo || "");
+      } else {
+        setPercentualAcrescimo("");
+      }
       
       const loadedModules = await Promise.all(
         parsedItems.map(async (item) => {
@@ -385,7 +397,8 @@ export default function EmissaoListaPrecosPage() {
         marca: marcaMap,
         tecido: tecidoMap
       },
-      validityDays
+      validityDays,
+      percentualAcrescimo: typeof percentualAcrescimo === "number" ? percentualAcrescimo : 0
     });
 
     await handleSaveEmission();
@@ -406,7 +419,8 @@ export default function EmissaoListaPrecosPage() {
         currency,
         cotacao: Number(cotacao),
         validityDays,
-        freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW"
+        freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW",
+        percentualAcrescimo: typeof percentualAcrescimo === "number" ? percentualAcrescimo : 0
       };
 
       const blob = await exportPriceListExcel(payload);
@@ -444,7 +458,8 @@ export default function EmissaoListaPrecosPage() {
         cotacao: Number(cotacao),
         validityDays,
         freightType: fretes.find(f => f.id === Number(selectedFreteId))?.nome || "EXW",
-        isColinha: true
+        isColinha: true,
+        percentualAcrescimo: typeof percentualAcrescimo === "number" ? percentualAcrescimo : 0
       };
 
       const blob = await exportPriceListExcel(payload);
@@ -474,10 +489,14 @@ export default function EmissaoListaPrecosPage() {
     const riskVal = cotacao || 1;
     
     const exw = calculateEXW(valorTecido, riskVal, c.percentualComissao, c.percentualGordura);
-    const unitUSD = exw + freightUSD;
+    let unitUSD = exw + freightUSD;
+    const pct = typeof percentualAcrescimo === "number" ? percentualAcrescimo : 0;
+    if (pct !== 0) {
+      unitUSD = unitUSD * (1 + pct / 100);
+    }
 
     return currency === "BRL" ? unitUSD * riskVal : unitUSD;
-  }, [configsMap, cotacao, currency]);
+  }, [configsMap, cotacao, currency, percentualAcrescimo]);
 
   return (
     <div className="list-container">
@@ -543,6 +562,18 @@ export default function EmissaoListaPrecosPage() {
                )}
              </button>
            </div>
+        </div>
+        <div style={{ width: 100 }}>
+           <label className="label">% Acréscimo</label>
+           <input 
+             className="cl-input" 
+             type="number" 
+             step="0.01" 
+             value={percentualAcrescimo} 
+             placeholder="0"
+             onChange={e => setPercentualAcrescimo(e.target.value === "" ? "" : Number(e.target.value))} 
+             title="Percentual de acréscimo nos valores dos tecidos por módulo" 
+           />
         </div>
         <div style={{ width: 90 }}>
            <label className="label">Validade</label>

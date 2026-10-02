@@ -117,6 +117,7 @@ export async function exportPriceListExcel(params: {
   validityDays?: number;
   freightType?: string;
   isColinha?: boolean;
+  percentualAcrescimo?: number;
 }) {
   const res = await fetch(`${API_BASE}/api/pi/modulos/excel-price-list`, {
     method: "POST",

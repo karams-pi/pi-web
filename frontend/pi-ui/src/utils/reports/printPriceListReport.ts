@@ -14,6 +14,7 @@ interface PrintPriceListReportOptions {
     tecido: Map<number, string>;
   };
   validityDays?: number;
+  percentualAcrescimo?: number;
 }
 
 export function printPriceListReport({
@@ -24,6 +25,7 @@ export function printPriceListReport({
   configsMap,
   maps,
   validityDays = 30,
+  percentualAcrescimo = 0,
 }: PrintPriceListReportOptions) {
   if (!modules || modules.length === 0) {
     alert("Sem dados para imprimir");
@@ -64,7 +66,10 @@ export function printPriceListReport({
     const exw = valorBase + comissao + gordura;
     const freightUSD = freightMap.get(modId) || 0;
     
-    const totalUSD = exw + freightUSD;
+    let totalUSD = exw + freightUSD;
+    if (percentualAcrescimo) {
+      totalUSD = totalUSD * (1 + percentualAcrescimo / 100);
+    }
 
     return currency === "BRL" ? totalUSD * risk : totalUSD;
   }

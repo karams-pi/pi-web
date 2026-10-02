@@ -237,7 +237,7 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    public byte[] ExportPriceListToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30, string? freightType = null)
+    public byte[] ExportPriceListToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30, string? freightType = null, decimal percentualAcrescimo = 0)
     {
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Lista de Preços");
@@ -402,7 +402,12 @@ public class ModuloExportService
                                     basePrice = Math.Round(valorBase + comissao + gordura, 2);
                                 }
                             }
-                            ws.Cells[currentRow, fabricStartCol + i].Value = (basePrice + freightDisp) * item.Quantidade;
+                            decimal unitPrice = basePrice + freightDisp;
+                            if (percentualAcrescimo != 0)
+                            {
+                                unitPrice = Math.Round(unitPrice * (1 + percentualAcrescimo / 100m), 2);
+                            }
+                            ws.Cells[currentRow, fabricStartCol + i].Value = unitPrice * item.Quantidade;
                         }
                         else
                         {
@@ -593,7 +598,7 @@ public class ModuloExportService
         }
     }
 
-    public byte[] ExportColinhaToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30, string? freightType = null)
+    public byte[] ExportColinhaToExcel(List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays = 30, string? freightType = null, decimal percentualAcrescimo = 0)
     {
         using var package = new ExcelPackage();
         
@@ -606,24 +611,24 @@ public class ModuloExportService
         if (estofados.Any())
         {
             var ws = package.Workbook.Worksheets.Add($"Estofados {supplierName.ToUpper()}");
-            BuildColinhaSheet(ws, estofados, currency, cotacao, configs, validityDays, freightType, isModular: true);
+            BuildColinhaSheet(ws, estofados, currency, cotacao, configs, validityDays, freightType, isModular: true, percentualAcrescimo: percentualAcrescimo);
         }
         if (poltronas.Any())
         {
             var ws = package.Workbook.Worksheets.Add($"POLTRONA {supplierName.ToUpper()}");
-            BuildColinhaSheet(ws, poltronas, currency, cotacao, configs, validityDays, freightType, isModular: false);
+            BuildColinhaSheet(ws, poltronas, currency, cotacao, configs, validityDays, freightType, isModular: false, percentualAcrescimo: percentualAcrescimo);
         }
         if (complementos.Any())
         {
             var ws = package.Workbook.Worksheets.Add("COMPLEMENTOS");
-            BuildColinhaSheet(ws, complementos, currency, cotacao, configs, validityDays, freightType, isModular: false);
+            BuildColinhaSheet(ws, complementos, currency, cotacao, configs, validityDays, freightType, isModular: false, percentualAcrescimo: percentualAcrescimo);
         }
         
         package.Workbook.Calculate();
         return package.GetAsByteArray();
     }
 
-    private void BuildColinhaSheet(ExcelWorksheet ws, List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays, string? freightType, bool isModular)
+    private void BuildColinhaSheet(ExcelWorksheet ws, List<PriceListItemDto> items, string currency, decimal cotacao, List<Configuracao> configs, int validityDays, string? freightType, bool isModular, decimal percentualAcrescimo = 0)
     {
         ws.Cells.Style.Font.Name = "Calibri";
         ws.Cells.Style.Font.Size = 9;
@@ -718,8 +723,16 @@ public class ModuloExportService
                     priceG0 = CalcPrice(mtG0.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome);
                 }
 
-                ws.Cells[currentRow, 6].Value = priceDisplay + freightDisp;
-                ws.Cells[currentRow, 7].Value = priceG0 + freightDisp;
+                decimal valDisplay = priceDisplay + freightDisp;
+                decimal valG0 = priceG0 + freightDisp;
+                if (percentualAcrescimo != 0)
+                {
+                    valDisplay = Math.Round(valDisplay * (1 + percentualAcrescimo / 100m), 2);
+                    valG0 = Math.Round(valG0 * (1 + percentualAcrescimo / 100m), 2);
+                }
+
+                ws.Cells[currentRow, 6].Value = valDisplay;
+                ws.Cells[currentRow, 7].Value = valG0;
 
                 ws.Cells[currentRow, 8].Formula = $"=F{currentRow}*0.85";
                 ws.Cells[currentRow, 9].Formula = $"=G{currentRow}*0.85";

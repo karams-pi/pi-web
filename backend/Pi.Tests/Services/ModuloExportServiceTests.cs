@@ -158,4 +158,44 @@ public class ModuloExportServiceTests
         // Multiplied by Quantity (2) = 330.00
         price.Should().Be(330.00m);
     }
+
+    [Fact]
+    public void ExportPriceListToExcel_ShouldApplyPercentualAcrescimo()
+    {
+        // Arrange
+        var module = new Modulo 
+        { 
+            Id = 1, 
+            Descricao = "Teste Acrescimo", 
+            Fornecedor = new Fornecedor { Nome = "Karams" },
+            Categoria = new Categoria { Nome = "Sofa" },
+            Marca = new Marca { Nome = "Brand" },
+            ModulosTecidos = new List<ModuloTecido>
+            {
+                new ModuloTecido { IdTecido = 1, ValorTecido = 100, Tecido = new Tecido { Id = 1, Nome = "G1" } }
+            }
+        };
+
+        var items = new List<ModuloExportService.PriceListItemDto>
+        {
+            new ModuloExportService.PriceListItemDto { Modulo = module, ValorFreteRateadoUSD = 10, Quantidade = 1 }
+        };
+
+        var configs = new List<Configuracao> { new Configuracao { PercentualComissao = 10, PercentualGordura = 5, ValorReducaoDolar = 0.1m } };
+
+        // Act - 10% acréscimo
+        var result = _service.ExportPriceListToExcel(items, "BRL", 5.0m, configs, validityDays: 30, freightType: "EXW", percentualAcrescimo: 10);
+
+        // Assert
+        using var stream = new System.IO.MemoryStream(result);
+        using var package = new ExcelPackage(stream);
+        var ws = package.Workbook.Worksheets[0];
+
+        var price = ws.Cells[8, 8].Value; // Column 8: G1 Price
+
+        // basePrice = 115.00 + freight = 50.00 -> 165.00
+        // + 10% acrescimo = 165.00 * 1.10 = 181.50
+        price.Should().Be(181.50m);
+    }
 }
+
