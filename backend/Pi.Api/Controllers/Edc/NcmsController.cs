@@ -47,6 +47,7 @@ public class NcmsController : ControllerBase
         }
 
         ncm.Codigo = codigoFormatado;
+        ncm.Descricao = ncm.Descricao?.Trim() ?? "";
         _context.Ncms.Add(ncm);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetNcm), new { id = ncm.Id }, ncm);
@@ -60,6 +61,8 @@ public class NcmsController : ControllerBase
             return BadRequest();
         }
 
+        ncm.Codigo = ncm.Codigo?.Trim() ?? "";
+        ncm.Descricao = ncm.Descricao?.Trim() ?? "";
         _context.Entry(ncm).State = EntityState.Modified;
 
         try

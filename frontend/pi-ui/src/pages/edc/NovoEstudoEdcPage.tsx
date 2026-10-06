@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Calculator, Save, X, Plus, Trash2, 
   ArrowLeft, Building, Globe, 
@@ -7,6 +7,7 @@ import {
   GripVertical, Loader2
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import SearchableSelect from '../../components/SearchableSelect';
 
 const NovoEstudoEdcPage: React.FC = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const NovoEstudoEdcPage: React.FC = () => {
   const [exportadores, setExportadores] = useState<any[]>([]);
   const [portos, setPortos] = useState<any[]>([]);
   const [modelos, setModelos] = useState<any[]>([]);
+  const [produtos, setProdutos] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState(() => ({
@@ -73,17 +75,19 @@ const NovoEstudoEdcPage: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [imp, exp, por, mods, tax] = await Promise.all([
+        const [imp, exp, por, mods, prods, tax] = await Promise.all([
           fetch('/api/edc/importadores').then(r => r.json()),
           fetch('/api/edc/exportadores').then(r => r.json()),
           fetch('/api/edc/portos').then(r => r.json()),
           fetch('/api/edc/modelos').then(r => r.json()),
+          fetch('/api/edc/produtos').then(r => r.json()),
           fetch('/api/edc/taxasaduaneiras').then(r => r.json())
         ]);
-        setImportadores(imp);
-        setExportadores(exp);
-        setPortos(por);
-        setModelos(mods);
+        setImportadores(imp || []);
+        setExportadores(exp || []);
+        setPortos(por || []);
+        setModelos(mods || []);
+        setProdutos(prods || []);
         
         if (id) {
           const sim = await fetch(`/api/edc/simulacoes/${id}`).then(r => r.json());
@@ -130,17 +134,91 @@ const NovoEstudoEdcPage: React.FC = () => {
     loadData();
   }, [id]);
 
+  // Unified Product/Model Options for SearchableSelect
+  const itemOptions = useMemo(() => {
+    const opts: any[] = [];
+    const addedProductIds = new Set<number>();
+
+    // 1. All models
+    modelos.forEach(m => {
+      const prod = m.produto;
+      const ref = prod?.referencia || m.codigo;
+      const ncmCode = prod?.ncm?.codigo;
+      const ncmDesc = prod?.ncm?.descricao;
+      const isCustomModel = m.nome && m.nome !== ref && m.nome !== m.codigo;
+      
+      const label = isCustomModel ? `${m.codigo} - ${m.nome}` : (ref || m.codigo);
+      const subtitle = `${prod?.descricao || m.descricao || ''}${ncmCode ? ` • NCM: ${ncmCode}` : ''}`;
+      
+      opts.push({
+        value: `m-${m.id}`,
+        label: label,
+        subtitle: subtitle,
+        badge: prod?.unidadeMedida || 'UN',
+        searchTerms: `${m.codigo} ${m.nome} ${ref} ${prod?.descricao || ''} ${m.descricao || ''} ${ncmCode || ''} ${ncmDesc || ''}`,
+        rawModel: m,
+        rawProduct: prod,
+        idModelo: m.id,
+        idProduto: m.idProduto || prod?.id
+      });
+
+      if (prod?.id) addedProductIds.add(prod.id);
+    });
+
+    // 2. Any active products that do not have a model record yet
+    produtos.forEach(p => {
+      if (!addedProductIds.has(p.id)) {
+        const ncmCode = p.ncm?.codigo;
+        const ncmDesc = p.ncm?.descricao;
+        opts.push({
+          value: `p-${p.id}`,
+          label: p.referencia || `Produto #${p.id}`,
+          subtitle: `${p.descricao || ''}${ncmCode ? ` • NCM: ${ncmCode}` : ''}`,
+          badge: p.unidadeMedida || 'UN',
+          searchTerms: `${p.referencia} ${p.descricao || ''} ${ncmCode || ''} ${ncmDesc || ''}`,
+          rawModel: null,
+          rawProduct: p,
+          idModelo: null,
+          idProduto: p.id
+        });
+      }
+    });
+
+    return opts;
+  }, [modelos, produtos]);
+
+  const importadorOptions = useMemo(() => importadores.map(i => ({
+    value: i.id,
+    label: i.razaoSocial,
+    subtitle: i.cnpj ? `CNPJ: ${i.cnpj}` : undefined,
+    searchTerms: `${i.razaoSocial} ${i.nomeFantasia || ''} ${i.cnpj || ''}`
+  })), [importadores]);
+
+  const exportadorOptions = useMemo(() => exportadores.map(e => ({
+    value: e.id,
+    label: e.nome,
+    subtitle: e.pais ? `País: ${e.pais} • Incoterm: ${e.incoterm || 'FOB'}` : undefined,
+    searchTerms: `${e.nome} ${e.pais || ''} ${e.incoterm || ''}`
+  })), [exportadores]);
+
+  const portoDestinoOptions = useMemo(() => portos.map(p => ({
+    value: p.id,
+    label: `${p.sigla} - ${p.nome}`,
+    subtitle: p.pais || '',
+    searchTerms: `${p.sigla} ${p.nome} ${p.pais || ''}`
+  })), [portos]);
+
   const handleAddItem = () => {
-    const firstModel = modelos[0];
+    const firstOpt = itemOptions[0];
     setFormData({
       ...formData,
       itens: [
         ...formData.itens, 
         { 
-          idModelo: firstModel?.id || 0, 
-          idProduto: firstModel?.idProduto || 0, 
+          idModelo: firstOpt?.idModelo || null, 
+          idProduto: firstOpt?.idProduto || 0, 
           quantidade: 1, 
-          valorFobUnitario: 0,
+          valorFobUnitario: firstOpt?.rawProduct?.precoFobBase || 0,
           valorFobSubfaturado: null
         }
       ]
@@ -250,31 +328,29 @@ const NovoEstudoEdcPage: React.FC = () => {
               </div>
               <div className="form-group">
                 <label>Importador (Comprador)</label>
-                <div className="input-with-icon">
-                   <Building size={16} />
-                   <select value={formData.idImportador} onChange={e => setFormData({...formData, idImportador: parseInt(e.target.value)})}>
-                    <option value="0">Selecione o Cliente...</option>
-                    {importadores.map(i => <option key={i.id} value={i.id}>{i.razaoSocial}</option>)}
-                  </select>
-                </div>
+                <SearchableSelect
+                  value={formData.idImportador}
+                  onChange={val => setFormData({...formData, idImportador: Number(val) || 0})}
+                  options={importadorOptions}
+                  placeholder="Selecione o Cliente / Importador..."
+                />
               </div>
               <div className="form-group">
                 <label>Exportador (Fornecedor)</label>
-                <div className="input-with-icon">
-                   <Globe size={16} />
-                   <select value={formData.idExportador} onChange={e => {
-                     const selectedId = parseInt(e.target.value);
-                     const selectedExp = exportadores.find(exp => exp.id === selectedId);
-                     setFormData(prev => ({
-                       ...prev,
-                       idExportador: selectedId,
-                       tipoFrete: selectedExp?.incoterm || prev.tipoFrete || 'FOB'
-                     }));
-                   }}>
-                    <option value="0">Selecione o Fornecedor...</option>
-                    {exportadores.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
-                  </select>
-                </div>
+                <SearchableSelect
+                  value={formData.idExportador}
+                  onChange={val => {
+                    const selectedId = Number(val) || 0;
+                    const selectedExp = exportadores.find(exp => exp.id === selectedId);
+                    setFormData(prev => ({
+                      ...prev,
+                      idExportador: selectedId,
+                      tipoFrete: selectedExp?.incoterm || prev.tipoFrete || 'FOB'
+                    }));
+                  }}
+                  options={exportadorOptions}
+                  placeholder="Selecione o Fornecedor / Exportador..."
+                />
               </div>
             </div>
           </div>
@@ -285,11 +361,11 @@ const NovoEstudoEdcPage: React.FC = () => {
               <h3 className="card-title">2. Itens da Proforma</h3>
               <button className="btn btn-secondary" onClick={handleAddItem}><Plus size={16} /> Adicionar Produto</button>
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive" style={{ overflow: 'visible' }}>
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Modelo Comercial</th>
+                    <th style={{ minWidth: '320px' }}>Produto / Modelo Comercial</th>
                     <th style={{ width: '80px' }}>U.M.</th>
                     <th style={{ width: '130px' }}>Quantidade</th>
                     <th style={{ width: '150px' }}>FOB Unit. (USD)</th>
@@ -303,32 +379,41 @@ const NovoEstudoEdcPage: React.FC = () => {
                   {formData.itens.length === 0 ? (
                     <tr><td colSpan={formData.flSimularSubfaturamento ? 6 : 5} style={{ textAlign: 'center', opacity: 0.5, padding: '30px' }}>Nenhum item adicionado.</td></tr>
                   ) : formData.itens.map((item, idx) => {
-                    const model = modelos.find(m => m.id === item.idModelo);
-                    const prod = model?.produto;
-                    const unit = prod?.unidadeMedida || 'UN';
+                    let selectedVal = "";
+                    if (item.idModelo) {
+                      selectedVal = `m-${item.idModelo}`;
+                    } else if (item.idProduto) {
+                      selectedVal = `p-${item.idProduto}`;
+                    }
+
+                    const selectedOpt = itemOptions.find(o => 
+                      (item.idModelo && o.idModelo === item.idModelo) || 
+                      (!item.idModelo && o.idProduto === item.idProduto) ||
+                      o.value === selectedVal
+                    );
+
+                    const unit = selectedOpt?.badge || selectedOpt?.rawProduct?.unidadeMedida || 'UN';
+
                     return (
                       <tr key={idx}>
-                        <td>
-                          <select 
-                            className="premium-select" 
-                            value={item.idModelo || 0} 
-                            onChange={e => {
-                              const selectedId = parseInt(e.target.value);
-                              const selectedModel = modelos.find(m => m.id === selectedId);
-                              
+                        <td style={{ minWidth: '320px' }}>
+                          <SearchableSelect
+                            value={selectedVal || (selectedOpt ? selectedOpt.value : "")}
+                            onChange={val => {
+                              const opt = itemOptions.find(o => String(o.value) === String(val));
+                              if (!opt) return;
+
                               const newItens = [...formData.itens];
-                              newItens[idx].idModelo = selectedId;
-                              newItens[idx].idProduto = selectedModel?.idProduto || 0;
+                              newItens[idx].idModelo = opt.idModelo;
+                              newItens[idx].idProduto = opt.idProduto;
+                              if (!newItens[idx].valorFobUnitario && opt.rawProduct?.precoFobBase) {
+                                newItens[idx].valorFobUnitario = opt.rawProduct.precoFobBase;
+                              }
                               setFormData({ ...formData, itens: newItens });
                             }}
-                          >
-                            <option value="0">Selecione o Modelo...</option>
-                            {modelos.map(m => (
-                              <option key={m.id} value={m.id}>
-                                {m.codigo} - {m.nome} ({m.produto?.referencia})
-                              </option>
-                            ))}
-                          </select>
+                            options={itemOptions}
+                            placeholder="Digite o nome, código ou NCM do produto..."
+                          />
                         </td>
                         <td>
                           <span className="badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.25)' }}>
@@ -340,7 +425,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                             <input 
                               type="number" 
                               value={item.quantidade} 
-                              onChange={e => updateItem(idx, 'quantidade', parseFloat(e.target.value))} 
+                              onChange={e => updateItem(idx, 'quantidade', parseFloat(e.target.value) || 0)} 
                             />
                             {unit === 'T' && (
                               <span 
@@ -358,7 +443,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                                   gap: '4px'
                                 }}
                               >
-                                ⚖️ {(item.quantidade * 1000).toLocaleString('pt-BR')} kg
+                                ⚖️ {((item.quantidade || 0) * 1000).toLocaleString('pt-BR')} kg
                               </span>
                             )}
                           </div>
@@ -366,7 +451,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                         <td>
                           <div className="input-with-icon">
                             <DollarSign size={14} />
-                            <input type="number" step="0.01" value={item.valorFobUnitario} onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value))} />
+                            <input type="number" step="0.01" value={item.valorFobUnitario} onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value) || 0)} />
                           </div>
                         </td>
                         {formData.flSimularSubfaturamento && (
@@ -558,10 +643,12 @@ const NovoEstudoEdcPage: React.FC = () => {
               </div>
               <div className="form-group">
                 <label>Porto Destino</label>
-                <select value={formData.idPortoDestino} onChange={e => setFormData({...formData, idPortoDestino: parseInt(e.target.value)})}>
-                  <option value="0">Selecione...</option>
-                  {portos.map(p => <option key={p.id} value={p.id}>{p.sigla} - {p.nome}</option>)}
-                </select>
+                <SearchableSelect
+                  value={formData.idPortoDestino}
+                  onChange={val => setFormData({...formData, idPortoDestino: Number(val) || 0})}
+                  options={portoDestinoOptions}
+                  placeholder="Selecione o Porto Destino..."
+                />
               </div>
               <div className="form-group">
                 <label>Incoterm</label>

@@ -68,6 +68,21 @@ public class ProdutosController : ControllerBase
 
         try
         {
+            // Garantir que exista pelo menos um modelo padrão para o produto
+            var temModelo = await _context.ModelosEdc.AnyAsync(m => m.IdProduto == id && m.FlAtivo);
+            if (!temModelo)
+            {
+                var modeloPadrao = new ModeloEdc
+                {
+                    IdProduto = produto.Id,
+                    Codigo = string.IsNullOrWhiteSpace(produto.Referencia) ? $"PROD-{produto.Id}" : produto.Referencia,
+                    Nome = string.IsNullOrWhiteSpace(produto.Referencia) ? produto.Descricao : produto.Referencia,
+                    Descricao = $"Modelo Padrão - {produto.Descricao}",
+                    FlAtivo = true
+                };
+                _context.ModelosEdc.Add(modeloPadrao);
+            }
+
             await _context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
@@ -94,8 +109,14 @@ public class ProdutosController : ControllerBase
             return NotFound();
         }
 
-        // Soft delete
+        // Soft delete produto e modelos associados
         produto.FlAtivo = false;
+        var modelos = await _context.ModelosEdc.Where(m => m.IdProduto == id).ToListAsync();
+        foreach (var m in modelos)
+        {
+            m.FlAtivo = false;
+        }
+
         await _context.SaveChangesAsync();
 
         return NoContent();

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Edit2, Trash2, Save, X, Grid, Box } from 'lucide-react';
+import SearchableSelect from '../../components/SearchableSelect';
 
 interface Produto {
   id: number;
@@ -52,9 +53,17 @@ const ModelosEdcPage: React.FC = () => {
       const response = await fetch('/api/edc/produtos');
       const data = await response.json();
       setProdutos(data);
-      if (data.length > 0) setFormData(prev => ({ ...prev, idProduto: data[0].id }));
+      if (data.length > 0) setFormData(prev => ({ ...prev, idProduto: prev.idProduto || data[0].id }));
     } catch (error) { console.error(error); }
   };
+
+  const produtoOptions = useMemo(() => produtos.map(p => ({
+    value: p.id,
+    label: p.referencia,
+    subtitle: p.descricao,
+    badge: p.unidadeMedida || 'UN',
+    searchTerms: `${p.referencia} ${p.descricao}`
+  })), [produtos]);
 
   const handleNewModelo = () => {
     setFormData({
@@ -206,25 +215,12 @@ const ModelosEdcPage: React.FC = () => {
                   </div>
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Produto Técnico Vinculado (Propriedades Logísticas)</label>
-                    <select 
-                      className="premium-select"
-                      value={formData.idProduto} 
-                      onChange={e => setFormData({...formData, idProduto: parseInt(e.target.value)})}
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        background: '#1e293b',
-                        border: '1px solid #475569',
-                        color: '#fff'
-                      }}
-                    >
-                      {produtos.map(p => (
-                        <option key={p.id} value={p.id}>
-                          {p.referencia} - {p.descricao} ({p.unidadeMedida || 'UN'} | {p.pesoBruto.toFixed(2)} {p.unidadeMedida === 'T' ? 'T' : 'kg'})
-                        </option>
-                      ))}
-                    </select>
+                    <SearchableSelect
+                      value={formData.idProduto}
+                      onChange={val => setFormData({...formData, idProduto: Number(val) || 0})}
+                      options={produtoOptions}
+                      placeholder="Buscar produto por referência ou descrição..."
+                    />
                   </div>
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Descrição Detalhada / Observações</label>

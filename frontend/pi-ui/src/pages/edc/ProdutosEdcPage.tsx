@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Edit2, Trash2, Save, X, Package } from 'lucide-react';
+import SearchableSelect from '../../components/SearchableSelect';
 
 interface Ncm {
   id: number;
   codigo: string;
+  descricao?: string;
+  aliquotaII?: number;
 }
 
 interface ProdutoEdc {
@@ -69,9 +72,17 @@ const ProdutosEdcPage: React.FC = () => {
       const response = await fetch('/api/edc/ncms');
       const data = await response.json();
       setNcms(data);
-      if (data.length > 0) setFormData(prev => ({ ...prev, idNcm: data[0].id }));
+      if (data.length > 0) setFormData(prev => ({ ...prev, idNcm: prev.idNcm || data[0].id }));
     } catch (error) { console.error(error); }
   };
+
+  const ncmOptions = useMemo(() => ncms.map(n => ({
+    value: n.id,
+    label: n.codigo,
+    subtitle: n.descricao || undefined,
+    badge: n.aliquotaII !== undefined ? `${((n.aliquotaII || 0) * 100).toFixed(1)}% II` : undefined,
+    searchTerms: `${n.codigo} ${n.descricao || ''}`
+  })), [ncms]);
 
   const fetchProductModels = async () => {
     setLoadingModels(true);
@@ -295,9 +306,12 @@ const ProdutosEdcPage: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label>Classificação NCM</label>
-                    <select value={formData.idNcm} onChange={e => setFormData({...formData, idNcm: parseInt(e.target.value)})}>
-                      {ncms.map(n => <option key={n.id} value={n.id}>{n.codigo}</option>)}
-                    </select>
+                    <SearchableSelect
+                      value={formData.idNcm}
+                      onChange={val => setFormData({...formData, idNcm: Number(val) || 0})}
+                      options={ncmOptions}
+                      placeholder="Buscar NCM por código ou descrição..."
+                    />
                   </div>
                   <div className="form-group">
                     <label>Unidade de Medida</label>
