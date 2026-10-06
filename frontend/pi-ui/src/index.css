@@ -494,6 +494,60 @@ input:focus, select:focus {
   box-shadow: 0 0 0 4px rgba(79, 158, 255, 0.1);
 }
 
+/* Input with Icon */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-with-icon svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.input-with-icon input,
+.input-with-icon select {
+  padding-left: 32px !important;
+  width: 100%;
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  vertical-align: middle;
+}
+
+.table th {
+  padding: 12px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.table input,
+.table select {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  min-height: 38px;
+}
+
+.table .input-with-icon input {
+  padding-left: 28px !important;
+}
+
 /* Modals */
 .modal-overlay {
   position: fixed;

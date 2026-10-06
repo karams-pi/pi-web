@@ -316,7 +316,7 @@ const NovoEstudoEdcPage: React.FC = () => {
         <div className="page-header-line"></div>
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: '1fr 380px', gap: '2rem', alignItems: 'start' }}>
+      <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: '2rem', alignItems: 'start' }}>
         <div className="form-sections" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Seção 1: Identificação */}
           <div className="card">
@@ -365,14 +365,14 @@ const NovoEstudoEdcPage: React.FC = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th style={{ minWidth: '320px' }}>Produto / Modelo Comercial</th>
-                    <th style={{ width: '80px' }}>U.M.</th>
-                    <th style={{ width: '130px' }}>Quantidade</th>
-                    <th style={{ width: '150px' }}>FOB Unit. (USD)</th>
+                    <th style={{ minWidth: '280px' }}>Produto / Modelo Comercial</th>
+                    <th style={{ width: '70px', textAlign: 'center', whiteSpace: 'nowrap' }}>U.M.</th>
+                    <th style={{ width: '130px', minWidth: '100px', whiteSpace: 'nowrap' }}>Quantidade</th>
+                    <th style={{ width: '160px', minWidth: '140px', whiteSpace: 'nowrap' }}>FOB Unit. (USD)</th>
                     {formData.flSimularSubfaturamento && (
-                      <th style={{ width: '150px' }}>FOB Sub Unit. (USD)</th>
+                      <th style={{ width: '160px', minWidth: '140px', whiteSpace: 'nowrap' }}>FOB Sub Unit. (USD)</th>
                     )}
-                    <th style={{ width: '50px' }}></th>
+                    <th style={{ width: '48px', textAlign: 'center' }}></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -396,7 +396,7 @@ const NovoEstudoEdcPage: React.FC = () => {
 
                     return (
                       <tr key={idx}>
-                        <td style={{ minWidth: '320px' }}>
+                        <td style={{ minWidth: '280px' }}>
                           <SearchableSelect
                             value={selectedVal || (selectedOpt ? selectedOpt.value : "")}
                             onChange={val => {
@@ -415,8 +415,8 @@ const NovoEstudoEdcPage: React.FC = () => {
                             placeholder="Digite o nome, código ou NCM do produto..."
                           />
                         </td>
-                        <td>
-                          <span className="badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.25)' }}>
+                        <td style={{ textAlign: 'center' }}>
+                          <span className="badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.25)', minWidth: '32px', display: 'inline-block', textAlign: 'center' }}>
                             {unit}
                           </span>
                         </td>
@@ -424,6 +424,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             <input 
                               type="number" 
+                              style={{ width: '100%', minWidth: '80px' }}
                               value={item.quantidade} 
                               onChange={e => updateItem(idx, 'quantidade', parseFloat(e.target.value) || 0)} 
                             />
@@ -437,7 +438,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                                   fontSize: '0.75rem', 
                                   padding: '4px 8px', 
                                   width: 'fit-content',
-                                  marginTop: '4px',
+                                  marginTop: '2px',
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '4px'
@@ -451,7 +452,14 @@ const NovoEstudoEdcPage: React.FC = () => {
                         <td>
                           <div className="input-with-icon">
                             <DollarSign size={14} />
-                            <input type="number" step="0.01" value={item.valorFobUnitario} onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value) || 0)} />
+                            <input 
+                              type="number" 
+                              step="any" 
+                              style={{ width: '100%', minWidth: '110px' }}
+                              placeholder="0.00"
+                              value={item.valorFobUnitario === 0 ? '' : item.valorFobUnitario} 
+                              onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value) || 0)} 
+                            />
                           </div>
                         </td>
                         {formData.flSimularSubfaturamento && (
@@ -460,7 +468,8 @@ const NovoEstudoEdcPage: React.FC = () => {
                               <DollarSign size={14} style={{ color: '#a78bfa' }} />
                               <input 
                                 type="number" 
-                                step="0.01" 
+                                step="any" 
+                                style={{ width: '100%', minWidth: '110px' }}
                                 placeholder={item.valorFobUnitario ? (item.valorFobUnitario * (formData.percentualSubfaturamento / 100)).toFixed(2) : '0.00'}
                                 value={item.valorFobSubfaturado === null || item.valorFobSubfaturado === undefined ? '' : item.valorFobSubfaturado} 
                                 onChange={e => {
@@ -471,7 +480,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                             </div>
                           </td>
                         )}
-                        <td><button className="btn-icon btn-icon-danger" onClick={() => handleRemoveItem(idx)}><Trash2 size={16} /></button></td>
+                        <td style={{ textAlign: 'center' }}><button className="btn-icon btn-icon-danger" onClick={() => handleRemoveItem(idx)}><Trash2 size={16} /></button></td>
                       </tr>
                     );
                   })}
