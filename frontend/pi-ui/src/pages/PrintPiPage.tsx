@@ -95,6 +95,38 @@ export default function PrintPiPage() {
     return getSupplierMetadata(sName);
   }, [pi]);
 
+  const getExw = (item: any): number => {
+    if (!item) return 0;
+    const val = item.valorEXW ?? item.valorExw ?? item.ValorEXW ?? item.valorexw;
+    if (val !== undefined && val !== null && !isNaN(Number(val)) && Number(val) > 0) {
+      return Number(val);
+    }
+    if (item.valorFinalItemUSDRisco && Number(item.valorFinalItemUSDRisco) > 0) {
+      const qty = Number(item.quantidade || 1);
+      const frete = Number(item.valorFreteRateadoUSD ?? item.valorFreteRateadoUsd ?? item.ValorFreteRateadoUSD ?? 0);
+      return Math.max(0, (Number(item.valorFinalItemUSDRisco) / qty) - frete);
+    }
+    if (item.valorFinalItemBRL && Number(item.valorFinalItemBRL) > 0) {
+      const riskVal = Number(pi?.cotacaoRisco) || 1;
+      const qty = Number(item.quantidade || 1);
+      const frete = Number(item.valorFreteRateadoUSD ?? item.valorFreteRateadoUsd ?? item.ValorFreteRateadoUSD ?? 0);
+      return Math.max(0, (Number(item.valorFinalItemBRL) / (riskVal * qty)) - frete);
+    }
+    if (item.moduloTecido?.valorTecido) {
+      return Number(item.moduloTecido.valorTecido);
+    }
+    return Number(val) || 0;
+  };
+
+  const getFreightUSD = (item: any): number => {
+    if (!item) return 0;
+    const val = item.valorFreteRateadoUSD ?? item.valorFreteRateadoUsd ?? item.ValorFreteRateadoUSD;
+    if (val !== undefined && val !== null && !isNaN(Number(val))) {
+      return Number(val);
+    }
+    return 0;
+  };
+
   const processedData = useMemo(() => {
     if (!pi) return { brandGroups: [], totalSofaQty: 0, totalQty: 0, totalM3: 0, totalValue: 0, risk: 1 };
     const allItems: any[] = [];
@@ -110,10 +142,13 @@ export default function PrintPiPage() {
                 });
             }
         });
-    } else if (pi.piItens) {
+    }
+    if (pi.piItens && pi.piItens.length > 0) {
         pi.piItens.forEach((i: any) => {
-            allItems.push({ ...i, quantidadePeca: i.quantidadePeca || 1 });
-            totalSofaQty += (i.quantidadePeca || 1);
+            if (!allItems.some(a => (a.id && a.id === i.id) || a === i)) {
+                allItems.push({ ...i, quantidadePeca: i.quantidadePeca || 1 });
+                totalSofaQty += (i.quantidadePeca || 1);
+            }
         });
     }
 
@@ -212,7 +247,7 @@ export default function PrintPiPage() {
             const lineM3 = (Number(item.m3 || 0)) * qtyMod;
             pieceTotalM3 += Math.round(lineM3 * 100) / 100;
             
-            const lineExwUnitUSD = (Number(item.valorEXW || 0)) + (Number(item.valorFreteRateadoUSD || 0));
+            const lineExwUnitUSD = getExw(item) + getFreightUSD(item);
             const itemUnitFinalUSD = lineExwUnitUSD * qtyMod * (currency === "BRL" ? risk : 1);
             pieceTotalUnitUSD += itemUnitFinalUSD;
         });
@@ -328,14 +363,14 @@ export default function PrintPiPage() {
                             const risk = processedData.risk;
                             const isBRL = currency === "BRL";
                             
-                            const lineExwUnitUSD = (Number(item?.valorEXW || 0)) + (Number(item?.valorFreteRateadoUSD || 0));
+                            const lineExwUnitUSD = getExw(item) + getFreightUSD(item);
                             const itemUnitFinalDisp = lineExwUnitUSD * (Number(item?.quantidade || 0)) * (isBRL ? risk : 1);
 
                             let pieceTotalUnitUSD = 0;
                             if (spans['totalExw'][index] > 0) {
                                 const span = spans['totalExw'][index];
                                 sortedItems.slice(index, index + span).forEach(g => {
-                                    const gExw = (Number(g?.item?.valorEXW || 0)) + (Number(g?.item?.valorFreteRateadoUSD || 0));
+                                    const gExw = getExw(g?.item) + getFreightUSD(g?.item);
                                     pieceTotalUnitUSD += gExw * (Number(g?.item?.quantidade || 0)) * (isBRL ? risk : 1);
                                 });
                             }

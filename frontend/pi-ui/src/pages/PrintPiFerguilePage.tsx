@@ -90,6 +90,37 @@ export default function PrintPiFerguilePage() {
     return getSupplierMetadata(sName);
   }, [pi]);
 
+  const getExw = (item: any): number => {
+    if (!item) return 0;
+    const direct = item.valorEXW ?? item.valorExw ?? item.ValorEXW ?? item.valor_exw;
+    if (direct !== undefined && direct !== null && !isNaN(Number(direct)) && Number(direct) > 0) {
+      return Number(direct);
+    }
+    const finalUsd = item.valorFinalItemUSDRisco ?? item.valorFinalItemUsd ?? item.ValorFinalItemUSDRisco ?? item.valor_final_item_usd_risco;
+    if (finalUsd !== undefined && finalUsd !== null && !isNaN(Number(finalUsd)) && Number(finalUsd) > 0) {
+      return Number(finalUsd);
+    }
+    const finalBrl = item.valorFinalItemBRL ?? item.ValorFinalItemBRL ?? item.valor_final_item_brl;
+    if (finalBrl !== undefined && finalBrl !== null && !isNaN(Number(finalBrl)) && Number(finalBrl) > 0) {
+      const risk = Number(pi?.cotacaoRisco) || 1;
+      return Number(finalBrl) / risk;
+    }
+    const mt = item.moduloTecido || item.ModuloTecido;
+    if (mt?.valorTecido && Number(mt.valorTecido) > 0) {
+      return Number(mt.valorTecido);
+    }
+    return 0;
+  };
+
+  const getFreightUSD = (item: any): number => {
+    if (!item) return 0;
+    const val = item.valorFreteRateadoUSD ?? item.valorFreteRateadoUsd ?? item.ValorFreteRateadoUSD ?? item.valor_frete_rateado_usd;
+    if (val !== undefined && val !== null && !isNaN(Number(val))) {
+      return Number(val);
+    }
+    return 0;
+  };
+
   const processedData = useMemo(() => {
     if (!pi) return { rows: [], brandSpans: [], descSpans: [], pieceTotalUnitUSDCol: [], totalValue: 0, totalM3: 0, totalQty: 0, totalSofaQty: 0, risk: 1 };
     const allItems: any[] = [];
@@ -101,8 +132,14 @@ export default function PrintPiFerguilePage() {
             totalSofaQty += (peca.quantidade || 0);
             if (peca.piItens) peca.piItens.forEach((item: any) => allItems.push({ ...item, quantidadePeca: peca.quantidade, idPiItemPeca: peca.id }));
         });
-    } else if (pi.piItens) {
-        pi.piItens.forEach((i: any) => { allItems.push({ ...i, quantidadePeca: i.quantidadePeca || 1 }); totalSofaQty += (i.quantidadePeca || 1); });
+    }
+    if (pi.piItens && pi.piItens.length > 0) {
+        pi.piItens.forEach((i: any) => {
+            if (!allItems.some(a => (a.id && a.id === i.id) || a === i)) {
+                allItems.push({ ...i, quantidadePeca: i.quantidadePeca || 1 });
+                totalSofaQty += (i.quantidadePeca || 1);
+            }
+        });
     }
 
     // Sort allItems by Brand Name (Marca) to group them alphabetically
@@ -123,7 +160,7 @@ export default function PrintPiFerguilePage() {
       const marca = mt?.modulo?.marca?.nome || "Outros";
       const volM3 = (item.m3 || 0) * (item.quantidade || 0);
       const isBRL = currency === "BRL";
-      const lineExwUnitUSD = (Number(item.valorEXW || 0)) + (Number(item.valorFreteRateadoUSD || 0));
+      const lineExwUnitUSD = getExw(item) + getFreightUSD(item);
       const itemUnitFinalDisp = lineExwUnitUSD * (Number(item.quantidade || 0)) * (isBRL ? risk : 1);
 
       return {

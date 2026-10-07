@@ -411,7 +411,44 @@ public class PiExportService
 
         // ═══════════════ DATA ROWS ═══════════════
         int currentRow = startRow + 2;
-        var itemsByBrand = pi.PiItens
+
+        var allItems = (pi.PiItens != null && pi.PiItens.Count > 0)
+            ? new List<PiItem>(pi.PiItens)
+            : (pi.PiItensPecas?.SelectMany(p => p.PiItens ?? new List<PiItem>()).ToList() ?? new List<PiItem>());
+
+        if (pi.PiItensPecas != null && pi.PiItensPecas.Count > 0)
+        {
+            var pieceItems = pi.PiItensPecas.SelectMany(p => p.PiItens ?? new List<PiItem>()).ToList();
+            foreach (var pItem in pieceItems)
+            {
+                if (!allItems.Any(c => (c.Id > 0 && c.Id == pItem.Id) || ReferenceEquals(c, pItem)))
+                {
+                    allItems.Add(pItem);
+                }
+            }
+        }
+
+        decimal GetItemExw(PiItem it)
+        {
+            if (it.ValorEXW > 0) return it.ValorEXW;
+            if (it.ValorFinalItemUSDRisco > 0)
+            {
+                var q = it.Quantidade > 0 ? it.Quantidade : 1m;
+                return Math.Max(0, (it.ValorFinalItemUSDRisco / q) - it.ValorFreteRateadoUSD);
+            }
+            if (it.ValorFinalItemBRL > 0 && pi.CotacaoRisco > 0)
+            {
+                var q = it.Quantidade > 0 ? it.Quantidade : 1m;
+                return Math.Max(0, (it.ValorFinalItemBRL / (pi.CotacaoRisco * q)) - it.ValorFreteRateadoUSD);
+            }
+            if (it.ModuloTecido != null && it.ModuloTecido.ValorTecido > 0)
+            {
+                return it.ModuloTecido.ValorTecido;
+            }
+            return it.ValorEXW;
+        }
+
+        var itemsByBrand = allItems
             .GroupBy(i => i.ModuloTecido?.Modulo?.Marca)
             .OrderBy(g => g.Key?.Nome ?? "Outros")
             .ToList();
@@ -447,8 +484,8 @@ public class PiExportService
             }
         }
 
-        decimal piTotalQty = pi.PiItens.Sum(i => (decimal)i.Quantidade);
-        decimal piTotalM3 = pi.PiItens.Sum(i => Math.Round(i.M3 * (decimal)i.Quantidade, 2));
+        decimal piTotalQty = allItems.Sum(i => (decimal)i.Quantidade);
+        decimal piTotalM3 = allItems.Sum(i => Math.Round(i.M3 * (decimal)i.Quantidade, 2));
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
 
@@ -594,9 +631,11 @@ public class PiExportService
                 ws.Cells[currentRow, 9].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                 // Individual Values per row
-                decimal freightUnit = (currency == "BRL" ? itemFreightBRL[item.Id] : itemFreightUSD[item.Id]);
+                decimal freightUnit = (currency == "BRL" 
+                    ? itemFreightBRL.GetValueOrDefault(item.Id, item.ValorFreteRateadoBRL) 
+                    : itemFreightUSD.GetValueOrDefault(item.Id, item.ValorFreteRateadoUSD));
 
-                decimal unitPriceBase = item.ValorEXW;
+                decimal unitPriceBase = GetItemExw(item);
                 if (currency == "BRL") unitPriceBase *= (decimal)pi.CotacaoRisco;
                 
                 decimal rowFreight = freightUnit * item.Quantidade;
@@ -624,11 +663,11 @@ public class PiExportService
                     {
                         decimal mQty = m.Quantidade > 0 ? (decimal)m.Quantidade : 1m;
                         
-                        // Use saved freight if available (strictly matching frontend)
-                        decimal mFreight = m.ValorFreteRateadoUSD;
-                        if (currency == "BRL") mFreight *= (decimal)pi.CotacaoRisco;
+                        decimal mFreight = (currency == "BRL"
+                            ? itemFreightBRL.GetValueOrDefault(m.Id, m.ValorFreteRateadoBRL)
+                            : itemFreightUSD.GetValueOrDefault(m.Id, m.ValorFreteRateadoUSD));
 
-                        decimal mUnitEXW = m.ValorEXW;
+                        decimal mUnitEXW = GetItemExw(m);
                         if (currency == "BRL") mUnitEXW *= (decimal)pi.CotacaoRisco;
                         
                         // To match the screen's 'UNIT' column for Karams: (EXW + Freight) * TOTAL PI Modules
@@ -906,12 +945,48 @@ public class PiExportService
         }
 
         // ═══════════════ FREIGHT PRE-CALCULATION ═══════════════
-        decimal piTotalM3 = pi.PiItens.Sum(i => i.M3 * i.Quantidade);
+        var allItems = (pi.PiItens != null && pi.PiItens.Count > 0)
+            ? new List<PiItem>(pi.PiItens)
+            : (pi.PiItensPecas?.SelectMany(p => p.PiItens ?? new List<PiItem>()).ToList() ?? new List<PiItem>());
+
+        if (pi.PiItensPecas != null && pi.PiItensPecas.Count > 0)
+        {
+            var pieceItems = pi.PiItensPecas.SelectMany(p => p.PiItens ?? new List<PiItem>()).ToList();
+            foreach (var pItem in pieceItems)
+            {
+                if (!allItems.Any(c => (c.Id > 0 && c.Id == pItem.Id) || ReferenceEquals(c, pItem)))
+                {
+                    allItems.Add(pItem);
+                }
+            }
+        }
+
+        decimal GetItemExw(PiItem it)
+        {
+            if (it.ValorEXW > 0) return it.ValorEXW;
+            if (it.ValorFinalItemUSDRisco > 0)
+            {
+                var q = it.Quantidade > 0 ? it.Quantidade : 1m;
+                return Math.Max(0, (it.ValorFinalItemUSDRisco / q) - it.ValorFreteRateadoUSD);
+            }
+            if (it.ValorFinalItemBRL > 0 && pi.CotacaoRisco > 0)
+            {
+                var q = it.Quantidade > 0 ? it.Quantidade : 1m;
+                return Math.Max(0, (it.ValorFinalItemBRL / (pi.CotacaoRisco * q)) - it.ValorFreteRateadoUSD);
+            }
+            if (it.ModuloTecido != null && it.ModuloTecido.ValorTecido > 0)
+            {
+                return it.ModuloTecido.ValorTecido;
+            }
+            return it.ValorEXW;
+        }
+
+        decimal piTotalM3 = allItems.Sum(i => i.M3 * i.Quantidade);
         decimal piTotalFreteUSD = pi.ValorTotalFreteUSD;
         decimal piTotalFreteBRL = pi.ValorTotalFreteBRL;
         decimal risk = pi.CotacaoRisco;
 
-        var orderedItems = pi.PiItens
+        var orderedItems = allItems
             .OrderBy(i => i.ModuloTecido?.Modulo?.Marca?.Nome ?? "ZZZ")
             .ThenBy(i => i.ModuloTecido?.Modulo?.Descricao ?? "")
             .ThenBy(i => i.ModuloTecido?.CodigoModuloTecido ?? "")
@@ -1011,8 +1086,10 @@ public class PiExportService
 
                 foreach (var item in modelGroup.Items)
                 {
-                    decimal fUnit = isBRL ? itemFreightBRL[item.Id] : itemFreightUSD[item.Id];
-                    decimal exwUnit = item.ValorEXW;
+                    decimal fUnit = isBRL 
+                        ? itemFreightBRL.GetValueOrDefault(item.Id, item.ValorFreteRateadoBRL) 
+                        : itemFreightUSD.GetValueOrDefault(item.Id, item.ValorFreteRateadoUSD);
+                    decimal exwUnit = GetItemExw(item);
                     if (isBRL) exwUnit *= risk;
                     decimal unitPrice = exwUnit + fUnit;
                     decimal rowTotal = unitPrice * item.Quantidade;
