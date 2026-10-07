@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer, FileText } from "lucide-react";
+import { formatEdcItemDisplay } from "../../utils/edcFormatters";
 
 export default function PrintEdcPage() {
   const { id } = useParams();
@@ -305,13 +306,8 @@ export default function PrintEdcPage() {
   const ncmPadrao = uniqueNcms.length > 3 ? "DIVERSOS" : (uniqueNcms.length > 0 ? uniqueNcms.join(", ") : "-");
 
   const getItemProductName = (item: any): string => {
-    const isPureDigits = (s?: string) => !s || /^\d+([\.\-]\d+)*$/.test(s.trim());
-    if (item.modelo?.nome && !isPureDigits(item.modelo.nome)) return item.modelo.nome.trim();
-    if (item.modelo?.codigo && !isPureDigits(item.modelo.codigo)) return item.modelo.codigo.trim();
-    if (item.produto?.referencia && !isPureDigits(item.produto.referencia)) return item.produto.referencia.trim();
-    if (item.produto?.descricao && !isPureDigits(item.produto.descricao)) return item.produto.descricao.trim();
-    if (item.produto?.ncm?.descricao && !isPureDigits(item.produto.ncm.descricao)) return item.produto.ncm.descricao.trim();
-    return item.produto?.referencia?.trim() || item.produto?.descricao?.trim() || "";
+    const info = formatEdcItemDisplay(item);
+    return info.title;
   };
 
   const uniqueProducts = estudo.itens 
@@ -1070,25 +1066,33 @@ Cálculo:
             </tr>
           </thead>
           <tbody>
-            {itensCalculados.map((item: any, idx: number) => (
-              <tr key={idx}>
-                <td style={{ fontWeight: "bold" }}>
-                  {item.modelo ? item.modelo.codigo : item.produto?.referencia}
-                </td>
-                <td className="text-center">{item.produto?.ncm?.codigo}</td>
-                <td className="text-center">{item.quantidade}</td>
-                <td className="text-center">{item.produto?.unidadeMedida || "UN"}</td>
-                <td className="text-right">{fmtUsd(item.valorFobUnitario)}</td>
-                <td className="text-right">{fmtBrl(item.itemValorAduaneiro)}</td>
-                <td className="text-right">{fmtPct(item.aliqII)}</td>
-                <td className="text-right">{fmtPct(item.aliqIPI)}</td>
-                <td className="text-right">{fmtPct(item.aliqPis + item.aliqCof)}</td>
-                <td className="text-right">{fmtBrl(item.taxasPort)}</td>
-                <td className="text-right">{fmtPct(item.aliqIcms)}</td>
-                <td className="text-right bold">{fmtBrl(item.totalNacItem)}</td>
-                <td className="text-right bold" style={{ background: "rgba(16, 185, 129, 0.05)" }}>{fmtBrl(item.custoUnitarioNacionalizado)}</td>
-              </tr>
-            ))}
+            {itensCalculados.map((item: any, idx: number) => {
+              const itemDisplay = formatEdcItemDisplay(item);
+              return (
+                <tr key={idx}>
+                  <td style={{ fontWeight: "bold" }}>
+                    <div>{itemDisplay.title}</div>
+                    {itemDisplay.subtitle && (
+                      <div style={{ fontSize: "7.5pt", fontWeight: "normal", color: "#666" }}>
+                        {itemDisplay.subtitle}
+                      </div>
+                    )}
+                  </td>
+                  <td className="text-center">{item.produto?.ncm?.codigo || "-"}</td>
+                  <td className="text-center">{item.quantidade}</td>
+                  <td className="text-center">{item.produto?.unidadeMedida || "UN"}</td>
+                  <td className="text-right">{fmtUsd(item.valorFobUnitario)}</td>
+                  <td className="text-right">{fmtBrl(item.itemValorAduaneiro)}</td>
+                  <td className="text-right">{fmtPct(item.aliqII)}</td>
+                  <td className="text-right">{fmtPct(item.aliqIPI)}</td>
+                  <td className="text-right">{fmtPct(item.aliqPis + item.aliqCof)}</td>
+                  <td className="text-right">{fmtBrl(item.taxasPort)}</td>
+                  <td className="text-right">{fmtPct(item.aliqIcms)}</td>
+                  <td className="text-right bold">{fmtBrl(item.totalNacItem)}</td>
+                  <td className="text-right bold" style={{ background: "rgba(16, 185, 129, 0.05)" }}>{fmtBrl(item.custoUnitarioNacionalizado)}</td>
+                </tr>
+              );
+            })}
             <tr className="bold" style={{ background: "rgba(255, 255, 255, 0.03)" }}>
               <td>TOTAIS / MÉDIAS</td>
               <td className="text-center">-</td>

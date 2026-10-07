@@ -6,6 +6,7 @@ import {
   Calculator, ShieldCheck, 
   TrendingUp, Package, CheckCircle2, Edit2
 } from 'lucide-react';
+import { formatEdcItemDisplay } from '../../utils/edcFormatters';
 
 const DetalheEstudoEdcPage: React.FC = () => {
   const { id } = useParams();
@@ -370,26 +371,28 @@ const DetalheEstudoEdcPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {itensCalculados.map((item: any, idx: number) => (
-                <tr key={idx}>
-                  <td style={{ paddingLeft: '24px' }}>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <div style={{ padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                        <Package size={18} style={{ color: 'var(--muted)' }} />
+              {itensCalculados.map((item: any, idx: number) => {
+                const itemDisplay = formatEdcItemDisplay(item);
+                return (
+                  <tr key={idx}>
+                    <td style={{ paddingLeft: '24px' }}>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <div style={{ padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                          <Package size={18} style={{ color: 'var(--muted)' }} />
+                        </div>
+                        <div>
+                          <strong style={{ display: 'block', color: '#fff' }}>
+                            {itemDisplay.title}
+                          </strong>
+                          {itemDisplay.subtitle && (
+                            <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block' }}>
+                              {itemDisplay.subtitle}
+                            </span>
+                          )}
+                          <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>NCM: {item.produto?.ncm?.codigo || '-'}</span>
+                        </div>
                       </div>
-                      <div>
-                        <strong style={{ display: 'block', color: '#fff' }}>
-                          {item.modelo ? `${item.modelo.codigo} - ${item.modelo.nome}` : item.produto?.referencia}
-                        </strong>
-                        {item.modelo && (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block' }}>
-                            Ref: {item.produto?.referencia} - {item.produto?.descricao}
-                          </span>
-                        )}
-                        <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>NCM: {item.produto?.ncm?.codigo}</span>
-                      </div>
-                    </div>
-                  </td>
+                    </td>
                   <td>R$ {item.itemValorAduaneiro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td>{fmtPct(item.aliqII)}</td>
                   <td>{fmtPct(item.aliqIPI)}</td>
@@ -402,8 +405,9 @@ const DetalheEstudoEdcPage: React.FC = () => {
                   <td style={{ paddingRight: '24px', textAlign: 'right' }}>
                     <strong style={{ color: '#fff' }}>R$ {item.totalNacItem.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
             <tfoot style={{ background: 'rgba(79, 158, 255, 0.05)' }}>
                <tr>

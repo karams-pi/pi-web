@@ -42,6 +42,32 @@ public class EdcExportService
         return normalized;
     }
 
+    private static bool IsPureDigits(string? s) => string.IsNullOrWhiteSpace(s) || System.Text.RegularExpressions.Regex.IsMatch(s.Trim(), @"^\d+([\.\-]\d+)*$");
+
+    private static string GetItemProductName(SimulacaoEdcItem item)
+    {
+        var prodRef = item.Produto?.Referencia?.Trim();
+        var prodDesc = item.Produto?.Descricao?.Trim();
+        var modCod = item.Modelo?.Codigo?.Trim();
+        var modNome = item.Modelo?.Nome?.Trim();
+
+        if (!string.IsNullOrWhiteSpace(modCod) && !string.IsNullOrWhiteSpace(modNome) && !string.Equals(modCod, modNome, StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{modCod} - {modNome}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(prodRef) && !IsPureDigits(prodRef))
+        {
+            return prodRef;
+        }
+
+        if (!string.IsNullOrWhiteSpace(modCod) && !IsPureDigits(modCod)) return modCod;
+        if (!string.IsNullOrWhiteSpace(modNome) && !IsPureDigits(modNome)) return modNome;
+        if (!string.IsNullOrWhiteSpace(prodDesc) && !IsPureDigits(prodDesc)) return prodDesc;
+        if (!string.IsNullOrWhiteSpace(item.Produto?.Ncm?.Descricao) && !IsPureDigits(item.Produto.Ncm.Descricao)) return item.Produto.Ncm.Descricao.Trim();
+        return prodRef ?? prodDesc ?? "";
+    }
+
     public byte[] ExportToExcel(SimulacaoEdc simulacao)
     {
         if (simulacao.Despesas != null)
@@ -177,18 +203,6 @@ public class EdcExportService
         }
         ws.Cells["G8"].Value = $"ICMS {(icmsPadrao * 100):N0}%";
         ws.Cells["G8"].Style.Font.Bold = true;
-
-        bool IsPureDigits(string? s) => string.IsNullOrWhiteSpace(s) || System.Text.RegularExpressions.Regex.IsMatch(s.Trim(), @"^\d+([\.\-]\d+)*$");
-
-        string GetItemProductName(SimulacaoEdcItem item)
-        {
-            if (!string.IsNullOrWhiteSpace(item.Modelo?.Nome) && !IsPureDigits(item.Modelo.Nome)) return item.Modelo.Nome.Trim();
-            if (!string.IsNullOrWhiteSpace(item.Modelo?.Codigo) && !IsPureDigits(item.Modelo.Codigo)) return item.Modelo.Codigo.Trim();
-            if (!string.IsNullOrWhiteSpace(item.Produto?.Referencia) && !IsPureDigits(item.Produto.Referencia)) return item.Produto.Referencia.Trim();
-            if (!string.IsNullOrWhiteSpace(item.Produto?.Descricao) && !IsPureDigits(item.Produto.Descricao)) return item.Produto.Descricao.Trim();
-            if (!string.IsNullOrWhiteSpace(item.Produto?.Ncm?.Descricao) && !IsPureDigits(item.Produto.Ncm.Descricao)) return item.Produto.Ncm.Descricao.Trim();
-            return item.Produto?.Referencia?.Trim() ?? item.Produto?.Descricao?.Trim() ?? "";
-        }
 
         var uniqueProducts = simulacao.Itens?
             .Select(GetItemProductName)
@@ -612,7 +626,7 @@ public class EdcExportService
 
                 ws.Cells[r, 1].Value = idx + 1; // Item
                 ws.Cells[r, 2].Value = ""; // Spacer
-                ws.Cells[r, 3].Value = item.Modelo?.Codigo ?? item.Produto?.Referencia ?? "";
+                ws.Cells[r, 3].Value = GetItemProductName(item);
                 ws.Cells[r, 4].Value = item.Produto?.Ncm?.Codigo ?? "";
                 ws.Cells[r, 5].Value = item.Produto?.Ncm?.AliquotaII ?? 0m;
                 ws.Cells[r, 6].Value = item.Produto?.Ncm?.AliquotaIPI ?? 0m;
