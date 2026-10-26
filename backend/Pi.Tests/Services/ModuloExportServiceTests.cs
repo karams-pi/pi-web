@@ -197,5 +197,57 @@ public class ModuloExportServiceTests
         // + 10% acrescimo = 165.00 * 1.10 = 181.50
         price.Should().Be(181.50m);
     }
+
+    [Fact]
+    public void ExportColinhaToExcel_ShouldHandleNonKaramsFabricsCorrectly()
+    {
+        // Arrange: Livintus ANGELUS with CO-5 and CO-7
+        var module = new Modulo 
+        { 
+            Id = 5676, 
+            IdFornecedor = 4,
+            Descricao = "ANGELUS - 2 MÓDULOS ASSENTO S/BÇ: 1,20M", 
+            Fornecedor = new Fornecedor { Id = 4, Nome = "Livintus" },
+            Categoria = new Categoria { Nome = "Estofados" },
+            Marca = new Marca { Id = 10, Nome = "ANGELUS" },
+            ModulosTecidos = new List<ModuloTecido>
+            {
+                new ModuloTecido { IdTecido = 19, ValorTecido = 6327, Tecido = new Tecido { Id = 19, Nome = "CO-5" }, FlAtivo = true },
+                new ModuloTecido { IdTecido = 21, ValorTecido = 6995, Tecido = new Tecido { Id = 21, Nome = "CO-7" }, FlAtivo = true }
+            }
+        };
+
+        var items = new List<ModuloExportService.PriceListItemDto>
+        {
+            new ModuloExportService.PriceListItemDto { Modulo = module, ValorFreteRateadoUSD = 0, Quantidade = 1 }
+        };
+
+        var configs = new List<Configuracao> { new Configuracao { IdFornecedor = 4, PercentualComissao = 0, PercentualGordura = 0, ValorReducaoDolar = 4.87m } };
+
+        // Act
+        var result = _service.ExportColinhaToExcel(items, "EXW", 4.87m, configs, validityDays: 30);
+
+        // Assert
+        using var stream = new System.IO.MemoryStream(result);
+        using var package = new ExcelPackage(stream);
+        var ws = package.Workbook.Worksheets[0];
+
+        // Headers on row 1
+        ws.Cells[1, 6].Value.Should().Be("CO-7");
+        ws.Cells[1, 7].Value.Should().Be("A PARTIR DE: CO-5");
+        ws.Cells[1, 8].Value.Should().Be("CO-7 (-15%)");
+        ws.Cells[1, 9].Value.Should().Be("A PARTIR DE: CO-5 (-15%)");
+
+        // Values on row 2:
+        // CO-7 = 6995 / 4.87 = 1436.34
+        // CO-5 = 6327 / 4.87 = 1299.18
+        var valCol6 = ws.Cells[2, 6].Value;
+        var valCol7 = ws.Cells[2, 7].Value;
+
+        valCol6.Should().Be(1436.34m);
+        valCol7.Should().Be(1299.18m);
+        valCol6.Should().NotBe(valCol7);
+    }
 }
+
 

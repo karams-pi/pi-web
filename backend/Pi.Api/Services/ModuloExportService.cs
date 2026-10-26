@@ -285,9 +285,9 @@ public class ModuloExportService
 
         var uniqueFabrics = groupedItems
             .SelectMany(i => i.Modulo.ModulosTecidos)
-            .Select(mt => mt.Tecido)
-            .Where(t => t != null)
-            .GroupBy(t => t!.Id)
+            .Where(mt => mt.FlAtivo && mt.Tecido != null)
+            .Select(mt => mt.Tecido!)
+            .GroupBy(t => t.Id)
             .Select(g => g.First())
             .ToList();
 
@@ -377,31 +377,7 @@ public class ModuloExportService
                         var mt = mod.ModulosTecidos.FirstOrDefault(x => x.IdTecido == fid && x.FlAtivo);
                         if (mt != null)
                         {
-                            decimal basePrice;
-                            if (modConfig == null)
-                            {
-                                basePrice = mt.ValorTecido;
-                            }
-                            else if (currency == "BRL")
-                            {
-                                decimal vComissao = mt.ValorTecido * (modConfig.PercentualComissao / 100);
-                                decimal vGordura = mt.ValorTecido * (modConfig.PercentualGordura / 100);
-                                basePrice = Math.Round(mt.ValorTecido + vComissao + vGordura, 2);
-                            }
-                            else
-                            {
-                                if (cotacao <= 0)
-                                {
-                                    basePrice = 0;
-                                }
-                                else
-                                {
-                                    decimal valorBase = mt.ValorTecido / cotacao;
-                                    decimal comissao = valorBase * (modConfig.PercentualComissao / 100);
-                                    decimal gordura = valorBase * (modConfig.PercentualGordura / 100);
-                                    basePrice = Math.Round(valorBase + comissao + gordura, 2);
-                                }
-                            }
+                            decimal basePrice = CalcPrice(mt.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome, isCotacaoJaRisco: true);
                             decimal unitPrice = basePrice + freightDisp;
                             if (percentualAcrescimo != 0)
                             {
@@ -468,7 +444,7 @@ public class ModuloExportService
         return package.GetAsByteArray();
     }
 
-    internal decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, long? idFornecedor, string? fornecedorName)
+    internal decimal CalcPrice(decimal valorTecido, string currency, decimal cotacao, Configuracao? config, long? idFornecedor, string? fornecedorName, bool isCotacaoJaRisco = false)
     {
         if (config == null) return valorTecido;
         
@@ -484,11 +460,19 @@ public class ModuloExportService
 
         if (cotacao == 0) return 0;
 
-        // IDs 3=Ferguile, 4=Livintus. Using ID is more robust than Name if Navigation Property is not loaded.
-        bool isFerguile = (idFornecedor == 3 || idFornecedor == 4) || (!string.IsNullOrEmpty(fornecedorName) && 
-            (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus")));
+        decimal cotacaoRisco;
+        if (isCotacaoJaRisco)
+        {
+            cotacaoRisco = cotacao;
+        }
+        else
+        {
+            // IDs 3=Ferguile, 4=Livintus. Using ID is more robust than Name if Navigation Property is not loaded.
+            bool isFerguile = (idFornecedor == 3 || idFornecedor == 4) || (!string.IsNullOrEmpty(fornecedorName) && 
+                (fornecedorName.ToLower().Contains("ferguile") || fornecedorName.ToLower().Contains("livintus")));
 
-        decimal cotacaoRisco = Math.Round(isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar), 2);
+            cotacaoRisco = Math.Round(isFerguile ? config.ValorReducaoDolar : (cotacao - config.ValorReducaoDolar), 2);
+        }
         
         if (cotacaoRisco <= 0) return 0;
 
@@ -642,10 +626,10 @@ public class ModuloExportService
         ws.Column(3).Width = 10; // Larg
         ws.Column(4).Width = 10; // Prof
         ws.Column(5).Width = 10; // Alt
-        ws.Column(6).Width = 12; // Display Group
-        ws.Column(7).Width = 16; // G0
-        ws.Column(8).Width = 12; // Display Group (Discounted)
-        ws.Column(9).Width = 16; // G0 (Discounted)
+        ws.Column(6).Width = 14; // Display Group
+        ws.Column(7).Width = 20; // Starting Group
+        ws.Column(8).Width = 18; // Display Group (Discounted)
+        ws.Column(9).Width = 24; // Starting Group (Discounted)
 
         var brandGroups = items
             .GroupBy(i => i.Modulo.Marca)
@@ -660,7 +644,41 @@ public class ModuloExportService
             var brandItems = brandGroup.ToList();
 
             var details = GetColinhaDetails(brandName);
-            string displayGroup = details.DisplayGroup;
+            
+            // Determine active fabrics for this brand
+            var brandFabrics = brandItems
+                .SelectMany(i => i.Modulo.ModulosTecidos)
+                .Where(mt => mt.FlAtivo && mt.Tecido != null)
+                .Select(mt => mt.Tecido!)
+                .GroupBy(t => t.Id)
+                .Select(g => g.First())
+                .OrderBy(t => Regex.Replace(t.Nome, @"\d+", m => m.Value.PadLeft(5, '0')))
+                .ToList();
+
+            // Determine starting fabric (G0 if exists, else first/lowest active tier)
+            var startingFabric = brandFabrics.FirstOrDefault(f => f.Nome.Equals("G0", StringComparison.OrdinalIgnoreCase))
+                              ?? brandFabrics.FirstOrDefault();
+            string startingGroup = startingFabric?.Nome ?? "G0";
+
+            // Determine display fabric
+            string displayGroup;
+            if (!string.IsNullOrEmpty(details.DisplayGroup) && brandFabrics.Any(f => f.Nome.Equals(details.DisplayGroup, StringComparison.OrdinalIgnoreCase)))
+            {
+                displayGroup = details.DisplayGroup;
+            }
+            else
+            {
+                var otherFabrics = brandFabrics.Where(f => !f.Nome.Equals(startingGroup, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (otherFabrics.Any())
+                {
+                    displayGroup = otherFabrics.FirstOrDefault(f => f.Nome.Equals("G1", StringComparison.OrdinalIgnoreCase))?.Nome
+                                ?? otherFabrics.Last().Nome;
+                }
+                else
+                {
+                    displayGroup = startingGroup;
+                }
+            }
             
             int startRow = currentRow;
 
@@ -671,9 +689,9 @@ public class ModuloExportService
             ws.Cells[currentRow, 4].Value = "Prof";
             ws.Cells[currentRow, 5].Value = "Altura";
             ws.Cells[currentRow, 6].Value = displayGroup;
-            ws.Cells[currentRow, 7].Value = "A PARTIR DE: G0";
-            ws.Cells[currentRow, 8].Value = displayGroup;
-            ws.Cells[currentRow, 9].Value = "A PARTIR DE: G0";
+            ws.Cells[currentRow, 7].Value = $"A PARTIR DE: {startingGroup}";
+            ws.Cells[currentRow, 8].Value = $"{displayGroup} (-15%)";
+            ws.Cells[currentRow, 9].Value = $"A PARTIR DE: {startingGroup} (-15%)";
 
             var hRange = ws.Cells[currentRow, 1, currentRow, 9];
             hRange.Style.Font.Bold = true;
@@ -704,35 +722,35 @@ public class ModuloExportService
                 decimal freightDisp = currency == "BRL" ? freightUSD * riskVal : freightUSD;
 
                 // Calculate display price
-                var mtDisplay = mod.ModulosTecidos.FirstOrDefault(x => x.Tecido != null && x.Tecido.Nome.ToUpper() == displayGroup.ToUpper() && x.FlAtivo)
+                var mtDisplay = mod.ModulosTecidos.FirstOrDefault(x => x.Tecido != null && x.Tecido.Nome.Equals(displayGroup, StringComparison.OrdinalIgnoreCase) && x.FlAtivo)
                                 ?? mod.ModulosTecidos.FirstOrDefault(x => x.FlAtivo);
 
-                // Calculate starting price (G0)
-                var mtG0 = mod.ModulosTecidos.FirstOrDefault(x => x.Tecido != null && x.Tecido.Nome.ToUpper() == "G0" && x.FlAtivo)
-                            ?? mod.ModulosTecidos.FirstOrDefault(x => x.FlAtivo);
+                // Calculate starting price
+                var mtStarting = mod.ModulosTecidos.FirstOrDefault(x => x.Tecido != null && x.Tecido.Nome.Equals(startingGroup, StringComparison.OrdinalIgnoreCase) && x.FlAtivo)
+                                ?? mod.ModulosTecidos.FirstOrDefault(x => x.FlAtivo);
 
                 decimal priceDisplay = 0;
                 if (mtDisplay != null)
                 {
-                    priceDisplay = CalcPrice(mtDisplay.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome);
+                    priceDisplay = CalcPrice(mtDisplay.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome, isCotacaoJaRisco: true);
                 }
                 
-                decimal priceG0 = 0;
-                if (mtG0 != null)
+                decimal priceStarting = 0;
+                if (mtStarting != null)
                 {
-                    priceG0 = CalcPrice(mtG0.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome);
+                    priceStarting = CalcPrice(mtStarting.ValorTecido, currency, cotacao, modConfig, mod.IdFornecedor, mod.Fornecedor?.Nome, isCotacaoJaRisco: true);
                 }
 
                 decimal valDisplay = priceDisplay + freightDisp;
-                decimal valG0 = priceG0 + freightDisp;
+                decimal valStarting = priceStarting + freightDisp;
                 if (percentualAcrescimo != 0)
                 {
                     valDisplay = Math.Round(valDisplay * (1 + percentualAcrescimo / 100m), 2);
-                    valG0 = Math.Round(valG0 * (1 + percentualAcrescimo / 100m), 2);
+                    valStarting = Math.Round(valStarting * (1 + percentualAcrescimo / 100m), 2);
                 }
 
                 ws.Cells[currentRow, 6].Value = valDisplay;
-                ws.Cells[currentRow, 7].Value = valG0;
+                ws.Cells[currentRow, 7].Value = valStarting;
 
                 ws.Cells[currentRow, 8].Formula = $"=F{currentRow}*0.85";
                 ws.Cells[currentRow, 9].Formula = $"=G{currentRow}*0.85";

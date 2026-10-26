@@ -25,7 +25,7 @@ public class ModulosController : ControllerBase
             .Include(m => m.Fornecedor)
             .Include(m => m.Categoria)
             .Include(m => m.Marca)
-            .Include(m => m.ModulosTecidos)
+            .Include(m => m.ModulosTecidos.Where(mt => mt.FlAtivo))
                 .ThenInclude(mt => mt.Tecido)
             .AsQueryable();
 
@@ -82,7 +82,7 @@ public class ModulosController : ControllerBase
             .Include(m => m.Fornecedor)
             .Include(m => m.Categoria)
             .Include(m => m.Marca)
-            .Include(m => m.ModulosTecidos)
+            .Include(m => m.ModulosTecidos.Where(mt => mt.FlAtivo))
                 .ThenInclude(mt => mt.Tecido)
             .Where(m => moduleIds.Contains(m.Id))
             .ToListAsync();

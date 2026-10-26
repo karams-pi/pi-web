@@ -84,11 +84,13 @@ export function printPriceListReport({
       return val.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
   }
 
-  // 1. Identify all unique fabrics
+  // 1. Identify all unique fabrics (active only)
   const uniqueFabricIds = new Set<number>();
   modules.forEach(m => {
       if (m.modulosTecidos) {
-          m.modulosTecidos.forEach(mt => uniqueFabricIds.add(mt.idTecido));
+          m.modulosTecidos
+              .filter(mt => mt.flAtivo !== false)
+              .forEach(mt => uniqueFabricIds.add(mt.idTecido));
       }
   });
 
@@ -226,7 +228,7 @@ export function printPriceListReport({
               
               let fabricCols = "";
               sortedFabricIds.forEach(fid => {
-                  const mt = mod.modulosTecidos?.find(x => x.idTecido === fid);
+                  const mt = mod.modulosTecidos?.find(x => x.idTecido === fid && x.flAtivo !== false);
                   if (mt) {
                       const val = calcFinalPrice(mt.valorTecido, mod.idFornecedor, mod.id);
                       const symbol = currency === "BRL" ? "R$" : "$";

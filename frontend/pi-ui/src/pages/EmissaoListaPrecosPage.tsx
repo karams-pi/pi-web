@@ -857,7 +857,7 @@ export default function EmissaoListaPrecosPage() {
                      </td>
                      <td style={{ verticalAlign: 'top', padding: '12px 8px' }}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px', background: 'rgba(0,0,0,0.2)', padding: 8, borderRadius: 6 }}>
-                          {si.modulo.modulosTecidos?.map(mt => (
+                          {si.modulo.modulosTecidos?.filter(mt => mt.flAtivo !== false).map(mt => (
                             <div key={`${si.tempId}_${mt.id}`} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: 2 }}>
                               <span style={{ color: '#94a3b8' }}>{mt.tecido?.nome}:</span>
                               <span style={{ fontWeight: 600, color: '#fff', marginLeft: 8 }}>
