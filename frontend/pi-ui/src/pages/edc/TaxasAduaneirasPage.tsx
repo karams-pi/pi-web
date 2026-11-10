@@ -17,7 +17,7 @@ const TaxasAduaneirasPage: React.FC = () => {
 
   const [formData, setFormData] = useState({
     nome: '',
-    valorPadrao: 0,
+    valorPadrao: 0 as number | string,
     moeda: 'BRL',
     tipo: 'Fixo'
   });
@@ -37,7 +37,12 @@ const TaxasAduaneirasPage: React.FC = () => {
     e.preventDefault();
     const method = editingTaxa ? 'PUT' : 'POST';
     const url = editingTaxa ? `/api/edc/taxasaduaneiras/${editingTaxa.id}` : '/api/edc/taxasaduaneiras';
-    const payload = editingTaxa ? { ...formData, id: editingTaxa.id } : formData;
+    const rawVal = Number(formData.valorPadrao) || 0;
+    const normalizedData = {
+      ...formData,
+      valorPadrao: formData.tipo === 'Percentual' ? rawVal / 100 : rawVal
+    };
+    const payload = editingTaxa ? { ...normalizedData, id: editingTaxa.id } : normalizedData;
 
     try {
       const response = await fetch(url, {
@@ -140,7 +145,7 @@ const TaxasAduaneirasPage: React.FC = () => {
                           setEditingTaxa(t);
                           setFormData({
                             nome: t.nome,
-                            valorPadrao: t.valorPadrao,
+                            valorPadrao: t.tipo === 'Percentual' ? Number(((t.valorPadrao || 0) * 100).toFixed(4)) : t.valorPadrao,
                             moeda: t.moeda,
                             tipo: t.tipo
                           });
@@ -200,14 +205,8 @@ const TaxasAduaneirasPage: React.FC = () => {
                       type="number" 
                       step="0.0001" 
                       required
-                      value={formData.tipo === 'Percentual' ? formData.valorPadrao * 100 : formData.valorPadrao} 
-                      onChange={e => {
-                        const val = parseFloat(e.target.value) || 0;
-                        setFormData({
-                          ...formData,
-                          valorPadrao: formData.tipo === 'Percentual' ? val / 100 : val
-                        });
-                      }} 
+                      value={formData.valorPadrao} 
+                      onChange={e => setFormData({ ...formData, valorPadrao: e.target.value })} 
                       placeholder={formData.tipo === 'Percentual' ? "Ex: 2.5 para 2.5%" : "Ex: 150.00"}
                     />
                   </div>

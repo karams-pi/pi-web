@@ -37,10 +37,10 @@ const ProdutosEdcPage: React.FC = () => {
     referencia: '',
     descricao: '',
     idNcm: 0,
-    pesoLiquido: 0,
-    pesoBruto: 0,
-    cubagemM3: 0,
-    precoFobBase: 0,
+    pesoLiquido: 0 as number | string,
+    pesoBruto: 0 as number | string,
+    cubagemM3: 0 as number | string,
+    precoFobBase: 0 as number | string,
     unidadeMedida: 'UN'
   });
 
@@ -143,10 +143,17 @@ const ProdutosEdcPage: React.FC = () => {
       const isEdit = formData.id !== undefined;
       const url = isEdit ? `/api/edc/produtos/${formData.id}` : '/api/edc/produtos';
       const method = isEdit ? 'PUT' : 'POST';
+      const payload = {
+        ...formData,
+        pesoLiquido: Number(formData.pesoLiquido) || 0,
+        pesoBruto: Number(formData.pesoBruto) || 0,
+        cubagemM3: Number(formData.cubagemM3) || 0,
+        precoFobBase: Number(formData.precoFobBase) || 0
+      };
       const response = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (response.ok) { 
         fetchProdutos(); 
@@ -335,11 +342,11 @@ const ProdutosEdcPage: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label>Peso Bruto ({formData.unidadeMedida === 'T' ? 'T' : formData.unidadeMedida === 'UN' ? 'UN' : 'kg'})</label>
-                    <input type="number" step="0.001" value={formData.pesoBruto} onChange={e => setFormData({...formData, pesoBruto: parseFloat(e.target.value)})} />
+                    <input type="number" step="0.001" value={formData.pesoBruto} onChange={e => setFormData({...formData, pesoBruto: e.target.value})} />
                   </div>
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Volume Total (m³)</label>
-                    <input type="number" step="0.0001" value={formData.cubagemM3} onChange={e => setFormData({...formData, cubagemM3: parseFloat(e.target.value)})} />
+                    <input type="number" step="0.0001" value={formData.cubagemM3} onChange={e => setFormData({...formData, cubagemM3: e.target.value})} />
                   </div>
                 </div>
 

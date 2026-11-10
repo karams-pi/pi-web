@@ -1,5 +1,6 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import type { ModuloTecido } from "../api/types";
 
 interface ModuloTecidoSelectProps {
@@ -18,12 +19,45 @@ export function ModuloTecidoSelect({
 }: ModuloTecidoSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number }>({
+    top: 0,
+    left: 0,
+    width: 280
+  });
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const updateDropdownPosition = useCallback(() => {
+    if (wrapperRef.current) {
+      const rect = wrapperRef.current.getBoundingClientRect();
+      setDropdownRect({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width
+      });
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    updateDropdownPosition();
+    window.addEventListener("scroll", updateDropdownPosition, true);
+    window.addEventListener("resize", updateDropdownPosition);
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPosition, true);
+      window.removeEventListener("resize", updateDropdownPosition);
+    };
+  }, [isOpen, updateDropdownPosition]);
 
   // Fecha o dropdown ao clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(target) &&
+        (!dropdownRef.current || !dropdownRef.current.contains(target))
+      ) {
         setIsOpen(false);
       }
     }
@@ -98,24 +132,26 @@ export function ModuloTecidoSelect({
         <span style={{ fontSize: "10px", marginLeft: 8 }}>▼</span>
       </div>
 
-      {isOpen && (
-        <div
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            zIndex: 1000,
-            background: "#1e1e2d", // Cor escura do tema
-            border: "1px solid #333",
-            borderRadius: "4px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-            marginTop: "4px",
-            maxHeight: "300px",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            style={{
+              position: "fixed",
+              top: `${dropdownRect.top}px`,
+              left: `${dropdownRect.left}px`,
+              width: `${dropdownRect.width}px`,
+              minWidth: "280px",
+              zIndex: 99999,
+              background: "#1e1e2d", // Cor escura do tema
+              border: "1px solid #333",
+              borderRadius: "4px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+              maxHeight: "300px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
           {/* Input de Busca */}
           <div style={{ padding: "8px", borderBottom: "1px solid #333" }}>
             <input
@@ -180,7 +216,8 @@ export function ModuloTecidoSelect({
               ))
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

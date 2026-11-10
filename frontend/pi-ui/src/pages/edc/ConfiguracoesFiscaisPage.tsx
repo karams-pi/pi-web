@@ -19,8 +19,8 @@ const ConfiguracoesFiscaisPage: React.FC = () => {
   const [formData, setFormData] = useState({
     id: undefined as number | undefined,
     uf: '',
-    aliquotaIcms: 0.18,
-    aliquotaFCP: 0.00,
+    aliquotaIcms: 18 as number | string,
+    aliquotaFCP: 0 as number | string,
     isencaoIPI: false
   });
 
@@ -39,8 +39,8 @@ const ConfiguracoesFiscaisPage: React.FC = () => {
     setFormData({
       id: undefined,
       uf: '',
-      aliquotaIcms: 0.18,
-      aliquotaFCP: 0.00,
+      aliquotaIcms: 18,
+      aliquotaFCP: 0,
       isencaoIPI: false
     });
     setEditingConfig(null);
@@ -51,8 +51,8 @@ const ConfiguracoesFiscaisPage: React.FC = () => {
     setFormData({
       id: c.id,
       uf: c.uf,
-      aliquotaIcms: c.aliquotaIcms,
-      aliquotaFCP: c.aliquotaFCP,
+      aliquotaIcms: Number(((c.aliquotaIcms || 0) * 100).toFixed(4)),
+      aliquotaFCP: Number(((c.aliquotaFCP || 0) * 100).toFixed(4)),
       isencaoIPI: c.isencaoIPI
     });
     setEditingConfig(c);
@@ -90,7 +90,9 @@ const ConfiguracoesFiscaisPage: React.FC = () => {
       const method = isEdit ? 'PUT' : 'POST';
       const payload = {
         ...formData,
-        uf: formData.uf.toUpperCase()
+        uf: formData.uf.toUpperCase(),
+        aliquotaIcms: (Number(formData.aliquotaIcms) || 0) / 100,
+        aliquotaFCP: (Number(formData.aliquotaFCP) || 0) / 100
       };
       
       const response = await fetch(url, {
@@ -211,8 +213,8 @@ const ConfiguracoesFiscaisPage: React.FC = () => {
                       type="number" 
                       step="0.01" 
                       required
-                      value={formData.aliquotaIcms * 100} 
-                      onChange={e => setFormData({...formData, aliquotaIcms: parseFloat(e.target.value) / 100})} 
+                      value={formData.aliquotaIcms} 
+                      onChange={e => setFormData({...formData, aliquotaIcms: e.target.value})} 
                     />
                   </div>
                   <div className="form-group">
@@ -221,8 +223,8 @@ const ConfiguracoesFiscaisPage: React.FC = () => {
                       type="number" 
                       step="0.01" 
                       required
-                      value={formData.aliquotaFCP * 100} 
-                      onChange={e => setFormData({...formData, aliquotaFCP: parseFloat(e.target.value) / 100})} 
+                      value={formData.aliquotaFCP} 
+                      onChange={e => setFormData({...formData, aliquotaFCP: e.target.value})} 
                     />
                   </div>
                   <div className="form-group" style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>

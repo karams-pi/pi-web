@@ -334,6 +334,11 @@ a {
   backdrop-filter: blur(8px);
 }
 
+.card:focus-within {
+  position: relative;
+  z-index: 30;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;

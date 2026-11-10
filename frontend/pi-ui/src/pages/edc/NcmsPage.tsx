@@ -23,11 +23,11 @@ const NcmsPage: React.FC = () => {
   const [formData, setFormData] = useState({
     codigo: '',
     descricao: '',
-    aliquotaII: 0,
-    aliquotaIPI: 0,
-    aliquotaPis: 0,
-    aliquotaCofins: 0,
-    aliquotaIcmsPadrao: 0.19
+    aliquotaII: 0 as number | string,
+    aliquotaIPI: 0 as number | string,
+    aliquotaPis: 0 as number | string,
+    aliquotaCofins: 0 as number | string,
+    aliquotaIcmsPadrao: 19 as number | string
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -50,7 +50,15 @@ const NcmsPage: React.FC = () => {
     setIsSaving(true);
     const method = editingNcm ? 'PUT' : 'POST';
     const url = editingNcm ? `/api/edc/ncms/${editingNcm.id}` : '/api/edc/ncms';
-    const payload = editingNcm ? { ...formData, id: editingNcm.id } : formData;
+    const normalizedData = {
+      ...formData,
+      aliquotaII: (Number(formData.aliquotaII) || 0) / 100,
+      aliquotaIPI: (Number(formData.aliquotaIPI) || 0) / 100,
+      aliquotaPis: (Number(formData.aliquotaPis) || 0) / 100,
+      aliquotaCofins: (Number(formData.aliquotaCofins) || 0) / 100,
+      aliquotaIcmsPadrao: (Number(formData.aliquotaIcmsPadrao) || 0) / 100
+    };
+    const payload = editingNcm ? { ...normalizedData, id: editingNcm.id } : normalizedData;
     
     try {
       const response = await fetch(url, {
@@ -102,7 +110,7 @@ const NcmsPage: React.FC = () => {
           <p className="page-description">Gerencie as alíquotas de importação e impostos federais por código.</p>
         </div>
         <div className="page-header-line"></div>
-        <button className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={() => { setEditingNcm(null); setFormData({ codigo: '', descricao: '', aliquotaII: 0, aliquotaIPI: 0, aliquotaPis: 0, aliquotaCofins: 0, aliquotaIcmsPadrao: 0.19 }); setShowModal(true); }}>
+        <button className="btn btn-primary" style={{ marginLeft: 'auto' }} onClick={() => { setEditingNcm(null); setFormData({ codigo: '', descricao: '', aliquotaII: 0, aliquotaIPI: 0, aliquotaPis: 0, aliquotaCofins: 0, aliquotaIcmsPadrao: 19 }); setShowModal(true); }}>
           <Plus size={18} />
           <span>Novo Código</span>
         </button>
@@ -154,11 +162,11 @@ const NcmsPage: React.FC = () => {
                           setFormData({
                             codigo: n.codigo,
                             descricao: n.descricao,
-                            aliquotaII: n.aliquotaII,
-                            aliquotaIPI: n.aliquotaIPI,
-                            aliquotaPis: n.aliquotaPis,
-                            aliquotaCofins: n.aliquotaCofins,
-                            aliquotaIcmsPadrao: n.aliquotaIcmsPadrao
+                            aliquotaII: Number(((n.aliquotaII || 0) * 100).toFixed(4)),
+                            aliquotaIPI: Number(((n.aliquotaIPI || 0) * 100).toFixed(4)),
+                            aliquotaPis: Number(((n.aliquotaPis || 0) * 100).toFixed(4)),
+                            aliquotaCofins: Number(((n.aliquotaCofins || 0) * 100).toFixed(4)),
+                            aliquotaIcmsPadrao: Number(((n.aliquotaIcmsPadrao || 0) * 100).toFixed(4))
                           });
                           setShowModal(true);
                         }}
@@ -203,23 +211,23 @@ const NcmsPage: React.FC = () => {
                   
                   <div className="form-group">
                     <label>Alíquota II (%)</label>
-                    <input type="number" step="0.01" value={formData.aliquotaII * 100} onChange={e => setFormData({...formData, aliquotaII: parseFloat(e.target.value) / 100})} />
+                    <input type="number" step="0.01" value={formData.aliquotaII} onChange={e => setFormData({...formData, aliquotaII: e.target.value})} />
                   </div>
                   <div className="form-group">
                     <label>Alíquota IPI (%)</label>
-                    <input type="number" step="0.01" value={formData.aliquotaIPI * 100} onChange={e => setFormData({...formData, aliquotaIPI: parseFloat(e.target.value) / 100})} />
+                    <input type="number" step="0.01" value={formData.aliquotaIPI} onChange={e => setFormData({...formData, aliquotaIPI: e.target.value})} />
                   </div>
                   <div className="form-group">
                     <label>Alíquota PIS (%)</label>
-                    <input type="number" step="0.01" value={formData.aliquotaPis * 100} onChange={e => setFormData({...formData, aliquotaPis: parseFloat(e.target.value) / 100})} />
+                    <input type="number" step="0.01" value={formData.aliquotaPis} onChange={e => setFormData({...formData, aliquotaPis: e.target.value})} />
                   </div>
                   <div className="form-group">
                     <label>Alíquota COFINS (%)</label>
-                    <input type="number" step="0.01" value={formData.aliquotaCofins * 100} onChange={e => setFormData({...formData, aliquotaCofins: parseFloat(e.target.value) / 100})} />
+                    <input type="number" step="0.01" value={formData.aliquotaCofins} onChange={e => setFormData({...formData, aliquotaCofins: e.target.value})} />
                   </div>
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>ICMS Padrão (%)</label>
-                    <input type="number" step="0.01" value={formData.aliquotaIcmsPadrao * 100} onChange={e => setFormData({...formData, aliquotaIcmsPadrao: parseFloat(e.target.value) / 100})} />
+                    <input type="number" step="0.01" value={formData.aliquotaIcmsPadrao} onChange={e => setFormData({...formData, aliquotaIcmsPadrao: e.target.value})} />
                   </div>
                 </div>
                 <div className="modal-footer" style={{ padding: '20px 0 0 0' }}>

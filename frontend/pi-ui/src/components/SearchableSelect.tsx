@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Search, ChevronDown, X, Check } from "lucide-react";
 
 export interface SearchableSelectOption {
@@ -43,15 +44,48 @@ export function SearchableSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number }>({
+    top: 0,
+    left: 0,
+    width: 280
+  });
 
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  const updateDropdownPosition = useCallback(() => {
+    if (wrapperRef.current) {
+      const rect = wrapperRef.current.getBoundingClientRect();
+      setDropdownRect({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width
+      });
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    updateDropdownPosition();
+    window.addEventListener("scroll", updateDropdownPosition, true);
+    window.addEventListener("resize", updateDropdownPosition);
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPosition, true);
+      window.removeEventListener("resize", updateDropdownPosition);
+    };
+  }, [isOpen, updateDropdownPosition]);
 
   // Close on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(target) &&
+        (!dropdownRef.current || !dropdownRef.current.contains(target))
+      ) {
         setIsOpen(false);
         setSearch("");
       }
@@ -253,25 +287,28 @@ export function SearchableSelect({
       </div>
 
       {/* Dropdown Menu */}
-      {isOpen && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 4px)",
-            left: 0,
-            width: dropdownWidth || "100%",
-            minWidth: "280px",
-            zIndex: 9999,
-            backgroundColor: "#0f172a",
-            border: "1px solid #334155",
-            borderRadius: "8px",
-            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            animation: "fadeIn 0.15s ease-out"
-          }}
-        >
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            onKeyDown={handleKeyDown}
+            style={{
+              position: "fixed",
+              top: `${dropdownRect.top}px`,
+              left: `${dropdownRect.left}px`,
+              width: dropdownWidth || `${dropdownRect.width}px`,
+              minWidth: "280px",
+              zIndex: 99999,
+              backgroundColor: "#0f172a",
+              border: "1px solid #334155",
+              borderRadius: "8px",
+              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7)",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              animation: "fadeIn 0.15s ease-out"
+            }}
+          >
           {/* Search Header */}
           <div
             style={{
@@ -475,7 +512,8 @@ export function SearchableSelect({
             <span>{filteredOptions.length} de {options.length} opções</span>
             <span>Use ↑↓ para navegar e Enter</span>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -263,17 +263,32 @@ const NovoEstudoEdcPage: React.FC = () => {
 
     setIsSaving(true);
     try {
-      // Sanitização de IDs nulos (converter 0 para null para chaves estrangeiras opcionais)
+      // Sanitização de IDs nulos (converter 0 para null para chaves estrangeiras opcionais) e conversão numérica
       const sanitizedItens = formData.itens.map(item => ({
         ...item,
-        idModelo: item.idModelo === 0 ? null : item.idModelo
+        idModelo: item.idModelo === 0 ? null : item.idModelo,
+        quantidade: Number(item.quantidade) || 0,
+        valorFobUnitario: Number(item.valorFobUnitario) || 0,
+        valorFobSubfaturado: item.valorFobSubfaturado === null || item.valorFobSubfaturado === undefined || item.valorFobSubfaturado === '' ? null : Number(item.valorFobSubfaturado)
+      }));
+
+      const sanitizedDespesas = formData.despesas.map(d => ({
+        ...d,
+        valor: Number(d.valor) || 0
       }));
 
       const sanitizedPayload = {
         ...formData,
+        cotacaoDolar: Number(formData.cotacaoDolar) || 0,
+        spreadCambio: Number(formData.spreadCambio) || 0,
+        valorFreteInternacional: Number(formData.valorFreteInternacional) || 0,
+        valorSeguroInternacional: Number(formData.valorSeguroInternacional) || 0,
+        comissaoPercentual: Number(formData.comissaoPercentual) || 0,
+        percentualSubfaturamento: Number(formData.percentualSubfaturamento) || 0,
         idPortoOrigem: formData.idPortoOrigem === 0 ? null : formData.idPortoOrigem,
         idPortoDestino: formData.idPortoDestino === 0 ? null : formData.idPortoDestino,
-        itens: sanitizedItens
+        itens: sanitizedItens,
+        despesas: sanitizedDespesas
       };
 
       const url = id ? `/api/edc/simulacoes/${id}` : '/api/edc/simulacoes';
@@ -300,7 +315,13 @@ const NovoEstudoEdcPage: React.FC = () => {
     }
   };
 
-  const totalFob = formData.itens.reduce((acc, i) => acc + (i.quantidade * i.valorFobUnitario), 0);
+  const cotacaoDolarNum = Number(formData.cotacaoDolar) || 0;
+  const spreadCambioNum = Number(formData.spreadCambio) || 0;
+  const freteInternacionalNum = Number(formData.valorFreteInternacional) || 0;
+  const seguroInternacionalNum = Number(formData.valorSeguroInternacional) || 0;
+  const comissaoPercentualNum = Number(formData.comissaoPercentual) || 0;
+  const percentualSubfaturamentoNum = Number(formData.percentualSubfaturamento) || 0;
+  const totalFob = formData.itens.reduce((acc, i) => acc + ((Number(i.quantidade) || 0) * (Number(i.valorFobUnitario) || 0)), 0);
 
   return (
     <div className="animate-fadeIn">
@@ -426,7 +447,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                               type="number" 
                               style={{ width: '100%', minWidth: '80px' }}
                               value={item.quantidade} 
-                              onChange={e => updateItem(idx, 'quantidade', parseFloat(e.target.value) || 0)} 
+                              onChange={e => updateItem(idx, 'quantidade', e.target.value)} 
                             />
                             {unit === 'T' && (
                               <span 
@@ -444,7 +465,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                                   gap: '4px'
                                 }}
                               >
-                                ⚖️ {((item.quantidade || 0) * 1000).toLocaleString('pt-BR')} kg
+                                ⚖️ {((Number(item.quantidade) || 0) * 1000).toLocaleString('pt-BR')} kg
                               </span>
                             )}
                           </div>
@@ -457,8 +478,8 @@ const NovoEstudoEdcPage: React.FC = () => {
                               step="any" 
                               style={{ width: '100%', minWidth: '110px' }}
                               placeholder="0.00"
-                              value={item.valorFobUnitario === 0 ? '' : item.valorFobUnitario} 
-                              onChange={e => updateItem(idx, 'valorFobUnitario', parseFloat(e.target.value) || 0)} 
+                              value={item.valorFobUnitario} 
+                              onChange={e => updateItem(idx, 'valorFobUnitario', e.target.value)} 
                             />
                           </div>
                         </td>
@@ -470,11 +491,11 @@ const NovoEstudoEdcPage: React.FC = () => {
                                 type="number" 
                                 step="any" 
                                 style={{ width: '100%', minWidth: '110px' }}
-                                placeholder={item.valorFobUnitario ? (item.valorFobUnitario * (formData.percentualSubfaturamento / 100)).toFixed(2) : '0.00'}
+                                placeholder={Number(item.valorFobUnitario) ? (Number(item.valorFobUnitario) * (percentualSubfaturamentoNum / 100)).toFixed(2) : '0.00'}
                                 value={item.valorFobSubfaturado === null || item.valorFobSubfaturado === undefined ? '' : item.valorFobSubfaturado} 
                                 onChange={e => {
                                   const val = e.target.value;
-                                  updateItem(idx, 'valorFobSubfaturado', val === '' ? null : parseFloat(val));
+                                  updateItem(idx, 'valorFobSubfaturado', val === '' ? null : val);
                                 }} 
                               />
                             </div>
@@ -583,7 +604,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                             value={despesa.valor} 
                             onChange={e => {
                               const newDespesas = [...formData.despesas];
-                              newDespesas[idx].valor = parseFloat(e.target.value) || 0;
+                              newDespesas[idx].valor = e.target.value;
                               setFormData(prev => ({ ...prev, despesas: newDespesas }));
                             }}
                           />
@@ -635,20 +656,20 @@ const NovoEstudoEdcPage: React.FC = () => {
                 <label>Câmbio (USD)</label>
                 <div className="input-with-icon">
                    <TrendingUp size={16} />
-                   <input type="number" step="0.0001" value={formData.cotacaoDolar} onChange={e => setFormData({...formData, cotacaoDolar: parseFloat(e.target.value)})} />
+                   <input type="number" step="0.0001" value={formData.cotacaoDolar} onChange={e => setFormData({...formData, cotacaoDolar: e.target.value as any})} />
                 </div>
               </div>
               <div className="form-group">
                 <label>PTAX (%)</label>
-                <input type="number" step="0.0001" value={formData.spreadCambio} onChange={e => setFormData({...formData, spreadCambio: parseFloat(e.target.value)})} />
+                <input type="number" step="0.0001" value={formData.spreadCambio} onChange={e => setFormData({...formData, spreadCambio: e.target.value as any})} />
               </div>
               <div className="form-group">
                 <label>Frete Internacional (USD)</label>
-                <input type="number" value={formData.valorFreteInternacional} onChange={e => setFormData({...formData, valorFreteInternacional: parseFloat(e.target.value)})} />
+                <input type="number" value={formData.valorFreteInternacional} onChange={e => setFormData({...formData, valorFreteInternacional: e.target.value as any})} />
               </div>
               <div className="form-group">
                 <label>Seguro (USD)</label>
-                <input type="number" value={formData.valorSeguroInternacional} onChange={e => setFormData({...formData, valorSeguroInternacional: parseFloat(e.target.value)})} />
+                <input type="number" value={formData.valorSeguroInternacional} onChange={e => setFormData({...formData, valorSeguroInternacional: e.target.value as any})} />
               </div>
               <div className="form-group">
                 <label>Porto Destino</label>
@@ -695,7 +716,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                   type="number" 
                   step="0.01" 
                   value={formData.comissaoPercentual} 
-                  onChange={e => setFormData({...formData, comissaoPercentual: parseFloat(e.target.value) || 0})} 
+                  onChange={e => setFormData({...formData, comissaoPercentual: e.target.value as any})} 
                   placeholder="Ex: 5"
                 />
               </div>
@@ -727,7 +748,7 @@ const NovoEstudoEdcPage: React.FC = () => {
                   <input 
                     type="number" 
                     value={formData.percentualSubfaturamento} 
-                    onChange={e => setFormData({...formData, percentualSubfaturamento: parseFloat(e.target.value) || 50})} 
+                    onChange={e => setFormData({...formData, percentualSubfaturamento: e.target.value as any})} 
                     placeholder="Ex: 50"
                   />
                 </div>
@@ -767,13 +788,13 @@ const NovoEstudoEdcPage: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#a78bfa' }}>
                   <span style={{ opacity: 0.9 }}>FOB Declarado (SUB):</span>
                   <span style={{ fontWeight: '600' }}>
-                    USD {formData.itens.reduce((acc, i) => acc + (i.quantidade * (i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined ? i.valorFobSubfaturado : (i.valorFobUnitario * (formData.percentualSubfaturamento / 100)))), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    USD {formData.itens.reduce((acc, i) => acc + ((Number(i.quantidade) || 0) * (i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined && i.valorFobSubfaturado !== '' ? Number(i.valorFobSubfaturado) : ((Number(i.valorFobUnitario) || 0) * (percentualSubfaturamentoNum / 100)))), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ opacity: 0.7 }}>Câmbio:</span>
-                <span style={{ fontWeight: '600' }}>R$ {formData.cotacaoDolar.toFixed(2)}</span>
+                <span style={{ fontWeight: '600' }}>R$ {cotacaoDolarNum.toFixed(2)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ opacity: 0.7 }}>Frete c/ PTAX:</span>
@@ -784,20 +805,20 @@ Fórmula:
 Valor do Frete em USD * (1 + PTAX / 100)
 
 Cálculo:
-US$ ${formData.valorFreteInternacional.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} * (1 + ${formData.spreadCambio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}%)
-= US$ ${(formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+US$ ${freteInternacionalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} * (1 + ${spreadCambioNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}%)
+= US$ ${(freteInternacionalNum * (1 + spreadCambioNum / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 >
-                  USD {(formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  USD {(freteInternacionalNum * (1 + spreadCambioNum / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ opacity: 0.7 }}>Seguro:</span>
-                <span style={{ fontWeight: '600' }}>USD {formData.valorSeguroInternacional.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span style={{ fontWeight: '600' }}>USD {seguroInternacionalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               {formData.flExibirComissao && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                  <span style={{ opacity: 0.7, color: '#fbbf24' }}>Comissão ({formData.comissaoPercentual}%):</span>
-                  <span style={{ fontWeight: '600', color: '#fbbf24' }}>USD {(totalFob * (formData.comissaoPercentual / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span style={{ opacity: 0.7, color: '#fbbf24' }}>Comissão ({comissaoPercentualNum}%):</span>
+                  <span style={{ fontWeight: '600', color: '#fbbf24' }}>USD {(totalFob * (comissaoPercentualNum / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               )}
 
@@ -808,21 +829,21 @@ US$ ${formData.valorFreteInternacional.toLocaleString('pt-BR', { minimumFraction
                     {formData.flSimularSubfaturamento ? 'Custo Cheio (Sem Subfaturamento)' : 'Custo Est. Nacionalizado'}
                   </span>
                   <span style={{ fontSize: formData.flSimularSubfaturamento ? '1.4rem' : '1.8rem', fontWeight: '800', color: formData.flSimularSubfaturamento ? 'var(--muted)' : 'var(--primary)' }}>
-                    R$ {((((totalFob + (formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)) + formData.valorSeguroInternacional) * formData.cotacaoDolar) * 1.45) + (formData.flExibirComissao ? (totalFob * (formData.comissaoPercentual / 100) * formData.cotacaoDolar) : 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    R$ {((((totalFob + (freteInternacionalNum * (1 + spreadCambioNum / 100)) + seguroInternacionalNum) * cotacaoDolarNum) * 1.45) + (formData.flExibirComissao ? (totalFob * (comissaoPercentualNum / 100) * cotacaoDolarNum) : 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 
                 {formData.flSimularSubfaturamento && (
                   <div style={{ textAlign: 'right' }}>
                     <span style={{ fontSize: '0.85rem', color: '#a78bfa', fontWeight: '600', display: 'block', marginBottom: '2px' }}>
-                      Custo Nacionalizado c/ SUB ({formData.percentualSubfaturamento}%)
+                      Custo Nacionalizado c/ SUB ({percentualSubfaturamentoNum}%)
                     </span>
                     <span style={{ fontSize: '1.8rem', fontWeight: '800', color: '#a78bfa' }}>
                       R$ {(() => {
-                        const totalFobSubVal = formData.itens.reduce((acc, i) => acc + (i.quantidade * (i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined ? i.valorFobSubfaturado : (i.valorFobUnitario * (formData.percentualSubfaturamento / 100)))), 0);
-                        const valorFobPorForaBrl = (totalFob - totalFobSubVal) * formData.cotacaoDolar;
-                        const aduaneiroSubBrl = ((totalFobSubVal + (formData.valorFreteInternacional * (1 + formData.spreadCambio / 100)) + formData.valorSeguroInternacional) * formData.cotacaoDolar);
-                        const comissaoBrl = formData.flExibirComissao ? (totalFob * (formData.comissaoPercentual / 100) * formData.cotacaoDolar) : 0;
+                        const totalFobSubVal = formData.itens.reduce((acc, i) => acc + ((Number(i.quantidade) || 0) * (i.valorFobSubfaturado !== null && i.valorFobSubfaturado !== undefined && i.valorFobSubfaturado !== '' ? Number(i.valorFobSubfaturado) : ((Number(i.valorFobUnitario) || 0) * (percentualSubfaturamentoNum / 100)))), 0);
+                        const valorFobPorForaBrl = (totalFob - totalFobSubVal) * cotacaoDolarNum;
+                        const aduaneiroSubBrl = ((totalFobSubVal + (freteInternacionalNum * (1 + spreadCambioNum / 100)) + seguroInternacionalNum) * cotacaoDolarNum);
+                        const comissaoBrl = formData.flExibirComissao ? (totalFob * (comissaoPercentualNum / 100) * cotacaoDolarNum) : 0;
                         return ((aduaneiroSubBrl * 1.45) + valorFobPorForaBrl + comissaoBrl).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                       })()}
                     </span>

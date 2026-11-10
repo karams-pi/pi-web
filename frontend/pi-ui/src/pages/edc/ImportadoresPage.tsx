@@ -25,7 +25,7 @@ const ImportadoresPage: React.FC = () => {
     inscricaoEstadual: '',
     uf: 'PR',
     regimeTributario: 'Lucro Real',
-    aliquotaIcmsPadrao: 0.19
+    aliquotaIcmsPadrao: 19 as number | string
   });
   const [editingImportador, setEditingImportador] = useState<Importador | null>(null);
 
@@ -48,7 +48,7 @@ const ImportadoresPage: React.FC = () => {
       inscricaoEstadual: '',
       uf: 'PR',
       regimeTributario: 'Lucro Real',
-      aliquotaIcmsPadrao: 0.19
+      aliquotaIcmsPadrao: 19
     });
     setEditingImportador(null);
     setShowModal(true);
@@ -62,7 +62,7 @@ const ImportadoresPage: React.FC = () => {
       inscricaoEstadual: i.inscricaoEstadual || '',
       uf: i.uf,
       regimeTributario: i.regimeTributario,
-      aliquotaIcmsPadrao: i.aliquotaIcmsPadrao
+      aliquotaIcmsPadrao: Number(((i.aliquotaIcmsPadrao || 0) * 100).toFixed(4))
     });
     setEditingImportador(i);
     setShowModal(true);
@@ -92,10 +92,14 @@ const ImportadoresPage: React.FC = () => {
       const isEdit = formData.id !== undefined;
       const url = isEdit ? `/api/edc/importadores/${formData.id}` : '/api/edc/importadores';
       const method = isEdit ? 'PUT' : 'POST';
+      const payload = {
+        ...formData,
+        aliquotaIcmsPadrao: (Number(formData.aliquotaIcmsPadrao) || 0) / 100
+      };
       const response = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (response.ok) { 
         fetchImportadores(); 
@@ -218,7 +222,7 @@ const ImportadoresPage: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label>ICMS Padrão (%)</label>
-                    <input type="number" step="0.01" value={formData.aliquotaIcmsPadrao * 100} onChange={e => setFormData({...formData, aliquotaIcmsPadrao: parseFloat(e.target.value) / 100})} />
+                    <input type="number" step="0.01" value={formData.aliquotaIcmsPadrao} onChange={e => setFormData({...formData, aliquotaIcmsPadrao: e.target.value})} />
                   </div>
                 </div>
                 <div className="modal-footer" style={{ padding: '20px 0 0 0' }}>
